@@ -15,11 +15,14 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public float jumpHeight = 5;
     public LayerMask environmentMask;
     public Transform groundCheck;
+    public Animator animator;
+    public Transform headAim;
     private PhotonView view;
     private Transform cam;
     private Rigidbody rb;
     private float netVel = 0f;
     private bool isGrounded;
+    private bool isMoving;
     private float xRotation = 0f;
     private float yRotation = 0f;
     private Vector3 movementVector;
@@ -36,6 +39,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         if (view.IsMine)
         {
             cam.parent = transform;
+            cam.localPosition = new Vector3(0f, 1.637f, 0f);
             Cursor.lockState = CursorLockMode.Locked;   
         }
     }
@@ -44,7 +48,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         if (!view.IsMine) return;
 
-        isGrounded = Physics.CheckSphere(groundCheck.position, 0.5f, environmentMask);
+        isGrounded = Physics.CheckSphere(groundCheck.position, 0.2f, environmentMask);
 
         if (Input.GetKeyDown("space"))
         {
@@ -73,14 +77,20 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         {
             netVel += acceleration * Time.deltaTime;
             netVel = Mathf.Clamp(netVel, initialVelocity, speed);
+            isMoving = true;
         }
         else
         {
             netVel = 0f;
+            isMoving = false;
         }
 
         movementVector = (verticalVector + horizontalVector).normalized * netVel;
         movementVector.y = rb.velocity.y;
+
+        headAim.position = cam.position + cam.forward;
+
+        UpdateAnimatorParemeters();
     }
 
     void FixedUpdate()
@@ -89,5 +99,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         {
             rb.velocity = movementVector;
         }
+    }
+
+    void UpdateAnimatorParemeters()
+    {
+        animator.SetBool("isGrounded", isGrounded);
+        animator.SetBool("isMoving", isMoving);
     }
 }
