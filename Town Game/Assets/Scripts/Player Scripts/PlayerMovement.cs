@@ -5,7 +5,7 @@ using Photon.Pun;
 using Photon.Pun.Demo.PunBasics;
 using Photon.Voice;
 
-// THIS MOVEMENT SCRIPT IS TO BE REWRITTEN IN THE FUTURE
+// THIS MOVEMENT SCRIPT IS TO BE REVISED IN THE FUTURE
 public class PlayerMovement : MonoBehaviourPunCallbacks
 {
     public float mouseSensitivity = 1f;
@@ -13,6 +13,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public float initialVelocity = 1f;
     public float speed = 8f;
     public float jumpHeight = 5;
+    public bool canJump = true;
     public LayerMask environmentMask;
     public Transform groundCheck;
     public Animator animator;
@@ -47,12 +48,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     private void Update()
     {
         if (!view.IsMine) return;
-
         isGrounded = Physics.CheckSphere(groundCheck.position, 0.2f, environmentMask);
 
         if (Input.GetKeyDown("space"))
         {
-            if (isGrounded)
+            if (isGrounded && canJump)
             {
                 rb.velocity = new Vector3(rb.velocity.x, jumpHeight, rb.velocity.z);
             }
@@ -60,7 +60,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
         float mouseX = Input.GetAxisRaw("Mouse X") * mouseSensitivity;
         float mouseY = Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
-
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90, 90);
         yRotation += mouseX;
@@ -69,10 +68,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
         float inputY = Input.GetAxis("Vertical");
         float inputX = Input.GetAxis("Horizontal");
-
         Vector3 verticalVector = transform.forward * inputY;
         Vector3 horizontalVector = transform.right * inputX;
-
         if (inputY != 0f || inputX != 0f)
         {
             netVel += acceleration * Time.deltaTime;
@@ -89,7 +86,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         movementVector.y = rb.velocity.y;
 
         headAim.position = cam.position + cam.forward;
-
         UpdateAnimatorParemeters();
     }
 

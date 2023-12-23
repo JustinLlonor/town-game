@@ -6,18 +6,21 @@ using UnityEngine;
 public class PlayerManager : MonoBehaviourPunCallbacks
 {
     public GameObject playerPrefab;
+    public Transform spawn;
+    public PlayerSettings playerSettings;
+
+    [System.Serializable]
+    public class PlayerSettings
+    {
+        public float speed = 5f;
+        public bool canJump = true;
+    }
 
     private void Start()
     {
-        PhotonNetwork.Instantiate(playerPrefab.name, Vector3.zero, Quaternion.identity);
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            Debug.Log("Instantiating");
-            PhotonNetwork.InstantiateRoomObject("Player", Vector3.zero, Quaternion.identity);
-        }
+        GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawn.position, spawn.rotation);
+        PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
+        playerMovement.speed = playerSettings.speed;
+        playerMovement.canJump = playerSettings.canJump;
     }
 }
