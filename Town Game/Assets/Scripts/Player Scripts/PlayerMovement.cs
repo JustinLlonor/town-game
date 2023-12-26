@@ -17,7 +17,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public LayerMask environmentMask;
     public Transform groundCheck;
     public Animator animator;
+    public float aniSpeedFactor = 2.5f;
     public Transform headAim;
+    public PhysicMaterial moveMaterial;
+    public PhysicMaterial stopMaterial;
+    public Collider movementCollider;
     private PhotonView view;
     private Transform cam;
     private Rigidbody rb;
@@ -41,6 +45,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         {
             cam.parent = transform;
             cam.localPosition = new Vector3(0f, 1.637f, 0f);
+            cam.localRotation = Quaternion.identity;
             Cursor.lockState = CursorLockMode.Locked;   
         }
     }
@@ -66,8 +71,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         cam.eulerAngles = new Vector3(xRotation, cam.eulerAngles.y, 0);
         transform.eulerAngles = new Vector3(0, yRotation, 0);
 
-        float inputY = Input.GetAxis("Vertical");
-        float inputX = Input.GetAxis("Horizontal");
+        float inputY = Input.GetAxisRaw("Vertical");
+        float inputX = Input.GetAxisRaw("Horizontal");
         Vector3 verticalVector = transform.forward * inputY;
         Vector3 horizontalVector = transform.right * inputX;
         if (inputY != 0f || inputX != 0f)
@@ -75,11 +80,13 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             netVel += acceleration * Time.deltaTime;
             netVel = Mathf.Clamp(netVel, initialVelocity, speed);
             isMoving = true;
+            if (movementCollider.material != moveMaterial) movementCollider.material = moveMaterial;
         }
         else
         {
             netVel = 0f;
             isMoving = false;
+            if (movementCollider.material != stopMaterial) movementCollider.material = stopMaterial;
         }
 
         movementVector = (verticalVector + horizontalVector).normalized * netVel;
@@ -87,6 +94,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
         headAim.position = cam.position + cam.forward;
         UpdateAnimatorParemeters();
+        UpdateAnimatorSpeed();
     }
 
     void FixedUpdate()
@@ -101,5 +109,16 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         animator.SetBool("isGrounded", isGrounded);
         animator.SetBool("isMoving", isMoving);
+    }
+
+    void UpdateAnimatorSpeed()
+    {
+        if (isMoving)
+        {
+            animator.SetFloat("moveMultiplier", speed / aniSpeedFactor);
+        } else
+        {
+            animator.SetFloat("moveMultiplier", 1f);
+        }
     }
 }

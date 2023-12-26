@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2984718625898795549
+--- !u!1 &7112498482707897826
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,22 +8,22 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7795883315039441122}
-  - component: {fileID: 6953661347052619856}
+  - component: {fileID: 605426312907635260}
+  - component: {fileID: -1617857638007918164}
   m_Layer: 0
-  m_Name: Player Manager
+  m_Name: Item Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7795883315039441122
+--- !u!4 &605426312907635260
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2984718625898795549}
+  m_GameObject: {fileID: 7112498482707897826}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -32,20 +32,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6953661347052619856
+--- !u!114 &-1617857638007918164
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2984718625898795549}
+  m_GameObject: {fileID: 7112498482707897826}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 38b8182a1f2d2a2438ddfbdb8a89e85f, type: 3}
+  m_Script: {fileID: 11500000, guid: 315c9feef42838a4d9b6a00e9c887d66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 6138009255113633390, guid: 1fa819f54f224f748b9846148ad9078f, type: 3}
-  spawn: {fileID: 0}
-  playerSettings:
-    speed: 5
-    canJump: 1
+  items:
+  - {fileID: 11400000, guid: a5d5dffa5b8249d429824aa66f7c6fde, type: 2}
+  - {fileID: 11400000, guid: fc88a8241bbeb98419a9036a3aaa7b50, type: 2}

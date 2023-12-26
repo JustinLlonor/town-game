@@ -8,12 +8,14 @@ public class ClientGFX : MonoBehaviour
 {
     public PhotonView view;
     public GameObject[] renderers;
+    public MeshRenderer serverItem;
 
     private void Start()
     {
         if (view.IsMine)
         {
             HideRenderers();
+            serverItem.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
         }
     }
 

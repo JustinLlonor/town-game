@@ -1,18 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
-public class WaitingRoomManager : MonoBehaviour
+public class WaitingRoomManager : MonoBehaviourPunCallbacks, IPunObservable
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public int playersRequired = 2;
+    public float gameTimer;
+    public float clientTimer;
 
-    // Update is called once per frame
-    void Update()
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info) 
     {
-        
+        if (stream.IsWriting)
+        {
+            stream.SendNext(gameTimer);
+        }
+        else
+        {
+            gameTimer = (float)stream.ReceiveNext();
+        }
     }
-}
+}   

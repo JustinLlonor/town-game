@@ -16,7 +16,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         public bool canJump = true;
     }
 
-    private void Start()
+    private void Awake()
     {
         GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawn.position, spawn.rotation);
         PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
