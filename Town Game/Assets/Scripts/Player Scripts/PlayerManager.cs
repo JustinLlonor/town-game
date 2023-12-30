@@ -8,6 +8,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     public GameObject playerPrefab;
     public Transform spawn;
     public PlayerSettings playerSettings;
+    public Transform camTransform;
 
     [System.Serializable]
     public class PlayerSettings
@@ -20,6 +21,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     {
         GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawn.position, spawn.rotation);
         PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
+        player.GetComponent<PlayerInventory>().camTransform = camTransform;
         playerMovement.speed = playerSettings.speed;
         playerMovement.canJump = playerSettings.canJump;
     }

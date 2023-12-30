@@ -12,13 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26f0c629937f79f45b51c75de6f46840, type: 3}
   m_Name: Fire Axe
   m_EditorClassIdentifier: 
+  icon: {fileID: 0}
   description: A handy tool, but also a very formidable weapon.
-  yOffset: -0.6
-  large: 1
   equipSounds:
   - Equip1
   - Equip2
   - Equip3
+  large: 1
+  yOffset: -0.6
+  pullSpeed: 20
+  dragSpeed: 100
+  holdPose: 
   model: {fileID: -7354185949920861747, guid: 67afa0fb94df67d4cbc3dfe48bf0f83e, type: 3}
   material: {fileID: -876546973899608171, guid: 67afa0fb94df67d4cbc3dfe48bf0f83e, type: 3}
   damage: 40
