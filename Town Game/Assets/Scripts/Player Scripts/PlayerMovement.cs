@@ -3,55 +3,57 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-// IF IT WORKS IT WORKS 
 public class PlayerMovement : MonoBehaviourPunCallbacks
 {
     [Header("Movement")]
-    public float mouseSensitivity = 1f;
-    public float acceleration = 0.4f;
-    public float initialVelocity = 1f;
-    public float speed = 8f;
+    public float speed = 6f;
+    public float movementMultiplier = 10f;
     public float jumpHeight = 5;
-    public float airHandling = 2f;
+    public float airHandling = 0.4f;
+    public float airSpeed = 4f;
     public bool canJump = true;
     public LayerMask environmentMask;
     public Transform groundCheck;
     public float groundedRadius = 0.2f;
+
+    [Header("Drag")]
+    public float groundDrag = 6f;
+
+    [Header("Keybinds")]
+    public KeyCode jumpKey = KeyCode.Space;
+
     [Header("Animation")]
     public Collider movementCollider;
     public Animator animator;
     public float aniSpeedFactor = 2.5f;
     public Transform headAim;
-    private PhotonView view;
-    private Transform cam;
-    private Rigidbody rb;
-    // Private values
-    private float netVel = 0f;
-    private bool isGrounded;
-    private bool previousGrounded;
-    private bool isMoving;
-    private float xRotation = 0f;
-    private float yRotation = 0f;
-    private Vector3 movementVector;
-    private RaycastHit slopeHit;
-    private Vector3 slopeVector;
+
+    [Header("Camera")]
+    public Transform graphics;
+    public Transform cameraPosition;
+    public Transform orientation;
+
+    PlayerManager playerManager;
+    PhotonView view;
+    Rigidbody rb;
+    bool isGrounded;
+    bool isMoving;
+    float horizontalMovement;
+    float verticalMovement;
+    RaycastHit slopeHit;
+    Vector3 moveDirection;
+    Vector3 slopeDirection;
 
     private void Awake()
     {
-        cam = Camera.main.transform;
+        playerManager = FindObjectOfType<PlayerManager>();
         view = gameObject.GetComponent<PhotonView>();
         rb = gameObject.GetComponent<Rigidbody>();
-    }
-
-    private void Start()
-    {
-        if (view.IsMine)
-        {
-            cam.parent = transform;
-            cam.localPosition = new Vector3(0f, 1.637f, 0f);
-            cam.localRotation = Quaternion.identity;
-            Cursor.lockState = CursorLockMode.Locked;   
-        }
+        rb.freezeRotation = true;
+        CameraMovement cm = playerManager.camTransform.GetComponent<CameraMovement>();
+        cm.player = graphics;
+        cm.orientation = orientation;
+        playerManager.camTransform.GetComponent<CamMove>().camPos = cameraPosition;
     }
 
     private void Update()
@@ -59,54 +61,104 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         if (!view.IsMine) return;
 
         isGrounded = Physics.CheckSphere(groundCheck.position, groundedRadius, environmentMask);
-        OnLand();
-        OnJump();
-        JumpControls();
-        CameraLook();
-        WASDMove();
-        headAim.position = cam.position + cam.forward;
+        MyInput();
+        ControlDrag();
+        if (Input.GetKeyDown(jumpKey) && isGrounded)
+        {
+            Jump();
+        }
+        slopeDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
         UpdateAnimatorParemeters();
         UpdateAnimatorSpeed();
-        slopeVector = Vector3.ProjectOnPlane(movementVector, slopeHit.normal);
+    }
+
+    private void FixedUpdate()
+    {
         MovePlayer();
-        AirCap();
-        previousGrounded = isGrounded;
+        CapAirVelocity();
     }
 
-    private void OnLand()
-    {
-        if (!previousGrounded && isGrounded)
-        {
-            movementVector.x = rb.velocity.x / 2f;
-            movementVector.z = rb.velocity.z / 2f;
-        }
-    }
-
-    private void OnJump()
-    {
-        if (previousGrounded && !isGrounded)
-        {
-            Vector3 newVel = rb.velocity;
-            newVel.x = movementVector.x;
-            newVel.z = movementVector.z;
-            rb.velocity = newVel;
-        }
-    }
-
-    private void AirCap()
+    void CapAirVelocity()
     {
         if (!isGrounded)
         {
-            if (new Vector3(rb.velocity.x, 0f, rb.velocity.z).magnitude > speed)
+            Vector3 checkVel = rb.velocity;
+            checkVel.y = 0f;
+            if (checkVel.magnitude > airSpeed)
             {
-                float yVel = rb.velocity.y;
-                rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z).normalized * speed;
-                rb.velocity = new Vector3(rb.velocity.x, yVel, rb.velocity.z);
+                checkVel = checkVel.normalized * airSpeed;
+                rb.velocity = new Vector3(checkVel.x, rb.velocity.y, checkVel.z);
             }
         }
     }
 
-    private bool OnSlope()
+    void MovePlayer()
+    {
+        if (isGrounded && !OnSlope())
+        {
+            rb.AddForce(moveDirection.normalized * speed * movementMultiplier, ForceMode.Acceleration);
+        }
+        else if (isGrounded && OnSlope())
+        {
+            rb.AddForce(slopeDirection.normalized * speed * movementMultiplier, ForceMode.Acceleration);
+        }
+        else
+        {
+            rb.AddForce(moveDirection.normalized * speed * movementMultiplier * airHandling, ForceMode.Acceleration);
+        }
+    }
+
+    void Jump()
+    {
+        rb.AddForce(transform.up * jumpHeight, ForceMode.Impulse);
+    }
+
+    void MyInput()
+    {
+        horizontalMovement = Input.GetAxisRaw("Horizontal");
+        verticalMovement = Input.GetAxisRaw("Vertical");
+
+        moveDirection = orientation.forward * verticalMovement + orientation.right * horizontalMovement;
+    }
+
+    void ControlDrag()
+    {
+        if (isGrounded)
+        {
+            rb.drag = groundDrag;
+        }
+        else
+        {
+            rb.drag = 0f;
+        }
+    }
+
+    void UpdateAnimatorParemeters()
+    {
+        animator.SetBool("isGrounded", isGrounded);
+        animator.SetBool("isMoving", isMoving);
+    }
+
+    void UpdateAnimatorSpeed()
+    {
+        if (moveDirection != Vector3.zero)
+        {
+            isMoving = true;
+        } else
+        {
+            isMoving = false;
+        }
+        if (isMoving)
+        {
+            animator.SetFloat("moveMultiplier", speed / aniSpeedFactor);
+        } 
+        else
+        {
+            animator.SetFloat("moveMultiplier", 1f);
+        }
+    }
+
+    bool OnSlope()
     {
         if (Physics.Raycast(groundCheck.position, Vector3.down, out slopeHit, 0.5f))
         {
@@ -116,90 +168,5 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             }
         }
         return false;
-    }
-
-    private void FixedUpdate()
-    {
-        if (!isGrounded)
-        {
-            movementVector.y = 0f;
-            rb.AddForce(movementVector * airHandling, ForceMode.Acceleration);
-        }
-        AirCap();
-    }
-
-    private void MovePlayer()
-    {
-        if (movementVector != Vector3.zero)
-        {
-            if (isGrounded && !OnSlope())
-            {
-                rb.position += movementVector * Time.deltaTime;
-            }
-            else if (isGrounded && OnSlope())
-            {
-                rb.position += slopeVector * Time.deltaTime;
-            }
-        }
-    }
-
-    private void JumpControls()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (isGrounded && canJump)
-            {
-                rb.velocity = new Vector3(rb.velocity.x, jumpHeight, rb.velocity.z);
-            }
-        }
-    }
-
-    private void CameraLook()
-    {
-        float mouseX = Input.GetAxisRaw("Mouse X") * mouseSensitivity;
-        float mouseY = Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
-        xRotation -= mouseY;
-        xRotation = Mathf.Clamp(xRotation, -90, 90);
-        yRotation += mouseX;
-        cam.eulerAngles = new Vector3(xRotation, cam.eulerAngles.y, 0);
-        transform.eulerAngles = new Vector3(0, yRotation, 0);
-    }
-
-    private void WASDMove()
-    {
-        float inputY = Input.GetAxisRaw("Vertical");
-        float inputX = Input.GetAxisRaw("Horizontal");
-        Vector3 verticalVector = transform.forward * inputY;
-        Vector3 horizontalVector = transform.right * inputX;
-        if (inputY != 0f || inputX != 0f)
-        {
-            netVel += acceleration * Time.deltaTime;
-            netVel = Mathf.Clamp(netVel, initialVelocity, speed);
-            isMoving = true;
-        }
-        else
-        {
-            netVel = 0f;
-            isMoving = false;
-        }
-        movementVector = (verticalVector + horizontalVector).normalized * netVel;
-        movementVector.y = rb.velocity.y;
-    }
-
-    private void UpdateAnimatorParemeters()
-    {
-        animator.SetBool("isGrounded", isGrounded);
-        animator.SetBool("isMoving", isMoving);
-    }
-
-    private void UpdateAnimatorSpeed()
-    {
-        if (isMoving)
-        {
-            animator.SetFloat("moveMultiplier", speed / aniSpeedFactor);
-        } else
-        {
-            animator.SetFloat("moveMultiplier", 1f);
-        }
     }
 }
