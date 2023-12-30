@@ -13,7 +13,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     [System.Serializable]
     public class PlayerSettings
     {
-        public float speed = 5f;
+        public float speed = 3f;
+        public float airspeed = 2.5f;
         public bool canJump = true;
     }
 
@@ -23,6 +24,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
         player.GetComponent<PlayerInventory>().camTransform = camTransform;
         playerMovement.speed = playerSettings.speed;
+        playerMovement.airSpeed = playerSettings.airspeed;
         playerMovement.canJump = playerSettings.canJump;
     }
 }

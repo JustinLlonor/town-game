@@ -11,6 +11,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public float movementMultiplier = 10f;
     public float sprintMultiplier = 1.67f;
     public float sprintStaminaConsumption = 20f;
+    public float groundDrag = 6f;
 
     [Header("Aerial")]
     public float jumpHeight = 3;
@@ -22,8 +23,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public Transform groundCheck;
     public float groundedRadius = 0.2f;
 
-    [Header("Drag")]
-    public float groundDrag = 6f;
+    [Header("Stairs")]
+    public float stepHeight = 0.1f;
 
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
@@ -119,6 +120,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     void Jump()
     {
+        if (!canJump) return;
         rb.AddForce(transform.up * jumpHeight, ForceMode.Impulse);
     }
 
