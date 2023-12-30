@@ -2,16 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using UnityEngine.Rendering;
 
 public class PlayerMovement : MonoBehaviourPunCallbacks
 {
     [Header("Movement")]
     public float speed = 6f;
     public float movementMultiplier = 10f;
-    public float jumpHeight = 5;
-    public float airHandling = 0.4f;
-    public float airSpeed = 4f;
+    public float sprintMultiplier = 1.67f;
+    public float sprintStaminaConsumption = 20f;
+
+    [Header("Aerial")]
+    public float jumpHeight = 3;
     public bool canJump = true;
+    public float jumpStaminaConsumption = 20f;
+    public float airHandling = 0.4f;
+    public float airSpeed = 2.7f;
     public LayerMask environmentMask;
     public Transform groundCheck;
     public float groundedRadius = 0.2f;
@@ -35,6 +41,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     PlayerManager playerManager;
     PhotonView view;
+    PlayerStats stats;
     Rigidbody rb;
     bool isGrounded;
     bool isMoving;
@@ -46,20 +53,21 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     private void Awake()
     {
-        playerManager = FindObjectOfType<PlayerManager>();
         view = gameObject.GetComponent<PhotonView>();
+        playerManager = FindObjectOfType<PlayerManager>();
+        if (!view.IsMine) return;
         rb = gameObject.GetComponent<Rigidbody>();
         rb.freezeRotation = true;
         CameraMovement cm = playerManager.camTransform.GetComponent<CameraMovement>();
         cm.player = graphics;
         cm.orientation = orientation;
+        cm.headAim = headAim;
         playerManager.camTransform.GetComponent<CamMove>().camPos = cameraPosition;
     }
 
     private void Update()
     {
         if (!view.IsMine) return;
-
         isGrounded = Physics.CheckSphere(groundCheck.position, groundedRadius, environmentMask);
         MyInput();
         ControlDrag();
@@ -74,6 +82,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     private void FixedUpdate()
     {
+        if (!view.IsMine) return;
         MovePlayer();
         CapAirVelocity();
     }
