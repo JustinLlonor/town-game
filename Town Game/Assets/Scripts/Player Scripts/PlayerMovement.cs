@@ -12,7 +12,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public float sprintMultiplier = 1.67f;
     public float sprintStaminaConsumption = 20f;
     public float groundDrag = 6f;
-
+        
     [Header("Aerial")]
     public float jumpHeight = 3;
     public bool canJump = true;
@@ -24,7 +24,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public float groundedRadius = 0.2f;
 
     [Header("Stairs")]
-    public float stepHeight = 0.1f;
+    public float stepHeight = 0.3f;
+    public float stepSmooth = .1f;
+    public float stepDistance = .2f;
+    public Transform stepRayLower;
+    public Transform stepRayUpper;
 
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
@@ -44,6 +48,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     PhotonView view;
     PlayerStats stats;
     Rigidbody rb;
+    bool isSnapped;
+    bool previousSnapped;
     bool isGrounded;
     bool isMoving;
     float horizontalMovement;
@@ -64,6 +70,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         cm.orientation = orientation;
         cm.headAim = headAim;
         playerManager.camTransform.GetComponent<CamMove>().camPos = cameraPosition;
+        stepRayUpper.localPosition = new Vector3(stepRayUpper.localPosition.x, stepHeight, stepRayUpper.localPosition.z);
     }
 
     private void Update()
@@ -86,6 +93,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         if (!view.IsMine) return;
         MovePlayer();
         CapAirVelocity();
+        StepClimb();
     }
 
     void CapAirVelocity()
@@ -168,7 +176,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             animator.SetFloat("moveMultiplier", 1f);
         }
     }
-
+        
     bool OnSlope()
     {
         if (Physics.Raycast(groundCheck.position, Vector3.down, out slopeHit, 0.5f))
@@ -179,5 +187,20 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             }
         }
         return false;
+    }
+
+    void StepClimb()
+    {
+        if (OnSlope()) return; // May be changed later
+        if (!isMoving) return;
+        if (!isGrounded) return;
+        if (Physics.Raycast(stepRayLower.position, moveDirection, stepDistance, environmentMask))
+        {
+            bool upper = Physics.Raycast(stepRayUpper.position, moveDirection, stepDistance + .05f, environmentMask);
+            if (!upper)
+            {
+                rb.position -= new Vector3(0f, -stepSmooth, 0f);
+            }
+        }
     }
 }
