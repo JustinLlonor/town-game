@@ -566,6 +566,10 @@ MonoBehaviour:
   stepDistance: 0.25
   stepRayLower: {fileID: 6757060838315044995}
   stepRayUpper: {fileID: 6393881673779276614}
+  fallDamageMultiplier: 6
+  mercyDistance: 2.5
+  softFall: {fileID: 11400000, guid: 528f3b71f8d841b4fb4c1d0fe1514918, type: 2}
+  hardFall: {fileID: 11400000, guid: 2eabfcc77b915034684d5160ef7ae947, type: 2}
   jumpKey: 32
   sprintKey: 304
   movementCollider: {fileID: 8835480446840007214}
@@ -598,9 +602,9 @@ MonoBehaviour:
   - {fileID: 1106844264840172896}
   - {fileID: 3395841891906680581}
   - {fileID: 2101631025278925208}
-  - {fileID: 5205273439839407196}
   - {fileID: 7854118565141575902}
   - {fileID: 1604209490162821275}
+  - {fileID: 5205273439839407196}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -1558,6 +1562,9 @@ MonoBehaviour:
   - Type: 1
     SynchronizeType: 1
     Name: moveMultiplier
+  - Type: 4
+    SynchronizeType: 2
+    Name: isRunning
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0

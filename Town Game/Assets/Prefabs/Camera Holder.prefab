@@ -112,9 +112,10 @@ MonoBehaviour:
   sFrequency: 0.05
   amplitude: 0.05
   sAmplitude: 0.08
-  isBobbing: 0
   snapSpeed: 5
-  playerMovement: {fileID: 0}
+  snapFix: 30
+  isBobbing: 0
+  isSprinting: 0
 --- !u!1 &6230202861230640545
 GameObject:
   m_ObjectHideFlags: 0
@@ -252,6 +253,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4766721283323813917}
+  - component: {fileID: 8679185673322323000}
   - component: {fileID: 910149815204121929}
   - component: {fileID: 4588525041265342294}
   - component: {fileID: 5168079798830904265}
@@ -278,6 +280,18 @@ Transform:
   - {fileID: 4959995351705500758}
   m_Father: {fileID: 4369339764396634583}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8679185673322323000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7308569900096164841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51a4ef87abf9a0c41b1e03ee413fa903, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!20 &910149815204121929
 Camera:
   m_ObjectHideFlags: 0

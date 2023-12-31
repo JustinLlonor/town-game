@@ -7,9 +7,12 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 {
     public GameObject playerPrefab;
     public Transform spawn;
+
+    [Header("Assignables")]
     public PlayerSettings playerSettings;
     public Transform camTransform;
     public CameraBobbing camBobbing;
+    public CameraShake camShake;
 
     [System.Serializable]
     public class PlayerSettings
@@ -21,6 +24,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 
     private void Awake()
     {
+        if (!PhotonNetwork.IsConnected) return;
         GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawn.position, spawn.rotation);
         PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
         player.GetComponent<PlayerInventory>().camTransform = camTransform;

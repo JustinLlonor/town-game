@@ -31,6 +31,12 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public Transform stepRayLower;
     public Transform stepRayUpper;
 
+    [Header("Fall")]
+    public float fallDamageMultiplier = 1f;
+    public float mercyDistance = 3f;
+    public Shake softFall;
+    public Shake hardFall;
+
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
     public KeyCode sprintKey = KeyCode.LeftShift;
@@ -51,13 +57,17 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     PlayerStats stats;
     Rigidbody rb;
     CameraBobbing bobbing;
+    CameraShake shake;
     float sprintGain = 1f;
     float jumpTimer = 0f;
     float horizontalMovement;
     float verticalMovement;
+    float previousYVel;
+    float peakYPosition;
     bool isMoving;
     bool isSprinting;
-    bool isGrounded;
+    bool isGrounded = true;
+    bool previousGrounded = true;
     RaycastHit slopeHit;
     Vector3 moveDirection;
     Vector3 slopeDirection;
@@ -75,6 +85,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         cm.orientation = orientation;
         cm.headAim = headAim;
         bobbing = playerManager.camBobbing;
+        shake = playerManager.camShake;
         playerManager.camTransform.GetComponent<CamMove>().camPos = cameraPosition;
         stepRayUpper.localPosition = new Vector3(stepRayUpper.localPosition.x, stepHeight, stepRayUpper.localPosition.z);
     }
@@ -98,6 +109,12 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         Bobbing();
         UpdateAnimatorParemeters();
         UpdateAnimatorSpeed();
+        if (!previousGrounded && isGrounded)
+        {
+            OnLand();
+        }
+        Fall();
+        previousGrounded = isGrounded;
     }
 
     private void FixedUpdate()
@@ -106,6 +123,37 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         MovePlayer();
         CapAirVelocity();
         StepClimb();
+    }
+
+    void Fall()
+    {
+        if (isGrounded)
+        {
+            peakYPosition = transform.position.y;
+            return;
+        }
+        
+        if (previousYVel >= 0f && rb.velocity.y < 0f)
+        {
+            peakYPosition = transform.position.y;
+        }
+        previousYVel = rb.velocity.y;
+    }
+
+    void OnLand()
+    {
+        float fallDistance = peakYPosition - transform.position.y;
+
+        if (fallDistance < 0.8f) return;
+        if (fallDistance > mercyDistance)
+        {
+            shake.StartShake(hardFall.shakeProperties);
+            // Damage HP: fallDistance * fallDamageMultiplier
+        }
+        else
+        {
+            shake.StartShake(softFall.shakeProperties);
+        }
     }
 
     void Bobbing()

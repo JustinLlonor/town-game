@@ -411,6 +411,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1715516218}
     - target: {fileID: 6953661347052619856, guid: 00b86e8be9c97a24e98cfbdeab7f72cf, type: 3}
+      propertyPath: camShake
+      value: 
+      objectReference: {fileID: 1705850823}
+    - target: {fileID: 6953661347052619856, guid: 00b86e8be9c97a24e98cfbdeab7f72cf, type: 3}
       propertyPath: camBobbing
       value: 
       objectReference: {fileID: 1876133411}
@@ -638,6 +642,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1705850823 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8679185673322323000, guid: 668a749bb83c86446922dfb5701650ab, type: 3}
+  m_PrefabInstance: {fileID: 4129793909933259028}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51a4ef87abf9a0c41b1e03ee413fa903, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1706692660
 GameObject:
   m_ObjectHideFlags: 0
