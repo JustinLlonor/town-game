@@ -507,6 +507,9 @@ MonoBehaviour:
   maxStamina: 100
   stamina: 100
   staminaRegenSpeed: 15
+  regenCooldownPoint: 1
+  staminaCooldown: 0
+  canRegenStamina: 1
 --- !u!114 &1106844264840172896
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -545,13 +548,14 @@ MonoBehaviour:
   speed: 3
   movementMultiplier: 10
   sprintMultiplier: 1.67
-  sprintStaminaConsumption: 20
+  sprintStaminaConsumption: 25
   groundDrag: 6
   jumpHeight: 6.5
-  canJump: 1
+  jumpCooldown: 0.5
   jumpStaminaConsumption: 20
+  canJump: 1
   airHandling: 0.4
-  airSpeed: 2.5
+  airSpeed: 3
   environmentMask:
     serializedVersion: 2
     m_Bits: 128
@@ -563,6 +567,7 @@ MonoBehaviour:
   stepRayLower: {fileID: 6757060838315044995}
   stepRayUpper: {fileID: 6393881673779276614}
   jumpKey: 32
+  sprintKey: 304
   movementCollider: {fileID: 8835480446840007214}
   animator: {fileID: 5001893267009733704}
   aniSpeedFactor: 2

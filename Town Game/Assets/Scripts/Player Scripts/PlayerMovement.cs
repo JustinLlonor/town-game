@@ -15,8 +15,9 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         
     [Header("Aerial")]
     public float jumpHeight = 3;
-    public bool canJump = true;
+    public float jumpCooldown = 0.5f;
     public float jumpStaminaConsumption = 20f;
+    public bool canJump = true;
     public float airHandling = 0.4f;
     public float airSpeed = 2.7f;
     public LayerMask environmentMask;
@@ -32,6 +33,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
+    public KeyCode sprintKey = KeyCode.LeftShift;
 
     [Header("Animation")]
     public Collider movementCollider;
@@ -48,10 +50,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     PhotonView view;
     PlayerStats stats;
     Rigidbody rb;
-    bool isSnapped;
-    bool previousSnapped;
     bool isGrounded;
     bool isMoving;
+    bool isSprinting;
+    float sprintGain = 1f;
+    float jumpTimer = 0f;
     float horizontalMovement;
     float verticalMovement;
     RaycastHit slopeHit;
@@ -63,6 +66,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         view = gameObject.GetComponent<PhotonView>();
         playerManager = FindObjectOfType<PlayerManager>();
         if (!view.IsMine) return;
+        stats = gameObject.GetComponent<PlayerStats>();
         rb = gameObject.GetComponent<Rigidbody>();
         rb.freezeRotation = true;
         CameraMovement cm = playerManager.camTransform.GetComponent<CameraMovement>();
@@ -79,11 +83,16 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         isGrounded = Physics.CheckSphere(groundCheck.position, groundedRadius, environmentMask);
         MyInput();
         ControlDrag();
-        if (Input.GetKeyDown(jumpKey) && isGrounded)
+        if (Input.GetKeyDown(jumpKey) && isGrounded && jumpTimer <= 0f)
         {
-            Jump();
+            if (stats.ConsumeStamina(jumpStaminaConsumption))
+            {
+                Jump();
+            }
         }
         slopeDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
+        if (jumpTimer > 0f && isGrounded) jumpTimer -= Time.deltaTime;
+        Sprint();
         UpdateAnimatorParemeters();
         UpdateAnimatorSpeed();
     }
@@ -94,6 +103,41 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         MovePlayer();
         CapAirVelocity();
         StepClimb();
+    }
+
+    void Sprint()
+    {
+        if (isMoving && Input.GetKey(sprintKey))
+        {
+            if (stats.RateConsumeStamina(sprintStaminaConsumption))
+            {
+                isSprinting = true;
+            }
+            else
+            {
+                isSprinting = false;
+                if (stats.staminaCooldown <= 0f)
+                {
+                    stats.staminaCooldown = 3f;
+                }
+            }
+        } 
+        else
+        {
+            isSprinting = false;
+        }
+
+        stats.canRegenStamina = !isSprinting;
+
+        if (isSprinting)
+        {
+            sprintGain = sprintMultiplier;
+        }
+        else
+        {
+            sprintGain = 1f;
+        }
+        
     }
 
     void CapAirVelocity()
@@ -114,15 +158,15 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         if (isGrounded && !OnSlope())
         {
-            rb.AddForce(moveDirection.normalized * speed * movementMultiplier, ForceMode.Acceleration);
+            rb.AddForce(moveDirection.normalized * speed * movementMultiplier * sprintGain, ForceMode.Acceleration);
         }
         else if (isGrounded && OnSlope())
         {
-            rb.AddForce(slopeDirection.normalized * speed * movementMultiplier, ForceMode.Acceleration);
+            rb.AddForce(slopeDirection.normalized * speed * movementMultiplier * sprintGain, ForceMode.Acceleration);
         }
         else
         {
-            rb.AddForce(moveDirection.normalized * speed * movementMultiplier * airHandling, ForceMode.Acceleration);
+            rb.AddForce(moveDirection.normalized * speed * movementMultiplier * airHandling * sprintGain, ForceMode.Acceleration);
         }
     }
 
@@ -130,6 +174,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         if (!canJump) return;
         rb.AddForce(transform.up * jumpHeight, ForceMode.Impulse);
+        jumpTimer = jumpCooldown;
     }
 
     void MyInput()

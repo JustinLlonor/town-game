@@ -5,14 +5,70 @@ using Photon.Pun;
 
 public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
 {
+    [Header("HP")]
     [SerializeField] float maxHP = 100f;
     [SerializeField] float HP = 100f;
     [SerializeField] float HPRegenSpeed = 5f;
+    [Header("Stamina")]
     [SerializeField] float maxStamina = 100f;
     [SerializeField] float stamina = 100f;
-    [SerializeField] float staminaRegenSpeed = 15f;
+    [SerializeField] float staminaRegenSpeed = 20f;
+    [SerializeField] float regenCooldownPoint = 2f;
+    public float staminaCooldown = 0f;
+    public bool canRegenStamina = true;
 
+    private void Update()
+    {
+        if (staminaCooldown > 0f)
+        {
+            staminaCooldown -= Time.deltaTime;
+        }
+        if (staminaCooldown <= regenCooldownPoint && canRegenStamina)
+        {
+            RegenStamina();
+        }
+    }
 
+    void RegenStamina()
+    {
+        if (stamina == maxStamina) return;
+        if (stamina <= maxStamina)
+        {
+            stamina += staminaRegenSpeed * Time.deltaTime;
+        }
+        else
+        {
+            stamina = maxStamina;
+        }
+    }
+
+    /// <summary>
+    /// Returns true and consumes stamina instantly if stamina is able to be consumed
+    /// </summary>
+    /// <param name="amount">Amount of stamina to be consumed instantly</param>
+    /// <returns></returns>
+    public bool ConsumeStamina(float amount)
+    {
+        if (stamina - amount <= 0f) return false;
+        if (staminaCooldown > 0f) return false;
+        stamina -= amount;
+
+        return true;
+    }
+
+    /// <summary>
+    /// Returns true and consumes stamina at a rate if stamina is able to be consumed
+    /// </summary>
+    /// <param name="rate">Rate of stamina to be consumed</param>
+    /// <returns></returns>
+    public bool RateConsumeStamina(float rate)
+    {
+        if (stamina <= 0f) return false;
+        if (staminaCooldown > 0f) return false;
+        stamina -= rate * Time.deltaTime;
+        
+        return true;
+    }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
