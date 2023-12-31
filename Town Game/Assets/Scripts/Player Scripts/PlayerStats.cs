@@ -13,7 +13,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField] float maxStamina = 100f;
     [SerializeField] float stamina = 100f;
     [SerializeField] float staminaRegenSpeed = 20f;
-    [SerializeField] float regenCooldownPoint = 2f;
+    [SerializeField] float regenCooldownPoint = 1f;
     public float staminaCooldown = 0f;
     public bool canRegenStamina = true;
 

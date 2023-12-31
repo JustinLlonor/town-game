@@ -547,7 +547,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 3
   movementMultiplier: 10
-  sprintMultiplier: 1.67
+  sprintMultiplier: 1.8
   sprintStaminaConsumption: 20
   groundDrag: 6
   jumpHeight: 6.5
@@ -570,7 +570,7 @@ MonoBehaviour:
   sprintKey: 304
   movementCollider: {fileID: 8835480446840007214}
   animator: {fileID: 5001893267009733704}
-  aniSpeedFactor: 2
+  aniSpeedFactor: 1.8
   headAim: {fileID: 854407532444519849}
   graphics: {fileID: 1342524613149204641}
   cameraPosition: {fileID: 8806967224018203518}

@@ -9,6 +9,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     public Transform spawn;
     public PlayerSettings playerSettings;
     public Transform camTransform;
+    public CameraBobbing camBobbing;
 
     [System.Serializable]
     public class PlayerSettings

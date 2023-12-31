@@ -12,7 +12,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public float sprintMultiplier = 1.67f;
     public float sprintStaminaConsumption = 20f;
     public float groundDrag = 6f;
-        
+    
     [Header("Aerial")]
     public float jumpHeight = 3;
     public float jumpCooldown = 0.5f;
@@ -50,13 +50,14 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     PhotonView view;
     PlayerStats stats;
     Rigidbody rb;
-    bool isGrounded;
-    bool isMoving;
-    bool isSprinting;
+    CameraBobbing bobbing;
     float sprintGain = 1f;
     float jumpTimer = 0f;
     float horizontalMovement;
     float verticalMovement;
+    bool isMoving;
+    bool isSprinting;
+    bool isGrounded;
     RaycastHit slopeHit;
     Vector3 moveDirection;
     Vector3 slopeDirection;
@@ -73,6 +74,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         cm.player = graphics;
         cm.orientation = orientation;
         cm.headAim = headAim;
+        bobbing = playerManager.camBobbing;
         playerManager.camTransform.GetComponent<CamMove>().camPos = cameraPosition;
         stepRayUpper.localPosition = new Vector3(stepRayUpper.localPosition.x, stepHeight, stepRayUpper.localPosition.z);
     }
@@ -93,6 +95,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         slopeDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
         if (jumpTimer > 0f && isGrounded) jumpTimer -= Time.deltaTime;
         Sprint();
+        Bobbing();
         UpdateAnimatorParemeters();
         UpdateAnimatorSpeed();
     }
@@ -103,6 +106,17 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         MovePlayer();
         CapAirVelocity();
         StepClimb();
+    }
+
+    void Bobbing()
+    {
+        if (!isGrounded)
+        {
+            bobbing.isBobbing = false;
+            return;
+        }
+        bobbing.isSprinting = isSprinting;
+        bobbing.isBobbing = isMoving;
     }
 
     void Sprint()
@@ -118,7 +132,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
                 isSprinting = false;
                 if (stats.staminaCooldown <= 0f)
                 {
-                    stats.staminaCooldown = 3f;
+                    stats.staminaCooldown = 1.5f;
                 }
             }
         } 

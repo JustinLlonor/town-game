@@ -47,6 +47,8 @@ MonoBehaviour:
   playerPrefab: {fileID: 1787190705143953567, guid: c95f5f72671cf3e45ac91a88a1fdb528, type: 3}
   spawn: {fileID: 0}
   playerSettings:
-    speed: 5
+    speed: 3
+    airspeed: 2.5
     canJump: 1
   camTransform: {fileID: 0}
+  camBobbing: {fileID: 0}
