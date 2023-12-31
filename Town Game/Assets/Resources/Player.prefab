@@ -503,7 +503,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHP: 100
   HP: 100
-  HPRegenSpeed: 5
+  HPRegenSpeed: 1.5
   maxStamina: 100
   stamina: 100
   staminaRegenSpeed: 15
@@ -568,7 +568,7 @@ MonoBehaviour:
   stepRayUpper: {fileID: 6393881673779276614}
   fallDamageMultiplier: 6
   mercyDistance: 2.5
-  softFall: {fileID: 11400000, guid: 528f3b71f8d841b4fb4c1d0fe1514918, type: 2}
+  softFall: {fileID: 11400000, guid: 4c80bee32ff484945b769c4af5e367b9, type: 2}
   hardFall: {fileID: 11400000, guid: 2eabfcc77b915034684d5160ef7ae947, type: 2}
   jumpKey: 32
   sprintKey: 304
@@ -579,6 +579,7 @@ MonoBehaviour:
   graphics: {fileID: 1342524613149204641}
   cameraPosition: {fileID: 8806967224018203518}
   orientation: {fileID: 7162067020350182232}
+  shake: {fileID: 0}
 --- !u!114 &5977247467016524006
 MonoBehaviour:
   m_ObjectHideFlags: 0

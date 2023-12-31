@@ -27,8 +27,41 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
         {
             RegenStamina();
         }
+        if (HP < maxHP)
+        {
+            RegenHP();
+        }
     }
 
+    // HP
+    void RegenHP()
+    {
+        HP += HPRegenSpeed * Time.deltaTime;
+        if (HP > maxHP)
+        {
+            HP = maxHP;
+        }
+    }
+
+    /// <summary>
+    /// Instantly removes the specified amount of HP.
+    /// </summary>
+    /// <param name="amount"></param>
+    public void Damage(float amount)
+    {
+        HP -= amount;
+        if (HP < 0f)
+        {
+            Kill();
+        }
+    }
+
+    public void Kill()
+    {
+
+    }
+
+    // Stamina
     void RegenStamina()
     {
         if (stamina == maxStamina) return;

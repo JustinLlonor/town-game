@@ -57,7 +57,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     PlayerStats stats;
     Rigidbody rb;
     CameraBobbing bobbing;
-    CameraShake shake;
+    public CameraShake shake;
     float sprintGain = 1f;
     float jumpTimer = 0f;
     float horizontalMovement;
@@ -113,8 +113,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         {
             OnLand();
         }
-        Fall();
         previousGrounded = isGrounded;
+        Fall();
     }
 
     private void FixedUpdate()
@@ -148,7 +148,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         if (fallDistance > mercyDistance)
         {
             shake.StartShake(hardFall.shakeProperties);
-            // Damage HP: fallDistance * fallDamageMultiplier
+            stats.Damage(fallDistance * fallDamageMultiplier);
         }
         else
         {
