@@ -201,6 +201,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         animator.SetBool("isGrounded", isGrounded);
         animator.SetBool("isMoving", isMoving);
+        animator.SetBool("isRunning", isSprinting);
     }
 
     void UpdateAnimatorSpeed()
