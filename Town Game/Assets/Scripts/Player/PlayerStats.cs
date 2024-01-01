@@ -20,13 +20,6 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     public GameObject corpsePrefab;
     public Transform myRig;
 
-    PhotonView view;
-
-    private void Awake()
-    {
-        view = gameObject.GetComponent<PhotonView>();
-    }
-
     private void Update()
     {
         if (staminaCooldown > 0f)
@@ -40,10 +33,6 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
         if (HP < maxHP)
         {
             RegenHP();
-        }
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Kill();
         }
     }
 
@@ -75,6 +64,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
         GameObject corpse = PhotonNetwork.InstantiateRoomObject(corpsePrefab.name, transform.position, transform.rotation);
         Ragdoller ragdoller = corpse.GetComponent<Ragdoller>();
         ragdoller.SetPositionsToTarget(myRig);
+        FindObjectOfType<CameraBobbing>().isBobbing = false;
 
         PhotonNetwork.Destroy(gameObject);
     }

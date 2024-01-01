@@ -8,11 +8,12 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     public GameObject playerPrefab;
     public Transform spawn;
 
-    [Header("Assignables")]
     public PlayerSettings playerSettings;
+    [Header("Assignables")]
     public Transform camTransform;
     public CameraBobbing camBobbing;
     public CameraShake camShake;
+    public RectTransform hotbar;
 
     [System.Serializable]
     public class PlayerSettings
@@ -27,7 +28,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         if (!PhotonNetwork.IsConnected) return;
         GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawn.position, spawn.rotation);
         PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
-        player.GetComponent<PlayerInventory>().camTransform = camTransform;
+        PlayerInventory playerInventory = player.GetComponent<PlayerInventory>();
+        playerInventory.camTransform = camTransform;
+        playerInventory.hotbarUI = hotbar;
         playerMovement.speed = playerSettings.speed;
         playerMovement.airSpeed = playerSettings.airspeed;
         playerMovement.canJump = playerSettings.canJump;

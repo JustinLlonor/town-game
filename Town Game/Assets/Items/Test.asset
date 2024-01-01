@@ -12,11 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c673f485f0e6af41af7b8afae2ddb3e, type: 3}
   m_Name: Test
   m_EditorClassIdentifier: 
+  icon: {fileID: 2800000, guid: 669f02f136d943e4a954daad8bbcbeac, type: 3}
   description: 
-  large: 0
   equipSounds:
   - Equip1
   - Equip2
   - Equip3
+  large: 0
+  yOffset: -0.14
+  pullSpeed: 40
+  dragSpeed: 120
+  holdPose: 
   model: {fileID: -7354185949920861747, guid: 67afa0fb94df67d4cbc3dfe48bf0f83e, type: 3}
   material: {fileID: -876546973899608171, guid: 67afa0fb94df67d4cbc3dfe48bf0f83e, type: 3}

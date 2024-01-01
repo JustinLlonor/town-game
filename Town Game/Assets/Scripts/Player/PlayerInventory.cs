@@ -14,6 +14,8 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     public Transform cItem; // Client item
     public Transform itemHolder; // ^^
     public Transform camTransform;
+    public GameObject hotbarSlot;
+    public RectTransform hotbarUI;
     private PhotonView view;
     private float itemPull = 40f;
     private float itemDrag = 40f;
@@ -55,6 +57,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
             Destroy(itemHolder.gameObject);
         }
         itemHolder.parent = null;
+        SetupHotbarUI();
         EquipItem(0);
     }
 
@@ -62,7 +65,20 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (!view.IsMine) return;
         HotbarControls();
+    }
+
+    private void LateUpdate()
+    {
         FollowItemTarget();
+    }
+
+    void SetupHotbarUI()
+    {
+        for (int i = 0; i < hotbar.Count; i++)
+        {
+            Instantiate(hotbarSlot, hotbarUI);
+        }
+        hotbarUI.anchoredPosition -= new Vector2((hotbar.Count - 1) * 50f, 0f);
     }
 
     private void HotbarControls()

@@ -9,7 +9,6 @@ public class Ragdoller : MonoBehaviour
     private Transform targetRig;
     public List<Transform> targetBones;
     public List<Transform> currentBones;
-    public LayerMask rigIgnore;
 
     /// <summary>
     /// Sets the corpse's bones positions to the target rig's bone positions
@@ -39,6 +38,7 @@ public class Ragdoller : MonoBehaviour
             if (!foundName)
             {
                 Debug.LogError("Inconsistent: " + tName);
+                Debug.Log(t.gameObject.layer);
                 return;
             }
         }
@@ -60,7 +60,7 @@ public class Ragdoller : MonoBehaviour
     {
         foreach (Transform child in target)
         {
-            if (child.gameObject.layer != rigIgnore) transforms.Add(child);
+            if (child.gameObject.layer != 10) transforms.Add(child);
             if (child.childCount > 0)
             {
                 AddTransform(child, ref transforms);
