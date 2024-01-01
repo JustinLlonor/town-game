@@ -22,6 +22,7 @@ public class CameraMovement : MonoBehaviour
 
     private void Update()
     {
+        if (player == null) return;
         CameraLook();
     }
 

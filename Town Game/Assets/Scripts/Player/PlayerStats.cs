@@ -16,6 +16,16 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField] float regenCooldownPoint = 1f;
     public float staminaCooldown = 0f;
     public bool canRegenStamina = true;
+    [Header("Death")]
+    public GameObject corpsePrefab;
+    public Transform myRig;
+
+    PhotonView view;
+
+    private void Awake()
+    {
+        view = gameObject.GetComponent<PhotonView>();
+    }
 
     private void Update()
     {
@@ -31,6 +41,10 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
         {
             RegenHP();
         }
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Kill();
+        }
     }
 
     // HP
@@ -39,7 +53,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
         HP += HPRegenSpeed * Time.deltaTime;
         if (HP > maxHP)
         {
-            HP = maxHP;
+            HP = maxHP; 
         }
     }
 
@@ -58,7 +72,11 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
 
     public void Kill()
     {
+        GameObject corpse = PhotonNetwork.InstantiateRoomObject(corpsePrefab.name, transform.position, transform.rotation);
+        Ragdoller ragdoller = corpse.GetComponent<Ragdoller>();
+        ragdoller.SetPositionsToTarget(myRig);
 
+        PhotonNetwork.Destroy(gameObject);
     }
 
     // Stamina

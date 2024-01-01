@@ -510,6 +510,8 @@ MonoBehaviour:
   regenCooldownPoint: 1
   staminaCooldown: 0
   canRegenStamina: 1
+  corpsePrefab: {fileID: 661462511884958941, guid: 6a48159334487a04cb28b3f5bb9a48fb, type: 3}
+  myRig: {fileID: 9118308081295399195}
 --- !u!114 &1106844264840172896
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -579,7 +581,6 @@ MonoBehaviour:
   graphics: {fileID: 1342524613149204641}
   cameraPosition: {fileID: 8806967224018203518}
   orientation: {fileID: 7162067020350182232}
-  shake: {fileID: 0}
 --- !u!114 &5977247467016524006
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1167,7 +1168,7 @@ GameObject:
   - component: {fileID: 9000314932712155709}
   - component: {fileID: 2791133701089415726}
   - component: {fileID: 7420980194143203979}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Head FX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2602,7 +2603,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9064175449939083589}
   - component: {fileID: 8777147583544259190}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Head Aim
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3107,7 +3108,7 @@ GameObject:
   - component: {fileID: 9170988098785283718}
   - component: {fileID: 4120767342097828368}
   - component: {fileID: 5474328964026401911}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Item (Server side)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3189,7 +3190,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4610033660252757411}
   - component: {fileID: 7779835605438496382}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Head Rig
   m_TagString: Untagged
   m_Icon: {fileID: 0}

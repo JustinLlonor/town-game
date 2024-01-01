@@ -57,7 +57,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     PlayerStats stats;
     Rigidbody rb;
     CameraBobbing bobbing;
-    public CameraShake shake;
+    CameraShake shake;
     float sprintGain = 1f;
     float jumpTimer = 0f;
     float horizontalMovement;
