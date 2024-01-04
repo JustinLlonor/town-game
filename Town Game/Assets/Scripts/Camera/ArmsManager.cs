@@ -7,10 +7,10 @@ public class ArmsManager : MonoBehaviour
     public Transform clientItem;
     public Transform armsItemHolder;
 
-    private void LateUpdate()
+    public void GrabItem()
     {
-        transform.eulerAngles = clientItem.eulerAngles - (clientItem.localEulerAngles - armsItemHolder.localEulerAngles);
-        transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y + 180f, transform.eulerAngles.z);
+        Quaternion rotDifference = clientItem.rotation * Quaternion.Inverse(armsItemHolder.rotation);
+        transform.rotation = rotDifference * transform.rotation;
         Vector3 positionDifference = clientItem.position - armsItemHolder.position;
         transform.position += positionDifference;
     }

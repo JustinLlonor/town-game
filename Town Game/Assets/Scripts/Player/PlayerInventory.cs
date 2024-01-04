@@ -6,6 +6,7 @@ using UnityEngine.Rendering;
 using UnityEngine.Animations.Rigging;
 using WebSocketSharp;
 using UnityEngine.UI;
+using UnityEditorInternal;
 
 public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -19,6 +20,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     public Transform cItem; // Client item
     public Transform itemHolder; // ^^
     public Transform camTransform;
+    public float dragMax = 5f;
     [Header("Item Animations")]
     public Animator animator;
     public int rightHandLayer;
@@ -94,6 +96,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (!view.IsMine) return;
         FollowItemTarget();
+        arms.GrabItem();
     }
 
     void SetupHotbarUI()
@@ -160,7 +163,16 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         {
             cItem.localRotation = Quaternion.Lerp(cItem.localRotation, Quaternion.identity, Time.deltaTime * itemPull);
         }
-        itemHolder.rotation = Quaternion.Lerp(itemHolder.rotation, camTransform.rotation, Time.deltaTime * itemDrag);
+        Quaternion newRot = Quaternion.Lerp(itemHolder.rotation, camTransform.rotation, Time.deltaTime * itemDrag);
+        if (Quaternion.Angle(newRot, camTransform.rotation) > dragMax)
+        {
+            Vector2 capped = (itemHolder.eulerAngles - camTransform.eulerAngles).normalized * dragMax;
+            itemHolder.eulerAngles = camTransform.eulerAngles + (Vector3)capped;
+        }
+        else
+        {
+            itemHolder.rotation = newRot;
+        }
     }
 
     public void EquipItem(int slot, bool selfEquip = false)
@@ -199,7 +211,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         cFilter.mesh = equippedItem.model;
         cRenderer.material = equippedItem.material;
         yOffset = equippedItem.yOffset;
-        cItem.localPosition = itemPosition - (Vector3.down * 0.1f);
+        cItem.localPosition = itemPosition + (Vector3.down * equippedItem.iYOffset);
         cItem.localEulerAngles = new Vector3(30f, 0f, 0f);
         itemPull = equippedItem.pullSpeed;
         itemDrag = equippedItem.dragSpeed;

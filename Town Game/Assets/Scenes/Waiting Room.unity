@@ -980,6 +980,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 7059585664992773488, guid: c95f5f72671cf3e45ac91a88a1fdb528, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.38
+      objectReference: {fileID: 0}
     - target: {fileID: 7084266916598505992, guid: c95f5f72671cf3e45ac91a88a1fdb528, type: 3}
       propertyPath: m_Layer
       value: 8
@@ -1003,6 +1007,18 @@ PrefabInstance:
     - target: {fileID: 7284487989838035471, guid: c95f5f72671cf3e45ac91a88a1fdb528, type: 3}
       propertyPath: m_Layer
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7294394464608036979, guid: c95f5f72671cf3e45ac91a88a1fdb528, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.28
+      objectReference: {fileID: 0}
+    - target: {fileID: 7294394464608036979, guid: c95f5f72671cf3e45ac91a88a1fdb528, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.14
+      objectReference: {fileID: 0}
+    - target: {fileID: 7294394464608036979, guid: c95f5f72671cf3e45ac91a88a1fdb528, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.43
       objectReference: {fileID: 0}
     - target: {fileID: 7352187892954554373, guid: c95f5f72671cf3e45ac91a88a1fdb528, type: 3}
       propertyPath: m_Layer
@@ -1093,7 +1109,6 @@ GameObject:
   - component: {fileID: 1053062581}
   - component: {fileID: 1053062580}
   - component: {fileID: 1053062579}
-  - component: {fileID: 1053062578}
   m_Layer: 5
   m_Name: UI Manager
   m_TagString: Untagged
@@ -1101,22 +1116,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1053062578
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1053062577}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: decfb2e961432f54883e155f0c158669, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  loadingScreen: {fileID: 0}
-  lobby: {fileID: 0}
-  createText: {fileID: 0}
-  joinText: {fileID: 0}
 --- !u!114 &1053062579
 MonoBehaviour:
   m_ObjectHideFlags: 0

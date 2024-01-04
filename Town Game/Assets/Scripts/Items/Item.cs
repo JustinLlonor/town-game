@@ -17,6 +17,7 @@ public class Item : ScriptableObject
     public string secondaryUseMethod;
     [Header("Animation")]
     public float yOffset = -0.14f;
+    public float iYOffset = 0.1f;
     public float pullSpeed = 40f;
     public float dragSpeed = 120f;
     public AnimationPose[] holdPoses;
