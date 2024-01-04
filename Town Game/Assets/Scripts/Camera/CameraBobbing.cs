@@ -9,47 +9,44 @@ public class CameraBobbing : MonoBehaviour
     public float sFrequency = 1f;
     public float amplitude = .1f;
     public float sAmplitude = .1f;
-    public float snapSpeed = 20f;
-    public float snapFix = 30f;
+    public float resetSpeed = 5f;
+    public float transitionSpeed = 5f;
     public bool isBobbing = false;
     public bool isSprinting = false;
     float bobPosition;
-    float fixSpeed = 0f;
+    float sprintWeight = 0f;
 
     private void Update()
     {
+        SprintWeight();
         if (isBobbing) Bob();
         if (!isBobbing) ResetPos();
     }
 
+    void SprintWeight()
+    {
+        if (isSprinting && sprintWeight != 1f)
+        {
+            sprintWeight += Time.deltaTime * transitionSpeed;
+        }
+        if (!isSprinting && sprintWeight != 0f)
+        {
+            sprintWeight -= Time.deltaTime * transitionSpeed;
+        }
+
+        sprintWeight = Mathf.Clamp01(sprintWeight);
+    }
+
     void Bob()
     {
-        float usedFrequency;
-        float usedAmplitude;
-        if (isSprinting)
-        {
-            usedFrequency = sFrequency;
-            usedAmplitude = sAmplitude;
-        }
-        else
-        {
-            usedFrequency = frequency;
-            usedAmplitude = amplitude;
-        }
         bobPosition += Time.deltaTime;
-        float y = Mathf.Sin(bobPosition/usedFrequency) * usedAmplitude;
-        float x = Mathf.Sin(0.5f/usedFrequency * (bobPosition - Mathf.PI/2f)) * usedAmplitude/2f;
-        Vector3 desiredPos = new Vector3(x, y, 0f);
-        if (Vector3.Distance(desiredPos, transform.localPosition) > 0.01f)
-        {
-            fixSpeed += snapFix * Time.deltaTime;
-            transform.localPosition = Vector3.Lerp(transform.localPosition, desiredPos, Time.deltaTime * fixSpeed);
-        } 
-        else
-        {
-            transform.localPosition = desiredPos;
-            fixSpeed = 0f;
-        }
+        float yWalk = Mathf.Sin(bobPosition / frequency) * amplitude;
+        float xWalk = Mathf.Sin(0.5f / frequency * (bobPosition - Mathf.PI / 2f)) * amplitude / 2f;
+        float ySprint = Mathf.Sin(bobPosition / sFrequency) * sAmplitude;
+        float xSprint = Mathf.Sin(0.5f / sFrequency * (bobPosition - Mathf.PI / 2f)) * sAmplitude / 2f;
+        float y = (ySprint - yWalk) * sprintWeight + yWalk;
+        float x = (xSprint - xWalk) * sprintWeight + xWalk;
+        transform.localPosition = new Vector3(x, y, 0f);
     }
 
     void ResetPos()
@@ -57,7 +54,7 @@ public class CameraBobbing : MonoBehaviour
         bobPosition = 0f;
         if (transform.localPosition != Vector3.zero)
         {
-            transform.localPosition = Vector3.Lerp(transform.localPosition, Vector3.zero, Time.deltaTime * snapSpeed);
+            transform.localPosition = Vector3.Lerp(transform.localPosition, Vector3.zero, Time.deltaTime * resetSpeed);
         }
     }
 }
