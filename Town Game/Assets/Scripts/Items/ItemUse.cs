@@ -1,0 +1,65 @@
+using Photon.Pun;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using WebSocketSharp;
+
+public class ItemUse : MonoBehaviour
+{
+    [Header("Keybinds")]
+    public KeyCode useKey;
+    public KeyCode secondaryUseKey;
+
+    [HideInInspector] public Animator animator;
+    [HideInInspector] public PlayerInventory inventory;
+    ItemManager itemManager;
+
+    private void Awake()
+    {
+        itemManager = FindObjectOfType<ItemManager>();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(useKey))
+        {
+            UseItem();
+        }
+        if (Input.GetKeyDown(secondaryUseKey))
+        {
+            UseSecondary();
+        }
+    }
+
+    void UseItem()
+    {
+        if (inventory.hotbar[inventory.equippedSlot].IsNullOrEmpty()) return;
+        Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot]];
+        if (item == null) return;
+        if (item as Weapon)
+        {
+            
+            return;
+        }
+        if (!item.useMethod.IsNullOrEmpty())
+        {
+            Invoke(item.useMethod, 0f);
+        }
+    }
+
+    void UseSecondary()
+    {
+        if (inventory.hotbar[inventory.equippedSlot].IsNullOrEmpty()) return;
+        Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot]];
+        if (item == null) return;
+        if (!item.secondaryUseMethod.IsNullOrEmpty())
+        {
+            Invoke(item.secondaryUseMethod, 0f);
+        }
+    }
+
+    void Empty()
+    {
+        Debug.Log("Empty"); 
+    }
+}

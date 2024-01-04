@@ -5,28 +5,38 @@ using Photon.Pun;
 using UnityEngine.Rendering;
 using UnityEngine.Animations.Rigging;
 using WebSocketSharp;
+using UnityEngine.UI;
 
 public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
 {
+    [Header("Hotbar")]
     public int equippedSlot;
     public List<string> hotbar = new List<string>();
+    public GameObject hotbarSlot;
+    public RectTransform hotbarUI;
+    [Header("Item Display")]
     public Transform sItem; // Server item
     public Transform cItem; // Client item
     public Transform itemHolder; // ^^
     public Transform camTransform;
-    public GameObject hotbarSlot;
-    public RectTransform hotbarUI;
-    private PhotonView view;
-    private float itemPull = 40f;
-    private float itemDrag = 40f;
-    private ItemManager itemManager;
-    private MeshFilter cFilter;
-    private MeshRenderer cRenderer;
-    private MeshFilter sFilter;
-    private MeshRenderer sRenderer;
-    private Vector3 itemPosition; // Local position of client item
-    private float yOffset;
-    private KeyCode[] hotbarInput =
+    [Header("Item Animations")]
+    public Animator animator;
+    public int rightHandLayer;
+    [Header("Arms")]
+    public ArmsManager arms;
+    public Animator armsAnimator;
+
+    PhotonView view;
+    float itemPull = 40f;
+    float itemDrag = 40f;
+    ItemManager itemManager;
+    MeshFilter cFilter;
+    MeshRenderer cRenderer;
+    MeshFilter sFilter;
+    MeshRenderer sRenderer;
+    Vector3 itemPosition; // Local position of client item
+    float yOffset;
+    KeyCode[] hotbarInput =
     {
         KeyCode.Alpha1,
         KeyCode.Alpha2,
@@ -38,6 +48,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         KeyCode.Alpha8,
         KeyCode.Alpha9,
     };
+    List<int> gripLayers = new List<int>();
 
     private void Awake()
     {
@@ -55,20 +66,33 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         if (!view.IsMine)
         {
             Destroy(itemHolder.gameObject);
+            Destroy(arms.gameObject);
         }
         itemHolder.parent = null;
+        arms.transform.parent = null;
+        arms.gameObject.SetActive(false);
         SetupHotbarUI();
         EquipItem(0);
+        UpdateHotbarUI();
     }
 
     private void Update()
     {
         if (!view.IsMine) return;
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            GiveItem("Fire Axe");
+        }
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            GiveItem("Test");
+        }
         HotbarControls();
     }
 
     private void LateUpdate()
     {
+        if (!view.IsMine) return;
         FollowItemTarget();
     }
 
@@ -78,7 +102,36 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         {
             Instantiate(hotbarSlot, hotbarUI);
         }
-        hotbarUI.anchoredPosition -= new Vector2((hotbar.Count - 1) * 50f, 0f);
+        //hotbarUI.anchoredPosition -= new Vector2((hotbar.Count - 1) * 50f, 0f); //For centering
+    }
+
+    void UpdateHotbarUI()
+    {
+        if (!view.IsMine) return;
+        for (int i = 0; i < hotbar.Count; i++)
+        {
+            RawImage panel = hotbarUI.GetChild(i).GetChild(0).GetComponent<RawImage>();
+            RawImage icon = hotbarUI.GetChild(i).GetChild(0).GetChild(0).GetComponent<RawImage>();
+            //Sets icons
+            if (hotbar[i].IsNullOrEmpty())
+            {
+                icon.enabled = false;
+            } 
+            else
+            {
+                icon.enabled = true;
+                icon.texture = itemManager.itemSearch[hotbar[i]].icon;
+            }
+            //Sets icon colors
+            if (equippedSlot == i)
+            {
+                panel.color = new Color(1f, 1f, 1f, .37f);
+            }
+            else
+            {
+                panel.color = new Color(0f, 0f, 0f, .37f); ;
+            }
+        }
     }
 
     private void HotbarControls()
@@ -91,6 +144,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
                 {
                     EquipItem(i);
                 }
+                UpdateHotbarUI();
             }
         }
     }
@@ -109,10 +163,10 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         itemHolder.rotation = Quaternion.Lerp(itemHolder.rotation, camTransform.rotation, Time.deltaTime * itemDrag);
     }
 
-    public void EquipItem(int slot)
+    public void EquipItem(int slot, bool selfEquip = false)
     {
         if (!view.IsMine) return;
-        if (equippedSlot == slot) return;
+        if (equippedSlot == slot && !selfEquip) return;
         equippedSlot = slot;
         if (hotbar[equippedSlot].IsNullOrEmpty())
         {
@@ -131,8 +185,17 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         Item equippedItem = itemManager.itemSearch[itemName];
         sFilter.mesh = equippedItem.model;
         sRenderer.material = equippedItem.material;
+        // Play all pose animations on the item
+        gripLayers.Clear();
+        foreach (Item.AnimationPose pose in equippedItem.holdPoses)
+        {
+            animator.Play(pose.animation, pose.layer);
+            animator.SetLayerWeight(pose.layer, 1f);
+            gripLayers.Add(pose.layer);
+        }
         // Client side
         if (!view.IsMine) return;
+        arms.gameObject.SetActive(true);
         cFilter.mesh = equippedItem.model;
         cRenderer.material = equippedItem.material;
         yOffset = equippedItem.yOffset;
@@ -140,26 +203,88 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         cItem.localEulerAngles = new Vector3(30f, 0f, 0f);
         itemPull = equippedItem.pullSpeed;
         itemDrag = equippedItem.dragSpeed;
+        foreach (Item.AnimationPose pose in equippedItem.holdPoses)
+        {
+            armsAnimator.Play(pose.animation, pose.layer);
+            armsAnimator.SetLayerWeight(pose.layer, 1f);
+        }
     }
 
     [PunRPC]
     public void HideItem()
     {
         sFilter.mesh = null;
+        foreach (int layer in gripLayers)
+        {
+            animator.SetLayerWeight(layer, 0f);
+        }
+        gripLayers.Clear();
         if (!view.IsMine) return;
+        arms.gameObject.SetActive(false);
         cFilter.mesh = null;
     }
 
+    /// <summary>
+    /// Gives an item to this player.
+    /// </summary>
+    /// <param name="itemName">Name of item</param>
+    /// <param name="slot">Slot to put item in, automatically finds a slot by default</param>
     [PunRPC]
-    public void AddItem(string itemName, int slot)
+    public void GiveItem(string itemName, int slot = -1)
     {
+        if (slot == -1)
+        {
+            for (int i = 0; i < hotbar.Count; i++)
+            {
+                if (hotbar[i].IsNullOrEmpty())
+                {
+                    slot = i;
+                    break;
+                }
+            }
+        }
+        if (slot == -1)
+        {
+            Debug.LogError("Inventory is full!");
+            return;
+        }
         if (!hotbar[slot].IsNullOrEmpty()) return;
         if (itemManager.itemSearch.ContainsKey(itemName))
         {
             hotbar[slot] = itemName;
-            equippedSlot = -1;
-            EquipItem(slot);
+            EquipItem(equippedSlot, slot == equippedSlot);
         }
+        UpdateHotbarUI();
+    }
+
+    /// <summary>
+    /// Removes an item from this player.
+    /// </summary>
+    /// <param name="itemName">Name of item</param>
+    /// <param name="slot">Slot to remove item from, finds the item automatically by default</param>
+    [PunRPC]
+    public void RemoveItem(string itemName, int slot = -1)
+    {
+        if (slot == -1)
+        {
+            for (int i = 0; i < hotbar.Count; i++)
+            {
+                if (hotbar[i] == itemName)
+                {
+                    hotbar[i] = "";
+                    EquipItem(equippedSlot, i == equippedSlot);
+                    break;
+                }
+            }
+        }
+        else
+        {
+            if (hotbar[slot] == itemName)
+            {
+                EquipItem(equippedSlot, slot == equippedSlot);
+            }
+        }
+        UpdateHotbarUI();
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

@@ -5,15 +5,26 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "New Item", menuName = "Items/Item")]
 public class Item : ScriptableObject
 {
-    public Texture2D icon; 
+    public Texture2D icon;
     public string description = "";
-    // If an item is large it cannot be stored in inventory, has to be held with both hands
+    public bool large = false; // large if cannot be stored in inventory
+    public Mesh model;
+    public Material material;
     public string[] equipSounds = new string[] { "Equip1", "Equip2", "Equip3" };
-    public bool large = false;
+    [Header("Usage")]
+    public string useAnimation;
+    public string useMethod;
+    public string secondaryUseMethod;
+    [Header("Animation")]
     public float yOffset = -0.14f;
     public float pullSpeed = 40f;
     public float dragSpeed = 120f;
-    public string holdPose;
-    public Mesh model;
-    public Material material;
+    public AnimationPose[] holdPoses;
+
+    [System.Serializable]
+    public struct AnimationPose
+    {
+        public string animation;
+        public int layer;
+    }
 }

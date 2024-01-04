@@ -7,11 +7,11 @@ public class Weapon : Item
 {
     [Header("Weapon Settings")]
     public float damage = 20f;
-    public float headMultiplier = 1.2f;
+    public float range = 0.8f;
     public float attackCooldown = 1f;
-    public bool disablesLegs = false;
-    public bool concussesHead = false;
-    public Collider hitbox;
     public string[] attackSounds = new string[] { };
     public string[] damageSounds = new string[] { };
+    public float headMultiplier = 1.2f;
+    public bool disablesLegs = false;
+    public bool concussesHead = false;
 }

@@ -14,22 +14,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   icon: {fileID: 2800000, guid: 669f02f136d943e4a954daad8bbcbeac, type: 3}
   description: A handy tool, but also a very formidable weapon.
+  large: 1
+  model: {fileID: -7354185949920861747, guid: 67afa0fb94df67d4cbc3dfe48bf0f83e, type: 3}
+  material: {fileID: -876546973899608171, guid: 67afa0fb94df67d4cbc3dfe48bf0f83e, type: 3}
   equipSounds:
   - Equip1
   - Equip2
   - Equip3
-  large: 1
-  yOffset: -0.6
+  useAnimation: 
+  useMethod: Empty
+  secondaryUseMethod: 
+  yOffset: -0.14
   pullSpeed: 20
   dragSpeed: 100
-  holdPose: 
-  model: {fileID: -7354185949920861747, guid: 67afa0fb94df67d4cbc3dfe48bf0f83e, type: 3}
-  material: {fileID: -876546973899608171, guid: 67afa0fb94df67d4cbc3dfe48bf0f83e, type: 3}
+  holdPoses:
+  - animation: Grip Fire Axe
+    layer: 3
+  - animation: Hold One Arm
+    layer: 1
   damage: 40
-  headMultiplier: 3
+  range: 0
   attackCooldown: 1
-  disablesLegs: 1
-  concussesHead: 0
-  hitbox: {fileID: 0}
   attackSounds: []
   damageSounds: []
+  headMultiplier: 3
+  disablesLegs: 0
+  concussesHead: 0
