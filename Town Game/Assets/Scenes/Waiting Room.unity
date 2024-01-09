@@ -266,6 +266,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Test Player Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 553772930366547643, guid: e11b4f359f8ec4a43a915e109017ea6c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 948635299029419552, guid: e11b4f359f8ec4a43a915e109017ea6c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -314,8 +318,20 @@ PrefabInstance:
       propertyPath: camTransform
       value: 
       objectReference: {fileID: 973562504}
+    - target: {fileID: 1365252924218313849, guid: e11b4f359f8ec4a43a915e109017ea6c, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: -7354185949920861747, guid: 67afa0fb94df67d4cbc3dfe48bf0f83e, type: 3}
+    - target: {fileID: 4203639062557139038, guid: e11b4f359f8ec4a43a915e109017ea6c, type: 3}
+      propertyPath: m_WarningMessage
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 5589379552730812098, guid: e11b4f359f8ec4a43a915e109017ea6c, type: 3}
       propertyPath: sceneViewId
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7479257239056932072, guid: e11b4f359f8ec4a43a915e109017ea6c, type: 3}
+      propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []

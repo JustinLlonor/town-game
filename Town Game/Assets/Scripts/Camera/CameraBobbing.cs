@@ -48,7 +48,7 @@ public class CameraBobbing : MonoBehaviour
         float x = (xSprint - xWalk) * sprintWeight + xWalk;
         transform.localPosition = new Vector3(x, y, 0f);
     }
-
+    
     void ResetPos()
     {
         bobPosition = 0f;

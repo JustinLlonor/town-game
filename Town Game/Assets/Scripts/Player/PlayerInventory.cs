@@ -6,7 +6,6 @@ using UnityEngine.Rendering;
 using UnityEngine.Animations.Rigging;
 using WebSocketSharp;
 using UnityEngine.UI;
-using UnityEditorInternal;
 
 public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -27,7 +26,8 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     [Header("Arms")]
     public ArmsManager arms;
     public Animator armsAnimator;
-
+    
+    AttackManager attackManager;
     PhotonView view;
     float itemPull = 40f;
     float itemDrag = 40f;
@@ -50,7 +50,8 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         KeyCode.Alpha8,
         KeyCode.Alpha9,
     };
-    List<int> gripLayers = new List<int>();
+    List<int> equipLayers = new List<int>();
+    int previousSlot;
 
     private void Awake()
     {
@@ -61,6 +62,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         cFilter = cItem.GetComponent<MeshFilter>();
         cRenderer = cItem.GetComponent<MeshRenderer>();
         itemPosition = cItem.localPosition;
+        attackManager = gameObject.GetComponent<AttackManager>();
     }
 
     private void Start()
@@ -81,6 +83,11 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     private void Update()
     {
         if (!view.IsMine) return;
+        if (previousSlot != equippedSlot)
+        {
+            OnUnequip(previousSlot);
+            previousSlot = equippedSlot;
+        }
         if (Input.GetKeyDown(KeyCode.Q))
         {
             GiveItem("Fire Axe");
@@ -97,6 +104,19 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         if (!view.IsMine) return;
         FollowItemTarget();
         arms.GrabItem();
+    }
+
+    /// <summary>
+    /// Called whenever an item is unequipped
+    /// </summary>
+    /// <param name="previous"></param>
+    private void OnUnequip(int previous)
+    {
+        if (hotbar[previous].IsNullOrEmpty()) return;
+        if (itemManager.itemSearch[hotbar[previous]] as Weapon)
+        {
+            attackManager.ResetAttack();
+        }
     }
 
     void SetupHotbarUI()
@@ -137,7 +157,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
-    private void HotbarControls()
+    void HotbarControls()
     {
         for(int i = 0; i < hotbarInput.Length; i++)
         {
@@ -152,7 +172,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
-    private void FollowItemTarget()
+    void FollowItemTarget()
     {
         itemHolder.position = camTransform.position;
         if (cItem.localPosition != itemPosition)
@@ -186,6 +206,11 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
             view.RPC("HideItem", RpcTarget.OthersBuffered);
             return;
         }
+        if (itemManager.itemSearch[hotbar[equippedSlot]] as Weapon)
+        {
+            Weapon weapon = (Weapon)itemManager.itemSearch[hotbar[equippedSlot]];
+            attackManager.SetAttackCooldown(weapon.attackCooldown);
+        }
 
         ShowItem(hotbar[equippedSlot]);
         view.RPC("ShowItem", RpcTarget.OthersBuffered, hotbar[equippedSlot]);
@@ -197,13 +222,14 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         Item equippedItem = itemManager.itemSearch[itemName];
         sFilter.mesh = equippedItem.model;
         sRenderer.material = equippedItem.material;
+        ResetEquipLayers();
         // Play all pose animations on the item
-        gripLayers.Clear();
-        foreach (Item.AnimationPose pose in equippedItem.holdPoses)
+        foreach (Item.AnimationState pose in equippedItem.holdPoses)
         {
-            animator.Play(pose.animation, pose.layer);
-            animator.SetLayerWeight(pose.layer, 1f);
-            gripLayers.Add(pose.layer);
+            int layer = animator.GetLayerIndex(pose.layer);
+            animator.Play(pose.animation, layer);
+            animator.SetLayerWeight(layer, 1f);
+            equipLayers.Add(layer);
         }
         // Client side
         if (!view.IsMine) return;
@@ -212,13 +238,14 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         cRenderer.material = equippedItem.material;
         yOffset = equippedItem.yOffset;
         cItem.localPosition = itemPosition + (Vector3.down * equippedItem.iYOffset);
-        cItem.localEulerAngles = new Vector3(30f, 0f, 0f);
+        cItem.localEulerAngles = new Vector3(equippedItem.angleOffset, 0f, 0f);
         itemPull = equippedItem.pullSpeed;
         itemDrag = equippedItem.dragSpeed;
-        foreach (Item.AnimationPose pose in equippedItem.holdPoses)
+        foreach (Item.AnimationState pose in equippedItem.holdPoses)
         {
-            armsAnimator.Play(pose.animation, pose.layer);
-            armsAnimator.SetLayerWeight(pose.layer, 1f);
+            int layer = armsAnimator.GetLayerIndex(pose.layer);
+            armsAnimator.Play(pose.animation, layer);
+            armsAnimator.SetLayerWeight(layer, 1f);
         }
     }
 
@@ -226,14 +253,19 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     public void HideItem()
     {
         sFilter.mesh = null;
-        foreach (int layer in gripLayers)
-        {
-            animator.SetLayerWeight(layer, 0f);
-        }
-        gripLayers.Clear();
+        ResetEquipLayers();
         if (!view.IsMine) return;
         arms.gameObject.SetActive(false);
         cFilter.mesh = null;
+    }
+
+    void ResetEquipLayers()
+    {
+        foreach (int layer in equipLayers)
+        {
+            animator.SetLayerWeight(layer, 0f);
+        }
+        equipLayers.Clear();
     }
 
     /// <summary>

@@ -8,10 +8,13 @@ public class Weapon : Item
     [Header("Weapon Settings")]
     public float damage = 20f;
     public float range = 0.8f;
-    public float attackCooldown = 1f;
+    [Tooltip("Amount of time for the attack raycast to be sent")]
+    public float attackCharge = 0.44f;
+    [Tooltip("How long before the player can attack again")]
+    public float attackCooldown = .44f;
     public string[] attackSounds = new string[] { };
     public string[] damageSounds = new string[] { };
-    public float headMultiplier = 1.2f;
-    public bool disablesLegs = false;
-    public bool concussesHead = false;
+//    public float headMultiplier = 1.2f;
+//    public bool disablesLegs = false;
+//    public bool concussesHead = false;
 }

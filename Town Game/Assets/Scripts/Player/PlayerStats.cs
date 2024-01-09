@@ -20,8 +20,16 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     public GameObject corpsePrefab;
     public Transform myRig;
 
+    PhotonView view;
+
+    private void Start()
+    {
+        view = gameObject.GetComponent<PhotonView>();
+    }
+
     private void Update()
     {
+        if (!view.IsMine) return;
         if (staminaCooldown > 0f)
         {
             staminaCooldown -= Time.deltaTime;
@@ -50,6 +58,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     /// Instantly removes the specified amount of HP.
     /// </summary>
     /// <param name="amount"></param>
+    [PunRPC]
     public void Damage(float amount)
     {
         HP -= amount;
@@ -61,7 +70,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
 
     public void Kill()
     {
-        GameObject corpse = PhotonNetwork.InstantiateRoomObject(corpsePrefab.name, transform.position, transform.rotation);
+        GameObject corpse = PhotonNetwork.Instantiate(corpsePrefab.name, transform.position, transform.rotation);
         Ragdoller ragdoller = corpse.GetComponent<Ragdoller>();
         ragdoller.SetPositionsToTarget(myRig);
         FindObjectOfType<CameraBobbing>().isBobbing = false;

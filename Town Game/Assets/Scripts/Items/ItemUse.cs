@@ -12,6 +12,7 @@ public class ItemUse : MonoBehaviour
 
     [HideInInspector] public Animator animator;
     [HideInInspector] public PlayerInventory inventory;
+    public AttackManager attackManager;
     ItemManager itemManager;
 
     private void Awake()
@@ -35,12 +36,13 @@ public class ItemUse : MonoBehaviour
     {
         if (inventory.hotbar[inventory.equippedSlot].IsNullOrEmpty()) return;
         Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot]];
-        if (item == null) return;
         if (item as Weapon)
         {
-            
+            Weapon weapon = (Weapon)item;
+            attackManager.Attack(weapon);
             return;
         }
+        if (inventory.hotbar[inventory.equippedSlot].IsNullOrEmpty()) return;
         if (!item.useMethod.IsNullOrEmpty())
         {
             Invoke(item.useMethod, 0f);
