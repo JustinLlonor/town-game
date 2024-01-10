@@ -91,7 +91,8 @@ public class AttackManager : MonoBehaviour
         StopAllCoroutines();
         if (currentAtk == weapon.useAnimations.Length) currentAtk = 0;
         Item.AnimationState state = weapon.useAnimations[currentAtk];
-        view.RPC("AttackManagerPlay", RpcTarget.All, state.animation, animator.GetLayerIndex(state.layer));
+        animator.Play(state.animation, animator.GetLayerIndex(state.layer));
+        view.RPC("AttackManagerPlay", RpcTarget.Others, state.animation, animator.GetLayerIndex(state.layer));
         tWeight = 1f;
         //armsAnimator.Play(state.animation, armsAnimator.GetLayerIndex(state.layer));
         //armsAnimator.SetLayerWeight(animator.GetLayerIndex(state.layer), 1f);

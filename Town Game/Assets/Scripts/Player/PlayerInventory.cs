@@ -175,10 +175,6 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     void FollowItemTarget()
     {
         itemHolder.position = camTransform.position;
-        if (cItem.localPosition != itemPosition)
-        {
-            cItem.localPosition = Vector3.Lerp(cItem.localPosition, new Vector3(itemPosition.x, yOffset, itemPosition.z), Time.deltaTime * itemPull);
-        }
         if (cItem.localRotation != Quaternion.identity)
         {
             cItem.localRotation = Quaternion.Lerp(cItem.localRotation, Quaternion.identity, Time.deltaTime * itemPull);
@@ -192,6 +188,11 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         else
         {
             itemHolder.rotation = newRot;
+        }
+        if (attackManager.isAttacking) return;
+        if (cItem.localPosition != itemPosition)
+        {
+            cItem.localPosition = Vector3.Lerp(cItem.localPosition, new Vector3(itemPosition.x, yOffset, itemPosition.z), Time.deltaTime * itemPull);
         }
     }
 
