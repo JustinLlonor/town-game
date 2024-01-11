@@ -12,8 +12,6 @@ public class Item : ScriptableObject
     public Material material;
     public string[] equipSounds = new string[] { "Equip1", "Equip2", "Equip3" };
     [Header("Usage")]
-    public AnimationState[] useAnimations;
-    public AnimationState[] clientAnimations;
     public string useMethod;
     public string secondaryUseMethod;
     [Header("Animation")]
@@ -22,6 +20,8 @@ public class Item : ScriptableObject
     public float angleOffset = 30f;
     public float pullSpeed = 40f;
     public float dragSpeed = 120f;
+    public AnimationState[] useAnimations;
+    public AnimationState[] clientAnimations;
     public AnimationState[] holdPoses;
     
     [System.Serializable]
