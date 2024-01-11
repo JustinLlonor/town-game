@@ -13,6 +13,7 @@ public class Item : ScriptableObject
     public string[] equipSounds = new string[] { "Equip1", "Equip2", "Equip3" };
     [Header("Usage")]
     public AnimationState[] useAnimations;
+    public AnimationState[] clientAnimations;
     public string useMethod;
     public string secondaryUseMethod;
     [Header("Animation")]

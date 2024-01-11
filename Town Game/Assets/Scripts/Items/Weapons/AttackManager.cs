@@ -9,31 +9,27 @@ public class AttackManager : MonoBehaviour
     public float weightLerp = 50f;
     [HideInInspector] public LayerMask playerMask;
     [HideInInspector] public Animator animator;
-    [HideInInspector] public Animator armsAnimator;
-    [HideInInspector] public ArmsManager armsManager;
     [HideInInspector] public PhotonView view;
+    [HideInInspector] public Animator itemAnimator;
+    [HideInInspector] public Transform animHolder;
 
+    CameraShake cShake;
     float tWeight;
     float currentWeight;
+    public float atkCooldown;
     Transform camTransform;
-    float atkCooldown;
-    float yOffset;
     int currentAtk = 0;
-    List<string> resetLayers = new List<string>();
+    List<string> resetLayers = new List<string>(); 
 
     private void Awake()
     {
+        cShake = FindObjectOfType<CameraShake>();
         camTransform = Camera.main.transform;
     }
 
     private void Update()
     {
         if (!view.IsMine) return;
-        //armsManager.traceItem = !isAttacking;
-        if (isAttacking)
-        {
-            //armsManager.FollowCam(yOffset);
-        }
         if (atkCooldown > 0f)
         {
             atkCooldown -= Time.deltaTime;
@@ -44,7 +40,6 @@ public class AttackManager : MonoBehaviour
             foreach (string layer in resetLayers)
             {
                 animator.SetLayerWeight(animator.GetLayerIndex(layer), currentWeight);
-                //armsAnimator.SetLayerWeight(animator.GetLayerIndex(layer), currentWeight);
             }
             if (Mathf.Abs(currentWeight - tWeight) < 0.01f)
             {
@@ -60,20 +55,22 @@ public class AttackManager : MonoBehaviour
     public void ResetAttack()
     {
         StopAllCoroutines();
+        itemAnimator.enabled = false;
         isAttacking = false;
+        animHolder.localRotation = Quaternion.identity;
         currentAtk = 0;
         ResetAnimations();
     }
 
     public void ResetAnimations()
     {
+        currentWeight = 0f;
+        tWeight = 0f;
         foreach (string layer in resetLayers)
         {
-            currentWeight = 0f;
-            tWeight = 0f;
             animator.SetLayerWeight(animator.GetLayerIndex(layer), 0f);
             animator.Play("New State", animator.GetLayerIndex(layer));
-            //armsAnimator.SetLayerWeight(animator.GetLayerIndex(layer), 0f);
+            itemAnimator.Play("New State", 0);
         }
         resetLayers.Clear();
     }
@@ -91,13 +88,16 @@ public class AttackManager : MonoBehaviour
         StopAllCoroutines();
         if (currentAtk == weapon.useAnimations.Length) currentAtk = 0;
         Item.AnimationState state = weapon.useAnimations[currentAtk];
+        Item.AnimationState cState = weapon.clientAnimations[currentAtk];
         animator.Play(state.animation, animator.GetLayerIndex(state.layer));
+        itemAnimator.enabled = true;
+        itemAnimator.Rebind();
+        itemAnimator.Update(0f);
+        itemAnimator.Play(cState.animation);
         view.RPC("AttackManagerPlay", RpcTarget.Others, state.animation, animator.GetLayerIndex(state.layer));
         tWeight = 1f;
-        //armsAnimator.Play(state.animation, armsAnimator.GetLayerIndex(state.layer));
-        //armsAnimator.SetLayerWeight(animator.GetLayerIndex(state.layer), 1f);
         if (!resetLayers.Contains(state.layer)) resetLayers.Add(state.layer);
-        StartCoroutine(Charge(weapon, animator.GetCurrentAnimatorStateInfo(animator.GetLayerIndex(state.layer)).length));
+        StartCoroutine(Charge(weapon, weapon.attackLength));
         currentAtk++;
     }
 
@@ -110,11 +110,19 @@ public class AttackManager : MonoBehaviour
             yield break;
         }
         yield return new WaitForSeconds(weapon.attackCharge);
+        PlayShake(weapon.shake);
         CastAttackRay(weapon.range, weapon.damage);
         atkCooldown = weapon.attackCooldown;
         yield return new WaitForSeconds(animLength - weapon.attackCharge);
         tWeight = 0f;
         isAttacking = false;
+        itemAnimator.enabled = false;
+        animHolder.localRotation = Quaternion.identity;
+    }
+
+    public void PlayShake(Shake shake)
+    {
+        cShake.StartShake(shake.shakeProperties);
     }
 
     public void CastAttackRay(float distance, float damage)

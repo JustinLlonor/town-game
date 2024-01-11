@@ -26,6 +26,11 @@ MonoBehaviour:
     layer: Attack
   - animation: HeavyAttack2
     layer: Attack
+  clientAnimations:
+  - animation: CHeavyAttack1
+    layer: Base Layer
+  - animation: CHeavyAttack2
+    layer: Base Layer
   useMethod: 
   secondaryUseMethod: 
   yOffset: -0.6
@@ -40,7 +45,9 @@ MonoBehaviour:
     layer: Right Arm
   damage: 40
   range: 2
-  attackCharge: 0.44
-  attackCooldown: 0.44
+  attackLength: 0.5
+  attackCharge: 0.216
+  attackCooldown: 0.216
+  shake: {fileID: 11400000, guid: 36e11568946ecd241b77cba0295d9f35, type: 2}
   attackSounds: []
   damageSounds: []

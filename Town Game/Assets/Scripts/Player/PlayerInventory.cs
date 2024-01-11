@@ -22,10 +22,6 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     public float dragMax = 5f;
     [Header("Item Animations")]
     public Animator animator;
-    public int rightHandLayer;
-    [Header("Arms")]
-    public ArmsManager arms;
-    public Animator armsAnimator;
     
     AttackManager attackManager;
     PhotonView view;
@@ -70,11 +66,8 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         if (!view.IsMine)
         {
             Destroy(itemHolder.gameObject);
-            Destroy(arms.gameObject);
         }
         itemHolder.parent = null;
-        arms.transform.parent = null;
-        arms.gameObject.SetActive(false);
         SetupHotbarUI();
         EquipItem(0);
         UpdateHotbarUI();
@@ -103,7 +96,6 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (!view.IsMine) return;
         FollowItemTarget();
-        arms.GrabItem();
     }
 
     /// <summary>
@@ -175,10 +167,6 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     void FollowItemTarget()
     {
         itemHolder.position = camTransform.position;
-        if (cItem.localRotation != Quaternion.identity)
-        {
-            cItem.localRotation = Quaternion.Lerp(cItem.localRotation, Quaternion.identity, Time.deltaTime * itemPull);
-        }
         Quaternion newRot = Quaternion.Lerp(itemHolder.rotation, camTransform.rotation, Time.deltaTime * itemDrag);
         if (Quaternion.Angle(newRot, camTransform.rotation) > dragMax)
         {
@@ -190,9 +178,14 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
             itemHolder.rotation = newRot;
         }
         if (attackManager.isAttacking) return;
-        if (cItem.localPosition != itemPosition)
+        Vector3 newPos = new Vector3(itemPosition.x, yOffset, itemPosition.z);
+        if (cItem.localRotation != Quaternion.identity)
         {
-            cItem.localPosition = Vector3.Lerp(cItem.localPosition, new Vector3(itemPosition.x, yOffset, itemPosition.z), Time.deltaTime * itemPull);
+            cItem.localRotation = Quaternion.Lerp(cItem.localRotation, Quaternion.identity, Time.deltaTime * itemPull);
+        }
+        if (cItem.localPosition != newPos)
+        {
+            cItem.localPosition = Vector3.Lerp(cItem.localPosition, newPos, Time.deltaTime * itemPull);
         }
     }
 
@@ -234,7 +227,6 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         }
         // Client side
         if (!view.IsMine) return;
-        arms.gameObject.SetActive(true);
         cFilter.mesh = equippedItem.model;
         cRenderer.material = equippedItem.material;
         yOffset = equippedItem.yOffset;
@@ -242,12 +234,6 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         cItem.localEulerAngles = new Vector3(equippedItem.angleOffset, 0f, 0f);
         itemPull = equippedItem.pullSpeed;
         itemDrag = equippedItem.dragSpeed;
-        foreach (Item.AnimationState pose in equippedItem.holdPoses)
-        {
-            int layer = armsAnimator.GetLayerIndex(pose.layer);
-            armsAnimator.Play(pose.animation, layer);
-            armsAnimator.SetLayerWeight(layer, 1f);
-        }
     }
 
     [PunRPC]
@@ -256,7 +242,6 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         sFilter.mesh = null;
         ResetEquipLayers();
         if (!view.IsMine) return;
-        arms.gameObject.SetActive(false);
         cFilter.mesh = null;
     }
 

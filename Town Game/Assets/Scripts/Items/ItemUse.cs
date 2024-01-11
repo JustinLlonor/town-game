@@ -12,16 +12,19 @@ public class ItemUse : MonoBehaviour
 
     [HideInInspector] public Animator animator;
     [HideInInspector] public PlayerInventory inventory;
-    public AttackManager attackManager;
+    [HideInInspector] public AttackManager attackManager;
     ItemManager itemManager;
+    PhotonView view;
 
     private void Awake()
     {
+        view = gameObject.GetComponent<PhotonView>();
         itemManager = FindObjectOfType<ItemManager>();
     }
 
     private void Update()
     {
+        
         if (Input.GetKeyDown(useKey))
         {
             UseItem();

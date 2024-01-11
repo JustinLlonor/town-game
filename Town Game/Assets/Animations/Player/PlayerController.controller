@@ -8,7 +8,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: HeavyAttack1
-  m_Speed: 1
+  m_Speed: 2
   m_CycleOffset: 0
   m_Transitions: []
   m_StateMachineBehaviours: []
@@ -338,7 +338,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: HeavyAttack2
-  m_Speed: 1
+  m_Speed: 2
   m_CycleOffset: 0
   m_Transitions: []
   m_StateMachineBehaviours: []
@@ -763,10 +763,10 @@ AnimatorStateMachine:
   m_ChildStates:
   - serializedVersion: 1
     m_State: {fileID: -9218109307363471032}
-    m_Position: {x: 590, y: -150, z: 0}
+    m_Position: {x: 530, y: 20, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -2423906395908344196}
-    m_Position: {x: 590, y: -80, z: 0}
+    m_Position: {x: 530, y: 90, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -8542831892248582770}
     m_Position: {x: 250, y: 60, z: 0}
