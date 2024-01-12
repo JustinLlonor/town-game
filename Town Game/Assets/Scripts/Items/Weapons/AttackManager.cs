@@ -6,6 +6,7 @@ using Photon.Pun;
 public class AttackManager : MonoBehaviour
 {
     public bool isAttacking = false;
+    public float animationCooldown = .1f;
     public float weightLerp = 50f;
     [HideInInspector] public LayerMask playerMask;
     [HideInInspector] public Animator animator;
@@ -16,7 +17,8 @@ public class AttackManager : MonoBehaviour
     CameraShake cShake;
     float tWeight;
     float currentWeight;
-    public float atkCooldown;
+    float atkCooldown;
+    float animCooldown;
     Transform camTransform;
     int currentAtk = 0;
     List<string> resetLayers = new List<string>(); 
@@ -30,6 +32,14 @@ public class AttackManager : MonoBehaviour
     private void Update()
     {
         if (!view.IsMine) return;
+        if (animCooldown  >= 0)
+        {
+            animCooldown -= Time.deltaTime;
+            if (animCooldown < 0f)
+            {
+                currentAtk = 0;
+            }
+        }
         if (atkCooldown > 0f)
         {
             atkCooldown -= Time.deltaTime;
@@ -109,6 +119,8 @@ public class AttackManager : MonoBehaviour
             Debug.LogError("Charge is longer than animation!");
             yield break;
         }
+        SoundManager.instance.Play3D(weapon.attackSounds[Random.Range(0, weapon.attackSounds.Length)], transform.position);
+        SoundManager.instance.view.RPC("Play3D", RpcTarget.Others, weapon.attackSounds[Random.Range(0, weapon.attackSounds.Length)], transform.position);
         yield return new WaitForSeconds(weapon.attackCharge);
         PlayShake(weapon.shake);
         CastAttackRay(weapon.range, weapon.damage);
@@ -117,6 +129,7 @@ public class AttackManager : MonoBehaviour
         tWeight = 0f;
         isAttacking = false;
         itemAnimator.enabled = false;
+        animCooldown = animationCooldown;
         animHolder.localRotation = Quaternion.identity;
     }
 

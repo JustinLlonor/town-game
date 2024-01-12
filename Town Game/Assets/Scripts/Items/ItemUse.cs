@@ -24,7 +24,7 @@ public class ItemUse : MonoBehaviour
 
     private void Update()
     {
-        
+        if (!view.IsMine) return;
         if (Input.GetKeyDown(useKey))
         {
             UseItem();

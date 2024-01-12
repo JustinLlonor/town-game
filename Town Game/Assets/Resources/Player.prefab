@@ -570,6 +570,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isAttacking: 0
+  animationCooldown: 0.8
   weightLerp: 20
   playerMask:
     serializedVersion: 2
@@ -578,7 +579,6 @@ MonoBehaviour:
   view: {fileID: 5977247467016524006}
   itemAnimator: {fileID: 1863577794435942604}
   animHolder: {fileID: 6724251589999686116}
-  atkCooldown: 0
 --- !u!114 &6160271850420175375
 MonoBehaviour:
   m_ObjectHideFlags: 0
