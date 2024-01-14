@@ -83,11 +83,11 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         }
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            GiveItem("Fire Axe");
+            //GiveItem("Fire Axe");
         }
         if (Input.GetKeyDown(KeyCode.E))
         {
-            GiveItem("Test");
+            //GiveItem("Test");
         }
         HotbarControls();
     }

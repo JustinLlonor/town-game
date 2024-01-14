@@ -18,7 +18,7 @@ public class AttackManager : MonoBehaviour
     float tWeight;
     float currentWeight;
     float atkCooldown;
-    float animCooldown;
+    float animTimer;
     Transform camTransform;
     int currentAtk = 0;
     List<string> resetLayers = new List<string>(); 
@@ -32,10 +32,10 @@ public class AttackManager : MonoBehaviour
     private void Update()
     {
         if (!view.IsMine) return;
-        if (animCooldown  >= 0)
+        if (animTimer  >= 0 && !isAttacking)
         {
-            animCooldown -= Time.deltaTime;
-            if (animCooldown < 0f)
+            animTimer -= Time.deltaTime;
+            if (animTimer < 0f)
             {
                 currentAtk = 0;
             }
@@ -68,6 +68,7 @@ public class AttackManager : MonoBehaviour
         itemAnimator.enabled = false;
         isAttacking = false;
         animHolder.localRotation = Quaternion.identity;
+        animTimer = -.0001f;
         currentAtk = 0;
         ResetAnimations();
     }
@@ -129,7 +130,7 @@ public class AttackManager : MonoBehaviour
         tWeight = 0f;
         isAttacking = false;
         itemAnimator.enabled = false;
-        animCooldown = animationCooldown;
+        animTimer = animationCooldown;
         animHolder.localRotation = Quaternion.identity;
     }
 
