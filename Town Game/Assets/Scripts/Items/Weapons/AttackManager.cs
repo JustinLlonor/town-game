@@ -124,7 +124,7 @@ public class AttackManager : MonoBehaviour
         SoundManager.instance.view.RPC("Play3D", RpcTarget.Others, weapon.attackSounds[Random.Range(0, weapon.attackSounds.Length)], transform.position);
         yield return new WaitForSeconds(weapon.attackCharge);
         PlayShake(weapon.shake);
-        CastAttackRay(weapon.range, weapon.damage);
+        CastAttackRay(weapon.range, weapon.damage, weapon.name);
         atkCooldown = weapon.attackCooldown;
         yield return new WaitForSeconds(animLength - weapon.attackCharge);
         tWeight = 0f;
@@ -139,13 +139,13 @@ public class AttackManager : MonoBehaviour
         cShake.StartShake(shake.shakeProperties);
     }
 
-    public void CastAttackRay(float distance, float damage)
+    public void CastAttackRay(float distance, float damage, string weaponName = "")
     {
         RaycastHit hit;
         if (Physics.Raycast(camTransform.position, camTransform.forward, out hit, distance, (int)playerMask))
         {
             PhotonView view = hit.transform.GetComponent<PhotonView>();
-            view.RPC("Damage", view.Owner, damage);
+            view.RPC("Damage", view.Owner, damage, weaponName);
         }
     }
 

@@ -534,12 +534,18 @@ MonoBehaviour:
   - 
   hotbarSlot: {fileID: 1340724474612461429, guid: dfc5d85edf9e2cc47bc5329f7e3e244d, type: 3}
   hotbarUI: {fileID: 0}
+  largeUI: {fileID: 0}
   sItem: {fileID: 9170988098785283718}
   cItem: {fileID: 7294394464608036979}
   itemHolder: {fileID: 6933809669839797647}
   camTransform: {fileID: 0}
   dragMax: 10
   animator: {fileID: 5001893267009733704}
+  dropVelocity: 3
+  movementMultiplier: 2
+  pickupCooldown: 0.5
+  itemPrefab: {fileID: 4422009458430310206, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+  dropKey: 103
 --- !u!114 &2378964989146487730
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -579,7 +585,6 @@ MonoBehaviour:
   view: {fileID: 5977247467016524006}
   itemAnimator: {fileID: 1863577794435942604}
   animHolder: {fileID: 6724251589999686116}
-  animCooldown: 0
 --- !u!114 &6160271850420175375
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2069,7 +2074,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3369263236979518758}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: spine.02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3145,7 +3150,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3627863261363966554}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: spine.03
   m_TagString: Untagged
   m_Icon: {fileID: 0}

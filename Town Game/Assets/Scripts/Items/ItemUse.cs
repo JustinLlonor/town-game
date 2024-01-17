@@ -25,11 +25,11 @@ public class ItemUse : MonoBehaviour
     private void Update()
     {
         if (!view.IsMine) return;
-        if (Input.GetKeyDown(useKey))
+        if (Input.GetKey(useKey))
         {
             UseItem();
         }
-        if (Input.GetKeyDown(secondaryUseKey))
+        if (Input.GetKey(secondaryUseKey))
         {
             UseSecondary();
         }

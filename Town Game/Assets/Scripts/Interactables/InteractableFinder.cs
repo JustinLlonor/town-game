@@ -42,9 +42,12 @@ public class InteractableFinder : MonoBehaviour
             }
             if (hit.collider.gameObject != currentInteractable)
             {
+                if (!hit.collider.gameObject.GetComponent<Interactable>().canInteract) return;
+                if (currentInteraction != null) currentInteraction.UnglowMaterials();
                 currentInteractable = hit.collider.gameObject;
                 currentInteraction = currentInteractable.GetComponent<Interactable>();
                 DisplayInteraction(currentInteraction);
+                currentInteraction.GlowMaterials();
                 return;
             }
             return;
@@ -54,6 +57,7 @@ public class InteractableFinder : MonoBehaviour
 
     void ResetInteractions()
     {
+        if (currentInteraction != null) currentInteraction.UnglowMaterials();
         currentInteractable = null;
         currentInteraction = null;
     }
@@ -66,7 +70,7 @@ public class InteractableFinder : MonoBehaviour
             {
                 if (Input.GetKeyDown(h.key))
                 {
-                    h.interactScript.Invoke(h.function, 0f);
+                    h.action.Invoke();
                 }
             }
         }

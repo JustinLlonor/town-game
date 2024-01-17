@@ -15,7 +15,7 @@ MonoBehaviour:
   icon: {fileID: 2800000, guid: 669f02f136d943e4a954daad8bbcbeac, type: 3}
   description: A handy tool, but also a very formidable weapon.
   large: 1
-  model: {fileID: -7354185949920861747, guid: 67afa0fb94df67d4cbc3dfe48bf0f83e, type: 3}
+  mesh: {fileID: -7354185949920861747, guid: 67afa0fb94df67d4cbc3dfe48bf0f83e, type: 3}
   material: {fileID: -876546973899608171, guid: 67afa0fb94df67d4cbc3dfe48bf0f83e, type: 3}
   equipSounds:
   - Equip1
@@ -53,3 +53,6 @@ MonoBehaviour:
   - HeavySwing1
   - HeavySwing2
   damageSounds: []
+  evidence:
+  - It seems they were cut by a sharp object.
+  - It seems a Fire Axe was used to kill them.

@@ -8,7 +8,7 @@ public class Item : ScriptableObject
     public Texture2D icon;
     public string description = "";
     public bool large = false; // large if cannot be stored in inventory
-    public Mesh model;
+    public Mesh mesh;
     public Material material;
     public string[] equipSounds = new string[] { "Equip1", "Equip2", "Equip3" };
     [Header("Usage")]

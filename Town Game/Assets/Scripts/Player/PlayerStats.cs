@@ -30,6 +30,10 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     private void Update()
     {
         if (!view.IsMine) return;
+        if (Input.GetKey(KeyCode.P))
+        {
+            Kill();
+        }
         if (staminaCooldown > 0f)
         {
             staminaCooldown -= Time.deltaTime;
@@ -59,7 +63,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     /// </summary>
     /// <param name="amount"></param>
     [PunRPC]
-    public void Damage(float amount)
+    public void Damage(float amount, string damageCause = "")
     {
         HP -= amount;
         if (HP < 0f)

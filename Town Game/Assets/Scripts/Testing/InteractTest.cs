@@ -6,6 +6,6 @@ public class InteractTest : MonoBehaviour
 {
     public void Interaction()
     {
-        Debug.Log("hehehehe");
+        FindObjectOfType<Rigidbody>().velocity = new Vector3(0f, 10f, 0f);
     }
 }

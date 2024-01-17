@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviourPunCallbacks
 {
+    public GameObject currentPlayer;
     public GameObject playerPrefab;
     public Transform spawn;
 
@@ -14,6 +15,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     public CameraBobbing camBobbing;
     public CameraShake camShake;
     public RectTransform hotbar;
+    public GameObject largeUI;
 
     [System.Serializable]
     public class PlayerSettings
@@ -31,8 +33,11 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         PlayerInventory playerInventory = player.GetComponent<PlayerInventory>();
         playerInventory.camTransform = camTransform;
         playerInventory.hotbarUI = hotbar;
+        playerInventory.largeUI = largeUI;
         playerMovement.speed = playerSettings.speed;
         playerMovement.airSpeed = playerSettings.airspeed;
         playerMovement.canJump = playerSettings.canJump;
+
+        currentPlayer = player;
     }
 }

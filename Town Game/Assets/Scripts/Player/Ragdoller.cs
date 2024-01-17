@@ -44,8 +44,8 @@ public class Ragdoller : MonoBehaviour
         }
         for (int currentIndex = 0; currentIndex < targetBones.Count; currentIndex++)
         {
-            currentBones[currentIndex].position = targetBones[currentIndex].position;
-            currentBones[currentIndex].rotation = targetBones[currentIndex].rotation;
+            currentBones[currentIndex].localPosition = targetBones[currentIndex].localPosition;
+            currentBones[currentIndex].localRotation = targetBones[currentIndex].localRotation;
         }
     }
 
@@ -60,7 +60,7 @@ public class Ragdoller : MonoBehaviour
     {
         foreach (Transform child in target)
         {
-            if (child.gameObject.layer != 10) transforms.Add(child);
+            if (child.gameObject.layer != 10 && child.gameObject.layer != 12) transforms.Add(child);
             if (child.childCount > 0)
             {
                 AddTransform(child, ref transforms);
