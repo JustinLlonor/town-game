@@ -52,6 +52,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public Transform orientation;
 
     PlayerManager playerManager;
+    CursorManager cursorManager;
     PhotonView view;
     PlayerStats stats;
     Rigidbody rb;
@@ -75,6 +76,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         view = gameObject.GetComponent<PhotonView>();
         playerManager = FindObjectOfType<PlayerManager>();
+        cursorManager = FindObjectOfType<CursorManager>();
         if (!view.IsMine) return;
         stats = gameObject.GetComponent<PlayerStats>();
         rb = gameObject.GetComponent<Rigidbody>();
@@ -93,7 +95,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         if (!view.IsMine) return;
         isGrounded = Physics.CheckSphere(groundCheck.position, groundedRadius, environmentMask);
-        MyInput();
+        Inputs();
         ControlDrag();
         if (Input.GetKeyDown(jumpKey) && isGrounded && jumpTimer <= 0f)
         {
@@ -238,8 +240,9 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         jumpTimer = jumpCooldown;
     }
 
-    void MyInput()
+    void Inputs()
     {
+        if (!cursorManager.isLocked) return;
         horizontalMovement = Input.GetAxisRaw("Horizontal");
         verticalMovement = Input.GetAxisRaw("Vertical");
 
@@ -276,14 +279,14 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
         if (isMoving)
         {
-            animator.SetFloat("moveMultiplier", speed / aniSpeedFactor);
+            //animator.SetFloat("moveMultiplier", speed / aniSpeedFactor);
         } 
         else
         {
-            animator.SetFloat("moveMultiplier", 1f);
+            //animator.SetFloat("moveMultiplier", 1f);
         }
     }
-        
+    
     bool OnSlope()
     {
         if (Physics.Raycast(groundCheck.position, Vector3.down, out slopeHit, 0.5f))

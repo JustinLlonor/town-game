@@ -455,12 +455,14 @@ GameObject:
   - component: {fileID: 2378964989146487730}
   - component: {fileID: 7351151026128905701}
   - component: {fileID: 6160271850420175375}
+  - component: {fileID: 7478806533832175603}
   - component: {fileID: 5977247467016524006}
   - component: {fileID: 3395841891906680581}
   - component: {fileID: 2101631025278925208}
   - component: {fileID: 8835480446840007214}
   - component: {fileID: 2546787659200004203}
   - component: {fileID: 7280666953437362449}
+  - component: {fileID: 4000725801890306170}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -482,8 +484,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1342524613149204641}
-  - {fileID: 6933809669839797647}
   - {fileID: 5430773155153704689}
+  - {fileID: 6933809669839797647}
   - {fileID: 8806967224018203518}
   - {fileID: 7162067020350182232}
   - {fileID: 8784010274421758976}
@@ -512,8 +514,12 @@ MonoBehaviour:
   regenCooldownPoint: 1
   staminaCooldown: 0
   canRegenStamina: 1
-  corpsePrefab: {fileID: 661462511884958941, guid: 6a48159334487a04cb28b3f5bb9a48fb, type: 3}
+  corpsePrefab: {fileID: 1324774699613132895, guid: 7fed3915b4c981048bf3b085ed791f3c, type: 3}
   myRig: {fileID: 9118308081295399195}
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  pe: {fileID: 0}
 --- !u!114 &1106844264840172896
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -597,9 +603,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 877dd7d95f06ac74f83c1116a9156048, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 3
+  speed: 2.5
   movementMultiplier: 10
-  sprintMultiplier: 1.8
+  sprintMultiplier: 2.2
   sprintStaminaConsumption: 20
   groundDrag: 6
   jumpHeight: 6.5
@@ -631,6 +637,18 @@ MonoBehaviour:
   graphics: {fileID: 1342524613149204641}
   cameraPosition: {fileID: 8806967224018203518}
   orientation: {fileID: 7162067020350182232}
+--- !u!114 &7478806533832175603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1787190705143953567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bfe9360daea9aa42b2f90dafecfaacd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &5977247467016524006
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -754,6 +772,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 126494ae2a10a34499272ed97a6c9f5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4000725801890306170
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1787190705143953567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40b36c07730cce24783a42eefc562f69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: 118
+  animator: {fileID: 5001893267009733704}
 --- !u!1 &2034351633861171132
 GameObject:
   m_ObjectHideFlags: 0
@@ -1548,6 +1580,7 @@ GameObject:
   - component: {fileID: 5527739715085672161}
   - component: {fileID: 5120924170084903890}
   - component: {fileID: 1604209490162821275}
+  - component: {fileID: 2837109604865662369}
   m_Layer: 0
   m_Name: Graphics
   m_TagString: Untagged
@@ -1639,6 +1672,9 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 2
     Name: isRunning
+  - Type: 4
+    SynchronizeType: 2
+    Name: isTalking
   m_SynchronizeLayers:
   - SynchronizeType: 1
     LayerIndex: 0
@@ -1652,6 +1688,8 @@ MonoBehaviour:
     LayerIndex: 4
   - SynchronizeType: 1
     LayerIndex: 5
+  - SynchronizeType: 1
+    LayerIndex: 6
 --- !u!114 &5527739715085672161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1671,7 +1709,6 @@ MonoBehaviour:
   tripodSize: 1
   boneColor: {r: 0, g: 0, b: 1, a: 0.5}
   m_Transforms:
-  - {fileID: 1342524613149204641}
   - {fileID: 9118308081295399195}
   - {fileID: 6542128211018118129}
   - {fileID: 5873017231490024372}
@@ -1763,6 +1800,22 @@ MonoBehaviour:
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
   m_UseLocal: 1
+--- !u!114 &2837109604865662369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3806856976935638070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba6e51fe5d98dab4c8e49059e7a54130, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sounds:
+  - FootstepMetal1
+  - FootstepMetal2
+  - FootstepMetal3
 --- !u!1 &3853616244144585514
 GameObject:
   m_ObjectHideFlags: 0
@@ -2074,7 +2127,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3369263236979518758}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: spine.02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2618,7 +2671,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3884888603099021445}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: eye.L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2892,7 +2945,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7870164688988246330}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: eyebrow.L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3056,7 +3109,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1804580743754220794}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: eyebrow.R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3119,7 +3172,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 637275358944288102}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: eye.R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3346,7 +3399,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2424825738452904499}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: mouth
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3539,7 +3592,7 @@ SkinnedMeshRenderer:
   m_Quality: 0
   m_UpdateWhenOffscreen: 0
   m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 4300000, guid: 0683559db4b4daa4bb9ce9c95b142742, type: 2}
+  m_Mesh: {fileID: 4300000, guid: e48a287005ccaed44be6908a48db2775, type: 2}
   m_Bones:
   - {fileID: 9118308081295399195}
   - {fileID: 6067828109587796757}

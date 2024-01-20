@@ -1,6 +1,3 @@
-using Photon.Pun;
-using Photon.Pun.Demo.Cockpit;
-using Photon.Voice;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,12 +9,13 @@ public class CameraMovement : MonoBehaviour
     public Transform orientation;
     public Transform headAim;
 
+    CursorManager cursorManager;
     float xRotation = 0f;
     float yRotation = 0f;
 
-    private void Start()
+    private void Awake()
     {
-        Cursor.lockState = CursorLockMode.Locked;
+        cursorManager = FindObjectOfType<CursorManager>();
     }
 
     private void Update()
@@ -28,6 +26,7 @@ public class CameraMovement : MonoBehaviour
 
     void CameraLook()
     {
+        if (!cursorManager.isLocked) return;
         float mouseX = Input.GetAxisRaw("Mouse X") * mouseSensitivity;
         float mouseY = Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
         xRotation -= mouseY;

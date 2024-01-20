@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using WebSocketSharp;
+using UnityEngine.EventSystems;
 
 public class ItemUse : MonoBehaviour
 {
@@ -13,18 +14,21 @@ public class ItemUse : MonoBehaviour
     [HideInInspector] public Animator animator;
     [HideInInspector] public PlayerInventory inventory;
     [HideInInspector] public AttackManager attackManager;
-    ItemManager itemManager;
+    ObjectManager itemManager;
     PhotonView view;
+    CursorManager cm;
 
     private void Awake()
     {
+        cm = FindObjectOfType<CursorManager>();
         view = gameObject.GetComponent<PhotonView>();
-        itemManager = FindObjectOfType<ItemManager>();
+        itemManager = FindObjectOfType<ObjectManager>();
     }
 
     private void Update()
     {
         if (!view.IsMine) return;
+        if (!cm.isLocked) return;
         if (Input.GetKey(useKey))
         {
             UseItem();

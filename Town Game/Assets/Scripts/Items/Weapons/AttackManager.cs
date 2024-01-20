@@ -121,10 +121,9 @@ public class AttackManager : MonoBehaviour
             yield break;
         }
         SoundManager.instance.Play3D(weapon.attackSounds[Random.Range(0, weapon.attackSounds.Length)], transform.position);
-        SoundManager.instance.view.RPC("Play3D", RpcTarget.Others, weapon.attackSounds[Random.Range(0, weapon.attackSounds.Length)], transform.position);
         yield return new WaitForSeconds(weapon.attackCharge);
         PlayShake(weapon.shake);
-        CastAttackRay(weapon.range, weapon.damage, weapon.name);
+        CastAttackRay(weapon.range, weapon.damage, weapon);
         atkCooldown = weapon.attackCooldown;
         yield return new WaitForSeconds(animLength - weapon.attackCharge);
         tWeight = 0f;
@@ -139,13 +138,19 @@ public class AttackManager : MonoBehaviour
         cShake.StartShake(shake.shakeProperties);
     }
 
-    public void CastAttackRay(float distance, float damage, string weaponName = "")
+    public void CastAttackRay(float distance, float damage, Weapon weapon = null)
     {
         RaycastHit hit;
         if (Physics.Raycast(camTransform.position, camTransform.forward, out hit, distance, (int)playerMask))
         {
-            PhotonView view = hit.transform.GetComponent<PhotonView>();
-            view.RPC("Damage", view.Owner, damage, weaponName);
+            Transform tTransform = hit.transform;
+            PhotonView view = tTransform.GetComponent<PhotonView>();
+            if (weapon != null)
+            {
+                view.RPC("AddEvidence", view.Owner, "cause", weapon.evidenceIcons, weapon.evidenceDescriptions, 0f);
+                SoundManager.instance.Play3D(weapon.damageSounds[Random.Range(0, weapon.damageSounds.Length)], hit.transform.position);
+            }
+            view.RPC("Damage", view.Owner, damage);
         }
     }
 

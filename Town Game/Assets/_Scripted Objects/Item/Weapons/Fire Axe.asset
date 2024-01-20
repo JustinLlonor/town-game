@@ -52,7 +52,11 @@ MonoBehaviour:
   attackSounds:
   - HeavySwing1
   - HeavySwing2
-  damageSounds: []
-  evidence:
-  - It seems they were cut by a sharp object.
-  - It seems a Fire Axe was used to kill them.
+  damageSounds:
+  - Stab1
+  evidenceDescriptions:
+  - It seems that they were cut to death by a sharp object.
+  - It seems that a Fire Axe was used to kill them.
+  evidenceIcons:
+  - Placeholder
+  - Placeholder

@@ -18,7 +18,7 @@ public class ItemPhys : MonoBehaviour
     private void Start()
     {
         gameObject.GetComponent<Interactable>().hovers[0].lore = "Pick up " + itemName;
-        Item item = FindObjectOfType<ItemManager>().itemSearch[itemName];
+        Item item = FindObjectOfType<ObjectManager>().itemSearch[itemName];
         gameObject.GetComponent<MeshFilter>().mesh = item.mesh;
         gameObject.GetComponent<MeshRenderer>().material.SetTexture("_Texture", item.material.mainTexture);
         gameObject.GetComponent<MeshCollider>().sharedMesh = item.mesh;

@@ -108,8 +108,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd5c4db1794ee6f469cff219b7fe2175, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frequency: 0.08
-  sFrequency: 0.05
+  walkLength: 1.167
+  sprintLength: 0.5525
   amplitude: 0.015
   sAmplitude: 0.05
   resetSpeed: 5
@@ -416,3 +416,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   range: 2
+  defaultCrosshair: {fileID: 0}
+  interactCrosshair: {fileID: 0}
+  interactText: {fileID: 0}

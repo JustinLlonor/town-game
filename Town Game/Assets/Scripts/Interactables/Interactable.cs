@@ -15,6 +15,14 @@ public class Interactable : MonoBehaviour
 
     bool isGlowing = false;
 
+    [System.Serializable]
+    public struct Hover
+    {
+        public string lore;
+        public KeyCode key;
+        public UnityEvent action;
+    }
+
     public void GlowMaterials()
     {
         if (!glow) return;
@@ -33,13 +41,5 @@ public class Interactable : MonoBehaviour
             r.material.SetFloat("_Power", 10000f);
         }
         isGlowing = false;
-    }
-
-    [System.Serializable]
-    public struct Hover
-    {
-        public string lore;
-        public KeyCode key;
-        public UnityEvent action;
     }
 }

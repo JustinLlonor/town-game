@@ -17,7 +17,13 @@ public class InteractableFinder : MonoBehaviour
     public TextMeshProUGUI interactText;
 
     GameObject currentInteractable = null;
+    CursorManager cm;
     Interactable currentInteraction;
+
+    private void Awake()
+    {
+        cm = FindObjectOfType<CursorManager>();
+    }
 
     private void Update()
     {
@@ -64,6 +70,7 @@ public class InteractableFinder : MonoBehaviour
 
     void InteractionKey()
     {
+        if (!cm.isLocked) return;
         if (currentInteraction != null)
         {
             foreach (Interactable.Hover h in currentInteraction.hovers)

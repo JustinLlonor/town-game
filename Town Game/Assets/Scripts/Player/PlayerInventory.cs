@@ -2,12 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-using UnityEngine.Rendering;
-using UnityEngine.Animations.Rigging;
 using WebSocketSharp;
 using UnityEngine.UI;
-using Photon.Pun.Demo.PunBasics;
-using Unity.VisualScripting;
 
 public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -38,7 +34,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     PhotonView view;
     float itemPull = 40f;
     float itemDrag = 40f;
-    ItemManager itemManager;
+    ObjectManager itemManager;
     MeshFilter cFilter;
     MeshRenderer cRenderer;
     MeshFilter sFilter;
@@ -65,7 +61,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     private void Awake()
     {
         view = gameObject.GetComponent<PhotonView>();
-        itemManager = FindObjectOfType<ItemManager>();
+        itemManager = FindObjectOfType<ObjectManager>();
         sFilter = sItem.GetComponent<MeshFilter>();
         sRenderer = sItem.GetComponent<MeshRenderer>();
         cFilter = cItem.GetComponent<MeshFilter>();

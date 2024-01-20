@@ -74,7 +74,7 @@ public class SoundManager : MonoBehaviour
     /// <param name="name">Name of the sound</param>
     /// <param name="position">Position of the sound</param>
     [PunRPC]
-    public void Play3D(string name, Vector3 position)
+    public void Play3D(string name, Vector3 position, bool global = true)
     {
         Sound sound = Array.Find(sounds, sound => sound.name == name);
         AudioSource source = Instantiate(soundInstance, position, Quaternion.identity).GetComponent<AudioSource>();
@@ -84,6 +84,11 @@ public class SoundManager : MonoBehaviour
         source.maxDistance = sound.maxDistance;
         source.minDistance = sound.minDistance;
         source.spatialBlend = 1f;
+
+        if (global)
+        {
+            view.RPC("Play3D", RpcTarget.Others, name, position, false);
+        }
     }
 
 }

@@ -62,6 +62,38 @@ MonoBehaviour:
     minDistance: 10
     maxDistance: 15
     source: {fileID: 0}
+  - name: FootstepMetal1
+    clip: {fileID: 8300000, guid: db07f7939c5fb1345836985adcb48335, type: 3}
+    volume: 0.1
+    pitch: 1
+    loop: 0
+    minDistance: 10
+    maxDistance: 15
+    source: {fileID: 0}
+  - name: FootstepMetal2
+    clip: {fileID: 8300000, guid: 2a3d30a515ee7c64caf2971e0f4f91af, type: 3}
+    volume: 0.1
+    pitch: 1
+    loop: 0
+    minDistance: 10
+    maxDistance: 15
+    source: {fileID: 0}
+  - name: FootstepMetal3
+    clip: {fileID: 8300000, guid: cdc03c93247360b4b9301f74bf51e951, type: 3}
+    volume: 0.1
+    pitch: 1
+    loop: 0
+    minDistance: 10
+    maxDistance: 15
+    source: {fileID: 0}
+  - name: Stab1
+    clip: {fileID: 8300000, guid: b64e85d00c458344fb82d73b1054a466, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    minDistance: 10
+    maxDistance: 15
+    source: {fileID: 0}
   soundInstance: {fileID: 3543802267380313500, guid: 44c59eb65ef66ab4b8860710a7896da7, type: 3}
   view: {fileID: 1445171470900705614}
 --- !u!114 &1445171470900705614

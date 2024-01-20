@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using System;
+using UnityEngine.Events;
 
 public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -20,11 +22,15 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     public GameObject corpsePrefab;
     public Transform myRig;
 
+    public OnDeathEvent OnDeath;    
+
     PhotonView view;
+    public PlayerEvidence pe;
 
     private void Start()
     {
         view = gameObject.GetComponent<PhotonView>();
+        pe = gameObject.GetComponent<PlayerEvidence>();
     }
 
     private void Update()
@@ -63,7 +69,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     /// </summary>
     /// <param name="amount"></param>
     [PunRPC]
-    public void Damage(float amount, string damageCause = "")
+    public void Damage(float amount)
     {
         HP -= amount;
         if (HP < 0f)
@@ -75,6 +81,8 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     public void Kill()
     {
         GameObject corpse = PhotonNetwork.Instantiate(corpsePrefab.name, transform.position, transform.rotation);
+        OnDeath.Invoke(corpse);
+        pe.ApplyEvidence(corpse);
         Ragdoller ragdoller = corpse.GetComponent<Ragdoller>();
         ragdoller.SetPositionsToTarget(myRig);
         FindObjectOfType<CameraBobbing>().isBobbing = false;
@@ -128,4 +136,9 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     {
         
     }
+}
+
+[System.Serializable]
+public class OnDeathEvent : UnityEvent<GameObject>
+{
 }
