@@ -137,7 +137,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 553772930366547643, guid: e11b4f359f8ec4a43a915e109017ea6c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 948635299029419552, guid: e11b4f359f8ec4a43a915e109017ea6c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -935,7 +935,7 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
---- !u!43 &716085018
+--- !u!43 &740448270
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2033,7 +2033,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1115170419}
-  m_Mesh: {fileID: 716085018}
+  m_Mesh: {fileID: 740448270}
 --- !u!114 &1115170423
 MonoBehaviour:
   m_ObjectHideFlags: 0

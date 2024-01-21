@@ -41,9 +41,9 @@ public class CameraBobbing : MonoBehaviour
     {
         bobPosition += Time.deltaTime;
         float yWalk = Mathf.Sin(2 / walkLength * 2 * Mathf.PI * bobPosition) * amplitude;
-        float xWalk = Mathf.Sin(0.5f / walkLength * (bobPosition - Mathf.PI / 2f)) * amplitude / 2f;
+        float xWalk = Mathf.Sin(1 / walkLength * 2 * Mathf.PI * bobPosition) * amplitude / 2f;
         float ySprint = Mathf.Sin(2 / sprintLength * 2 * Mathf.PI * bobPosition) * sAmplitude;
-        float xSprint = Mathf.Sin(0.5f / sprintLength * (bobPosition - Mathf.PI / 2f)) * sAmplitude / 2f;
+        float xSprint = Mathf.Sin(1 / sprintLength * 2 * Mathf.PI * bobPosition) * sAmplitude / 2f;
         float y = (ySprint - yWalk) * sprintWeight + yWalk;
         float x = (xSprint - xWalk) * sprintWeight + xWalk;
         transform.localPosition = new Vector3(x, y, 0f);

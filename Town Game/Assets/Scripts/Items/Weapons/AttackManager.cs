@@ -100,7 +100,7 @@ public class AttackManager : MonoBehaviour
         if (currentAtk == weapon.useAnimations.Length) currentAtk = 0;
         Item.AnimationState state = weapon.useAnimations[currentAtk];
         Item.AnimationState cState = weapon.clientAnimations[currentAtk];
-        animator.Play(state.animation, animator.GetLayerIndex(state.layer));
+        animator.Play(state.animation, animator.GetLayerIndex(state.layer), 0f);
         itemAnimator.enabled = true;
         itemAnimator.Rebind();
         itemAnimator.Update(0f);
