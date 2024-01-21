@@ -365,9 +365,9 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         itemObj.GetComponent<Interactable>().canInteract = false;
         Vector3 velocityAdd = Vector3.ClampMagnitude(rb.velocity / movementMultiplier, 3f);
         itemObj.GetComponent<Rigidbody>().velocity = mainCam.forward * dropVelocity + velocityAdd;
+        itemObj.GetComponent<PhotonView>().RPC("SetName", RpcTarget.All, item.name);
         ItemPhys itemPhys = itemObj.GetComponent<ItemPhys>();
         itemPhys.interactTimer = pickupCooldown;
-        itemPhys.itemName = item.name;
         RemoveItem(hotbar[equippedSlot], equippedSlot);
     }
 

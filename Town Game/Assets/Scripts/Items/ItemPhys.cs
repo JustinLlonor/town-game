@@ -7,23 +7,21 @@ public class ItemPhys : MonoBehaviour
 {
     public string itemName;
     public float interactTimer = .5f;
+    bool pickedUp = false;
 
     PlayerManager playerManager;
+    PhotonView view;
 
     private void Awake()
     {
         playerManager = FindObjectOfType<PlayerManager>();
+        view = gameObject.GetComponent<PhotonView>();
     }
 
     private void Start()
     {
-        gameObject.GetComponent<Interactable>().hovers[0].lore = "Pick up " + itemName;
-        Item item = FindObjectOfType<ObjectManager>().itemSearch[itemName];
-        gameObject.GetComponent<MeshFilter>().mesh = item.mesh;
-        gameObject.GetComponent<MeshRenderer>().material.SetTexture("_Texture", item.material.mainTexture);
-        gameObject.GetComponent<MeshCollider>().sharedMesh = item.mesh;
-
-        gameObject.GetComponent<PhotonView>().TransferOwnership(0);
+        view.RPC("CreateItem", RpcTarget.All);
+        view.TransferOwnership(0);
     }
 
     private void Update()
@@ -40,9 +38,36 @@ public class ItemPhys : MonoBehaviour
 
     public void PickUpItem()
     {
+        if (pickedUp) return;
         PlayerInventory inventory = playerManager.currentPlayer.GetComponent<PlayerInventory>();
         if (inventory.IsInventoryFull()) return;
         inventory.GiveItem(itemName, true);
+        view.TransferOwnership(PhotonNetwork.LocalPlayer);
+        view.RPC("RemoveItem", view.Owner);
+        pickedUp = true;
+        gameObject.GetComponent<MeshRenderer>().enabled = false;
+        gameObject.GetComponent<Interactable>().canInteract = false;
+    }
+
+    [PunRPC]
+    public void RemoveItem()
+    {
         PhotonNetwork.Destroy(gameObject);
+    }
+
+    [PunRPC]
+    public void CreateItem()
+    {
+        gameObject.GetComponent<Interactable>().hovers[0].lore = "Pick up " + itemName;
+        Item item = FindObjectOfType<ObjectManager>().itemSearch[itemName];
+        gameObject.GetComponent<MeshFilter>().mesh = item.mesh;
+        gameObject.GetComponent<MeshRenderer>().material.SetTexture("_Texture", item.material.mainTexture);
+        gameObject.GetComponent<MeshCollider>().sharedMesh = item.mesh;
+    }
+
+    [PunRPC]
+    public void SetName(string name)
+    {
+        itemName = name;
     }
 }
