@@ -9,7 +9,7 @@ public class Item : ScriptableObject
     public string description = "";
     public bool large = false; // large if cannot be stored in inventory
     public Mesh mesh;
-    public Material material;
+    public Texture2D texture;
     public string[] equipSounds = new string[] { "Equip1", "Equip2", "Equip3" };
     [Header("Usage")]
     public string useMethod;

@@ -150,7 +150,7 @@ public class AttackManager : MonoBehaviour
                 view.RPC("AddEvidence", view.Owner, "cause", weapon.evidenceIcons, weapon.evidenceDescriptions, 0f);
                 SoundManager.instance.Play3D(weapon.damageSounds[Random.Range(0, weapon.damageSounds.Length)], hit.transform.position);
             }
-            view.RPC("Damage", view.Owner, damage);
+            view.RPC("Damage", view.Owner, damage, true);
         }
     }
 

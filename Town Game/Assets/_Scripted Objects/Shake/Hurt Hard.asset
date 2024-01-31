@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7fb4b91f7da61e943a29d7798de5a210, type: 3}
-  m_Name: Explosion
+  m_Name: Hurt Hard
   m_EditorClassIdentifier: 
   shakeProperties:
-    angle: 90
+    angle: 0
     strength: 0.1
-    speed: 5
-    duration: 0.7
-    noisePercent: 1
-    dampingPercent: 0.427
-    rotationPercent: 0.153
+    speed: 1
+    duration: 0.3
+    noisePercent: 0.39
+    dampingPercent: 0.708
+    rotationPercent: 0.644

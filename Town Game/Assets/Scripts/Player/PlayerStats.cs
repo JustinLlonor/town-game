@@ -21,20 +21,35 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     [Header("Death")]
     public GameObject corpsePrefab;
     public Transform myRig;
+    [Header("Hurt")]
+    public string hurtLayer = "Hurt";
+    public float hurtWeight = 0.4f;
+    public float hurtLerp = 50f;
+    public Shake softHurt;
+    public Shake hardHurt;
+    public float softThreshold = 30f;
 
-    public OnDeathEvent OnDeath;    
+    public OnDeathEvent OnDeath;
 
+    CameraShake shake;
     PhotonView view;
-    public PlayerEvidence pe;
+    PlayerEvidence pe;
+    [HideInInspector] public Animator anim;
+    int hLayer;
+    float hWeight;
 
     private void Start()
     {
+        hLayer = anim.GetLayerIndex(hurtLayer);
         view = gameObject.GetComponent<PhotonView>();
         pe = gameObject.GetComponent<PlayerEvidence>();
+        if (!view.IsMine) return;
+        shake = FindObjectOfType<CameraShake>();
     }
 
     private void Update()
     {
+        FixDmg();
         if (!view.IsMine) return;
         if (Input.GetKey(KeyCode.P))
         {
@@ -69,13 +84,40 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     /// </summary>
     /// <param name="amount"></param>
     [PunRPC]
-    public void Damage(float amount)
+    public void Damage(float amount, bool playShake = true)
     {
         HP -= amount;
         if (HP < 0f)
         {
             Kill();
         }
+        view.RPC("DamageAnimation", RpcTarget.All);
+        if (playShake)
+        {
+            if (amount < softThreshold)
+            {
+                shake.StartShake(softHurt.shakeProperties);
+            }
+            else
+            {
+                shake.StartShake(hardHurt.shakeProperties);
+            }
+        }
+    }
+
+    [PunRPC]
+    public void DamageAnimation()
+    {
+        hWeight = hurtWeight;
+        anim.SetLayerWeight(hLayer, hWeight);
+    }
+
+    void FixDmg()
+    {
+        if (hWeight == 0f) return;
+        hWeight = Mathf.Lerp(hWeight, 0f, Time.deltaTime * hurtLerp);
+        anim.SetLayerWeight(hLayer, hWeight);
+        if (hWeight < 0.001f) hWeight = 0f;
     }
 
     public void Kill()

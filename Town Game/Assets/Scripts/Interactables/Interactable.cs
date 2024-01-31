@@ -11,7 +11,7 @@ public class Interactable : MonoBehaviour
     [Header("Glow")]
     public bool glow = false;
     public Renderer[] renderers;
-    public float glowAmount = .5f;
+    public float glowAmount = 1f;
 
     bool isGlowing = false;
 
@@ -28,7 +28,7 @@ public class Interactable : MonoBehaviour
         if (!glow) return;
         foreach (Renderer r in renderers)
         {
-            r.material.SetFloat("_Power", glowAmount);
+            r.material.SetFloat("_RimBrightness", glowAmount);
         }
         isGlowing = true;
     }
@@ -38,7 +38,7 @@ public class Interactable : MonoBehaviour
         if (!isGlowing) return;
         foreach (Renderer r in renderers)
         {
-            r.material.SetFloat("_Power", 10000f);
+            r.material.SetFloat("_RimBrightness", .3f);
         }
         isGlowing = false;
     }

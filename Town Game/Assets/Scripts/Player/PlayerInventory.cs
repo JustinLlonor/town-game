@@ -236,7 +236,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     {
         Item equippedItem = itemManager.itemSearch[itemName];
         sFilter.mesh = equippedItem.mesh;
-        sRenderer.material = equippedItem.material;
+        sRenderer.material.SetTexture("_MainTexture", equippedItem.texture);
         ResetEquipLayers();
         // Play all pose animations on the item
         foreach (Item.AnimationState pose in equippedItem.holdPoses)
@@ -249,7 +249,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         // Client side
         if (!view.IsMine) return;
         cFilter.mesh = equippedItem.mesh;
-        cRenderer.material = equippedItem.material;
+        cRenderer.material.SetTexture("_MainTexture", equippedItem.texture);
         yOffset = equippedItem.yOffset;
         cItem.localPosition = itemPosition + (Vector3.down * equippedItem.iYOffset);
         cItem.localEulerAngles = new Vector3(equippedItem.angleOffset, 0f, 0f);

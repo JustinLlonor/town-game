@@ -35,6 +35,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public float mercyDistance = 3f;
     public Shake softFall;
     public Shake hardFall;
+    public string softSound;
+    public string hardSound;
 
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
@@ -126,7 +128,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         StepClimb();
     }
 
-    void Fall()
+    void Fall() 
     {
         if (isGrounded)
         {
@@ -149,11 +151,13 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         if (fallDistance > mercyDistance)
         {
             shake.StartShake(hardFall.shakeProperties);
-            stats.Damage(fallDistance * fallDamageMultiplier);
+            stats.Damage(fallDistance * fallDamageMultiplier, false);
+            SoundManager.instance.Play3D(hardSound, transform.position);
         }
         else
         {
             shake.StartShake(softFall.shakeProperties);
+            SoundManager.instance.Play3D(softSound, transform.position);
         }
     }
 

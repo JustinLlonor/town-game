@@ -94,6 +94,22 @@ MonoBehaviour:
     minDistance: 10
     maxDistance: 15
     source: {fileID: 0}
+  - name: LandMetalSoft
+    clip: {fileID: 8300000, guid: 4376e4f4bebd04244b6d14db1de4e30f, type: 3}
+    volume: 0.257
+    pitch: 1
+    loop: 0
+    minDistance: 10
+    maxDistance: 15
+    source: {fileID: 0}
+  - name: LandMetalHard
+    clip: {fileID: 8300000, guid: dab9d58f12d0dbc4a821b3d2c3dd4f66, type: 3}
+    volume: 0.604
+    pitch: 1
+    loop: 0
+    minDistance: 10
+    maxDistance: 15
+    source: {fileID: 0}
   soundInstance: {fileID: 3543802267380313500, guid: 44c59eb65ef66ab4b8860710a7896da7, type: 3}
   view: {fileID: 1445171470900705614}
 --- !u!114 &1445171470900705614
