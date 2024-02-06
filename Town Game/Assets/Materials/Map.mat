@@ -87,6 +87,7 @@ Material:
     m_Floats:
     - _AlphaClip: 0
     - _AlphaToMask: 0
+    - _Ambient: 0.08
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
@@ -105,15 +106,16 @@ Material:
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
+    - _OffsetPoint: 0.62
     - _Parallax: 0.02
     - _QueueControl: 0
     - _QueueOffset: 0
     - _RampOffset: 0.26
     - _ReceiveShadows: 1
-    - _RimBrightness: 0
+    - _RimBrightness: 0.01
     - _RimPower: 0.48
     - _RimStep: 0
-    - _Smoothness: 0.07
+    - _Smoothness: 0.02
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1

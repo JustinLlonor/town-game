@@ -20,7 +20,8 @@ public class ItemPhys : MonoBehaviour
 
     private void Start()
     {
-        view.RPC("CreateItem", RpcTarget.All);
+        CreateItem();
+        view.RPC("CreateItem", RpcTarget.Others);
         view.TransferOwnership(0);
     }
 

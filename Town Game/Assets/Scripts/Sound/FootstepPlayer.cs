@@ -5,7 +5,8 @@ using UnityEngine;
 
 public class FootstepPlayer : MonoBehaviour
 {
-    public string[] sounds = new string[] { };
+    public Transform footstepRaycast;
+    public LayerMask environmentMask;
 
     SoundManager sm;
     PhotonView view;
@@ -19,6 +20,14 @@ public class FootstepPlayer : MonoBehaviour
     public void PlayFootstep()
     {
         if (!view.IsMine) return;
-        sm.Play3D(sounds[Random.Range(0, sounds.Length)], transform.position);
+        RaycastHit hit;
+        if (Physics.Raycast(footstepRaycast.position, footstepRaycast.up * -1f, out hit, Mathf.Infinity, (int)environmentMask))
+        {
+            SoundMaterial sma = hit.transform.GetComponent<SoundMaterial>();
+            if (sma == null) return;
+            string mat = sma.GetSMat(hit.textureCoord);
+            Debug.Log(mat + "Step" + Random.Range(0, 3).ToString());
+            sm.Play3D(mat + "Step" + Random.Range(0, 3).ToString(), transform.position);
+        }
     }
 }

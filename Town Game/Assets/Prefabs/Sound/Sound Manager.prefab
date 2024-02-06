@@ -62,7 +62,7 @@ MonoBehaviour:
     minDistance: 10
     maxDistance: 15
     source: {fileID: 0}
-  - name: FootstepMetal1
+  - name: grassStep0
     clip: {fileID: 8300000, guid: db07f7939c5fb1345836985adcb48335, type: 3}
     volume: 0.1
     pitch: 1
@@ -70,7 +70,7 @@ MonoBehaviour:
     minDistance: 10
     maxDistance: 15
     source: {fileID: 0}
-  - name: FootstepMetal2
+  - name: grassStep1
     clip: {fileID: 8300000, guid: 2a3d30a515ee7c64caf2971e0f4f91af, type: 3}
     volume: 0.1
     pitch: 1
@@ -78,17 +78,9 @@ MonoBehaviour:
     minDistance: 10
     maxDistance: 15
     source: {fileID: 0}
-  - name: FootstepMetal3
+  - name: grassStep2
     clip: {fileID: 8300000, guid: cdc03c93247360b4b9301f74bf51e951, type: 3}
     volume: 0.1
-    pitch: 1
-    loop: 0
-    minDistance: 10
-    maxDistance: 15
-    source: {fileID: 0}
-  - name: Stab1
-    clip: {fileID: 8300000, guid: b64e85d00c458344fb82d73b1054a466, type: 3}
-    volume: 1
     pitch: 1
     loop: 0
     minDistance: 10
@@ -105,6 +97,14 @@ MonoBehaviour:
   - name: LandMetalHard
     clip: {fileID: 8300000, guid: dab9d58f12d0dbc4a821b3d2c3dd4f66, type: 3}
     volume: 0.604
+    pitch: 1
+    loop: 0
+    minDistance: 10
+    maxDistance: 15
+    source: {fileID: 0}
+  - name: Stab1
+    clip: {fileID: 8300000, guid: b64e85d00c458344fb82d73b1054a466, type: 3}
+    volume: 1
     pitch: 1
     loop: 0
     minDistance: 10
