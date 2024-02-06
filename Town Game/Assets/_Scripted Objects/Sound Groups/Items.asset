@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cebe634f119f3514b8fe9ab5eac3fb6e, type: 3}
+  m_Name: Items
+  m_EditorClassIdentifier: 
+  volumeMultiplier: 1
+  sounds:
+  - name: HeavySwing1
+    clip: {fileID: 8300000, guid: 2113a44d91704964aa6851bd4bfd866c, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    minDistance: 10
+    maxDistance: 15
+    source: {fileID: 0}
+  - name: HeavySwing2
+    clip: {fileID: 8300000, guid: f1834ae82e0ca8940ba564f30a8edb88, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    minDistance: 10
+    maxDistance: 15
+    source: {fileID: 0}
+  - name: Stab1
+    clip: {fileID: 8300000, guid: b64e85d00c458344fb82d73b1054a466, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    minDistance: 10
+    maxDistance: 15
+    source: {fileID: 0}

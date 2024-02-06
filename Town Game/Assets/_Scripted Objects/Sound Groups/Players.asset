@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cebe634f119f3514b8fe9ab5eac3fb6e, type: 3}
+  m_Name: Players
+  m_EditorClassIdentifier: 
+  volumeMultiplier: 1
+  sounds:
+  - name: metalStep0
+    clip: {fileID: 8300000, guid: db07f7939c5fb1345836985adcb48335, type: 3}
+    volume: 0.1
+    pitch: 1
+    loop: 0
+    minDistance: 10
+    maxDistance: 15
+    source: {fileID: 0}
+  - name: metalStep1
+    clip: {fileID: 8300000, guid: 2a3d30a515ee7c64caf2971e0f4f91af, type: 3}
+    volume: 0.1
+    pitch: 1
+    loop: 0
+    minDistance: 10
+    maxDistance: 15
+    source: {fileID: 0}
+  - name: metalStep2
+    clip: {fileID: 8300000, guid: cdc03c93247360b4b9301f74bf51e951, type: 3}
+    volume: 0.1
+    pitch: 1
+    loop: 0
+    minDistance: 10
+    maxDistance: 15
+    source: {fileID: 0}
+  - name: metalLandSoft
+    clip: {fileID: 8300000, guid: 4376e4f4bebd04244b6d14db1de4e30f, type: 3}
+    volume: 0.257
+    pitch: 1
+    loop: 0
+    minDistance: 10
+    maxDistance: 15
+    source: {fileID: 0}
+  - name: metalLandHard
+    clip: {fileID: 8300000, guid: dab9d58f12d0dbc4a821b3d2c3dd4f66, type: 3}
+    volume: 0.604
+    pitch: 1
+    loop: 0
+    minDistance: 10
+    maxDistance: 15
+    source: {fileID: 0}

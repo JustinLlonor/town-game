@@ -21,6 +21,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public float airSpeed = 2.7f;
     public LayerMask environmentMask;
     public Transform groundCheck;
+    public Shake jumpShake;
     public float groundedRadius = 0.2f;
 
     [Header("Stairs")]
@@ -147,7 +148,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         float fallDistance = peakYPosition - transform.position.y;
 
-        if (fallDistance < 0.8f) return;
+        if (fallDistance < 0.4f) return;
         if (fallDistance > mercyDistance)
         {
             shake.StartShake(hardFall.shakeProperties);
@@ -240,6 +241,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     void Jump()
     {
         if (!canJump) return;
+        shake.StartShake(jumpShake.shakeProperties);
         rb.AddForce(transform.up * jumpHeight, ForceMode.Impulse);
         jumpTimer = jumpCooldown;
     }

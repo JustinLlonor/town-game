@@ -23,6 +23,7 @@ public class SoundManager : MonoBehaviour
     }
 
     public Sound[] sounds;
+    public SoundGroup[] soundGroups;
     public GameObject soundInstance;
     public static SoundManager instance;
     public PhotonView view;

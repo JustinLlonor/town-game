@@ -614,7 +614,7 @@ MonoBehaviour:
   sprintMultiplier: 1.7
   sprintStaminaConsumption: 20
   groundDrag: 6
-  jumpHeight: 6.5
+  jumpHeight: 5
   jumpCooldown: 0.5
   jumpStaminaConsumption: 20
   canJump: 1
@@ -624,6 +624,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   groundCheck: {fileID: 4579068949193498039}
+  jumpShake: {fileID: 11400000, guid: 75956f023138a7244a7a58663cb0ed13, type: 2}
   groundedRadius: 0.2
   stepHeight: 0.3
   stepSmooth: 0.1
@@ -1822,10 +1823,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba6e51fe5d98dab4c8e49059e7a54130, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sounds:
-  - FootstepMetal1
-  - FootstepMetal2
-  - FootstepMetal3
   footstepRaycast: {fileID: 4579068949193498039}
   environmentMask:
     serializedVersion: 2
