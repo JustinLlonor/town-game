@@ -10,13 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cebe634f119f3514b8fe9ab5eac3fb6e, type: 3}
-  m_Name: Players
+  m_Name: Environment Interactions
   m_EditorClassIdentifier: 
   volumeMultiplier: 1
+  settingGroup: 
   sounds:
   - name: metalStep0
     clip: {fileID: 8300000, guid: db07f7939c5fb1345836985adcb48335, type: 3}
-    volume: 0.1
+    volume: 0.05
     pitch: 1
     loop: 0
     minDistance: 10
@@ -24,7 +25,7 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: metalStep1
     clip: {fileID: 8300000, guid: 2a3d30a515ee7c64caf2971e0f4f91af, type: 3}
-    volume: 0.1
+    volume: 0.05
     pitch: 1
     loop: 0
     minDistance: 10
@@ -32,7 +33,7 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: metalStep2
     clip: {fileID: 8300000, guid: cdc03c93247360b4b9301f74bf51e951, type: 3}
-    volume: 0.1
+    volume: 0.05
     pitch: 1
     loop: 0
     minDistance: 10
@@ -40,7 +41,7 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: metalLandSoft
     clip: {fileID: 8300000, guid: 4376e4f4bebd04244b6d14db1de4e30f, type: 3}
-    volume: 0.257
+    volume: 0.164
     pitch: 1
     loop: 0
     minDistance: 10
@@ -48,7 +49,47 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: metalLandHard
     clip: {fileID: 8300000, guid: dab9d58f12d0dbc4a821b3d2c3dd4f66, type: 3}
-    volume: 0.604
+    volume: 0.508
+    pitch: 1
+    loop: 0
+    minDistance: 10
+    maxDistance: 15
+    source: {fileID: 0}
+  - name: grassStep0
+    clip: {fileID: 8300000, guid: 394c199290a2eaa48899236f85a057a9, type: 3}
+    volume: 0.05
+    pitch: 1
+    loop: 0
+    minDistance: 10
+    maxDistance: 15
+    source: {fileID: 0}
+  - name: grassStep1
+    clip: {fileID: 8300000, guid: b715433b9adb96c428fcbd3a06c21b0f, type: 3}
+    volume: 0.05
+    pitch: 1
+    loop: 0
+    minDistance: 10
+    maxDistance: 15
+    source: {fileID: 0}
+  - name: grassStep2
+    clip: {fileID: 8300000, guid: 8673eaa9bb04a6e43b2e0abba083c719, type: 3}
+    volume: 0.05
+    pitch: 1
+    loop: 0
+    minDistance: 10
+    maxDistance: 15
+    source: {fileID: 0}
+  - name: grassLandSoft
+    clip: {fileID: 8300000, guid: 69be81b71f52f9d4fb660ddb322b27ac, type: 3}
+    volume: 0.099
+    pitch: 1
+    loop: 0
+    minDistance: 10
+    maxDistance: 15
+    source: {fileID: 0}
+  - name: grassLandHard
+    clip: {fileID: 8300000, guid: 3422c94cb3bdd4141acfe9306c0a1a62, type: 3}
+    volume: 0.17
     pitch: 1
     loop: 0
     minDistance: 10

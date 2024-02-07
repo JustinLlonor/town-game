@@ -26,7 +26,6 @@ public class FootstepPlayer : MonoBehaviour
             SoundMaterial sma = hit.transform.GetComponent<SoundMaterial>();
             if (sma == null) return;
             string mat = sma.GetSMat(hit.textureCoord);
-            Debug.Log(mat + "Step" + Random.Range(0, 3).ToString());
             sm.Play3D(mat + "Step" + Random.Range(0, 3).ToString(), transform.position);
         }
     }

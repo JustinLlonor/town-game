@@ -22,7 +22,6 @@ public class SoundManager : MonoBehaviour
         public AudioSource source;
     }
 
-    public Sound[] sounds;
     public SoundGroup[] soundGroups;
     public GameObject soundInstance;
     public static SoundManager instance;
@@ -43,13 +42,16 @@ public class SoundManager : MonoBehaviour
 
         // ^ Singleton stuff
 
-        foreach (Sound s in sounds)
+        foreach(SoundGroup sg in soundGroups)
         {
-            s.source = gameObject.AddComponent<AudioSource>();
-            s.source.clip = s.clip;
-            s.source.volume = s.volume;
-            s.source.pitch = s.pitch;
-            s.source.loop = s.loop;
+            foreach (Sound s in sg.sounds)
+            {
+                s.source = gameObject.AddComponent<AudioSource>();
+                s.source.clip = s.clip;
+                s.source.volume = s.volume;
+                s.source.pitch = s.pitch;
+                s.source.loop = s.loop;
+            }
         }
     }
 
@@ -60,12 +62,24 @@ public class SoundManager : MonoBehaviour
     [PunRPC]
     public void Play(string name)
     {
-        Sound s = Array.Find(sounds, sound => sound.name == name);
-        if (s == null)
+        SoundGroup sg = null;
+        Sound s = null;
+        foreach (SoundGroup group in soundGroups)
+        {
+            s = Array.Find(group.sounds, sound => sound.name == name);
+            if (s != null)
+            {
+                sg = group;
+                break;
+            }
+        }
+        if (s == null || sg == null)
         {
             Debug.LogWarning("Sound: " + s.name + " was not found!");
             return;
         }
+        s.source.volume = s.volume * sg.volumeMultiplier;
+
         s.source.Play();
     }
 
@@ -77,10 +91,28 @@ public class SoundManager : MonoBehaviour
     [PunRPC]
     public void Play3D(string name, Vector3 position, bool global = true)
     {
-        Sound sound = Array.Find(sounds, sound => sound.name == name);
+        SoundGroup sg = null;
+        Sound sound = null;
+        bool foundSound = false;
+        foreach (SoundGroup group in soundGroups)
+        {
+            sound = Array.Find(group.sounds, sound => sound.name == name);
+            if (sound != null)
+            {
+                sg = group;
+                foundSound = true;
+                break;
+            }
+        }
+        if (!foundSound)
+        {
+            Debug.LogWarning("Sound: " + name + " was not found!");
+            return;
+        }
+
         AudioSource source = Instantiate(soundInstance, position, Quaternion.identity).GetComponent<AudioSource>();
         source.clip = sound.clip;
-        source.volume = sound.volume;
+        source.volume = sound.volume * sg.volumeMultiplier;
         source.pitch = sound.pitch;
         source.maxDistance = sound.maxDistance;
         source.minDistance = sound.minDistance;
@@ -91,5 +123,4 @@ public class SoundManager : MonoBehaviour
             view.RPC("Play3D", RpcTarget.Others, name, position, false);
         }
     }
-
 }

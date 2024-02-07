@@ -36,8 +36,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public float mercyDistance = 3f;
     public Shake softFall;
     public Shake hardFall;
-    public string softSound;
-    public string hardSound;
 
     [Header("Keybinds")]
     public KeyCode jumpKey = KeyCode.Space;
@@ -153,12 +151,26 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         {
             shake.StartShake(hardFall.shakeProperties);
             stats.Damage(fallDistance * fallDamageMultiplier, false);
-            SoundManager.instance.Play3D(hardSound, transform.position);
+            RaycastHit hit;
+            if (Physics.Raycast(groundCheck.position, groundCheck.up * -1f, out hit, Mathf.Infinity, (int)environmentMask))
+            {
+                SoundMaterial sma = hit.transform.GetComponent<SoundMaterial>();
+                if (sma == null) return;
+                string mat = sma.GetSMat(hit.textureCoord);
+                SoundManager.instance.Play3D(mat + "LandHard", transform.position);
+            }
         }
         else
         {
             shake.StartShake(softFall.shakeProperties);
-            SoundManager.instance.Play3D(softSound, transform.position);
+            RaycastHit hit;
+            if (Physics.Raycast(groundCheck.position, groundCheck.up * -1f, out hit, Mathf.Infinity, (int)environmentMask))
+            {
+                SoundMaterial sma = hit.transform.GetComponent<SoundMaterial>();
+                if (sma == null) return;
+                string mat = sma.GetSMat(hit.textureCoord);
+                SoundManager.instance.Play3D(mat + "LandSoft", transform.position);
+            }
         }
     }
 
