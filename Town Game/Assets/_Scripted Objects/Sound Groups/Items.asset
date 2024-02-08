@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: Items
   m_EditorClassIdentifier: 
   volumeMultiplier: 1
+  settingGroup: 
   sounds:
   - name: HeavySwing1
     clip: {fileID: 8300000, guid: 2113a44d91704964aa6851bd4bfd866c, type: 3}
-    volume: 1
+    volume: 0.4
     pitch: 1
     loop: 0
     minDistance: 10
@@ -24,7 +25,7 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: HeavySwing2
     clip: {fileID: 8300000, guid: f1834ae82e0ca8940ba564f30a8edb88, type: 3}
-    volume: 1
+    volume: 0.4
     pitch: 1
     loop: 0
     minDistance: 10

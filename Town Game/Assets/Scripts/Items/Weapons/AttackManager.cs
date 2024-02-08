@@ -8,6 +8,7 @@ public class AttackManager : MonoBehaviour
     public bool isAttacking = false;
     public float animationCooldown = .1f;
     public float weightLerp = 50f;
+    [HideInInspector] public LayerMask environmentMask;
     [HideInInspector] public LayerMask playerMask;
     [HideInInspector] public Animator animator;
     [HideInInspector] public PhotonView view;
@@ -151,12 +152,21 @@ public class AttackManager : MonoBehaviour
                 SoundManager.instance.Play3D(weapon.damageSounds[Random.Range(0, weapon.damageSounds.Length)], hit.transform.position);
             }
             view.RPC("Damage", view.Owner, damage, true);
+            return;
+        }
+        RaycastHit hit2;
+        if (Physics.Raycast(camTransform.position, camTransform.forward, out hit2, distance, (int)environmentMask))
+        {
+            SoundMaterial sma = hit2.transform.GetComponent<SoundMaterial>();
+            if (sma == null) return;
+            string mat = sma.GetSMat(hit2.textureCoord);
+            SoundManager.instance.Play3D(mat + "Hit" + Random.Range(0, 3).ToString(), hit2.point);
         }
     }
 
     [PunRPC]
     public void AttackManagerPlay(string animation, int index)
     {
-        animator.Play(animation, index);
+        animator.Play(animation, index, 0f);
     }
 }

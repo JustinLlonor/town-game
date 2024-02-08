@@ -169,7 +169,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
                 SoundMaterial sma = hit.transform.GetComponent<SoundMaterial>();
                 if (sma == null) return;
                 string mat = sma.GetSMat(hit.textureCoord);
-                SoundManager.instance.Play3D(mat + "LandSoft", transform.position);
+                SoundManager.instance.Play3D(mat + "LandSoft", groundCheck.position);
             }
         }
     }
@@ -256,6 +256,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         shake.StartShake(jumpShake.shakeProperties);
         rb.AddForce(transform.up * jumpHeight, ForceMode.Impulse);
         jumpTimer = jumpCooldown;
+        SoundManager.instance.Play3D("Jump", groundCheck.position);
     }
 
     void Inputs()
