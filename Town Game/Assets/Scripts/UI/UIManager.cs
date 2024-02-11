@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
+    public static UIManager instance;
     public CorpseUI cUI;
     public CloseUI closeUI;
 
@@ -14,6 +15,7 @@ public class UIManager : MonoBehaviour
 
     private void Awake()
     {
+        instance = this;
         cm = FindObjectOfType<CursorManager>();
         closeUI += CloseCorpse;
     }
@@ -27,6 +29,9 @@ public class UIManager : MonoBehaviour
         }
     }
 
+
+
+    // Corpse code //
     public void OpenCorpse(List<Evidence> evidence, int depth = 0)
     {
         cUI.gameObject.SetActive(true);

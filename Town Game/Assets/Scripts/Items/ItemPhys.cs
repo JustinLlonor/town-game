@@ -2,6 +2,7 @@ using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using WebSocketSharp;
 
 public class ItemPhys : MonoBehaviour
 {
@@ -11,11 +12,13 @@ public class ItemPhys : MonoBehaviour
 
     PlayerManager playerManager;
     PhotonView view;
+    ObjectManager om;
 
     private void Awake()
     {
         playerManager = FindObjectOfType<PlayerManager>();
         view = gameObject.GetComponent<PhotonView>();
+        om = FindObjectOfType<ObjectManager>();
     }
 
     private void Start()
@@ -41,6 +44,12 @@ public class ItemPhys : MonoBehaviour
     {
         if (pickedUp) return;
         PlayerInventory inventory = playerManager.currentPlayer.GetComponent<PlayerInventory>();
+        string eName = inventory.hotbar[inventory.equippedSlot];
+        if (!eName.IsNullOrEmpty())
+        {
+            Item item = om.itemSearch[inventory.hotbar[inventory.equippedSlot]];
+            if (item.large) return;
+        }
         if (inventory.IsInventoryFull()) return;
         inventory.GiveItem(itemName, true);
         view.TransferOwnership(PhotonNetwork.LocalPlayer);
@@ -62,7 +71,7 @@ public class ItemPhys : MonoBehaviour
         gameObject.GetComponent<Interactable>().hovers[0].lore = "Pick up " + itemName;
         Item item = FindObjectOfType<ObjectManager>().itemSearch[itemName];
         gameObject.GetComponent<MeshFilter>().mesh = item.mesh;
-        gameObject.GetComponent<MeshRenderer>().material.SetTexture("_MainTexture", item.texture);
+        gameObject.GetComponent<MeshRenderer>().material.SetTexture("_MainTex", item.texture);
         gameObject.GetComponent<MeshCollider>().sharedMesh = item.mesh;
     }
 

@@ -12,8 +12,6 @@ public class InteractableFinder : MonoBehaviour
     [Header("Settings")]
     public float range = 2f;
     [Header("References")]
-    public GameObject defaultCrosshair;
-    public GameObject interactCrosshair;
     public TextMeshProUGUI interactText;
 
     GameObject currentInteractable = null;
@@ -28,7 +26,6 @@ public class InteractableFinder : MonoBehaviour
     private void Update()
     {
         CastRay();
-        Crosshair();
         InteractionKey();
     }
 
@@ -53,6 +50,7 @@ public class InteractableFinder : MonoBehaviour
                 currentInteractable = hit.collider.gameObject;
                 currentInteraction = currentInteractable.GetComponent<Interactable>();
                 DisplayInteraction(currentInteraction);
+                CrosshairManager.instance.AddCrosshair(0, 0);
                 currentInteraction.GlowMaterials();
                 return;
             }
@@ -66,6 +64,8 @@ public class InteractableFinder : MonoBehaviour
         if (currentInteraction != null) currentInteraction.UnglowMaterials();
         currentInteractable = null;
         currentInteraction = null;
+        interactText.gameObject.SetActive(false);
+        CrosshairManager.instance.RemoveCrosshair(0);
     }
 
     void InteractionKey()
@@ -93,13 +93,8 @@ public class InteractableFinder : MonoBehaviour
         {
             iTxt = $"{iTxt}[{h.key}] {h.lore}\n";
         }
-        interactText.text = iTxt;
-    }
 
-    void Crosshair()
-    {
-        bool cDisplay = currentInteractable == null;
-        defaultCrosshair.SetActive(cDisplay);
-        interactCrosshair.SetActive(!cDisplay);
+        interactText.gameObject.SetActive(true);
+        interactText.text = iTxt;
     }
 }

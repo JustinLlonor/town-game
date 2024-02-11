@@ -125,6 +125,7 @@ public class AttackManager : MonoBehaviour
         yield return new WaitForSeconds(weapon.attackCharge);
         PlayShake(weapon.shake);
         CastAttackRay(weapon.range, weapon.damage, weapon);
+        //Debug.Break();
         atkCooldown = weapon.attackCooldown;
         yield return new WaitForSeconds(animLength - weapon.attackCharge);
         tWeight = 0f;
@@ -157,6 +158,17 @@ public class AttackManager : MonoBehaviour
         RaycastHit hit2;
         if (Physics.Raycast(camTransform.position, camTransform.forward, out hit2, distance, (int)environmentMask))
         {
+            MeshRenderer hitRenderer = hit2.transform.GetComponent<MeshRenderer>();
+            Texture2D hitTex = (Texture2D)hitRenderer.material.mainTexture;
+            Vector2 uv = hit2.textureCoord;
+            uv.x *= hitTex.width;
+            uv.y *= hitTex.height;
+            Color color = hitTex.GetPixel(Mathf.RoundToInt(uv.x), Mathf.RoundToInt(uv.y));
+            Vector3 rotation = Quaternion.FromToRotation(Vector3.up, hit2.normal).eulerAngles;
+            Vector3 tColor = new Vector3(color.r, color.g, color.b);
+            ParticleManager.instance.SpawnParticle("Chunks", hit2.point, rotation, tColor);
+            ParticleManager.instance.transform.GetComponent<PhotonView>().RPC("SpawnParticle", RpcTarget.Others, "Chunks", hit2.point, rotation, tColor);
+
             SoundMaterial sma = hit2.transform.GetComponent<SoundMaterial>();
             if (sma == null) return;
             string mat = sma.GetSMat(hit2.textureCoord);

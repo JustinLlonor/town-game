@@ -210,6 +210,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     public void EquipItem(int slot, bool selfEquip = false)
     {
         if (!view.IsMine) return;
+        CrosshairManager.instance.RemoveCrosshair(1);
         largeUI.SetActive(false);
         if (equippedSlot == slot && !selfEquip) return;
         equippedSlot = slot;
@@ -225,6 +226,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         {
             Weapon weapon = (Weapon)equippedItem;
             attackManager.SetAttackCooldown(weapon.attackCooldown);
+            CrosshairManager.instance.AddCrosshair(1, 1);
         }
 
         ShowItem(hotbar[equippedSlot]);
@@ -236,7 +238,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     {
         Item equippedItem = itemManager.itemSearch[itemName];
         sFilter.mesh = equippedItem.mesh;
-        sRenderer.material.SetTexture("_MainTexture", equippedItem.texture);
+        sRenderer.material.SetTexture("_MainTex", equippedItem.texture);
         ResetEquipLayers();
         // Play all pose animations on the item
         foreach (Item.AnimationState pose in equippedItem.holdPoses)
@@ -249,7 +251,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         // Client side
         if (!view.IsMine) return;
         cFilter.mesh = equippedItem.mesh;
-        cRenderer.material.SetTexture("_MainTexture", equippedItem.texture);
+        cRenderer.material.SetTexture("_MainTex", equippedItem.texture);
         yOffset = equippedItem.yOffset;
         cItem.localPosition = itemPosition + (Vector3.down * equippedItem.iYOffset);
         cItem.localEulerAngles = new Vector3(equippedItem.angleOffset, 0f, 0f);

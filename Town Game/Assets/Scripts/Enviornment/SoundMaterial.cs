@@ -17,7 +17,7 @@ public class SoundMaterial : MonoBehaviour
         pixelUV.x *= texture.width;
         pixelUV.y *= texture.height;
 
-        Color color = texture.GetPixel(Mathf.RoundToInt(pixelUV.x), Mathf.RoundToInt(pixelUV.y));
+        Color color = texture.GetPixel(Mathf.FloorToInt(pixelUV.x), Mathf.FloorToInt(pixelUV.y));
 
         float closeness = 0f;
         SMatIndex.SoundColor closest = null;

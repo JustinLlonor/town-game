@@ -16,9 +16,9 @@ MonoBehaviour:
   settingGroup: 
   sounds:
   - name: Jump
-    clip: {fileID: 8300000, guid: a0b45f39758e08c4ea37a7ccf648a7e2, type: 3}
+    clip: {fileID: 8300000, guid: fd1828551db11224bae9e94f002d5191, type: 3}
     volume: 0.6
-    pitch: 1
+    pitch: 1.25
     loop: 0
     minDistance: 10
     maxDistance: 15
@@ -64,25 +64,25 @@ MonoBehaviour:
     maxDistance: 15
     source: {fileID: 0}
   - name: metalHit0
-    clip: {fileID: 8300000, guid: 381bd6c62663c8a41a466ac1620dc670, type: 3}
-    volume: 0.5
-    pitch: 0.9
+    clip: {fileID: 8300000, guid: 3473e08e24190c54c8ce1227313a44b2, type: 3}
+    volume: 0.25
+    pitch: 0.7
     loop: 0
     minDistance: 10
     maxDistance: 15
     source: {fileID: 0}
   - name: metalHit1
-    clip: {fileID: 8300000, guid: 6a304a944e763794297693d0ad9877a9, type: 3}
-    volume: 0.5
-    pitch: 0.9
+    clip: {fileID: 8300000, guid: d4c7abcb4fc8f6c46829cf517809a566, type: 3}
+    volume: 0.25
+    pitch: 0.7
     loop: 0
     minDistance: 10
     maxDistance: 15
     source: {fileID: 0}
   - name: metalHit2
-    clip: {fileID: 8300000, guid: 6fc8d3ec62e933440920bca538437c03, type: 3}
-    volume: 0.5
-    pitch: 0.9
+    clip: {fileID: 8300000, guid: 1ab0474b262d34e498abeee7a01f88d8, type: 3}
+    volume: 0.25
+    pitch: 0.7
     loop: 0
     minDistance: 10
     maxDistance: 15
