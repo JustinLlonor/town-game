@@ -15,14 +15,6 @@ MonoBehaviour:
   volumeMultiplier: 1
   settingGroup: 
   sounds:
-  - name: Jump
-    clip: {fileID: 8300000, guid: fd1828551db11224bae9e94f002d5191, type: 3}
-    volume: 0.6
-    pitch: 1.25
-    loop: 0
-    minDistance: 10
-    maxDistance: 15
-    source: {fileID: 0}
   - name: metalStep0
     clip: {fileID: 8300000, guid: db07f7939c5fb1345836985adcb48335, type: 3}
     volume: 0.05

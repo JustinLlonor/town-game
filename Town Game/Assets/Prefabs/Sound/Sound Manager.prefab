@@ -45,74 +45,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88fa6b4a50144c94bb4fd19099041541, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sounds:
-  - name: HeavySwing1
-    clip: {fileID: 8300000, guid: 2113a44d91704964aa6851bd4bfd866c, type: 3}
-    volume: 1
-    pitch: 1
-    loop: 0
-    minDistance: 10
-    maxDistance: 15
-    source: {fileID: 0}
-  - name: HeavySwing2
-    clip: {fileID: 8300000, guid: f1834ae82e0ca8940ba564f30a8edb88, type: 3}
-    volume: 1
-    pitch: 1
-    loop: 0
-    minDistance: 10
-    maxDistance: 15
-    source: {fileID: 0}
-  - name: grassStep0
-    clip: {fileID: 8300000, guid: db07f7939c5fb1345836985adcb48335, type: 3}
-    volume: 0.1
-    pitch: 1
-    loop: 0
-    minDistance: 10
-    maxDistance: 15
-    source: {fileID: 0}
-  - name: grassStep1
-    clip: {fileID: 8300000, guid: 2a3d30a515ee7c64caf2971e0f4f91af, type: 3}
-    volume: 0.1
-    pitch: 1
-    loop: 0
-    minDistance: 10
-    maxDistance: 15
-    source: {fileID: 0}
-  - name: grassStep2
-    clip: {fileID: 8300000, guid: cdc03c93247360b4b9301f74bf51e951, type: 3}
-    volume: 0.1
-    pitch: 1
-    loop: 0
-    minDistance: 10
-    maxDistance: 15
-    source: {fileID: 0}
-  - name: LandMetalSoft
-    clip: {fileID: 8300000, guid: 4376e4f4bebd04244b6d14db1de4e30f, type: 3}
-    volume: 0.257
-    pitch: 1
-    loop: 0
-    minDistance: 10
-    maxDistance: 15
-    source: {fileID: 0}
-  - name: LandMetalHard
-    clip: {fileID: 8300000, guid: dab9d58f12d0dbc4a821b3d2c3dd4f66, type: 3}
-    volume: 0.604
-    pitch: 1
-    loop: 0
-    minDistance: 10
-    maxDistance: 15
-    source: {fileID: 0}
-  - name: Stab1
-    clip: {fileID: 8300000, guid: b64e85d00c458344fb82d73b1054a466, type: 3}
-    volume: 1
-    pitch: 1
-    loop: 0
-    minDistance: 10
-    maxDistance: 15
-    source: {fileID: 0}
   soundGroups:
   - {fileID: 11400000, guid: 04d3769109bc5fe4086c8978885a97ad, type: 2}
   - {fileID: 11400000, guid: 17d4bc22465b14c41bab2978c39547dc, type: 2}
+  - {fileID: 11400000, guid: 32314191ad90fd7458b060cc3d058e61, type: 2}
   soundInstance: {fileID: 3543802267380313500, guid: 44c59eb65ef66ab4b8860710a7896da7, type: 3}
   view: {fileID: 1445171470900705614}
 --- !u!114 &1445171470900705614
