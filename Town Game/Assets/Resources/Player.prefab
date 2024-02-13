@@ -459,6 +459,7 @@ GameObject:
   - component: {fileID: 5977247467016524006}
   - component: {fileID: 3395841891906680581}
   - component: {fileID: 2101631025278925208}
+  - component: {fileID: 1367603565845618735}
   - component: {fileID: 8835480446840007214}
   - component: {fileID: 2546787659200004203}
   - component: {fileID: 7280666953437362449}
@@ -617,7 +618,7 @@ MonoBehaviour:
   sprintMultiplier: 1.7
   sprintStaminaConsumption: 20
   groundDrag: 6
-  jumpHeight: 5
+  jumpHeight: 6
   jumpCooldown: 0.5
   jumpStaminaConsumption: 20
   canJump: 1
@@ -720,6 +721,29 @@ MonoBehaviour:
   m_SynchronizeAngularVelocity: 0
   m_TeleportEnabled: 0
   m_TeleportIfDistanceGreaterThan: 3
+--- !u!136 &1367603565845618735
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1787190705143953567}
+  m_Material: {fileID: 13400000, guid: a04529e497818024e96290d0bf3ecb29, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.22
+  m_Height: 1.485796
+  m_Direction: 1
+  m_Center: {x: 0, y: 1.0621021, z: 0}
 --- !u!136 &8835480446840007214
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -727,7 +751,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1787190705143953567}
-  m_Material: {fileID: 13400000, guid: fe798049805df834c85471a238cd5480, type: 2}
+  m_Material: {fileID: 13400000, guid: e4f5d06317088d64493e84cd03fa6135, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0

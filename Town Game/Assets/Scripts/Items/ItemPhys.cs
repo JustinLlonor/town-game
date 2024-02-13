@@ -13,9 +13,11 @@ public class ItemPhys : MonoBehaviour
     PlayerManager playerManager;
     PhotonView view;
     ObjectManager om;
+    InteractableFinder finder;
 
     private void Awake()
     {
+        finder = FindObjectOfType<InteractableFinder>();
         playerManager = FindObjectOfType<PlayerManager>();
         view = gameObject.GetComponent<PhotonView>();
         om = FindObjectOfType<ObjectManager>();
@@ -48,7 +50,11 @@ public class ItemPhys : MonoBehaviour
         if (!eName.IsNullOrEmpty())
         {
             Item item = om.itemSearch[inventory.hotbar[inventory.equippedSlot]];
-            if (item.large) return;
+            if (item.large)
+            {
+                finder.iValid = false;
+                return;
+            }
         }
         if (inventory.IsInventoryFull()) return;
         inventory.GiveItem(itemName, true);

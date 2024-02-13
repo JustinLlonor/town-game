@@ -13,10 +13,13 @@ public class InteractableFinder : MonoBehaviour
     public float range = 2f;
     [Header("References")]
     public TextMeshProUGUI interactText;
+    public InteractableUI iui;
 
+    [HideInInspector] public bool iValid = true;
     GameObject currentInteractable = null;
     CursorManager cm;
     Interactable currentInteraction;
+    float timer = 0f;
 
     private void Awake()
     {
@@ -56,7 +59,7 @@ public class InteractableFinder : MonoBehaviour
             }
             return;
         }
-        ResetInteractions();
+        if (currentInteractable != null) ResetInteractions();
     }
 
     void ResetInteractions()
@@ -64,37 +67,64 @@ public class InteractableFinder : MonoBehaviour
         if (currentInteraction != null) currentInteraction.UnglowMaterials();
         currentInteractable = null;
         currentInteraction = null;
-        interactText.gameObject.SetActive(false);
+        StopAllCoroutines();
+        timer = 0f;
+        iui.StopHighlight();
+        iui.ClearInteractions();
         CrosshairManager.instance.RemoveCrosshair(0);
     }
 
     void InteractionKey()
     {
         if (!cm.isLocked) return;
+        if (timer > 0f) return;
         if (currentInteraction != null)
         {
+            int i = 0;
             foreach (Interactable.Hover h in currentInteraction.hovers)
             {
                 if (Input.GetKeyDown(h.key))
                 {
-                    h.action.Invoke();
+                    iui.StartHighlight(iui.transform.GetChild(i), h.delay);
+                    StartCoroutine(StartTimer(h.delay, h));
                 }
+                i++;
             }
         }
+    }
+
+    IEnumerator StartTimer(float length, Interactable.Hover h)
+    {
+        while (Input.GetKey(h.key))
+        {
+            yield return null;
+            timer += Time.deltaTime;
+            if (timer > length)
+            {
+                h.action.Invoke();
+                if (!iValid)
+                {
+                    iValid = true;
+                    break;
+                }
+                CrosshairManager.instance.RemoveCrosshair(0);
+                iui.ClearInteractions();
+                timer = 0f;
+                break;
+            }
+        }
+        timer = 0f;
+        iui.StopHighlight();
     }
 
     void DisplayInteraction(Interactable inter)
     {
         // Sets to lore of interaction
         Interactable.Hover[] hovers = inter.hovers;
-
-        string iTxt = "";
+        iui.ClearInteractions();
         foreach (Interactable.Hover h in hovers)
         {
-            iTxt = $"{iTxt}[{h.key}] {h.lore}\n";
+            iui.AddInteraction($"[{h.key}] {h.lore}\n");
         }
-
-        interactText.gameObject.SetActive(true);
-        interactText.text = iTxt;
     }
 }

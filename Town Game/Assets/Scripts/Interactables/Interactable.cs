@@ -20,6 +20,7 @@ public class Interactable : MonoBehaviour
     {
         public string lore;
         public KeyCode key;
+        public float delay;
         public UnityEvent action;
     }
 
