@@ -10,14 +10,7 @@ public class InteractableUI : MonoBehaviour
     public float alphaLerp = 40f;
     public GameObject interactPrefab;
     Transform interacted = null;
-    bool hovering = false;
     float iAlpha = 1f;
-    InteractableFinder finder;
-
-    private void Awake()
-    {
-        finder = FindObjectOfType<InteractableFinder>();
-    }
 
     private void Update()
     {

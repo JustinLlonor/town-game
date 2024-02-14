@@ -20,8 +20,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     [System.Serializable]
     public class PlayerSettings
     {
-        public float speed = 3f;
-        public float airspeed = 2.5f;
+        public float speed = 3f;    
         public bool canJump = true;
     }
 
@@ -35,7 +34,6 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         playerInventory.hotbarUI = hotbar;
         playerInventory.largeUI = largeUI;
         playerMovement.speed = playerSettings.speed;
-        playerMovement.airSpeed = playerSettings.airspeed;
         playerMovement.canJump = playerSettings.canJump;
 
         currentPlayer = player;

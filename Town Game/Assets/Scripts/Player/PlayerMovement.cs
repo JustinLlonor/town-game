@@ -18,7 +18,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public float jumpStaminaConsumption = 20f;
     public bool canJump = true;
     public float airHandling = 0.4f;
-    public float airSpeed = 2.7f;
+    float airSpeed = 2.7f;
     public LayerMask environmentMask;
     public Transform groundCheck;
     public Shake jumpShake;
@@ -75,6 +75,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     private void Awake()
     {
+        airSpeed = speed;
         view = gameObject.GetComponent<PhotonView>();
         playerManager = FindObjectOfType<PlayerManager>();
         cursorManager = FindObjectOfType<CursorManager>();
@@ -115,6 +116,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         {
             OnLand();
         }
+        if (previousGrounded && !isGrounded)
+        {
+            OnAir();
+        }
         previousGrounded = isGrounded;
         Fall();
     }
@@ -140,6 +145,12 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             peakYPosition = transform.position.y;
         }
         previousYVel = rb.velocity.y;
+    }
+
+    void OnAir()
+    {
+        if (isSprinting) airSpeed = speed * sprintMultiplier;
+        if (!isSprinting) airSpeed = speed;
     }
 
     void OnLand()

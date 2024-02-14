@@ -85,6 +85,12 @@ public class InteractableFinder : MonoBehaviour
             {
                 if (Input.GetKeyDown(h.key))
                 {
+                    if (h.delay == 0f)
+                    {
+                        h.action.Invoke();
+                        ResetInteractions();
+                        return;
+                    }
                     iui.StartHighlight(iui.transform.GetChild(i), h.delay);
                     StartCoroutine(StartTimer(h.delay, h));
                 }

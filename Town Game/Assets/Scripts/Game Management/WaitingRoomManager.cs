@@ -14,6 +14,11 @@ public class WaitingRoomManager : MonoBehaviourPunCallbacks, IPunObservable
     GameTimer gt;
     int previousRoomPhase = 0;
 
+    public void LaunchGame()
+    {
+
+    }
+
     void Awake()
     {
         gt = gameObject.GetComponent<GameTimer>();

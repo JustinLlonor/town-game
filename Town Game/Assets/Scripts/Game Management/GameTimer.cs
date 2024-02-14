@@ -55,6 +55,7 @@ public class GameTimer : MonoBehaviourPunCallbacks, IPunObservable
 
     void TimerUI()
     {
+        if (timerText == null) return;
         timerText.text = Mathf.Ceil(clientTimer).ToString();
     }
 

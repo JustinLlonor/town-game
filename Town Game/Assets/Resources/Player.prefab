@@ -622,8 +622,7 @@ MonoBehaviour:
   jumpCooldown: 0.5
   jumpStaminaConsumption: 20
   canJump: 1
-  airHandling: 0.4
-  airSpeed: 3
+  airHandling: 0.2
   environmentMask:
     serializedVersion: 2
     m_Bits: 128
@@ -741,9 +740,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.22
-  m_Height: 1.485796
+  m_Height: 1.7325841
   m_Direction: 1
-  m_Center: {x: 0, y: 1.0621021, z: 0}
+  m_Center: {x: 0, y: 0.938708, z: 0}
 --- !u!136 &8835480446840007214
 CapsuleCollider:
   m_ObjectHideFlags: 0
