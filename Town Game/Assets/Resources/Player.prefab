@@ -509,9 +509,9 @@ MonoBehaviour:
   maxHP: 100
   HP: 100
   HPRegenSpeed: 1.5
-  maxStamina: 100
-  stamina: 100
-  staminaRegenSpeed: 15
+  maxStamina: 200
+  stamina: 200
+  staminaRegenSpeed: 30
   regenCooldownPoint: 1
   staminaCooldown: 0
   canRegenStamina: 1
@@ -615,7 +615,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 2.5
   movementMultiplier: 10
-  sprintMultiplier: 1.7
+  sprintMultiplier: 2
   sprintStaminaConsumption: 20
   groundDrag: 6
   jumpHeight: 6

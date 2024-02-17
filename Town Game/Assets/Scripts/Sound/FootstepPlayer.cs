@@ -21,7 +21,7 @@ public class FootstepPlayer : MonoBehaviour
     {
         if (!view.IsMine) return;
         RaycastHit hit;
-        if (Physics.Raycast(footstepRaycast.position, footstepRaycast.up * -1f, out hit, Mathf.Infinity, (int)environmentMask))
+        if (Physics.Raycast(footstepRaycast.position, footstepRaycast.up * -1f, out hit, 1f, (int)environmentMask))
         {
             SoundMaterial sma = hit.transform.GetComponent<SoundMaterial>();
             if (sma == null) return;

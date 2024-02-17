@@ -6,8 +6,7 @@ in float ToonRampOffset, in float ToonRampOffsetPoint, in float Ambient, out flo
     #ifdef SHADERGRAPH_PREVIEW
         ToonRampOutput = float3(0.5,0.5,0);
         Direction = float3(0.5,0.5,0);
-    #else
- 
+    #else   
         // grab the shadow coordinates
         #if SHADOWS_SCREEN
             half4 shadowCoord = ComputeScreenPos(ClipSpacePos);
@@ -26,16 +25,15 @@ in float ToonRampOffset, in float ToonRampOffsetPoint, in float Ambient, out flo
         
         
         // toonramp in a smoothstep
-        half toonRamp = smoothstep(ToonRampOffset, ToonRampOffset + ToonRampSmoothness, d);
+        half toonRamp = smoothstep(ToonRampOffset, ToonRampOffset+ ToonRampSmoothness, d );
         
         
  
-        float3 extraLights;
+        float3 extraLights = float3(0, 0, 0);
         // get the number of point/spot lights
         int pixelLightCount = GetAdditionalLightsCount();
         // loop over every light
-        for (int j = 0; j < pixelLightCount; ++j)
-        {   
+        for (int j = 0; j < pixelLightCount; ++j) {
             // grab the point light
             // If you get an error here V remove the ", half4(1,1,1,1)" part
             Light aLight = GetAdditionalLight(j, WorldPos, half4(1, 1, 1, 1));
@@ -47,7 +45,7 @@ in float ToonRampOffset, in float ToonRampOffsetPoint, in float Ambient, out flo
             half d = dot(Normal, aLight.direction) * 0.5 + 0.5;
             
             // toonramp in a smoothstep
-            half toonRampExtra = smoothstep(ToonRampOffsetPoint, ToonRampOffsetPoint + ToonRampSmoothness, d);
+            half toonRampExtra = smoothstep(ToonRampOffsetPoint, ToonRampOffsetPoint+ ToonRampSmoothness, d );
  
             // add them all together
             extraLights += (attenuatedLightColor * toonRampExtra);
@@ -57,7 +55,7 @@ in float ToonRampOffset, in float ToonRampOffsetPoint, in float Ambient, out flo
         toonRamp *= light.shadowAttenuation;
  
         // add in lights and extra tinting
-        ToonRampOutput = light.color * (toonRamp + ToonRampTinting) + Ambient;
+        ToonRampOutput = light.color * (toonRamp + ToonRampTinting)  + Ambient;
  
         // also add in point/spot lights
         ToonRampOutput += extraLights;
@@ -67,7 +65,7 @@ in float ToonRampOffset, in float ToonRampOffsetPoint, in float Ambient, out flo
             Direction = normalize(light.direction);
         #else
         // if no main light, use a side down angle
-            Direction = float3(0.5, 0.5, 0);
+            Direction = float3(0.5,0.5,0);
         #endif
  
     #endif

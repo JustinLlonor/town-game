@@ -9,8 +9,8 @@ public class GameTimer : MonoBehaviourPunCallbacks, IPunObservable
 {
     public bool isTicking = false;
     public UnityEvent onTimerStart;
-    public UnityEvent onTimerFinish;
     public UnityEvent onTimerStop;
+    public UnityEvent onTimerFinish;
     public TextMeshProUGUI timerText;
     public float gameTimer;
     public float clientTimer;

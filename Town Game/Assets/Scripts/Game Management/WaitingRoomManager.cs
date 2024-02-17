@@ -16,11 +16,14 @@ public class WaitingRoomManager : MonoBehaviourPunCallbacks, IPunObservable
 
     public void LaunchGame()
     {
-
+        Debug.Log("Loading game...");
+        if (!PhotonNetwork.IsMasterClient) return;
+        PhotonNetwork.LoadLevel(2);
     }
 
     void Awake()
     {
+        PhotonNetwork.AutomaticallySyncScene = true;
         gt = gameObject.GetComponent<GameTimer>();
     }
 
@@ -76,7 +79,7 @@ public class WaitingRoomManager : MonoBehaviourPunCallbacks, IPunObservable
     void StartTimer()
     {
         Debug.Log("meow");
-        gt.StartTimer(5f);
+        gt.StartTimer(3f);
     }
 
     void PhaseUI()
