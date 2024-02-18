@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviourPunCallbacks
 {
@@ -23,6 +24,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public Transform groundCheck;
     public Shake jumpShake;
     public float groundedRadius = 0.2f;
+    public bool isGrounded = true;
 
     [Header("Stairs")]
     public float stepHeight = 0.3f;
@@ -37,10 +39,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public Shake softFall;
     public Shake hardFall;
 
-    [Header("Keybinds")]
-    public KeyCode jumpKey = KeyCode.Space;
-    public KeyCode sprintKey = KeyCode.LeftShift;
-
     [Header("Animation")]
     public Collider movementCollider;
     public Animator animator;
@@ -51,14 +49,13 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public Transform graphics;
     public Transform cameraPosition;
     public Transform orientation;
-
     PlayerManager playerManager;
     CursorManager cursorManager;
     PhotonView view;
     PlayerStats stats;
     Rigidbody rb;
     CameraBobbing bobbing;
-    CameraShake shake;
+    CameraShake shake;  
     float sprintGain = 1f;
     float jumpTimer = 0f;
     float horizontalMovement;
@@ -67,11 +64,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     float peakYPosition;
     bool isMoving;
     bool isSprinting;
-    bool isGrounded = true;
     bool previousGrounded = true;
     RaycastHit slopeHit;
     Vector3 moveDirection;
     Vector3 slopeDirection;
+    private Controls _controls;
 
     private void Awake()
     {
@@ -79,6 +76,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         view = gameObject.GetComponent<PhotonView>();
         playerManager = FindObjectOfType<PlayerManager>();
         cursorManager = FindObjectOfType<CursorManager>();
+        if (!view.IsMine) Destroy(gameObject.GetComponent<PlayerInput>());
+        _controls = new Controls();
         if (!view.IsMine) return;
         stats = gameObject.GetComponent<PlayerStats>();
         rb = gameObject.GetComponent<Rigidbody>();
@@ -99,13 +98,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         isGrounded = Physics.CheckSphere(groundCheck.position, groundedRadius, environmentMask);
         Inputs();
         ControlDrag();
-        if (Input.GetKeyDown(jumpKey) && isGrounded && jumpTimer <= 0f)
-        {
-            if (stats.ConsumeStamina(jumpStaminaConsumption))
-            {
-                Jump();
-            }
-        }
         slopeDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
         if (jumpTimer > 0f && isGrounded) jumpTimer -= Time.deltaTime;
         Sprint();
@@ -130,6 +122,37 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         MovePlayer();
         CapAirVelocity();
         StepClimb();
+    }
+
+    private new void OnEnable()
+    {
+        _controls.Enable();
+    }
+
+    private new void OnDisable()
+    {
+        _controls.Disable();
+    }
+
+    private void OnSprint() { }
+
+    private void OnJump()
+    {
+        if (!canJump) return;
+        if (!stats.ConsumeStamina(jumpStaminaConsumption)) return;
+        if (!isGrounded) return;
+        if (!(jumpTimer <= 0f)) return;
+        shake.StartShake(jumpShake.shakeProperties);
+        rb.AddForce(transform.up * jumpHeight, ForceMode.Impulse);
+        jumpTimer = jumpCooldown;
+        SoundManager.instance.Play3D("Jump", groundCheck.position);
+    }
+
+    private void OnMove(InputValue iv)
+    {
+        Vector2 mv = iv.Get<Vector2>();
+        horizontalMovement = mv.x;
+        verticalMovement = mv.y;
     }
 
     void Fall() 
@@ -198,7 +221,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     void Sprint()
     {
-        if (isMoving && Input.GetKey(sprintKey))
+        bool onSprintKey = _controls.BaseGameplay.Sprint.ReadValue<float>() > 0f;
+        if (isMoving && onSprintKey && isGrounded)
         {
             if (stats.RateConsumeStamina(sprintStaminaConsumption))
             {
@@ -261,20 +285,9 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
     }
 
-    void Jump()
-    {
-        if (!canJump) return;
-        shake.StartShake(jumpShake.shakeProperties);
-        rb.AddForce(transform.up * jumpHeight, ForceMode.Impulse);
-        jumpTimer = jumpCooldown;
-        SoundManager.instance.Play3D("Jump", groundCheck.position);
-    }
-
     void Inputs()
     {
         if (!cursorManager.isLocked) return;
-        horizontalMovement = Input.GetAxisRaw("Horizontal");
-        verticalMovement = Input.GetAxisRaw("Vertical");
 
         moveDirection = orientation.forward * verticalMovement + orientation.right * horizontalMovement;
     }

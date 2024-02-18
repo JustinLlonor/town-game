@@ -34,12 +34,14 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     CameraShake shake;
     PhotonView view;
     PlayerEvidence pe;
+    PlayerMovement pm;
     [HideInInspector] public Animator anim;
     int hLayer;
     float hWeight;
 
     private void Start()
     {
+        pm = gameObject.GetComponent<PlayerMovement>();
         hLayer = anim.GetLayerIndex(hurtLayer);
         view = gameObject.GetComponent<PhotonView>();
         pe = gameObject.GetComponent<PlayerEvidence>();
@@ -59,7 +61,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
         {
             staminaCooldown -= Time.deltaTime;
         }
-        if (staminaCooldown <= regenCooldownPoint && canRegenStamina)
+        if (staminaCooldown <= regenCooldownPoint && canRegenStamina && pm.isGrounded)
         {
             RegenStamina();
         }
