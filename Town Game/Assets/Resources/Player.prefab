@@ -450,6 +450,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1317372394872903684}
+  - component: {fileID: 3091803339169035289}
   - component: {fileID: 5552705410368871873}
   - component: {fileID: 1106844264840172896}
   - component: {fileID: 2378964989146487730}
@@ -494,6 +495,36 @@ Transform:
   - {fileID: 2587516000765255706}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3091803339169035289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1787190705143953567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: da001568072378d4da01e7b426730683, type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: BaseGameplay
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!114 &5552705410368871873
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -509,9 +540,9 @@ MonoBehaviour:
   maxHP: 100
   HP: 100
   HPRegenSpeed: 1.5
-  maxStamina: 200
-  stamina: 200
-  staminaRegenSpeed: 30
+  maxStamina: 120
+  stamina: 120
+  staminaRegenSpeed: 15
   regenCooldownPoint: 1
   staminaCooldown: 0
   canRegenStamina: 1
@@ -613,9 +644,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 877dd7d95f06ac74f83c1116a9156048, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 2.5
+  speed: 3.75
   movementMultiplier: 10
-  sprintMultiplier: 2
+  sprintMultiplier: 1.333333
   sprintStaminaConsumption: 20
   groundDrag: 6
   jumpHeight: 6
