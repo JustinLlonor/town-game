@@ -49,7 +49,16 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""name"": ""Sprint"",
                     ""type"": ""Value"",
                     ""id"": ""e4fc99fc-bcb9-4ec8-8b00-9d9b781924f7"",
-                    ""expectedControlType"": ""Analog"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Crouch"",
+                    ""type"": ""Value"",
+                    ""id"": ""71b01b11-f927-4fc1-a56b-6c44dba9acf6"",
+                    ""expectedControlType"": ""Axis"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
@@ -132,6 +141,17 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""action"": ""Sprint"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""eff512d4-b8fc-4044-950b-86325ffb0552"",
+                    ""path"": ""<Keyboard>/leftCtrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Crouch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -143,6 +163,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_BaseGameplay_Jump = m_BaseGameplay.FindAction("Jump", throwIfNotFound: true);
         m_BaseGameplay_Move = m_BaseGameplay.FindAction("Move", throwIfNotFound: true);
         m_BaseGameplay_Sprint = m_BaseGameplay.FindAction("Sprint", throwIfNotFound: true);
+        m_BaseGameplay_Crouch = m_BaseGameplay.FindAction("Crouch", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -207,6 +228,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_BaseGameplay_Jump;
     private readonly InputAction m_BaseGameplay_Move;
     private readonly InputAction m_BaseGameplay_Sprint;
+    private readonly InputAction m_BaseGameplay_Crouch;
     public struct BaseGameplayActions
     {
         private @Controls m_Wrapper;
@@ -214,6 +236,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         public InputAction @Jump => m_Wrapper.m_BaseGameplay_Jump;
         public InputAction @Move => m_Wrapper.m_BaseGameplay_Move;
         public InputAction @Sprint => m_Wrapper.m_BaseGameplay_Sprint;
+        public InputAction @Crouch => m_Wrapper.m_BaseGameplay_Crouch;
         public InputActionMap Get() { return m_Wrapper.m_BaseGameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -232,6 +255,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Sprint.started += instance.OnSprint;
             @Sprint.performed += instance.OnSprint;
             @Sprint.canceled += instance.OnSprint;
+            @Crouch.started += instance.OnCrouch;
+            @Crouch.performed += instance.OnCrouch;
+            @Crouch.canceled += instance.OnCrouch;
         }
 
         private void UnregisterCallbacks(IBaseGameplayActions instance)
@@ -245,6 +271,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Sprint.started -= instance.OnSprint;
             @Sprint.performed -= instance.OnSprint;
             @Sprint.canceled -= instance.OnSprint;
+            @Crouch.started -= instance.OnCrouch;
+            @Crouch.performed -= instance.OnCrouch;
+            @Crouch.canceled -= instance.OnCrouch;
         }
 
         public void RemoveCallbacks(IBaseGameplayActions instance)
@@ -267,5 +296,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnMove(InputAction.CallbackContext context);
         void OnSprint(InputAction.CallbackContext context);
+        void OnCrouch(InputAction.CallbackContext context);
     }
 }

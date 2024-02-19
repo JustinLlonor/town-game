@@ -7,8 +7,10 @@ public class CameraBobbing : MonoBehaviour
 {
     public float walkLength = 1f;
     public float sprintLength = 1f;
+    public float crouchLength = 1f;
     public float amplitude = .1f;
     public float sAmplitude = .1f;
+    public float cAmplitude = 0.04f;
     public float resetSpeed = 5f;
     public float transitionSpeed = 5f;
     public bool isBobbing = false;

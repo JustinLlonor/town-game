@@ -1,5 +1,5 @@
 {
-    "name": "PlayerControls",
+    "name": "Controls",
     "maps": [
         {
             "name": "BaseGameplay",
@@ -27,7 +27,16 @@
                     "name": "Sprint",
                     "type": "Value",
                     "id": "e4fc99fc-bcb9-4ec8-8b00-9d9b781924f7",
-                    "expectedControlType": "Analog",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Crouch",
+                    "type": "Value",
+                    "id": "71b01b11-f927-4fc1-a56b-6c44dba9acf6",
+                    "expectedControlType": "Axis",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -108,6 +117,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Sprint",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "eff512d4-b8fc-4044-950b-86325ffb0552",
+                    "path": "<Keyboard>/leftCtrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Crouch",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

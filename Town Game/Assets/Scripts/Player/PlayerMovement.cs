@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using UnityEngine.InputSystem;
+using JetBrains.Annotations;
 
 public class PlayerMovement : MonoBehaviourPunCallbacks
 {
@@ -10,6 +11,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public float speed = 6f;
     public float movementMultiplier = 10f;
     public float sprintMultiplier = 1.67f;
+    public float crouchMultiplier = 0.4f;
     public float sprintStaminaConsumption = 20f;
     public float groundDrag = 6f;
     
@@ -25,6 +27,16 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public Shake jumpShake;
     public float groundedRadius = 0.2f;
     public bool isGrounded = true;
+
+    [Header("Crouching")]
+    public AnimationCurve crouchCurve;
+    public float crouchTime = .2f;
+    public bool isCrouching = false;
+    public float playerRadius;
+    public Transform uncrouchCastUpper;
+    public Transform uncrouchCastLower;
+    public Collider[] standingColliders;
+    public Collider[] crouchingColliders;
 
     [Header("Stairs")]
     public float stepHeight = 0.3f;
@@ -48,6 +60,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     [Header("Camera")]
     public Transform graphics;
     public Transform cameraPosition;
+    public Transform standPos;
+    public Transform crouchPos;
     public Transform orientation;
     PlayerManager playerManager;
     CursorManager cursorManager;
@@ -57,18 +71,22 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     CameraBobbing bobbing;
     CameraShake shake;  
     float sprintGain = 1f;
+    float crouchMinus = 1f;
     float jumpTimer = 0f;
     float horizontalMovement;
     float verticalMovement;
     float previousYVel;
     float peakYPosition;
+    float unCastDistance;
     bool isMoving;
     bool isSprinting;
     bool previousGrounded = true;
+    bool sprintPressed = false;
     RaycastHit slopeHit;
     Vector3 moveDirection;
     Vector3 slopeDirection;
-    private Controls _controls;
+    IEnumerator currentCamLerp;
+    IEnumerator currentCrouchExit;
 
     private void Awake()
     {
@@ -77,7 +95,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         playerManager = FindObjectOfType<PlayerManager>();
         cursorManager = FindObjectOfType<CursorManager>();
         if (!view.IsMine) Destroy(gameObject.GetComponent<PlayerInput>());
-        _controls = new Controls();
         if (!view.IsMine) return;
         stats = gameObject.GetComponent<PlayerStats>();
         rb = gameObject.GetComponent<Rigidbody>();
@@ -90,6 +107,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         shake = playerManager.camShake;
         playerManager.camTransform.GetComponent<CamMove>().camPos = cameraPosition;
         stepRayUpper.localPosition = new Vector3(stepRayUpper.localPosition.x, stepHeight, stepRayUpper.localPosition.z);
+        unCastDistance = uncrouchCastUpper.position.y - uncrouchCastLower.position.y;
     }
 
     private void Update()
@@ -124,17 +142,15 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         StepClimb();
     }
 
-    private new void OnEnable()
+    private void OnSprint(InputValue iv)
     {
-        _controls.Enable();
+        if (iv.Get<float>() == 1f)
+        {
+            sprintPressed = true;
+            return;
+        }
+        sprintPressed = false;
     }
-
-    private new void OnDisable()
-    {
-        _controls.Disable();
-    }
-
-    private void OnSprint() { }
 
     private void OnJump()
     {
@@ -155,6 +171,123 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         verticalMovement = mv.y;
     }
 
+    private void OnCrouch(InputValue iv)
+    {
+        if (iv.Get<float>() == 1f)
+        {
+            EnterCrouch();
+            return;
+        }
+        ExitCrouch();
+    }
+
+    void EnterCrouch()
+    {
+        if (isCrouching) return;
+        if (isSprinting)
+        {
+            sprintPressed = false;
+            isSprinting = false;
+        }
+        EnableCrouchHitboxes();
+        view.RPC("EnableCrouchHitboxes", RpcTarget.Others);
+        crouchMinus = crouchMultiplier;
+        StartCamLerp(cameraPosition, crouchPos);
+        isCrouching = true;
+    }
+
+    void ExitCrouch()
+    {
+        if (!isCrouching) return;
+        if (currentCrouchExit != null)
+        {
+            StopCoroutine(currentCrouchExit);
+        }
+        currentCrouchExit = CheckCrouchExit();
+        StartCoroutine(currentCrouchExit);
+    }
+
+    void StartCamLerp(Transform from, Transform to)
+    {
+        if (currentCamLerp != null)
+        {
+            StopCoroutine(currentCamLerp);
+        }
+        currentCamLerp = LerpCamPos(from, to);
+        StartCoroutine(currentCamLerp);
+    }
+
+    IEnumerator LerpCamPos(Transform from, Transform to)
+    {
+        Transform newFrom = Instantiate(from.gameObject, from.parent).transform;
+        StartCoroutine(LifeTimer(newFrom.gameObject));
+        float lerpTime = 0f;
+        float lerpMax = crouchTime;
+        while (lerpTime < crouchTime)
+        {
+            yield return null;
+            float lerpPercent = lerpTime / lerpMax;
+            lerpPercent = crouchCurve.Evaluate(lerpPercent);
+            Vector3 newPos = Vector3.Lerp(newFrom.position, to.position, lerpPercent);
+            cameraPosition.position = newPos;
+            lerpTime += Time.deltaTime;
+        }
+        cameraPosition.position = to.position;
+    }
+
+    IEnumerator CheckCrouchExit()
+    {
+        while (!CanUncrouch())
+        {
+            yield return null;
+        }
+        DisableCrouchHitboxes();
+        view.RPC("DisableCrouchHitboxes", RpcTarget.Others);
+        crouchMinus = 1f;
+        StartCamLerp(cameraPosition, standPos);
+        isCrouching = false;
+    }
+
+    IEnumerator LifeTimer(GameObject obj)
+    {
+        float timer = 0f;
+        while (timer < crouchTime)
+        {
+            yield return null;
+            timer += Time.deltaTime;
+        }
+        Destroy(obj);
+    }
+
+    [PunRPC]
+    void EnableCrouchHitboxes() 
+    {
+        SetColliders(crouchingColliders, true);
+        SetColliders(standingColliders, false);
+    }
+
+    [PunRPC]
+    void DisableCrouchHitboxes()
+    {
+        SetColliders(crouchingColliders, false);
+        SetColliders(standingColliders, true);
+    }
+
+    void SetColliders(Collider[] colliders, bool isActive)
+    {
+        foreach (Collider c in colliders)
+        {
+            c.enabled = isActive;
+        }
+    }
+
+    bool CanUncrouch()
+    {
+        Ray ray = new Ray(uncrouchCastLower.position, Vector3.up);
+        bool canUncrouch = !Physics.SphereCast(ray, playerRadius-.001f, unCastDistance, environmentMask);
+        return canUncrouch;
+    }
+     
     void Fall() 
     {
         if (isGrounded)
@@ -221,11 +354,15 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     void Sprint()
     {
-        bool onSprintKey = _controls.BaseGameplay.Sprint.ReadValue<float>() > 0f;
-        if (isMoving && onSprintKey && isGrounded)
+        if (isMoving && sprintPressed && isGrounded)
         {
             if (stats.RateConsumeStamina(sprintStaminaConsumption))
             {
+                if (isCrouching)
+                {
+                    if (!CanUncrouch()) return;
+                }
+                ExitCrouch();
                 isSprinting = true;
             }
             else
@@ -273,22 +410,21 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         if (isGrounded && !OnSlope())
         {
-            rb.AddForce(moveDirection.normalized * speed * movementMultiplier * sprintGain, ForceMode.Acceleration);
+            rb.AddForce(moveDirection.normalized * speed * movementMultiplier * sprintGain * crouchMinus, ForceMode.Acceleration);
         }
         else if (isGrounded && OnSlope())
         {
-            rb.AddForce(slopeDirection.normalized * speed * movementMultiplier * sprintGain, ForceMode.Acceleration);
+            rb.AddForce(slopeDirection.normalized * speed * movementMultiplier * sprintGain * crouchMinus, ForceMode.Acceleration);
         }
         else
         {
-            rb.AddForce(moveDirection.normalized * speed * movementMultiplier * airHandling * sprintGain, ForceMode.Acceleration);
+            rb.AddForce(moveDirection.normalized * speed * movementMultiplier * airHandling * sprintGain * crouchMinus, ForceMode.Acceleration);
         }
     }
 
     void Inputs()
     {
         if (!cursorManager.isLocked) return;
-
         moveDirection = orientation.forward * verticalMovement + orientation.right * horizontalMovement;
     }
 
@@ -309,6 +445,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         animator.SetBool("isGrounded", isGrounded);
         animator.SetBool("isMoving", isMoving);
         animator.SetBool("isRunning", isSprinting);
+        animator.SetBool("isCrouching", isCrouching);
     }
 
     void UpdateAnimatorSpeed()
