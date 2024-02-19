@@ -9,8 +9,14 @@ public class InteractableUI : MonoBehaviour
     public float returnLerp = 20f;
     public float alphaLerp = 40f;
     public GameObject interactPrefab;
+    public float maxAlpha = .6f;
     Transform interacted = null;
     float iAlpha = 1f;
+
+    private void Awake()
+    {
+        iAlpha = maxAlpha;
+    }
 
     private void Update()
     {
@@ -19,11 +25,11 @@ public class InteractableUI : MonoBehaviour
             if (iAlpha == 0f) return;
             iAlpha = Mathf.Lerp(iAlpha, 0f, alphaLerp * Time.deltaTime);
             SetAlphas(iAlpha);
-        } 
+        }
         else
         {
-            if (iAlpha == 1f) return;
-            iAlpha = Mathf.Lerp(iAlpha, 1f, alphaLerp * Time.deltaTime);
+            if (iAlpha == maxAlpha) return;
+            iAlpha = Mathf.Lerp(iAlpha, maxAlpha, alphaLerp * Time.deltaTime);
             SetAlphas(iAlpha);
         }
     }
@@ -42,7 +48,9 @@ public class InteractableUI : MonoBehaviour
     public void AddInteraction(string text)
     {
         GameObject interaction = Instantiate(interactPrefab, transform);
-        interaction.GetComponent<TextMeshProUGUI>().text = text;
+        TextMeshProUGUI tex = interaction.GetComponent<TextMeshProUGUI>();
+        tex.text = text;
+        tex.color = new Color(1f, 1f, 1f, maxAlpha);
     }
 
     public void ClearInteractions()
