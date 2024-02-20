@@ -8,47 +8,89 @@ public class CameraBobbing : MonoBehaviour
     public float walkLength = 1f;
     public float sprintLength = 1f;
     public float crouchLength = 1f;
-    public float amplitude = .1f;
+    public float wAmplitude = .1f;
     public float sAmplitude = .1f;
     public float cAmplitude = 0.04f;
+    public float zTilt = 1f;
     public float resetSpeed = 5f;
     public float transitionSpeed = 5f;
     public bool isBobbing = false;
     public bool isSprinting = false;
+    public bool isCrouching = false;
     float bobPosition;
-    float sprintWeight = 0f;
+    float previousLength = 1f;
+    float previousAmplitude = 1f;
+    float currentLength = 1f;
+    float currentAmplitude = 1f;
+    float currentWeight = 1f;
 
-    private void Update()
+    private void Awake()
     {
-        SprintWeight();
-        if (isBobbing) Bob();
-        if (!isBobbing) ResetPos();
+        previousLength = walkLength;
+        previousAmplitude = wAmplitude;
     }
 
-    void SprintWeight()
+    private void LateUpdate()
     {
-        if (isSprinting && sprintWeight != 1f)
+        Weights();
+        if (isBobbing) Bob();
+        if (!isBobbing) ResetPos();
+        if (!isCrouching || !isBobbing)
         {
-            sprintWeight += Time.deltaTime * transitionSpeed;
+            transform.localRotation = Quaternion.Lerp(transform.localRotation, Quaternion.identity, Time.deltaTime * resetSpeed);
         }
-        if (!isSprinting && sprintWeight != 0f)
+    }
+
+    void Weights()
+    {
+        if (!isBobbing) return;
+        if (isSprinting)
         {
-            sprintWeight -= Time.deltaTime * transitionSpeed;
+            SetNewCurrent(sprintLength, sAmplitude);
+        }
+        if (!isSprinting && !isCrouching)
+        {
+            SetNewCurrent(walkLength, wAmplitude);
+        }
+        if (isCrouching)
+        {
+            SetNewCurrent(crouchLength, cAmplitude);
         }
 
-        sprintWeight = Mathf.Clamp01(sprintWeight);
+        if (currentWeight != 1f)
+        {
+            currentWeight += Time.deltaTime * transitionSpeed;
+            currentWeight = Mathf.Clamp01(currentWeight);
+        }
+    }
+
+    void SetNewCurrent(float length, float amplitude)
+    {
+        if (length != currentLength)
+        {
+            currentWeight = 0f;
+            previousLength = currentLength;
+            previousAmplitude = currentAmplitude;
+        }
+        currentLength = length;
+        currentAmplitude = amplitude;
     }
 
     void Bob()
     {
         bobPosition += Time.deltaTime;
-        float yWalk = Mathf.Sin(2 / walkLength * 2 * Mathf.PI * bobPosition) * amplitude;
-        float xWalk = Mathf.Sin(1 / walkLength * 2 * Mathf.PI * bobPosition) * amplitude / 2f;
-        float ySprint = Mathf.Sin(2 / sprintLength * 2 * Mathf.PI * bobPosition) * sAmplitude;
-        float xSprint = Mathf.Sin(1 / sprintLength * 2 * Mathf.PI * bobPosition) * sAmplitude / 2f;
-        float y = (ySprint - yWalk) * sprintWeight + yWalk;
-        float x = (xSprint - xWalk) * sprintWeight + xWalk;
+        float yPrevious = Mathf.Sin(2 / previousLength * 2 * Mathf.PI * bobPosition) * previousAmplitude;
+        float xPrevious = Mathf.Sin(1 / previousLength * 2 * Mathf.PI * bobPosition) * previousAmplitude / 2f;
+        float yCurrent = Mathf.Sin(2 / currentLength * 2 * Mathf.PI * bobPosition) * currentAmplitude;
+        float xCurrent = Mathf.Sin(1 / currentLength * 2 * Mathf.PI * bobPosition) * currentAmplitude / 2f;
+        float y = (yCurrent - yPrevious) * currentWeight + yPrevious;
+        float x = (xCurrent - xPrevious) * currentWeight + xPrevious;
         transform.localPosition = new Vector3(x, y, 0f);
+        if (isCrouching)
+        {
+            float zRot = x * zTilt;
+            transform.localEulerAngles = new Vector3(transform.localRotation.x, transform.localRotation.y, zRot);
+        }
     }
     
     void ResetPos()

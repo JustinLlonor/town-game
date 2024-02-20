@@ -108,14 +108,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd5c4db1794ee6f469cff219b7fe2175, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  walkLength: 1.167
+  walkLength: 0.9725
   sprintLength: 0.5525
-  amplitude: 0.015
-  sAmplitude: 0.05
+  crouchLength: 1
+  wAmplitude: 0.05
+  sAmplitude: 0.1
+  cAmplitude: 0.04
+  zTilt: 25
   resetSpeed: 5
   transitionSpeed: 5
   isBobbing: 0
   isSprinting: 0
+  isCrouching: 0
 --- !u!1 &6230202861230640545
 GameObject:
   m_ObjectHideFlags: 0
@@ -416,6 +420,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   range: 2
-  defaultCrosshair: {fileID: 0}
-  interactCrosshair: {fileID: 0}
   interactText: {fileID: 0}
+  iui: {fileID: 0}
+  iValid: 1

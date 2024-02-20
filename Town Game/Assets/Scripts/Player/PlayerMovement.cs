@@ -350,6 +350,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
         bobbing.isSprinting = isSprinting;
         bobbing.isBobbing = isMoving;
+        bobbing.isCrouching = isCrouching;
     }
 
     void Sprint()

@@ -32,7 +32,7 @@ public class CameraMovement : MonoBehaviour
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90, 90);
         yRotation += mouseX;
-        transform.eulerAngles = new Vector3(xRotation, yRotation, 0);
+        transform.eulerAngles = new Vector3(xRotation, yRotation, 0f);
         orientation.eulerAngles = new Vector3(0, yRotation, 0);
         player.eulerAngles = orientation.eulerAngles;
         headAim.position = transform.position + transform.forward;
