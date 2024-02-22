@@ -13,11 +13,10 @@ MonoBehaviour:
   m_Name: Land Hard
   m_EditorClassIdentifier: 
   shakeProperties:
-    angle: 90
+    angle: -90
     strength: 0.4
     speed: 4
     duration: 0.3
     noisePercent: 0.267
     dampingPercent: 0.593
     rotationPercent: 0.313
-    changePosition: 1

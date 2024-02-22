@@ -8,8 +8,9 @@ public class AttackManager : MonoBehaviour
     public bool isAttacking = false;
     public float animationCooldown = .1f;
     public float weightLerp = 50f;
+    public Collider[] colliders;
+    public LayerMask dmgMask;
     [HideInInspector] public LayerMask environmentMask;
-    [HideInInspector] public LayerMask playerMask;
     [HideInInspector] public Animator animator;
     [HideInInspector] public PhotonView view;
     [HideInInspector] public Animator itemAnimator;
@@ -28,6 +29,11 @@ public class AttackManager : MonoBehaviour
     {
         cShake = FindObjectOfType<CameraShake>();
         camTransform = Camera.main.transform;
+        if (!view.IsMine) return;
+        foreach(Collider collider in colliders)
+        {
+            collider.enabled = false;
+        }
     }
 
     private void Update()
@@ -143,10 +149,14 @@ public class AttackManager : MonoBehaviour
     public void CastAttackRay(float distance, float damage, Weapon weapon = null)
     {
         RaycastHit hit;
-        if (Physics.Raycast(camTransform.position, camTransform.forward, out hit, distance, (int)playerMask))
+        if (Physics.Raycast(camTransform.position, camTransform.forward, out hit, distance, dmgMask))
         {
-            Transform tTransform = hit.transform;
-            PhotonView view = tTransform.GetComponent<PhotonView>();
+            PhotonView view = hit.transform.GetComponent<PhotonView>();
+            if (view == null)
+            {
+                Debug.LogError("View not found!");
+                return;
+            }
             if (weapon != null)
             {
                 view.RPC("AddEvidence", view.Owner, "cause", weapon.evidenceIcons, weapon.evidenceDescriptions, 0f);
@@ -174,6 +184,19 @@ public class AttackManager : MonoBehaviour
             string mat = sma.GetSMat(hit2.textureCoord);
             SoundManager.instance.Play3D(mat + "Hit" + Random.Range(0, 3).ToString(), hit2.point);
         }
+    }
+
+    PhotonView GetDamageView(Transform checkedTransform)
+    {
+        while (checkedTransform.parent != null)
+        {
+            checkedTransform = checkedTransform.parent;
+            if (checkedTransform.gameObject.tag == "Player")
+            {
+                return checkedTransform.GetComponent<PhotonView>();
+            }
+        }
+        return null;
     }
 
     [PunRPC]

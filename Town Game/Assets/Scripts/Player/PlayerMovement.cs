@@ -29,8 +29,9 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public bool isGrounded = true;
 
     [Header("Crouching")]
-    public AnimationCurve crouchCurve;
+    public float crouchJumpMultiplier = 0.6f;
     public float crouchTime = .2f;
+    public AnimationCurve crouchCurve;
     public bool isCrouching = false;
     public float playerRadius;
     public Transform uncrouchCastUpper;
@@ -158,10 +159,15 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         if (!stats.ConsumeStamina(jumpStaminaConsumption)) return;
         if (!isGrounded) return;
         if (!(jumpTimer <= 0f)) return;
+        if (isCrouching) rb.AddForce(transform.up * jumpHeight * crouchJumpMultiplier, ForceMode.Impulse);
+        if (!isCrouching)
+        {
+            animator.Play("Jump");
+            rb.AddForce(transform.up * jumpHeight, ForceMode.Impulse);
+            SoundManager.instance.Play3D("Jump", groundCheck.position);
+        }
         shake.StartShake(jumpShake.shakeProperties);
-        rb.AddForce(transform.up * jumpHeight, ForceMode.Impulse);
         jumpTimer = jumpCooldown;
-        SoundManager.instance.Play3D("Jump", groundCheck.position);
     }
 
     private void OnMove(InputValue iv)
@@ -307,6 +313,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         if (isSprinting) airSpeed = speed * sprintMultiplier;
         if (!isSprinting) airSpeed = speed;
+        if (isCrouching) airSpeed = speed * crouchMultiplier;
     }
 
     void OnLand()

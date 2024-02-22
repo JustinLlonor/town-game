@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4312630353697931205}
   m_Layer: 0
   m_Name: middle1.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -74,7 +74,7 @@ GameObject:
   - component: {fileID: 4387264542735252850}
   m_Layer: 0
   m_Name: ring1.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -138,7 +138,7 @@ GameObject:
   - component: {fileID: 6501996020310103523}
   m_Layer: 0
   m_Name: pinky3.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -484,7 +484,7 @@ GameObject:
   - component: {fileID: 1138125396271112744}
   m_Layer: 0
   m_Name: pinky2.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -533,7 +533,7 @@ GameObject:
   - component: {fileID: 4000725801890306170}
   m_Layer: 6
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -736,12 +736,26 @@ MonoBehaviour:
   isAttacking: 0
   animationCooldown: 0.3
   weightLerp: 20
+  colliders:
+  - {fileID: 100124761108778186}
+  - {fileID: 4938274588834256044}
+  - {fileID: 1405521087558613715}
+  - {fileID: 9030407907706823834}
+  - {fileID: 767559608596064627}
+  - {fileID: 5355424680436994750}
+  - {fileID: 5914001071574798273}
+  - {fileID: 2897002708966903195}
+  - {fileID: 2391119420752058097}
+  - {fileID: 6307139785105208891}
+  - {fileID: 804241609843201094}
+  - {fileID: 5577768305694560694}
+  - {fileID: 2113896290026379922}
+  dmgMask:
+    serializedVersion: 2
+    m_Bits: 1024
   environmentMask:
     serializedVersion: 2
     m_Bits: 128
-  playerMask:
-    serializedVersion: 2
-    m_Bits: 64
   animator: {fileID: 5001893267009733704}
   view: {fileID: 5977247467016524006}
   itemAnimator: {fileID: 1863577794435942604}
@@ -764,7 +778,7 @@ MonoBehaviour:
   crouchMultiplier: 0.7
   sprintStaminaConsumption: 20
   groundDrag: 6
-  jumpHeight: 6
+  jumpHeight: 6.5
   jumpCooldown: 0.5
   jumpStaminaConsumption: 20
   canJump: 1
@@ -776,6 +790,8 @@ MonoBehaviour:
   jumpShake: {fileID: 11400000, guid: 75956f023138a7244a7a58663cb0ed13, type: 2}
   groundedRadius: 0.2
   isGrounded: 1
+  crouchJumpMultiplier: 0.7
+  crouchTime: 0.2
   crouchCurve:
     serializedVersion: 2
     m_Curve:
@@ -800,7 +816,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  crouchTime: 0.2
   isCrouching: 0
   playerRadius: 0.21
   uncrouchCastUpper: {fileID: 477552824089262698}
@@ -1160,7 +1175,7 @@ GameObject:
   - component: {fileID: 4131815906390657596}
   m_Layer: 0
   m_Name: thumb1.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1190,7 +1205,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3148779679355939206}
-  m_Layer: 0
+  - component: {fileID: 767559608596064627}
+  m_Layer: 10
   m_Name: head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1218,6 +1234,27 @@ Transform:
   - {fileID: 2424825738452904499}
   m_Father: {fileID: 3716483972060972689}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!135 &767559608596064627
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2418358651939824861}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.0013
+  m_Center: {x: 0, y: 0.001, z: 0.0002}
 --- !u!1 &2433336196233227219
 GameObject:
   m_ObjectHideFlags: 0
@@ -1343,7 +1380,7 @@ GameObject:
   - component: {fileID: 6374153202849870882}
   m_Layer: 0
   m_Name: ring1.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1375,7 +1412,7 @@ GameObject:
   - component: {fileID: 5367409174033098183}
   m_Layer: 0
   m_Name: middle3.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1406,7 +1443,7 @@ GameObject:
   - component: {fileID: 3987063499481790461}
   m_Layer: 0
   m_Name: thumb3.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1437,7 +1474,7 @@ GameObject:
   - component: {fileID: 5660957984162474693}
   m_Layer: 0
   m_Name: ring2.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1469,7 +1506,7 @@ GameObject:
   - component: {fileID: 7901988006079138545}
   m_Layer: 0
   m_Name: middle1.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1499,7 +1536,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8203419638957146883}
-  m_Layer: 0
+  - component: {fileID: 2897002708966903195}
+  m_Layer: 10
   m_Name: forearm.L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1522,6 +1560,27 @@ Transform:
   - {fileID: 6242451726365047817}
   m_Father: {fileID: 4243171588198375546}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &2897002708966903195
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3004673810909026660}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.0006254228, y: 0.0026693838, z: 0.00081211946}
+  m_Center: {x: -0.0000006522312, y: 0.0012882167, z: -0.00002228704}
 --- !u!1 &3119446071879163220
 GameObject:
   m_ObjectHideFlags: 0
@@ -1533,9 +1592,9 @@ GameObject:
   - component: {fileID: 9000314932712155709}
   - component: {fileID: 2791133701089415726}
   - component: {fileID: 7420980194143203979}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: Head FX
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1616,7 +1675,7 @@ GameObject:
   - component: {fileID: 1217600909574479996}
   m_Layer: 0
   m_Name: middle2.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1646,7 +1705,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3716483972060972689}
-  m_Layer: 0
+  - component: {fileID: 9030407907706823834}
+  m_Layer: 10
   m_Name: neck
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1669,6 +1729,27 @@ Transform:
   - {fileID: 3148779679355939206}
   m_Father: {fileID: 3627863261363966554}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &9030407907706823834
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3362781079813245814}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.001, y: 0.001, z: 0.001}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3509266266639936057
 GameObject:
   m_ObjectHideFlags: 0
@@ -1711,7 +1792,7 @@ GameObject:
   - component: {fileID: 7497008709652130164}
   m_Layer: 0
   m_Name: ring2.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1741,7 +1822,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4243171588198375546}
-  m_Layer: 0
+  - component: {fileID: 5355424680436994750}
+  m_Layer: 10
   m_Name: upperarm.L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1764,6 +1846,27 @@ Transform:
   - {fileID: 8203419638957146883}
   m_Father: {fileID: 4859662172232819344}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &5355424680436994750
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3563313221898160697}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.0009560714, y: 0.002815205, z: 0.00081211946}
+  m_Center: {x: 0.000046237754, y: 0.0010387572, z: -0.000022287019}
 --- !u!1 &3569424940578757243
 GameObject:
   m_ObjectHideFlags: 0
@@ -1775,7 +1878,7 @@ GameObject:
   - component: {fileID: 7687114967491908232}
   m_Layer: 0
   m_Name: pinky3.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1936,6 +2039,9 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 2
     Name: isTalking
+  - Type: 4
+    SynchronizeType: 2
+    Name: isCrouching
   m_SynchronizeLayers:
   - SynchronizeType: 1
     LayerIndex: 0
@@ -2090,7 +2196,7 @@ GameObject:
   - component: {fileID: 3452871290412810765}
   m_Layer: 0
   m_Name: middle3.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2121,7 +2227,7 @@ GameObject:
   - component: {fileID: 4845049117496576117}
   m_Layer: 0
   m_Name: middle2.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2314,8 +2420,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 9118308081295399195}
   m_AABB:
-    m_Center: {x: 0.0000000027939677, y: 0.005783732, z: -0.00052219466}
-    m_Extent: {x: 0.008601445, y: 0.00035732845, z: 0.0006563291}
+    m_Center: {x: -2.3283064e-10, y: -0.0006801933, z: 0.00045918243}
+    m_Extent: {x: 0.007031465, y: 0.008194186, z: 0.002186108}
   m_DirtyAABB: 0
 --- !u!1 &4044619975271303462
 GameObject:
@@ -2328,7 +2434,7 @@ GameObject:
   - component: {fileID: 3273156424468779350}
   m_Layer: 0
   m_Name: thumb2.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2360,7 +2466,7 @@ GameObject:
   - component: {fileID: 7454801379011852431}
   m_Layer: 0
   m_Name: pointer2.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2390,7 +2496,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3369263236979518758}
-  m_Layer: 0
+  - component: {fileID: 4938274588834256044}
+  m_Layer: 10
   m_Name: spine.02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2413,6 +2520,27 @@ Transform:
   - {fileID: 3627863261363966554}
   m_Father: {fileID: 6067828109587796757}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &4938274588834256044
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4146332139379836389}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.0034, y: 0.0027506244, z: 0.0019999999}
+  m_Center: {x: -3.3690273e-19, y: 0.00007311611, z: -1.6351746e-12}
 --- !u!1 &4472980383641624464
 GameObject:
   m_ObjectHideFlags: 0
@@ -2422,7 +2550,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6899375287241130625}
-  m_Layer: 0
+  - component: {fileID: 2113896290026379922}
+  m_Layer: 10
   m_Name: shin.R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2445,6 +2574,27 @@ Transform:
   - {fileID: 5547133871879666185}
   m_Father: {fileID: 63964417928658295}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &2113896290026379922
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4472980383641624464}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.0014625445, y: 0.0044585126, z: 0.0013726094}
+  m_Center: {x: 0.0000048506845, y: 0.0022047707, z: -0.000023655712}
 --- !u!1 &4538118135648026394
 GameObject:
   m_ObjectHideFlags: 0
@@ -2454,7 +2604,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4778135071635045163}
-  m_Layer: 0
+  - component: {fileID: 5914001071574798273}
+  m_Layer: 10
   m_Name: upperarm.R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2477,6 +2628,27 @@ Transform:
   - {fileID: 1554958680908832276}
   m_Father: {fileID: 8279318877981277017}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &5914001071574798273
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4538118135648026394}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.0009560714, y: 0.002815205, z: 0.00081211946}
+  m_Center: {x: 0.000046237754, y: 0.0010387572, z: -0.000022287019}
 --- !u!1 &4540519117895555996
 GameObject:
   m_ObjectHideFlags: 0
@@ -2486,7 +2658,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 63964417928658295}
-  m_Layer: 0
+  - component: {fileID: 804241609843201094}
+  m_Layer: 10
   m_Name: thigh.R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2509,6 +2682,27 @@ Transform:
   - {fileID: 6899375287241130625}
   m_Father: {fileID: 9118308081295399195}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &804241609843201094
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4540519117895555996}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.0014625445, y: 0.0033383856, z: 0.0013726096}
+  m_Center: {x: 0.000004850698, y: 0.0022691586, z: -0.000023655704}
 --- !u!1 &4659133457600599389
 GameObject:
   m_ObjectHideFlags: 0
@@ -2520,7 +2714,7 @@ GameObject:
   - component: {fileID: 6281718922114534316}
   m_Layer: 0
   m_Name: pointer1.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2552,7 +2746,7 @@ GameObject:
   - component: {fileID: 5967770378792083993}
   m_Layer: 0
   m_Name: thumb2.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2613,7 +2807,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2195195739010853229}
-  m_Layer: 0
+  - component: {fileID: 6307139785105208891}
+  m_Layer: 10
   m_Name: thigh.L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2636,6 +2831,27 @@ Transform:
   - {fileID: 3843419870947176388}
   m_Father: {fileID: 9118308081295399195}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &6307139785105208891
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5286397067725394496}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.0014625445, y: 0.0033383856, z: 0.0013726096}
+  m_Center: {x: 0.000004850698, y: 0.0022691586, z: -0.000023655704}
 --- !u!1 &5412791604201935769
 GameObject:
   m_ObjectHideFlags: 0
@@ -2647,7 +2863,7 @@ GameObject:
   - component: {fileID: 1645696770531898201}
   m_Layer: 0
   m_Name: ring3.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2709,7 +2925,7 @@ GameObject:
   - component: {fileID: 5851583053079354217}
   m_Layer: 0
   m_Name: ring3.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2740,7 +2956,7 @@ GameObject:
   - component: {fileID: 6071946675661500486}
   m_Layer: 0
   m_Name: pinky1.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2772,7 +2988,7 @@ GameObject:
   - component: {fileID: 1649423610079395803}
   m_Layer: 0
   m_Name: pointer3.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2803,7 +3019,7 @@ GameObject:
   - component: {fileID: 8462134711692110980}
   m_Layer: 0
   m_Name: pinky2.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2897,7 +3113,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1554958680908832276}
-  m_Layer: 0
+  - component: {fileID: 2391119420752058097}
+  m_Layer: 10
   m_Name: forearm.R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2920,6 +3137,27 @@ Transform:
   - {fileID: 5307200988228242352}
   m_Father: {fileID: 4778135071635045163}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &2391119420752058097
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6495887121820669082}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.0006254228, y: 0.0026693838, z: 0.00081211946}
+  m_Center: {x: -0.0000006522312, y: 0.0012882167, z: -0.00002228704}
 --- !u!1 &6924742355165564303
 GameObject:
   m_ObjectHideFlags: 0
@@ -2929,7 +3167,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9118308081295399195}
-  m_Layer: 0
+  - component: {fileID: 100124761108778186}
+  m_Layer: 10
   m_Name: spine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2956,6 +3195,27 @@ Transform:
   - {fileID: 63964417928658295}
   m_Father: {fileID: 1342524613149204641}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &100124761108778186
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6924742355165564303}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.0034, y: 0.0017201762, z: 0.0020312925}
+  m_Center: {x: 4.755366e-19, y: 0.000745433, z: 0.0001042898}
 --- !u!1 &7124889052745499396
 GameObject:
   m_ObjectHideFlags: 0
@@ -2999,9 +3259,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3884888603099021445}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: eye.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3032,7 +3292,7 @@ GameObject:
   - component: {fileID: 6706510609064349016}
   m_Layer: 0
   m_Name: pinky1.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3094,9 +3354,9 @@ GameObject:
   m_Component:
   - component: {fileID: 9064175449939083589}
   - component: {fileID: 8777147583544259190}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: Head Aim
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3159,7 +3419,7 @@ MonoBehaviour:
         weight: 0
     m_Offset: {x: 0, y: 0, z: 0}
     m_MinLimit: -180
-    m_MaxLimit: 52
+    m_MaxLimit: 89
     m_AimAxis: 4
     m_UpAxis: 2
     m_WorldUpType: 0
@@ -3181,7 +3441,7 @@ GameObject:
   - component: {fileID: 5379798574388097374}
   m_Layer: 0
   m_Name: pointer2.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3244,7 +3504,7 @@ GameObject:
   - component: {fileID: 4966339927698781915}
   m_Layer: 0
   m_Name: pointer3.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3273,9 +3533,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7870164688988246330}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: eyebrow.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3306,7 +3566,7 @@ GameObject:
   - component: {fileID: 463742819581879628}
   m_Layer: 0
   m_Name: thumb1.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3375,7 +3635,7 @@ GameObject:
   - component: {fileID: 500543390426349055}
   m_Layer: 0
   m_Name: pointer1.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3437,9 +3697,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1804580743754220794}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: eyebrow.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3500,9 +3760,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 637275358944288102}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: eye.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3562,9 +3822,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3627863261363966554}
+  - component: {fileID: 1405521087558613715}
   m_Layer: 10
   m_Name: spine.03
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3587,6 +3848,27 @@ Transform:
   - {fileID: 8279318877981277017}
   m_Father: {fileID: 3369263236979518758}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1405521087558613715
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8524301715189317246}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.0034, y: 0.0021284514, z: 0.002}
+  m_Center: {x: -2.2617188e-18, y: 0.0008357665, z: -1.6357138e-11}
 --- !u!1 &8638769751203297095
 GameObject:
   m_ObjectHideFlags: 0
@@ -3632,7 +3914,7 @@ GameObject:
   - component: {fileID: 5474328964026401911}
   m_Layer: 10
   m_Name: Item (Server side)
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3712,9 +3994,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4610033660252757411}
   - component: {fileID: 7779835605438496382}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: Head Rig
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3758,9 +4040,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2424825738452904499}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: mouth
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3820,7 +4102,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3843419870947176388}
-  m_Layer: 0
+  - component: {fileID: 5577768305694560694}
+  m_Layer: 10
   m_Name: shin.L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3843,6 +4126,27 @@ Transform:
   - {fileID: 2287357079700540121}
   m_Father: {fileID: 2195195739010853229}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &5577768305694560694
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9024555057005070007}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.0014625445, y: 0.0044585126, z: 0.0013726094}
+  m_Center: {x: 0.0000048506845, y: 0.0022047707, z: -0.000023655712}
 --- !u!1 &9147323742237946422
 GameObject:
   m_ObjectHideFlags: 0
@@ -3854,7 +4158,7 @@ GameObject:
   - component: {fileID: 4694892221098326350}
   m_Layer: 0
   m_Name: thumb3.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

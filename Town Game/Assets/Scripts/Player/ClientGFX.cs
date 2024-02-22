@@ -9,9 +9,10 @@ public class ClientGFX : MonoBehaviour
     public PhotonView view;
     public GameObject[] renderers;
     public MeshRenderer serverItem;
-
+    
     private void Start()
     {
+        Debug.Log("hi");
         if (view.IsMine)
         {
             HideRenderers();

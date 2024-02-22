@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2852774928198496274}
   m_Layer: 9
   m_Name: ring2.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -41,10 +41,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 205225316692070664}
-  - component: {fileID: 5976165096822324859}
   m_Layer: 9
   m_Name: pointer1.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -65,22 +64,6 @@ Transform:
   - {fileID: 3132474816708437837}
   m_Father: {fileID: 1731521073598559699}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5976165096822324859
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 304073329281015542}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &366763348355364474
 GameObject:
   m_ObjectHideFlags: 0
@@ -401,7 +384,7 @@ GameObject:
   - component: {fileID: 4877008097696086626}
   m_Layer: 9
   m_Name: middle2.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -433,7 +416,7 @@ GameObject:
   - component: {fileID: 6183985048345109202}
   m_Layer: 9
   m_Name: middle2.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -551,24 +534,6 @@ MonoBehaviour:
   - {fileID: 3697045111867269612}
   - {fileID: 8617115784321763838}
   - {fileID: 97165062625200696}
-  - {fileID: 310767463220932366}
-  - {fileID: 2547680998133901686}
-  - {fileID: 6122955741567087527}
-  - {fileID: 9030655035956561124}
-  - {fileID: 7115148331201797646}
-  - {fileID: 1209782942680305795}
-  - {fileID: 3089835178160896192}
-  - {fileID: 5976165096822324859}
-  - {fileID: 3710422542824536399}
-  - {fileID: 1720173358654276049}
-  - {fileID: 3605417009490450179}
-  - {fileID: 6238924297415558833}
-  - {fileID: 2875153010405024215}
-  - {fileID: 3270001857125918329}
-  - {fileID: 7090758285952401568}
-  - {fileID: 4693138372498875072}
-  - {fileID: 2408097320562775065}
-  - {fileID: 6978624788319267480}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -596,10 +561,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8965165477680141421}
-  - component: {fileID: 6238924297415558833}
   m_Layer: 9
   m_Name: thumb2.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -620,22 +584,6 @@ Transform:
   - {fileID: 6116575036223898421}
   m_Father: {fileID: 9122568114112198978}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6238924297415558833
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1561727398622988629}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &1571929083864516918
 GameObject:
   m_ObjectHideFlags: 0
@@ -1129,7 +1077,7 @@ GameObject:
   - component: {fileID: 7792004201313862733}
   m_Layer: 9
   m_Name: ring2.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1326,9 +1274,9 @@ GameObject:
   - component: {fileID: 8204531337523826322}
   - component: {fileID: 3120813334588464872}
   - component: {fileID: 8751506138060936789}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: Head FX
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1407,10 +1355,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 911604516690733652}
-  - component: {fileID: 9030655035956561124}
   m_Layer: 9
   m_Name: ring1.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1431,22 +1378,6 @@ Transform:
   - {fileID: 7792004201313862733}
   m_Father: {fileID: 3994973859825676655}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &9030655035956561124
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2839320424487381548}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &2842200104277224238
 GameObject:
   m_ObjectHideFlags: 0
@@ -1456,10 +1387,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4554110264015775104}
-  - component: {fileID: 2408097320562775065}
   m_Layer: 9
   m_Name: pinky3.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1479,22 +1409,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1352821901374785018}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2408097320562775065
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2842200104277224238}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &2943978820230493800
 GameObject:
   m_ObjectHideFlags: 0
@@ -1815,7 +1729,7 @@ GameObject:
   - component: {fileID: 1223150702190552392}
   m_Layer: 9
   m_Name: pointer3.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1844,10 +1758,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6117260446304737900}
-  - component: {fileID: 310767463220932366}
   m_Layer: 9
   m_Name: middle1.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1868,22 +1781,6 @@ Transform:
   - {fileID: 4877008097696086626}
   m_Father: {fileID: 3994973859825676655}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &310767463220932366
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3482710689818961799}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &3557726526523240588
 GameObject:
   m_ObjectHideFlags: 0
@@ -1942,9 +1839,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8691398045617513018}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: eye.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2027,9 +1924,9 @@ GameObject:
   m_Component:
   - component: {fileID: 7204980573895689772}
   - component: {fileID: 8493540808030800320}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: spine.03
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2108,10 +2005,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7023676626029531632}
-  - component: {fileID: 1209782942680305795}
   m_Layer: 9
   m_Name: middle1.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2132,22 +2028,6 @@ Transform:
   - {fileID: 6183985048345109202}
   m_Father: {fileID: 1731521073598559699}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1209782942680305795
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3904672709299145564}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &3997808416459726199
 GameObject:
   m_ObjectHideFlags: 0
@@ -2300,10 +2180,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1125607907182741583}
-  - component: {fileID: 2547680998133901686}
   m_Layer: 9
   m_Name: pinky1.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2324,22 +2203,6 @@ Transform:
   - {fileID: 7460419610057124485}
   m_Father: {fileID: 3994973859825676655}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2547680998133901686
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4013400341285559790}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &4098843323722672489
 GameObject:
   m_ObjectHideFlags: 0
@@ -2349,10 +2212,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2417873692161338873}
-  - component: {fileID: 3270001857125918329}
   m_Layer: 9
   m_Name: thumb2.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2373,22 +2235,6 @@ Transform:
   - {fileID: 1873248390048811092}
   m_Father: {fileID: 8516467135097705704}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3270001857125918329
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4098843323722672489}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &4249091629310810427
 GameObject:
   m_ObjectHideFlags: 0
@@ -2398,9 +2244,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2000176686841104048}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: eyebrow.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2431,7 +2277,7 @@ GameObject:
   - component: {fileID: 2290825383800007577}
   m_Layer: 9
   m_Name: pointer2.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2461,9 +2307,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6497644234670425967}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: eye.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2709,10 +2555,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8516467135097705704}
-  - component: {fileID: 1720173358654276049}
   m_Layer: 9
   m_Name: thumb1.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2733,22 +2578,6 @@ Transform:
   - {fileID: 2417873692161338873}
   m_Father: {fileID: 1731521073598559699}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1720173358654276049
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4894738302550914192}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &4942650234208270126
 GameObject:
   m_ObjectHideFlags: 0
@@ -2927,7 +2756,7 @@ GameObject:
   - component: {fileID: 9072112003463240411}
   m_Layer: 12
   m_Name: Search
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2962,8 +2791,9 @@ MonoBehaviour:
   canInteract: 1
   hovers:
   - lore: Inspect Corpse
-    key: 101
-    delay: 1
+    interactKey: 1
+    color: {r: 1, g: 0.9228635, b: 0.3443396, a: 1}
+    delay: 0.5
     action:
       m_PersistentCalls:
         m_Calls:
@@ -3016,10 +2846,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6116575036223898421}
-  - component: {fileID: 4693138372498875072}
   m_Layer: 9
   m_Name: thumb3.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3039,22 +2868,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8965165477680141421}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4693138372498875072
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5302300933389918456}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &5789281819650185656
 GameObject:
   m_ObjectHideFlags: 0
@@ -3066,7 +2879,7 @@ GameObject:
   - component: {fileID: 1642812680439120910}
   m_Layer: 9
   m_Name: pointer3.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3146,7 +2959,7 @@ GameObject:
   - component: {fileID: 1046040729511838448}
   m_Layer: 9
   m_Name: middle3.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3237,10 +3050,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1209642076580520538}
-  - component: {fileID: 7090758285952401568}
   m_Layer: 9
   m_Name: pinky3.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3260,22 +3072,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7460419610057124485}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7090758285952401568
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6313560448254335410}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &6478169556424232838
 GameObject:
   m_ObjectHideFlags: 0
@@ -3287,7 +3083,7 @@ GameObject:
   - component: {fileID: 3132474816708437837}
   m_Layer: 9
   m_Name: pointer2.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3317,10 +3113,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9122568114112198978}
-  - component: {fileID: 7115148331201797646}
   m_Layer: 9
   m_Name: thumb1.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3341,22 +3136,6 @@ Transform:
   - {fileID: 8965165477680141421}
   m_Father: {fileID: 3994973859825676655}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7115148331201797646
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7050780484842383853}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &7060781849294886821
 GameObject:
   m_ObjectHideFlags: 0
@@ -3531,10 +3310,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1352821901374785018}
-  - component: {fileID: 2875153010405024215}
   m_Layer: 9
   m_Name: pinky2.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3555,22 +3333,6 @@ Transform:
   - {fileID: 4554110264015775104}
   m_Father: {fileID: 443215986722926561}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2875153010405024215
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7073402840586270251}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &7248589869774139701
 GameObject:
   m_ObjectHideFlags: 0
@@ -3811,10 +3573,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7460419610057124485}
-  - component: {fileID: 3605417009490450179}
   m_Layer: 9
   m_Name: pinky2.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3835,22 +3596,6 @@ Transform:
   - {fileID: 1209642076580520538}
   m_Father: {fileID: 1125607907182741583}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3605417009490450179
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7394076456593872944}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &7588246325640960867
 GameObject:
   m_ObjectHideFlags: 0
@@ -3862,7 +3607,7 @@ GameObject:
   - component: {fileID: 3191733638229281966}
   m_Layer: 9
   m_Name: ring3.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3941,10 +3686,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7034829537020226661}
-  - component: {fileID: 6122955741567087527}
   m_Layer: 9
   m_Name: pointer1.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3965,22 +3709,6 @@ Transform:
   - {fileID: 2290825383800007577}
   m_Father: {fileID: 3994973859825676655}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6122955741567087527
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7698055423867646957}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &7901425126629662528
 GameObject:
   m_ObjectHideFlags: 0
@@ -4318,10 +4046,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 443215986722926561}
-  - component: {fileID: 3089835178160896192}
   m_Layer: 9
   m_Name: pinky1.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4342,22 +4069,6 @@ Transform:
   - {fileID: 1352821901374785018}
   m_Father: {fileID: 1731521073598559699}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3089835178160896192
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7941673261514494726}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &8011711156403137990
 GameObject:
   m_ObjectHideFlags: 0
@@ -4367,9 +4078,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6613557043452970456}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: mouth
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4400,7 +4111,7 @@ GameObject:
   - component: {fileID: 652852330502066364}
   m_Layer: 9
   m_Name: ring3.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4429,10 +4140,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1873248390048811092}
-  - component: {fileID: 6978624788319267480}
   m_Layer: 9
   m_Name: thumb3.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4452,22 +4162,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2417873692161338873}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6978624788319267480
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8439381974857218126}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &8820037111498902042
 GameObject:
   m_ObjectHideFlags: 0
@@ -4479,7 +4173,7 @@ GameObject:
   - component: {fileID: 1141230010747567831}
   m_Layer: 9
   m_Name: middle3.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4540,10 +4234,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8517724367763590788}
-  - component: {fileID: 3710422542824536399}
   m_Layer: 9
   m_Name: ring1.R
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4564,22 +4257,6 @@ Transform:
   - {fileID: 2852774928198496274}
   m_Father: {fileID: 1731521073598559699}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3710422542824536399
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8870258838165046336}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &9121112282922558205
 GameObject:
   m_ObjectHideFlags: 0
@@ -4589,9 +4266,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2627866606300178374}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: eyebrow.L
-  m_TagString: Untagged
+  m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

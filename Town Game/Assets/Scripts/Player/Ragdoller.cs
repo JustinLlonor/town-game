@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public class Ragdoller : MonoBehaviour
+public class Ragdoller : MonoBehaviourPunCallbacks  
 {
     public Transform currentRig; // The rig on the ragdoll
     private Transform targetRig;
@@ -13,6 +13,7 @@ public class Ragdoller : MonoBehaviour
     /// <summary>
     /// Sets the corpse's bones positions to the target rig's bone positions
     /// </summary>
+    [PunRPC]
     public void SetPositionsToTarget(Transform tRig)
     {
         targetRig = tRig;
@@ -21,7 +22,7 @@ public class Ragdoller : MonoBehaviour
             Debug.LogError("Target rig not assigned!");
             return;
         }
-        transform.position = targetRig.parent.position;
+        currentRig.position = targetRig.position;
         RagdollSetup();
         foreach (Transform t in targetBones)
         {
@@ -38,14 +39,14 @@ public class Ragdoller : MonoBehaviour
             if (!foundName)
             {
                 Debug.LogError("Inconsistent: " + tName);
-                Debug.Log(t.gameObject.layer);
+                Debug.Log(t.gameObject.tag);
                 return;
             }
         }
         for (int currentIndex = 0; currentIndex < targetBones.Count; currentIndex++)
         {
-            currentBones[currentIndex].localPosition = targetBones[currentIndex].localPosition;
-            currentBones[currentIndex].localRotation = targetBones[currentIndex].localRotation;
+            currentBones[currentIndex].position = targetBones[currentIndex].position;
+            currentBones[currentIndex].rotation = targetBones[currentIndex].rotation;
         }
     }
 
@@ -60,7 +61,7 @@ public class Ragdoller : MonoBehaviour
     {
         foreach (Transform child in target)
         {
-            if (child.gameObject.layer != 10 && child.gameObject.layer != 12) transforms.Add(child);
+            if (child.gameObject.tag != "Rig Ignore") transforms.Add(child);
             if (child.childCount > 0)
             {
                 AddTransform(child, ref transforms);

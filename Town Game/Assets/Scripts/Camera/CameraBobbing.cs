@@ -26,8 +26,8 @@ public class CameraBobbing : MonoBehaviour
 
     private void Awake()
     {
-        previousLength = walkLength;
-        previousAmplitude = wAmplitude;
+        currentLength = walkLength;
+        currentAmplitude = wAmplitude;
     }
 
     private void LateUpdate()

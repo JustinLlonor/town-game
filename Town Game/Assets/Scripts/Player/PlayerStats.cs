@@ -4,6 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using System;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -51,6 +52,10 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            PhotonNetwork.LeaveRoom();
+        }
         FixDmg();
         if (!view.IsMine) return;
         if (Input.GetKey(KeyCode.P))
@@ -131,6 +136,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
         ragdoller.SetPositionsToTarget(myRig);
         FindObjectOfType<CameraBobbing>().isBobbing = false;
 
+        //corpse.GetComponent<PhotonView>().TransferOwnership(0);
         PhotonNetwork.Destroy(gameObject);
     }
 
@@ -174,6 +180,11 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
         stamina -= rate * Time.deltaTime;
         
         return true;
+    }
+
+    public override void OnLeftRoom()
+    {
+        SceneManager.LoadScene(0);
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

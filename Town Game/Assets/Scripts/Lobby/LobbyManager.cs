@@ -4,6 +4,7 @@ using Unity.VisualScripting;
 using TMPro;
 using UnityEngine;
 using Photon.Pun;
+using Photon.Realtime;
 
 public class LobbyManager : MonoBehaviourPunCallbacks
 {
@@ -19,8 +20,11 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     public void CreatePress()
     {
-        PhotonNetwork.CreateRoom(createText.text);
+        RoomOptions ro = new RoomOptions();
+        ro.CleanupCacheOnLeave = false;
+        PhotonNetwork.CreateRoom(createText.text, ro);
     }
+
     public void JoinPress()
     {
         PhotonNetwork.JoinRoom(joinText.text);

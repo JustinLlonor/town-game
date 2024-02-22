@@ -1,4 +1,5 @@
 using Photon.Pun;
+using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -37,5 +38,10 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         playerMovement.canJump = playerSettings.canJump;
 
         currentPlayer = player;
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        Debug.Log("Player left");
     }
 }

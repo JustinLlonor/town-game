@@ -112,7 +112,7 @@ MonoBehaviour:
   sprintLength: 0.5525
   crouchLength: 1
   wAmplitude: 0.03
-  sAmplitude: 0.1
+  sAmplitude: 0.08
   cAmplitude: 0.04
   zTilt: 25
   resetSpeed: 5
@@ -257,11 +257,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4766721283323813917}
+  - component: {fileID: 3342184779573511502}
+  - component: {fileID: 2522160804449797291}
   - component: {fileID: 8679185673322323000}
   - component: {fileID: 910149815204121929}
   - component: {fileID: 4588525041265342294}
   - component: {fileID: 5168079798830904265}
-  - component: {fileID: 2522160804449797291}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -285,6 +286,62 @@ Transform:
   - {fileID: 4959995351705500758}
   m_Father: {fileID: 4369339764396634583}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3342184779573511502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7308569900096164841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: d1a46caebc7ff67479477b2b749f204b, type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: 
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
+--- !u!114 &2522160804449797291
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7308569900096164841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c3b71db44d4a9647bca15cf2075e75b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactableMask:
+    serializedVersion: 2
+    m_Bits: 4096
+  environmentMask:
+    serializedVersion: 2
+    m_Bits: 128
+  range: 2
+  interactText: {fileID: 0}
+  iui: {fileID: 0}
+  interactActions:
+  - {fileID: -5521037850191274806, guid: d1a46caebc7ff67479477b2b749f204b, type: 3}
+  - {fileID: 724544186050314342, guid: d1a46caebc7ff67479477b2b749f204b, type: 3}
+  - {fileID: -5860677679832714288, guid: d1a46caebc7ff67479477b2b749f204b, type: 3}
+  iValid: 1
 --- !u!114 &8679185673322323000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -401,25 +458,3 @@ MonoBehaviour:
     mipBias: 0
     varianceClampScale: 0.9
     contrastAdaptiveSharpening: 0
---- !u!114 &2522160804449797291
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7308569900096164841}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c3b71db44d4a9647bca15cf2075e75b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactableMask:
-    serializedVersion: 2
-    m_Bits: 4096
-  environmentMask:
-    serializedVersion: 2
-    m_Bits: 128
-  range: 2
-  interactText: {fileID: 0}
-  iui: {fileID: 0}
-  iValid: 1

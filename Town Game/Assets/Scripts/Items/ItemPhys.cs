@@ -27,9 +27,9 @@ public class ItemPhys : MonoBehaviour
     {
         CreateItem();
         view.RPC("CreateItem", RpcTarget.Others);
-        view.TransferOwnership(0);
+        //view.TransferOwnership(0);
     }
-
+    
     private void Update()
     {
         if (interactTimer > 0f)

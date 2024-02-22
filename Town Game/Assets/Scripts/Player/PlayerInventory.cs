@@ -93,7 +93,6 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
             previousSlot = equippedSlot;
         }
         HotbarControls();
-        DropControls();
         if (equippedItem != null) largeUI.SetActive(equippedItem.large);
     }
 
@@ -101,6 +100,11 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (!view.IsMine) return;
         FollowItemTarget();
+    }
+
+    private void OnDropItem()
+    {
+        DropItem(itemManager.itemSearch[hotbar[equippedSlot]]);
     }
 
     /// <summary>
@@ -170,15 +174,6 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
                 }
                 UpdateHotbarUI();
             }
-        }
-    }
-
-    void DropControls()
-    {
-        if (Input.GetKeyDown(dropKey))
-        {
-            if (hotbar[equippedSlot].IsNullOrEmpty()) return;
-            DropItem(itemManager.itemSearch[hotbar[equippedSlot]]);
         }
     }
 
@@ -363,6 +358,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
 
     public void DropItem(Item item)
     {
+        if (hotbar[equippedSlot].IsNullOrEmpty()) return;
         GameObject itemObj = PhotonNetwork.Instantiate(itemPrefab.name, mainCam.position, mainCam.rotation);
         itemObj.GetComponent<Interactable>().canInteract = false;
         Vector3 velocityAdd = Vector3.ClampMagnitude(rb.velocity / movementMultiplier, 3f);

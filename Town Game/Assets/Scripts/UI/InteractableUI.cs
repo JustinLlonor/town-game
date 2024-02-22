@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class InteractableUI : MonoBehaviour
 {
@@ -40,17 +41,19 @@ public class InteractableUI : MonoBehaviour
         {
             if (child != interacted)
             {
-                child.GetComponent<TextMeshProUGUI>().color = new Color(1f, 1f, 1f, alpha);
+                TextMeshProUGUI text = child.GetComponent<TextMeshProUGUI>();
+                text.color = new Color(text.color.r, text.color.g, text.color.b, alpha);
             }
         }
     }
 
-    public void AddInteraction(string text)
+    public void AddInteraction(string text, Color color)
     {
         GameObject interaction = Instantiate(interactPrefab, transform);
         TextMeshProUGUI tex = interaction.GetComponent<TextMeshProUGUI>();
         tex.text = text;
-        tex.color = new Color(1f, 1f, 1f, maxAlpha);
+        tex.color = new Color(color.r, color.g, color.b, maxAlpha);
+        interaction.transform.GetChild(0).GetComponent<Image>().color = color;
     }
 
     public void ClearInteractions()

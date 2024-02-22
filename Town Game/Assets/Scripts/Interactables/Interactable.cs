@@ -15,12 +15,21 @@ public class Interactable : MonoBehaviour
     bool isGlowing = false;
 
     [System.Serializable]
-    public struct Hover
+    public class Hover
     {
         public string lore;
-        public KeyCode key;
+        public InteractKey interactKey;
+        public Color textColor = new Color (1f, 0.95f, 0.4f);
         public float delay;
         public UnityEvent action;
+    }
+
+    public enum InteractKey
+    {
+        None = 0,
+        Interact1 = 1,
+        Interact2 = 2,
+        Interact3 = 3,
     }
 
     public void GlowMaterials()

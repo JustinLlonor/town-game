@@ -55,7 +55,8 @@ MonoBehaviour:
   canInteract: 1
   hovers:
   - lore: Pick up
-    key: 101
+    interactKey: 1
+    tColor: {r: 1, g: 0.9522664, b: 0.4009434, a: 1}
     delay: 0.25
     action:
       m_PersistentCalls:

@@ -23,7 +23,6 @@ public class CameraShake : MonoBehaviour
     {
         float completionPercent = 0f;
         float movePercent = 0f;
-
         float angle_radians = properties.angle * Mathf.Deg2Rad - Mathf.PI;
         Vector3 previousWaypoint = Vector3.zero;
         Vector3 currentWaypoint = Vector3.zero;
@@ -89,7 +88,7 @@ public class CameraShake : MonoBehaviour
             this.duration = duration;
             this.noisePercent = noisePercent;
             this.dampingPercent = dampingPercent;
-            this.rotationPercent = rotationPercent;
+            this.rotationPercent = rotationPercent; 
         }
     }
 }

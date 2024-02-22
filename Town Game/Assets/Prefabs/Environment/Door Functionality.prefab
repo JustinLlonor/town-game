@@ -70,6 +70,7 @@ MonoBehaviour:
   hovers:
   - lore: Open door
     key: 101
+    interactKey: 1
     delay: 0.25
     action:
       m_PersistentCalls:
@@ -159,6 +160,7 @@ MonoBehaviour:
   hovers:
   - lore: Close door
     key: 101
+    interactKey: 1
     delay: 0
     action:
       m_PersistentCalls:

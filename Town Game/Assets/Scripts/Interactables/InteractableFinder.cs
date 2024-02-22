@@ -1,8 +1,9 @@
-using Photon.Pun.Demo.Cockpit;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class InteractableFinder : MonoBehaviour
 {
@@ -12,14 +13,16 @@ public class InteractableFinder : MonoBehaviour
     [Header("Settings")]
     public float range = 2f;
     [Header("References")]
-    public TextMeshProUGUI interactText;
     public InteractableUI iui;
+    [Header("Keys")]
+    public InputActionReference[] interactActions;
 
     [HideInInspector] public bool iValid = true;
     GameObject currentInteractable = null;
     CursorManager cm;
     Interactable currentInteraction;
     float timer = 0f;
+    bool currentPressed = false;
 
     private void Awake()
     {
@@ -29,7 +32,39 @@ public class InteractableFinder : MonoBehaviour
     private void Update()
     {
         CastRay();
-        InteractionKey();
+    }
+
+    private void OnInteract1(InputValue iv)
+    {
+        if (iv.Get<float>() == 1f)
+        {
+            currentPressed = true;
+            InteractionKey(Interactable.InteractKey.Interact1);
+            return;
+        }
+        currentPressed = false;
+    }
+
+    private void OnInteract2(InputValue iv)
+    {
+        if (iv.Get<float>() == 1f)
+        {
+            currentPressed = true;
+            InteractionKey(Interactable.InteractKey.Interact2);
+            return;
+        }
+        currentPressed = false;
+    }
+
+    private void OnInteract3(InputValue iv)
+    {
+        if (iv.Get<float>() == 1f)
+        {
+            currentPressed = true;
+            InteractionKey(Interactable.InteractKey.Interact3);
+            return;
+        }
+        currentPressed = false;
     }
 
     void CastRay()
@@ -74,7 +109,7 @@ public class InteractableFinder : MonoBehaviour
         CrosshairManager.instance.RemoveCrosshair(0);
     }
 
-    void InteractionKey()
+    void InteractionKey(Interactable.InteractKey key)
     {
         if (!cm.isLocked) return;
         if (timer > 0f) return;
@@ -83,7 +118,8 @@ public class InteractableFinder : MonoBehaviour
             int i = 0;
             foreach (Interactable.Hover h in currentInteraction.hovers)
             {
-                if (Input.GetKeyDown(h.key))
+                if (h.interactKey == Interactable.InteractKey.None) continue;
+                if (h.interactKey == key)
                 {
                     if (h.delay == 0f)
                     {
@@ -101,7 +137,7 @@ public class InteractableFinder : MonoBehaviour
 
     IEnumerator StartTimer(float length, Interactable.Hover h)
     {
-        while (Input.GetKey(h.key))
+        while (currentPressed)
         {
             yield return null;
             timer += Time.deltaTime;
@@ -130,7 +166,23 @@ public class InteractableFinder : MonoBehaviour
         iui.ClearInteractions();
         foreach (Interactable.Hover h in hovers)
         {
-            iui.AddInteraction($"[{h.key}] {h.lore}\n");
+            if (h.interactKey != Interactable.InteractKey.None)
+            {
+                InputAction interactAction = ToInteractAction(h.interactKey).action;
+                int bindingIndex = interactAction.GetBindingIndexForControl(interactAction.controls[0]);
+                string interactText = InputControlPath.ToHumanReadableString(
+                    interactAction.bindings[bindingIndex].effectivePath,
+                    InputControlPath.HumanReadableStringOptions.OmitDevice);
+                iui.AddInteraction($"[{interactText}] {h.lore}\n", h.textColor);
+                return;
+            }
+            iui.AddInteraction($"{h.lore}\n", h.textColor);
         }
+    }
+
+    InputActionReference ToInteractAction(Interactable.InteractKey key)
+    {
+        if (key == Interactable.InteractKey.None) return null;
+        return interactActions[(int)key-1];
     }
 }
