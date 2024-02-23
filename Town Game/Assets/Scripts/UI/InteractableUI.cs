@@ -53,7 +53,7 @@ public class InteractableUI : MonoBehaviour
         TextMeshProUGUI tex = interaction.GetComponent<TextMeshProUGUI>();
         tex.text = text;
         tex.color = new Color(color.r, color.g, color.b, maxAlpha);
-        interaction.transform.GetChild(0).GetComponent<Image>().color = color;
+        interaction.transform.GetChild(0).GetComponent<Image>().color = new Color(color.r, color.g, color.b, 0.3f);
     }
 
     public void ClearInteractions()

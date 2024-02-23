@@ -14,12 +14,12 @@ public class Interactable : MonoBehaviour
 
     bool isGlowing = false;
 
-    [System.Serializable]
+    [Serializable]
     public class Hover
     {
         public string lore;
         public InteractKey interactKey;
-        public Color textColor = new Color (1f, 0.95f, 0.4f);
+        public Color color = Color.white;
         public float delay;
         public UnityEvent action;
     }

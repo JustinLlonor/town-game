@@ -163,11 +163,18 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         if (!isCrouching)
         {
             animator.Play("Jump");
+            view.RPC("JumpAnimation", RpcTarget.Others);
             rb.AddForce(transform.up * jumpHeight, ForceMode.Impulse);
             SoundManager.instance.Play3D("Jump", groundCheck.position);
         }
         shake.StartShake(jumpShake.shakeProperties);
         jumpTimer = jumpCooldown;
+    }
+
+    [PunRPC]
+    public void JumpAnimation()
+    {
+        animator.Play("Jump");
     }
 
     private void OnMove(InputValue iv)

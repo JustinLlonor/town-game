@@ -173,10 +173,10 @@ public class InteractableFinder : MonoBehaviour
                 string interactText = InputControlPath.ToHumanReadableString(
                     interactAction.bindings[bindingIndex].effectivePath,
                     InputControlPath.HumanReadableStringOptions.OmitDevice);
-                iui.AddInteraction($"[{interactText}] {h.lore}\n", h.textColor);
+                iui.AddInteraction($"[{interactText}] {h.lore}\n", h.color);
                 return;
             }
-            iui.AddInteraction($"{h.lore}\n", h.textColor);
+            iui.AddInteraction($"{h.lore}\n", h.color);
         }
     }
 
