@@ -60,6 +60,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Awake()
     {
+        camTransform = Camera.main.transform.parent;
         view = gameObject.GetComponent<PhotonView>();
         itemManager = FindObjectOfType<ObjectManager>();
         sFilter = sItem.GetComponent<MeshFilter>();

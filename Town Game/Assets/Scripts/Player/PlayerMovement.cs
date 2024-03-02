@@ -496,7 +496,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     void StepClimb()
     {
-        if (OnSlope()) return; // May be changed later
+        //if (OnSlope()) return; // May be changed later
         if (!isMoving) return;
         if (!isGrounded) return;
         if (Physics.Raycast(stepRayLower.position, moveDirection, stepDistance, environmentMask))
@@ -504,6 +504,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             bool upper = Physics.Raycast(stepRayUpper.position, moveDirection, stepDistance + .05f, environmentMask);
             if (!upper)
             {
+                Debug.Log("Stepping");
                 rb.position -= new Vector3(0f, -stepSmooth, 0f);
             }
         }
