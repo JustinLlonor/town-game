@@ -17,6 +17,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     public CameraShake camShake;
     public RectTransform hotbar;
     public GameObject largeUI;
+    public CleanupMaster cm;
 
     [System.Serializable]
     public class PlayerSettings
@@ -38,10 +39,5 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         playerMovement.canJump = playerSettings.canJump;
 
         currentPlayer = player;
-    }
-
-    public override void OnPlayerLeftRoom(Player otherPlayer)
-    {
-        Debug.Log("Player left");
     }
 }
