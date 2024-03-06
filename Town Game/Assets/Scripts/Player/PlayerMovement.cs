@@ -504,7 +504,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             bool upper = Physics.Raycast(stepRayUpper.position, moveDirection, stepDistance + .05f, environmentMask);
             if (!upper)
             {
-                Debug.Log("Stepping");
                 rb.position -= new Vector3(0f, -stepSmooth, 0f);
             }
         }

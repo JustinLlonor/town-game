@@ -41,7 +41,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8927670568152924241}
   m_Layer: 0
-  m_Name: Multiplayer Scripts
+  m_Name: 3D Scene Scripts
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -283,6 +283,10 @@ PrefabInstance:
       propertyPath: camBobbing
       value: 
       objectReference: {fileID: 2982945857563652879}
+    - target: {fileID: 6953661347052619856, guid: 00b86e8be9c97a24e98cfbdeab7f72cf, type: 3}
+      propertyPath: camTransform
+      value: 
+      objectReference: {fileID: 6829310027673692852}
     - target: {fileID: 7795883315039441122, guid: 00b86e8be9c97a24e98cfbdeab7f72cf, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

@@ -9,8 +9,8 @@ using UnityEngine.SceneManagement;
 public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
 {
     [Header("HP")]
-    [SerializeField] float maxHP = 100f;
-    [SerializeField] float HP = 100f;
+    public float maxHP = 100f;
+    public float HP = 100f;
     [SerializeField] float HPRegenSpeed = 5f;
     [Header("Stamina")]
     [SerializeField] float maxStamina = 100f;
@@ -24,12 +24,12 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     public Transform myRig;
     [Header("Hurt")]
     public string hurtLayer = "Hurt";
-    public float hurtWeight = 0.4f;
+    public float hurtWeight = 0.1f;
     public float hurtLerp = 50f;
     public Shake softHurt;
     public Shake hardHurt;
     public float softThreshold = 30f;
-
+    [Header("Events")]
     public OnDeathEvent OnDeath;
 
     CameraShake shake;
@@ -189,8 +189,22 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        
+        if (stream.IsWriting)
+        {
+            stream.SendNext(HP);
+            stream.SendNext(maxHP);
+        }
+        else
+        {
+            HP = (float)stream.ReceiveNext();
+            maxHP = (float)stream.ReceiveNext();
+        }
     }
+}
+
+// parameter is the new HP
+public class OnChangeHP : UnityEvent<float, float>
+{
 }
 
 [System.Serializable]

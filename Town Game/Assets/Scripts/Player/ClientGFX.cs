@@ -12,7 +12,6 @@ public class ClientGFX : MonoBehaviour
     
     private void Start()
     {
-        Debug.Log("hi");
         if (view.IsMine)
         {
             HideRenderers();

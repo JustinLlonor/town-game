@@ -78,7 +78,6 @@ public class WaitingRoomManager : MonoBehaviourPunCallbacks, IPunObservable
 
     void StartTimer()
     {
-        Debug.Log("meow");
         gt.StartTimer(3f);
     }
 
