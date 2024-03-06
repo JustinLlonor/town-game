@@ -39,7 +39,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks
             nicknameText.text = previousNick;
             return;
         }
-        SessionData.nickname = newNick;
+        SessionData.nickname = newNick.Trim();
+        nicknameText.text = SessionData.nickname;
     }
 
     public void CreatePress()

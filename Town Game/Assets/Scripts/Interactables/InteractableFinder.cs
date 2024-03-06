@@ -18,9 +18,9 @@ public class InteractableFinder : MonoBehaviour
     public InputActionReference[] interactActions;
 
     [HideInInspector] public bool iValid = true;
+    [HideInInspector] public Interactable currentInteraction;
     GameObject currentInteractable = null;
     CursorManager cm;
-    Interactable currentInteraction;
     float timer = 0f;
     bool currentPressed = false;
 
@@ -97,7 +97,7 @@ public class InteractableFinder : MonoBehaviour
         if (currentInteractable != null) ResetInteractions();
     }
 
-    void ResetInteractions()
+    public void ResetInteractions()
     {
         if (currentInteraction != null) currentInteraction.UnglowMaterials();
         currentInteractable = null;

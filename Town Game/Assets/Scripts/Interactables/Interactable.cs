@@ -24,6 +24,15 @@ public class Interactable : MonoBehaviour
         public UnityEvent action;
     }
 
+    private void OnDestroy()
+    {
+        InteractableFinder ifi = FindObjectOfType<InteractableFinder>(); 
+        if (ifi.currentInteraction == this)
+        {
+            ifi.ResetInteractions();
+        }
+    }
+
     public enum InteractKey
     {
         None = 0,
