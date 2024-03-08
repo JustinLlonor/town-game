@@ -26,7 +26,8 @@ public class Interactable : MonoBehaviour
 
     private void OnDestroy()
     {
-        InteractableFinder ifi = FindObjectOfType<InteractableFinder>(); 
+        InteractableFinder ifi = FindObjectOfType<InteractableFinder>();
+        if (ifi == null) return;
         if (ifi.currentInteraction == this)
         {
             ifi.ResetInteractions();

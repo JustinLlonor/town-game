@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using System.Runtime;
 using TMPro;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using WebSocketSharp;
 using Steamworks;
-using System.Text;
+using System;
 
 public class LobbyManager : MonoBehaviourPunCallbacks
 {
@@ -18,14 +19,17 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     public TMP_InputField nicknameText;
     string previousNick;
 
+    private void FixedUpdate()
+    {
+        if (SteamManager.Initialized) SteamAPI.RunCallbacks();
+    }
+
     private void Start()
     {
+        Cursor.lockState = CursorLockMode.None;
         PhotonNetwork.ConnectUsingSettings();
-        CSteamID steamID = SteamUser.GetSteamID();
         string defaultNick = SteamFriends.GetPersonaName();
-        string newNick = SteamFriends.GetPlayerNickname(steamID);
         SessionData.nickname = defaultNick;
-        if (newNick != null) SessionData.nickname = newNick;
         previousNick = SessionData.nickname;
     }
 
@@ -47,8 +51,12 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         if (nicknameText.text.IsNullOrEmpty()) return;
         RoomOptions ro = new RoomOptions();
+        ro.MaxPlayers = 15;
+        ro.IsOpen = false;
+        ro.IsVisible = false;
         ro.CleanupCacheOnLeave = false;
         PhotonNetwork.CreateRoom(createText.text, ro);
+        SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePrivate, 15);
     }
 
     public void JoinPress()
@@ -73,7 +81,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     public override void OnCreatedRoom()
     {
-        
+        //SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePrivate, 15);
     }
 
     public override void OnJoinedRoom()

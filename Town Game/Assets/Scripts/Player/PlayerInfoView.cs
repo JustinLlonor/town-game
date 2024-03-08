@@ -8,6 +8,8 @@ public class PlayerInfoView : MonoBehaviourPunCallbacks
 {
     public Gradient healthGradient = new Gradient();
     public string[] healthTextGradient = new string[] { };
+    public Gradient sanityGradient = new Gradient();
+    public string[] sanityTextGradient = new string[] { };
     public PlayerStats stats;
     public PhotonView view;
     Interactable vi;

@@ -19,6 +19,7 @@ public class WaitingRoomManager : MonoBehaviourPunCallbacks, IPunObservable
         Debug.Log("Loading game...");
         if (!PhotonNetwork.IsMasterClient) return;
         PhotonNetwork.LoadLevel(2);
+        PhotonNetwork.CurrentRoom.IsOpen = false;
     }
 
     void Awake()
