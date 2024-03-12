@@ -52,9 +52,12 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         if (nicknameText.text.IsNullOrEmpty()) return;
         RoomOptions ro = new RoomOptions();
         ro.MaxPlayers = 15;
-        ro.IsOpen = false;
-        ro.IsVisible = false;
         ro.CleanupCacheOnLeave = false;
+        if (SteamManager.Initialized)
+        {
+            ro.IsOpen = false;
+            ro.IsVisible = false;
+        }
         PhotonNetwork.CreateRoom(createText.text, ro);
         SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePrivate, 15);
     }
@@ -62,6 +65,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     public void JoinPress()
     {
         if (nicknameText.text.IsNullOrEmpty()) return;
+        Debug.Log("Joining");
+        Debug.Log(PhotonNetwork.IsConnected);
         PhotonNetwork.JoinRoom(joinText.text);
     }
 
@@ -92,5 +97,10 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         // Initialize Properties
         playerProperties["name"] = SessionData.nickname;
         PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
+    }
+
+    public override void OnJoinRoomFailed(short returnCode, string message)
+    {
+        Debug.LogError(message);    
     }
 }

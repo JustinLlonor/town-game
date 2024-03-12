@@ -31,11 +31,7 @@ public class SteamInviteAccepter : MonoBehaviour
     private void OnLobbyEntered(LobbyEnter_t callback)
     {
         string roomName = (string)SteamMatchmaking.GetLobbyData((CSteamID)callback.m_ulSteamIDLobby, "roomname");
-        if (roomName.IsNullOrEmpty())
-        {
-            Debug.LogError("Room name is empty!");
-            return;
-        }
+        if (roomName.IsNullOrEmpty()) return;
         Debug.LogError("Accepting invite to room: " + roomName);
         PhotonNetwork.JoinRoom(roomName);
     }

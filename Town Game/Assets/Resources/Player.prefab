@@ -530,6 +530,7 @@ GameObject:
   - component: {fileID: 847193838002151960}
   - component: {fileID: 5432845057157182992}
   - component: {fileID: 7280666953437362449}
+  - component: {fileID: 873785079005984450}
   - component: {fileID: 4000725801890306170}
   - component: {fileID: 4613987656612589359}
   m_Layer: 6
@@ -1049,6 +1050,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 126494ae2a10a34499272ed97a6c9f5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &873785079005984450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1787190705143953567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8035102a71cf5e14a8aa7d892a4925b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isMale: 1
+  attire:
+  - bodyPart: 0
+    renderer: {fileID: 4897513087386901126}
+    clothing: {fileID: 0}
+  - bodyPart: 2
+    renderer: {fileID: 5395435907658582406}
+    clothing: {fileID: 0}
+  - bodyPart: 3
+    renderer: {fileID: 7586582529506314482}
+    clothing: {fileID: 0}
+  - bodyPart: 4
+    renderer: {fileID: 7420980194143203979}
+    clothing: {fileID: 0}
 --- !u!114 &4000725801890306170
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1606,7 +1633,7 @@ GameObject:
   - component: {fileID: 2791133701089415726}
   - component: {fileID: 7420980194143203979}
   m_Layer: 0
-  m_Name: Head FX
+  m_Name: Hat
   m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4402,7 +4429,7 @@ GameObject:
   - component: {fileID: 6993119660854477913}
   - component: {fileID: 7586582529506314482}
   m_Layer: 0
-  m_Name: HeadMale
+  m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4546,7 +4573,7 @@ GameObject:
   - component: {fileID: 6370996354352381834}
   - component: {fileID: 4897513087386901126}
   m_Layer: 0
-  m_Name: TShirtMale
+  m_Name: Torso
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

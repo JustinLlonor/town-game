@@ -135,6 +135,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SteamManager
       objectReference: {fileID: 0}
+    - target: {fileID: 2046424596877422344, guid: be6c5330b7091124298f1eda6479c37b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6373459315039795792, guid: be6c5330b7091124298f1eda6479c37b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -404,7 +408,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.6975347, g: 0.75918245, b: 0.8962264, a: 0}
+  m_BackGroundColor: {r: 0.7298161, g: 0.8490566, b: 0.6688323, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -742,7 +746,7 @@ GameObject:
   - component: {fileID: 1010071654}
   - component: {fileID: 1010071655}
   m_Layer: 0
-  m_Name: i dont even wanna name this shit
+  m_Name: SteamInviteAccepter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

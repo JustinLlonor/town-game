@@ -58,10 +58,6 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
         }
         FixDmg();
         if (!view.IsMine) return;
-        if (Input.GetKey(KeyCode.P))
-        {
-            Kill();
-        }
         if (staminaCooldown > 0f)
         {
             staminaCooldown -= Time.deltaTime;
