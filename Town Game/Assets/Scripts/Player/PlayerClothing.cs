@@ -15,9 +15,9 @@ public class PlayerClothing : MonoBehaviour
     }
 
     [PunRPC]
-    public void SetClothing(int clothingIndex)
+    public void SetClothing(string clothingName)
     {
-        Clothing clothing = om.clothingSearch[((Clothing.BodyPart)clothingIndex).ToString()];
+        Clothing clothing = om.clothingSearch[clothingName];
         Attire foundAttire = new Attire();
 
         foreach (Attire attire in attires)

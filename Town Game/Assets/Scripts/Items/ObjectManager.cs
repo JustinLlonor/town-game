@@ -15,6 +15,6 @@ public class ObjectManager : MonoBehaviour
     {
         foreach (Item item in items) itemSearch.Add(item.name, item);
         foreach (Texture2D tex in textures) texSearch.Add(tex.name, tex);
-        foreach (Clothing clothing in clothings) clothingSearch.Add(clothing.bodyPart.ToString(), clothing);
+        foreach (Clothing clothing in clothings) clothingSearch.Add(clothing.name, clothing);
     }
 }
