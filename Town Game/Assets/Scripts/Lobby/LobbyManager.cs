@@ -28,7 +28,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         Cursor.lockState = CursorLockMode.None;
         PhotonNetwork.ConnectUsingSettings();
-        string defaultNick = SteamFriends.GetPersonaName();
+        string defaultNick = "";
+        if (SteamManager.Initialized) defaultNick = SteamFriends.GetPersonaName();
         SessionData.nickname = defaultNick;
         previousNick = SessionData.nickname;
     }
@@ -59,7 +60,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
             ro.IsVisible = false;
         }
         PhotonNetwork.CreateRoom(createText.text, ro);
-        SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePrivate, 15);
+        if (SteamManager.Initialized) SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePrivate, 15);
     }
 
     public void JoinPress()

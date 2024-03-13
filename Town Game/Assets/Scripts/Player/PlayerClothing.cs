@@ -13,7 +13,7 @@ public class PlayerClothing : MonoBehaviour
     ObjectManager om;
     PhotonView view;
 
-    private void Awake()
+    private void Start()
     {
         om = FindObjectOfType<ObjectManager>();
         view = gameObject.GetComponent<PhotonView>();
@@ -65,19 +65,18 @@ public class PlayerClothing : MonoBehaviour
             }
             Clothing selectedClothing = rc.clothings[Random.Range(0, rc.clothings.Length)];
             SetClothing(selectedClothing.name);
-            view.RPC("SetClothing", RpcTarget.OthersBuffered, selectedClothing);
+            view.RPC("SetClothing", RpcTarget.OthersBuffered, selectedClothing.name);
         }
     }
 
-    void RenderClothing(Attire attire, bool isNull = false)
+    void RenderClothing(Attire attire)
     {
-        MeshFilter meshFilter = attire.renderer.transform.GetComponent<MeshFilter>();
-        attire.renderer.material.mainTexture = attire.clothing.texture;
+        if (attire.clothing != null) attire.renderer.material.mainTexture = attire.clothing.texture;
         if (isMale)
         {
-            if (meshFilter != null)
+            if (attire.renderer.transform.GetComponent<MeshFilter>() != null)
             {
-                meshFilter.mesh = attire.clothing.maleModel;
+                attire.renderer.transform.GetComponent<MeshFilter>().mesh = attire.clothing.maleModel;
                 return;
             }
             ((SkinnedMeshRenderer)attire.renderer).sharedMesh = attire.clothing.maleModel;
@@ -85,9 +84,9 @@ public class PlayerClothing : MonoBehaviour
         }
         else
         {
-            if (meshFilter != null)
+            if (attire.renderer.transform.GetComponent<MeshFilter>() != null)
             {
-                meshFilter.mesh = attire.clothing.femaleModel;
+                attire.renderer.transform.GetComponent<MeshFilter>().mesh = attire.clothing.femaleModel;
                 return;
             }
             ((SkinnedMeshRenderer)attire.renderer).sharedMesh = attire.clothing.femaleModel;
