@@ -17,5 +17,6 @@ public class Clothing : ScriptableObject
         Hands = 2,
         Head = 3,
         Hat = 4,
+        Mask = 5
     }
 }
