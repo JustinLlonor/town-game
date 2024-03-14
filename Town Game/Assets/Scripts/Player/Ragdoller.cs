@@ -23,6 +23,7 @@ public class Ragdoller : MonoBehaviourPunCallbacks
             return;
         }
         currentRig.position = targetRig.position;
+        currentRig.rotation = targetRig.rotation;
         RagdollSetup();
         foreach (Transform t in targetBones)
         {
@@ -45,8 +46,8 @@ public class Ragdoller : MonoBehaviourPunCallbacks
         }
         for (int currentIndex = 0; currentIndex < targetBones.Count; currentIndex++)
         {
-            currentBones[currentIndex].position = targetBones[currentIndex].position;
-            currentBones[currentIndex].rotation = targetBones[currentIndex].rotation;
+            currentBones[currentIndex].localPosition = targetBones[currentIndex].localPosition;
+            currentBones[currentIndex].localRotation = targetBones[currentIndex].localRotation;
         }
     }
 

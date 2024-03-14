@@ -179,7 +179,7 @@ CharacterJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 0, y: 0, z: 1}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 5.165931e-10, y: 0.0024602131, z: -6.984921e-10}
+  m_ConnectedAnchor: {x: -6.548363e-11, y: 0.0024602131, z: -8.149075e-10}
   serializedVersion: 2
   m_SwingAxis: {x: 1, y: 0, z: 0}
   m_TwistLimitSpring:
@@ -229,6 +229,89 @@ MonoBehaviour:
   m_SynchronizeAngularVelocity: 1
   m_TeleportEnabled: 0
   m_TeleportIfDistanceGreaterThan: 3
+--- !u!1 &825461160665157728
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6961583378710495427}
+  - component: {fileID: 4905305991152532029}
+  - component: {fileID: 4124289810740391879}
+  m_Layer: 0
+  m_Name: Mask
+  m_TagString: Rig Ignore
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6961583378710495427
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 825461160665157728}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.000000014901161, y: 4.2632564e-14, z: 1.4210855e-14, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.01, y: 0.010000001, z: 0.010000002}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5102540068542233570}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &4905305991152532029
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 825461160665157728}
+  m_Mesh: {fileID: 0}
+--- !u!23 &4124289810740391879
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 825461160665157728}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: ef526697ae326fa4995303c6d58932f7, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &1082575986672271727
 GameObject:
   m_ObjectHideFlags: 0
@@ -240,7 +323,7 @@ GameObject:
   - component: {fileID: 530730137332332319}
   - component: {fileID: 4924962740166748441}
   m_Layer: 9
-  m_Name: HeadMale
+  m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -446,9 +529,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8977612658379817706}
-  - component: {fileID: 4611598449715828891}
   - component: {fileID: 1858181473977014069}
+  - component: {fileID: 4611598449715828891}
   - component: {fileID: 6819454333702521818}
+  - component: {fileID: 3565132005091156166}
   m_Layer: 9
   m_Name: Corpse
   m_TagString: Untagged
@@ -473,19 +557,6 @@ Transform:
   - {fileID: 178129519572620643}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
---- !u!114 &4611598449715828891
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1324774699613132895}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 675c8f77c46edd64ab576014380aaf82, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  evidence: []
 --- !u!114 &1858181473977014069
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -537,6 +608,21 @@ MonoBehaviour:
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &4611598449715828891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1324774699613132895}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 675c8f77c46edd64ab576014380aaf82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nickname: 
+  isCultist: 0
+  evidence: []
 --- !u!114 &6819454333702521818
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -552,6 +638,46 @@ MonoBehaviour:
   currentRig: {fileID: 3796299676639738154}
   targetBones: []
   currentBones: []
+--- !u!114 &3565132005091156166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1324774699613132895}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8035102a71cf5e14a8aa7d892a4925b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isMale: 0
+  isCorpse: 1
+  attires:
+  - bodyPart: 0
+    renderer: {fileID: 5592798257895558223}
+    clothing: {fileID: 0}
+    hiddenParts: 
+  - bodyPart: 1
+    renderer: {fileID: 1081510623212570588}
+    clothing: {fileID: 0}
+    hiddenParts: 
+  - bodyPart: 2
+    renderer: {fileID: 6738419526117926668}
+    clothing: {fileID: 0}
+    hiddenParts: 
+  - bodyPart: 3
+    renderer: {fileID: 4924962740166748441}
+    clothing: {fileID: 0}
+    hiddenParts: 
+  - bodyPart: 4
+    renderer: {fileID: 8751506138060936789}
+    clothing: {fileID: 0}
+    hiddenParts: 
+  - bodyPart: 5
+    renderer: {fileID: 4124289810740391879}
+    clothing: {fileID: 0}
+    hiddenParts: 
+  randomizedClothing: []
 --- !u!1 &1561727398622988629
 GameObject:
   m_ObjectHideFlags: 0
@@ -1213,7 +1339,7 @@ CharacterJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: -1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.0020257616, y: 0.0028565966, z: -0.00012692396}
+  m_ConnectedAnchor: {x: -0.0020257616, y: 0.0028565966, z: -0.0001269241}
   serializedVersion: 2
   m_SwingAxis: {x: 0, y: 0, z: 1}
   m_TwistLimitSpring:
@@ -1231,7 +1357,7 @@ CharacterJoint:
     spring: 0
     damper: 0
   m_Swing1Limit:
-    limit: 50
+    limit: 88.86879
     bounciness: 0
     contactDistance: 0
   m_Swing2Limit:
@@ -1275,7 +1401,7 @@ GameObject:
   - component: {fileID: 3120813334588464872}
   - component: {fileID: 8751506138060936789}
   m_Layer: 0
-  m_Name: Head FX
+  m_Name: Hat
   m_TagString: Rig Ignore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1303,7 +1429,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2402517825301044236}
-  m_Mesh: {fileID: -9115994194503963082, guid: 8d1ac21b364890c42a40c0a3de273cc9, type: 3}
+  m_Mesh: {fileID: 0}
 --- !u!23 &8751506138060936789
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1420,7 +1546,7 @@ GameObject:
   - component: {fileID: 2133574775407095039}
   - component: {fileID: 5592798257895558223}
   m_Layer: 9
-  m_Name: TShirtMale
+  m_Name: Torso
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1675,7 +1801,7 @@ CharacterJoint:
     spring: 0
     damper: 0
   m_LowTwistLimit:
-    limit: -20
+    limit: -68.228516
     bounciness: 0
     contactDistance: 0
   m_HighTwistLimit:
@@ -2413,6 +2539,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8204531337523826322}
+  - {fileID: 6961583378710495427}
   - {fileID: 6497644234670425967}
   - {fileID: 8691398045617513018}
   - {fileID: 2627866606300178374}
@@ -2546,6 +2673,150 @@ MonoBehaviour:
   m_SynchronizeAngularVelocity: 1
   m_TeleportEnabled: 0
   m_TeleportIfDistanceGreaterThan: 3
+--- !u!1 &4851559703782662053
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 565727285125736624}
+  - component: {fileID: 1081510623212570588}
+  m_Layer: 9
+  m_Name: Legs
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &565727285125736624
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4851559703782662053}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.000000021855694, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 100, y: 100, z: 100}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 178129519572620643}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!137 &1081510623212570588
+SkinnedMeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4851559703782662053}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 3
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: ef526697ae326fa4995303c6d58932f7, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  serializedVersion: 2
+  m_Quality: 0
+  m_UpdateWhenOffscreen: 0
+  m_SkinnedMotionVectors: 1
+  m_Mesh: {fileID: 4300000, guid: 5135232c5a72356498c3b787f87900ce, type: 2}
+  m_Bones:
+  - {fileID: 3796299676639738154}
+  - {fileID: 2536843329847856299}
+  - {fileID: 5574353211908547296}
+  - {fileID: 7204980573895689772}
+  - {fileID: 1172669332680366218}
+  - {fileID: 5102540068542233570}
+  - {fileID: 6497644234670425967}
+  - {fileID: 6613557043452970456}
+  - {fileID: 8691398045617513018}
+  - {fileID: 2627866606300178374}
+  - {fileID: 2000176686841104048}
+  - {fileID: 1260900552447474541}
+  - {fileID: 8098681505609564439}
+  - {fileID: 1345558578520749232}
+  - {fileID: 3994973859825676655}
+  - {fileID: 911604516690733652}
+  - {fileID: 7792004201313862733}
+  - {fileID: 652852330502066364}
+  - {fileID: 6117260446304737900}
+  - {fileID: 4877008097696086626}
+  - {fileID: 1141230010747567831}
+  - {fileID: 7034829537020226661}
+  - {fileID: 2290825383800007577}
+  - {fileID: 1642812680439120910}
+  - {fileID: 1125607907182741583}
+  - {fileID: 7460419610057124485}
+  - {fileID: 1209642076580520538}
+  - {fileID: 9122568114112198978}
+  - {fileID: 8965165477680141421}
+  - {fileID: 6116575036223898421}
+  - {fileID: 104603910786304191}
+  - {fileID: 5208030802808586875}
+  - {fileID: 7310405350291501626}
+  - {fileID: 1731521073598559699}
+  - {fileID: 8517724367763590788}
+  - {fileID: 2852774928198496274}
+  - {fileID: 3191733638229281966}
+  - {fileID: 7023676626029531632}
+  - {fileID: 6183985048345109202}
+  - {fileID: 1046040729511838448}
+  - {fileID: 205225316692070664}
+  - {fileID: 3132474816708437837}
+  - {fileID: 1223150702190552392}
+  - {fileID: 443215986722926561}
+  - {fileID: 1352821901374785018}
+  - {fileID: 4554110264015775104}
+  - {fileID: 8516467135097705704}
+  - {fileID: 2417873692161338873}
+  - {fileID: 1873248390048811092}
+  - {fileID: 5600309568763442668}
+  - {fileID: 1571617187475094538}
+  - {fileID: 1859831767521212698}
+  - {fileID: 284889913597426981}
+  - {fileID: 4863142857494982198}
+  - {fileID: 4117629556011430494}
+  - {fileID: 161839768797425862}
+  - {fileID: 2080749197808810891}
+  - {fileID: 481926362532498602}
+  - {fileID: 1918848166235853279}
+  m_BlendShapeWeights: []
+  m_RootBone: {fileID: 3796299676639738154}
+  m_AABB:
+    m_Center: {x: -2.3283064e-10, y: -0.0006801933, z: 0.00045918243}
+    m_Extent: {x: 0.007031465, y: 0.008194186, z: 0.002186108}
+  m_DirtyAABB: 0
 --- !u!1 &4894738302550914192
 GameObject:
   m_ObjectHideFlags: 0
@@ -2711,7 +2982,7 @@ CharacterJoint:
     spring: 0
     damper: 0
   m_Swing1Limit:
-    limit: 50
+    limit: 87.998535
     bounciness: 0
     contactDistance: 0
   m_Swing2Limit:
@@ -3258,7 +3529,7 @@ CharacterJoint:
     spring: 0
     damper: 0
   m_LowTwistLimit:
-    limit: -20
+    limit: -70.4346
     bounciness: 0
     contactDistance: 0
   m_HighTwistLimit:
@@ -3459,7 +3730,7 @@ CharacterJoint:
     bounciness: 0
     contactDistance: 0
   m_HighTwistLimit:
-    limit: 0
+    limit: 31.978182
     bounciness: 0
     contactDistance: 0
   m_SwingLimitSpring:
@@ -3562,6 +3833,7 @@ Transform:
   - {fileID: 2291555629609757475}
   - {fileID: 530730137332332319}
   - {fileID: 2133574775407095039}
+  - {fileID: 565727285125736624}
   m_Father: {fileID: 8977612658379817706}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7394076456593872944
@@ -3829,18 +4101,18 @@ CharacterJoint:
     spring: 0
     damper: 0
   m_LowTwistLimit:
-    limit: -20
+    limit: -21.219585
     bounciness: 0
     contactDistance: 0
   m_HighTwistLimit:
-    limit: 20
+    limit: 23.740265
     bounciness: 0
     contactDistance: 0
   m_SwingLimitSpring:
     spring: 0
     damper: 0
   m_Swing1Limit:
-    limit: 10
+    limit: 20.022085
     bounciness: 0
     contactDistance: 0
   m_Swing2Limit:
@@ -3998,7 +4270,7 @@ CharacterJoint:
     bounciness: 0
     contactDistance: 0
   m_HighTwistLimit:
-    limit: 0
+    limit: 24.195803
     bounciness: 0
     contactDistance: 0
   m_SwingLimitSpring:

@@ -200,7 +200,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: GloriousToast
+  m_text: <Player Name>
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 789bd3a124a1b2b4daa43b1be67c9959, type: 2}
   m_sharedMaterial: {fileID: -8370791751656364495, guid: 789bd3a124a1b2b4daa43b1be67c9959, type: 2}
@@ -389,8 +389,10 @@ GameObject:
   - component: {fileID: 3505443905195225951}
   - component: {fileID: 4082172833618820746}
   - component: {fileID: 5014744747085501153}
+  - component: {fileID: 942780691325407155}
   - component: {fileID: 3978135401851811920}
   - component: {fileID: 6718172887860175225}
+  - component: {fileID: 2952743998683700517}
   m_Layer: 5
   m_Name: UI Manager
   m_TagString: Untagged
@@ -485,6 +487,36 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &942780691325407155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 922143092667609872}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: e9640c4d222590d42beb6cab51ad9ef6, type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: UI
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!114 &3978135401851811920
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -510,7 +542,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37e34f2c5524c514baed84302a360707, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  uiOpened: 0
   cUI: {fileID: 488163711818168382}
+--- !u!114 &2952743998683700517
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 922143092667609872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36684e74b1bd2e447a216e440f0102e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disableOnUI: 0
 --- !u!1 &2285669255574503324
 GameObject:
   m_ObjectHideFlags: 0
@@ -1749,7 +1795,7 @@ GameObject:
   - component: {fileID: 8614527948022307011}
   - component: {fileID: 898618202057839497}
   m_Layer: 5
-  m_Name: Name
+  m_Name: Alignment
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2130,6 +2176,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cb71e32dc1349d49863128453f93351, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  nameText: {fileID: 2565594751195960484}
+  alignmentText: {fileID: 898618202057839497}
+  innocentColor: {r: 0.03529412, g: 1, b: 0, a: 1}
+  cultistColor: {r: 1, g: 0, b: 0.42356968, a: 1}
   eContent: {fileID: 977930301047813079}
   evidencePrefab: {fileID: 2568512158437922683, guid: 0ccb61efec557854b9553215c56c8056, type: 3}
   descTxt: {fileID: 9023151792028687470}
@@ -2481,7 +2531,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3763532256189983360, guid: 0ccb61efec557854b9553215c56c8056, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3763532256189983360, guid: 0ccb61efec557854b9553215c56c8056, type: 3}
       propertyPath: m_AnchorMin.x
@@ -2489,7 +2539,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3763532256189983360, guid: 0ccb61efec557854b9553215c56c8056, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3763532256189983360, guid: 0ccb61efec557854b9553215c56c8056, type: 3}
       propertyPath: m_SizeDelta.x
@@ -2529,11 +2579,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3763532256189983360, guid: 0ccb61efec557854b9553215c56c8056, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 3763532256189983360, guid: 0ccb61efec557854b9553215c56c8056, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -50
       objectReference: {fileID: 0}
     - target: {fileID: 3763532256189983360, guid: 0ccb61efec557854b9553215c56c8056, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

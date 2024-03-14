@@ -52,12 +52,16 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Update()
     {
+        FixDmg();
+        if (!view.IsMine) return;
         if (Input.GetKeyDown(KeyCode.B))
         {
             PhotonNetwork.LeaveRoom();
         }
-        FixDmg();
-        if (!view.IsMine) return;
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            Kill();
+        }
         if (staminaCooldown > 0f)
         {
             staminaCooldown -= Time.deltaTime;
@@ -126,13 +130,31 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     public void Kill()
     {
         GameObject corpse = PhotonNetwork.Instantiate(corpsePrefab.name, transform.position, transform.rotation);
+        PhotonView corpseView = corpse.GetComponent<PhotonView>();
         OnDeath.Invoke(corpse);
         pe.ApplyEvidence(corpse);
         Ragdoller ragdoller = corpse.GetComponent<Ragdoller>();
         ragdoller.SetPositionsToTarget(myRig);
         FindObjectOfType<CameraBobbing>().isBobbing = false;
 
-        //corpse.GetComponent<PhotonView>().TransferOwnership(0);
+        // Set corpse nickname
+        Corpse co = corpse.GetComponent<Corpse>();
+        co.SetVelocity(gameObject.GetComponent<Rigidbody>().velocity);
+        co.SetCorpseData(view.Owner);
+        corpseView.RPC("SetCorpseData", RpcTarget.OthersBuffered, view.Owner);
+
+        // Sets corpse clothing to this player's clothing
+        PlayerClothing cpc = corpse.GetComponent<PlayerClothing>();
+        PlayerClothing pc = gameObject.GetComponent<PlayerClothing>();
+        foreach (PlayerClothing.Attire attire in pc.attires)
+        {
+            if (attire.clothing == null) continue;
+            cpc.SetClothing(attire.clothing.name, cpc.isMale);
+            corpseView.RPC("SetClothing", RpcTarget.OthersBuffered, attire.clothing.name, cpc.isMale);
+        }
+        return;
+
+        //Destroy player
         PhotonNetwork.Destroy(gameObject);
     }
 

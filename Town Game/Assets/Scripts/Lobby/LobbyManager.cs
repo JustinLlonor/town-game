@@ -8,7 +8,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using WebSocketSharp;
 using Steamworks;
-using System;
+
 
 public class LobbyManager : MonoBehaviourPunCallbacks
 {
@@ -97,6 +97,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         ExitGames.Client.Photon.Hashtable playerProperties = new ExitGames.Client.Photon.Hashtable();
         // Initialize Properties
         playerProperties["name"] = SessionData.nickname;
+        playerProperties["isCultist"] = false;
+        playerProperties["isMale"] = false;
         PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
     }
 

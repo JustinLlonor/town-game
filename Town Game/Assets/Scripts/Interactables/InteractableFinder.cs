@@ -20,18 +20,17 @@ public class InteractableFinder : MonoBehaviour
     [HideInInspector] public bool iValid = true;
     [HideInInspector] public Interactable currentInteraction;
     GameObject currentInteractable = null;
-    CursorManager cm;
     float timer = 0f;
     bool currentPressed = false;
 
-    private void Awake()
+    private void Start()
     {
-        cm = FindObjectOfType<CursorManager>();
+        UIManager.instance.OnUIOpen += ResetInteractions;
     }
 
     private void Update()
     {
-        CastRay();
+        if (!UIManager.instance.uiOpened) CastRay();
     }
 
     private void OnInteract1(InputValue iv)
@@ -111,7 +110,7 @@ public class InteractableFinder : MonoBehaviour
 
     void InteractionKey(Interactable.InteractKey key)
     {
-        if (!cm.isLocked) return;
+        if (UIManager.instance.uiOpened) return;
         if (timer > 0f) return;
         if (currentInteraction != null)
         {

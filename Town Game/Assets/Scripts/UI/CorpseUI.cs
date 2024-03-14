@@ -7,6 +7,10 @@ using UnityEngine.UI;
 public class CorpseUI : MonoBehaviour
 {
     [Header("Evidence")]
+    public TextMeshProUGUI nameText;
+    public TextMeshProUGUI alignmentText;
+    public Color innocentColor;
+    public Color cultistColor;
     public Transform eContent;
     public GameObject evidencePrefab;
     [Header("Description")]
@@ -36,7 +40,6 @@ public class CorpseUI : MonoBehaviour
             eButton.text = e.descriptions[depth];
         }
     }
-
     void ResetUI()
     {
         nfObj.SetActive(true);
@@ -45,5 +48,22 @@ public class CorpseUI : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
+    }
+
+    public void SetName(string name)
+    {
+        nameText.text = name;
+    }
+
+    public void SetAlignment(bool isCultist)
+    {
+        if (isCultist)
+        {
+            alignmentText.text = "Cultists";
+            alignmentText.color = cultistColor;
+            return;
+        }
+        alignmentText.text = "Researchers";
+        alignmentText.color = innocentColor;
     }
 }

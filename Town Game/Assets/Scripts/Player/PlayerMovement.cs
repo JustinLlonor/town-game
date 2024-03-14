@@ -65,9 +65,9 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public Transform crouchPos;
     public Transform orientation;
     PlayerManager playerManager;
-    CursorManager cursorManager;
     PhotonView view;
     PlayerStats stats;
+    PlayerInput playerInput;
     Rigidbody rb;
     CameraBobbing bobbing;
     CameraShake shake;  
@@ -94,8 +94,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         airSpeed = speed;
         view = gameObject.GetComponent<PhotonView>();
         playerManager = FindObjectOfType<PlayerManager>();
-        cursorManager = FindObjectOfType<CursorManager>();
-        if (!view.IsMine) Destroy(gameObject.GetComponent<PlayerInput>());
+        playerInput = gameObject.GetComponent<PlayerInput>();
+        if (!view.IsMine) Destroy(playerInput);
         if (!view.IsMine) return;
         stats = gameObject.GetComponent<PlayerStats>();
         rb = gameObject.GetComponent<Rigidbody>();
@@ -439,7 +439,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     void Inputs()
     {
-        if (!cursorManager.isLocked) return;
         moveDirection = orientation.forward * verticalMovement + orientation.right * horizontalMovement;
     }
 

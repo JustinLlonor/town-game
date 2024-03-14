@@ -8,36 +8,43 @@ using Unity.VisualScripting;
 public class PlayerClothing : MonoBehaviour
 {
     public bool isMale;
+    public bool isCorpse = false;
     public Attire[] attires;
     public RandomizedClothing[] randomizedClothing;
     ObjectManager om;
     PhotonView view;
 
-    private void Start()
+    private void Awake()
     {
         om = FindObjectOfType<ObjectManager>();
         view = gameObject.GetComponent<PhotonView>();
+    }
+
+    private void Start()
+    {
+        if (isCorpse) return;
         RandomizeGender();
         RandomizeClothing();
     }
 
     [PunRPC]
-    public void SetClothing(string clothingName)
+    public void SetClothing(string clothingName, bool male)
     {
+        isMale = male;
         Clothing clothing = om.clothingSearch[clothingName];
-        Attire foundAttire = new Attire();
+        int i = 0;
 
         foreach (Attire attire in attires)
         {
             if (attire.bodyPart == clothing.bodyPart)
             {
-                foundAttire = attire;
                 break;
             }
+            i++;
         }
-        foundAttire.clothing = clothing;
+        attires[i].clothing = clothing;
 
-        RenderClothing(foundAttire);
+        RenderClothing(attires[i]);
     }
 
     [PunRPC]
@@ -49,8 +56,11 @@ public class PlayerClothing : MonoBehaviour
     public void RandomizeGender()
     {
         bool male = false;
-        int randomGender = Random.Range(0, 2);
+        int randomGender = Random.Range((int)0, (int)2);
         if (randomGender == 0) male = true;
+        ExitGames.Client.Photon.Hashtable playerProperties = view.Owner.CustomProperties;
+        playerProperties["isMale"] = male;
+        view.Owner.SetCustomProperties(playerProperties);
         SetSex(male);
         view.RPC("SetSex", RpcTarget.OthersBuffered, male);
     }
@@ -64,8 +74,8 @@ public class PlayerClothing : MonoBehaviour
                 if (Random.value <= rc.nullChance) continue;
             }
             Clothing selectedClothing = rc.clothings[Random.Range(0, rc.clothings.Length)];
-            SetClothing(selectedClothing.name);
-            view.RPC("SetClothing", RpcTarget.OthersBuffered, selectedClothing.name);
+            SetClothing(selectedClothing.name, isMale);
+            view.RPC("SetClothing", RpcTarget.OthersBuffered, selectedClothing.name, isMale);
         }
     }
 

@@ -5,6 +5,8 @@ using Photon.Pun;
 
 public class Corpse : MonoBehaviourPunCallbacks
 {
+    public string nickname;
+    public bool isCultist;
     public List<Evidence> evidence;
 
     UIManager ui;
@@ -20,8 +22,28 @@ public class Corpse : MonoBehaviourPunCallbacks
         evidence.Add(new Evidence(icons, descriptions, time));
     }
 
+    [PunRPC]
+    public void SetCorpseData(Photon.Realtime.Player player)
+    {
+        nickname = (string)player.CustomProperties["name"];
+        isCultist = (bool)player.CustomProperties["isCultist"];
+        PlayerClothing pc = transform.GetComponent<PlayerClothing>();
+        pc.isMale = (bool)player.CustomProperties["isMale"];
+
+    }
+
     public void InspectCorpse()
     {
-        ui.OpenCorpse(evidence);
+        ui.OpenCorpse(evidence, nickname, isCultist);
+    }
+
+    public void SetVelocity(Vector3 velocity)
+    {
+        Rigidbody[] limbs = transform.GetComponentsInChildren<Rigidbody>();
+        foreach (Rigidbody limb in limbs)
+        {
+            limb.velocity = velocity;
+            limb.angularVelocity = velocity;
+        }
     }
 }
