@@ -13,7 +13,7 @@ public class AttackManager : MonoBehaviour
     [HideInInspector] public LayerMask environmentMask;
     [HideInInspector] public Animator animator;
     [HideInInspector] public PhotonView view;
-    [HideInInspector] public Animator itemAnimator;
+    public Animator itemAnimator;
     [HideInInspector] public Transform animHolder;
 
     CameraShake cShake;
