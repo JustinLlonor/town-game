@@ -3265,8 +3265,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.003627437, y: 0.0066968515, z: 0.0022895685}
-  m_Center: {x: 0.000019258112, y: 0.00009057521, z: -0.00000002175772}
+  m_Size: {x: 0.003627437, y: 0.008331908, z: 0.0020808089}
+  m_Center: {x: 0.000019258112, y: 0.00090811314, z: 0.000039152408}
 --- !u!114 &5858100474516846259
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3288,6 +3288,8 @@ MonoBehaviour:
     action:
       m_PersistentCalls:
         m_Calls: []
+    trackLore: 0
+    trackColor: 0
   - lore: Healthy
     interactKey: 0
     color: {r: 0.30865914, g: 1, b: 0.28773582, a: 0}
@@ -3295,13 +3297,17 @@ MonoBehaviour:
     action:
       m_PersistentCalls:
         m_Calls: []
+    trackLore: 1
+    trackColor: 1
   - lore: Sane
     interactKey: 0
-    color: {r: 0.29045033, g: 0.37188497, b: 0.5754717, a: 0}
+    color: {r: 0.29045033, g: 0.37188497, b: 0.5754717, a: 1}
     delay: 0
     action:
       m_PersistentCalls:
         m_Calls: []
+    trackLore: 1
+    trackColor: 1
   glow: 0
   renderers: []
   glowAmount: 1

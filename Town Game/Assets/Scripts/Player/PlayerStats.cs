@@ -56,7 +56,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
         if (!view.IsMine) return;
         if (Input.GetKeyDown(KeyCode.B))
         {
-            PhotonNetwork.LeaveRoom();
+            Damage(20f);
         }
         if (Input.GetKeyDown(KeyCode.K))
         {

@@ -55,6 +55,16 @@ public class InteractableUI : MonoBehaviour
         tex.color = new Color(color.r, color.g, color.b, maxAlpha);
         interaction.transform.GetChild(0).GetComponent<Image>().color = new Color(color.r, color.g, color.b, 0.3f);
     }
+    public void SetInteractionLore(int index, string lore)
+    {
+        transform.GetChild(index).GetComponent<TextMeshProUGUI>().text = lore;
+    }
+
+    public void SetInteractionColor(int index, Color color)
+    {
+        transform.GetChild(index).GetComponent<TextMeshProUGUI>().color = color;
+    }
+
 
     public void ClearInteractions()
     {

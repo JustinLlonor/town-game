@@ -22,6 +22,7 @@ public class InteractableFinder : MonoBehaviour
     GameObject currentInteractable = null;
     float timer = 0f;
     bool currentPressed = false;
+    List<int> trackedIndexes = new List<int>();
 
     private void Start()
     {
@@ -31,6 +32,11 @@ public class InteractableFinder : MonoBehaviour
     private void Update()
     {
         if (!UIManager.instance.uiOpened) CastRay();
+    }
+
+    private void FixedUpdate()
+    {
+        UpdateTracking();
     }
 
     private void OnInteract1(InputValue iv)
@@ -105,6 +111,7 @@ public class InteractableFinder : MonoBehaviour
         timer = 0f;
         iui.StopHighlight();
         iui.ClearInteractions();
+        trackedIndexes.Clear();
         CrosshairManager.instance.RemoveCrosshair(0);
     }
 
@@ -163,6 +170,7 @@ public class InteractableFinder : MonoBehaviour
         // Sets to lore of interaction
         Interactable.Hover[] hovers = inter.hovers;
         iui.ClearInteractions();
+        int i = 0;
         foreach (Interactable.Hover h in hovers)
         {
             if (h.interactKey != Interactable.InteractKey.None)
@@ -173,9 +181,38 @@ public class InteractableFinder : MonoBehaviour
                     interactAction.bindings[bindingIndex].effectivePath,
                     InputControlPath.HumanReadableStringOptions.OmitDevice);
                 iui.AddInteraction($"[{interactText}] {h.lore}\n", h.color);
-                return;
+                if (h.trackColor || h.trackLore) trackedIndexes.Add(i);
+                i++;
+                continue;
             }
             iui.AddInteraction($"{h.lore}\n", h.color);
+            if (h.trackColor || h.trackLore) trackedIndexes.Add(i);
+            i++;
+        }
+    }
+
+    void UpdateTracking()
+    {
+        if (currentInteraction == null || trackedIndexes.Count == 0) return;
+        Interactable.Hover[] hovers = currentInteraction.hovers;
+        foreach (int i in trackedIndexes)
+        {
+            if (hovers[i].trackColor) iui.SetInteractionColor(i, hovers[i].color);
+            if (hovers[i].trackLore)
+            {
+                if (hovers[i].interactKey == Interactable.InteractKey.None)
+                {
+                    iui.SetInteractionLore(i, hovers[i].lore);
+                } else
+                {
+                    InputAction interactAction = ToInteractAction(hovers[i].interactKey).action;
+                    int bindingIndex = interactAction.GetBindingIndexForControl(interactAction.controls[0]);
+                    string interactText = InputControlPath.ToHumanReadableString(
+                        interactAction.bindings[bindingIndex].effectivePath,
+                        InputControlPath.HumanReadableStringOptions.OmitDevice);
+                    iui.SetInteractionLore(i, $"[{interactText}] {hovers[i].lore}\n");
+                }
+            }
         }
     }
 

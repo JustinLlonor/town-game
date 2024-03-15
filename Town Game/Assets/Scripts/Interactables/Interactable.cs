@@ -22,6 +22,8 @@ public class Interactable : MonoBehaviour
         public Color color = Color.white;
         public float delay;
         public UnityEvent action;
+        public bool trackLore = false;
+        public bool trackColor = false;
     }
 
     private void OnDestroy()
