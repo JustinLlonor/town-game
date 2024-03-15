@@ -170,6 +170,8 @@ public class InteractableFinder : MonoBehaviour
         // Sets to lore of interaction
         Interactable.Hover[] hovers = inter.hovers;
         iui.ClearInteractions();
+        trackedIndexes.Clear();
+        CrosshairManager.instance.RemoveCrosshair(0);
         int i = 0;
         foreach (Interactable.Hover h in hovers)
         {
