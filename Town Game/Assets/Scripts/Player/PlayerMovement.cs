@@ -64,6 +64,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public Transform standPos;
     public Transform crouchPos;
     public Transform orientation;
+
+    public Leap OnLeap;
+
+    public delegate void Leap();
+
     PlayerManager playerManager;
     PhotonView view;
     PlayerStats stats;
@@ -79,8 +84,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     float previousYVel;
     float peakYPosition;
     float unCastDistance;
-    bool isMoving;
-    bool isSprinting;
+    [HideInInspector] public bool isMoving;
+    [HideInInspector] public bool isSprinting;
     bool previousGrounded = true;
     bool sprintPressed = false;
     RaycastHit slopeHit;
@@ -169,6 +174,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
         shake.StartShake(jumpShake.shakeProperties);
         jumpTimer = jumpCooldown;
+        OnLeap.Invoke();
     }
 
     [PunRPC]
