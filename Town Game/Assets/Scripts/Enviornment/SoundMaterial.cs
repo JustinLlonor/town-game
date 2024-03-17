@@ -7,6 +7,7 @@ public class SoundMaterial : MonoBehaviour
 {
     public Texture2D texture;
     public SMatIndex soundIndex;
+    public Texture2D hitTexture;
     
     /// <summary>
     /// Gets the sound material returned as a string. Requires the textureCoord of the hit

@@ -18,11 +18,6 @@ public class Item : ScriptableObject
     public string holdPose = "ArmHoldNormal_f";
     public string gripPose;
     public string[] clientAnimations;
-    public float yOffset = -0.14f;
-    public float iYOffset = 0.1f;
-    public float angleOffset = 30f;
-    public float pullSpeed = 40f;
-    public float dragSpeed = 120f;
     [Header("Character Animation")]
     public AnimationState[] useAnimations;
     public AnimationState[] holdPoses;

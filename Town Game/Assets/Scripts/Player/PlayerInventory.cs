@@ -15,8 +15,6 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     public GameObject largeUI;
     [Header("Item Display")]
     public Transform sItem; // Server item
-    public Transform cItem; // Client item
-    public Transform itemHolder; // ^^
     public Transform camTransform;
     public float dragMax = 5f;
     [Header("Item Animations")]
@@ -33,17 +31,11 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     Item equippedItem = null;
     AttackManager attackManager;
     PhotonView view;
-    float itemPull = 40f;
-    float itemDrag = 40f;
     ObjectManager itemManager;
-    MeshFilter cFilter;
-    MeshRenderer cRenderer;
     MeshFilter sFilter;
     MeshRenderer sRenderer;
     Transform mainCam;
     Rigidbody rb;
-    Vector3 itemPosition; // Local position of client item
-    float yOffset;
     KeyCode[] hotbarInput =
     {
         KeyCode.Alpha1,
@@ -66,9 +58,6 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         itemManager = FindObjectOfType<ObjectManager>();
         sFilter = sItem.GetComponent<MeshFilter>();
         sRenderer = sItem.GetComponent<MeshRenderer>();
-        cFilter = cItem.GetComponent<MeshFilter>();
-        cRenderer = cItem.GetComponent<MeshRenderer>();
-        itemPosition = cItem.localPosition;
         attackManager = gameObject.GetComponent<AttackManager>();
         rb = gameObject.GetComponent<Rigidbody>();
         mainCam = Camera.main.transform;
@@ -77,11 +66,6 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Start()
     {
-        if (!view.IsMine)
-        {
-            Destroy(itemHolder.gameObject);
-        }
-        itemHolder.parent = null;
         SetupHotbarUI();
         EquipItem(0);
         UpdateHotbarUI();
@@ -102,7 +86,6 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     private void LateUpdate()
     {
         if (!view.IsMine) return;
-        FollowItemTarget();
     }
 
     private void OnDropItem()
@@ -180,31 +163,6 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
-    void FollowItemTarget()
-    {
-        itemHolder.position = camTransform.position;
-        Quaternion newRot = Quaternion.Lerp(itemHolder.rotation, camTransform.rotation, Time.deltaTime * itemDrag);
-        if (Quaternion.Angle(newRot, camTransform.rotation) > dragMax)
-        {
-            Vector2 capped = (itemHolder.eulerAngles - camTransform.eulerAngles).normalized * dragMax;
-            itemHolder.eulerAngles = camTransform.eulerAngles + (Vector3)capped;
-        }
-        else
-        {
-            itemHolder.rotation = newRot;
-        }
-        if (attackManager.isAttacking) return;
-        Vector3 newPos = new Vector3(itemPosition.x, yOffset, itemPosition.z);
-        if (cItem.localRotation != Quaternion.identity)
-        {
-            cItem.localRotation = Quaternion.Lerp(cItem.localRotation, Quaternion.identity, Time.deltaTime * itemPull);
-        }
-        if (cItem.localPosition != newPos)
-        {
-            cItem.localPosition = Vector3.Lerp(cItem.localPosition, newPos, Time.deltaTime * itemPull);
-        }
-    }
-
     public void EquipItem(int slot, bool selfEquip = false)
     {
         if (!view.IsMine) return;
@@ -250,14 +208,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         if (!view.IsMine) return;
         fps.ShowClientItem(equippedItem);
 
-        return; // For rework
-        cFilter.mesh = equippedItem.mesh;
-        cRenderer.material.SetTexture("_MainTex", equippedItem.texture);
-        yOffset = equippedItem.yOffset;
-        cItem.localPosition = itemPosition + (Vector3.down * equippedItem.iYOffset);
-        cItem.localEulerAngles = new Vector3(equippedItem.angleOffset, 0f, 0f);
-        itemPull = equippedItem.pullSpeed;
-        itemDrag = equippedItem.dragSpeed;
+        return; 
     }
 
     [PunRPC]

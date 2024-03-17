@@ -155,8 +155,6 @@ public class InteractableFinder : MonoBehaviour
                     iValid = true;
                     break;
                 }
-                CrosshairManager.instance.RemoveCrosshair(0);
-                iui.ClearInteractions();
                 timer = 0f;
                 break;
             }

@@ -84,6 +84,7 @@ public class PlayerClothing : MonoBehaviour
         if (attire.clothing != null) attire.renderer.material.mainTexture = attire.clothing.texture;
         if (isMale)
         {
+            if (attire.clothing.maleArmModel != null) FindObjectOfType<FirstPerson>().ChangeArmMesh(attire.clothing.maleArmModel);
             if (attire.renderer.transform.GetComponent<MeshFilter>() != null)
             {
                 attire.renderer.transform.GetComponent<MeshFilter>().mesh = attire.clothing.maleModel;
@@ -94,6 +95,7 @@ public class PlayerClothing : MonoBehaviour
         }
         else
         {
+            if (attire.clothing.femaleArmModel != null) FindObjectOfType<FirstPerson>().ChangeArmMesh(attire.clothing.femaleArmModel);
             if (attire.renderer.transform.GetComponent<MeshFilter>() != null)
             {
                 attire.renderer.transform.GetComponent<MeshFilter>().mesh = attire.clothing.femaleModel;

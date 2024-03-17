@@ -18,6 +18,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     public RectTransform hotbar;
     public GameObject largeUI;
     public CleanupMaster cm;
+    public FirstPerson fps;
 
     [System.Serializable]
     public class PlayerSettings
@@ -37,6 +38,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         playerInventory.largeUI = largeUI;
         playerMovement.speed = playerSettings.speed;
         playerMovement.canJump = playerSettings.canJump;
+        fps.trackedMV = playerMovement;
 
         currentPlayer = player;
     }

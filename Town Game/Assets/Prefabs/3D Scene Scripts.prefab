@@ -340,6 +340,10 @@ PrefabInstance:
       value: Player Manager
       objectReference: {fileID: 0}
     - target: {fileID: 6953661347052619856, guid: 00b86e8be9c97a24e98cfbdeab7f72cf, type: 3}
+      propertyPath: fps
+      value: 
+      objectReference: {fileID: 8031061117389015669}
+    - target: {fileID: 6953661347052619856, guid: 00b86e8be9c97a24e98cfbdeab7f72cf, type: 3}
       propertyPath: spawn
       value: 
       objectReference: {fileID: 745082805845088640}
@@ -573,5 +577,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 51a4ef87abf9a0c41b1e03ee413fa903, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8031061117389015669 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1473637898553221736, guid: 668a749bb83c86446922dfb5701650ab, type: 3}
+  m_PrefabInstance: {fileID: 8865166907863328797}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11c6b833541f7774d9fa4b45039731e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

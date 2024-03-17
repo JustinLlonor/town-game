@@ -62,12 +62,15 @@ public class InteractableUI : MonoBehaviour
 
     public void SetInteractionColor(int index, Color color)
     {
+        TextMeshProUGUI tmp = transform.GetChild(index).GetComponent<TextMeshProUGUI>();
+        color.a = tmp.color.a;
         transform.GetChild(index).GetComponent<TextMeshProUGUI>().color = color;
     }
 
 
     public void ClearInteractions()
     {
+        StopAllCoroutines();
         foreach (Transform child in transform)
         {
             Destroy(child.gameObject);

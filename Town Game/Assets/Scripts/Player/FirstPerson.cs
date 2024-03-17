@@ -1,19 +1,19 @@
 using Photon.Pun.Demo.Cockpit;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Animations;
 using UnityEngine;
 
 public class FirstPerson : MonoBehaviour
 {
     public PlayerMovement trackedMV;
     public Transform itemTransform;
+    public SkinnedMeshRenderer armsRenderer;
     MeshFilter itemFilter;
     MeshRenderer itemRenderer;
     Animator animator;
     Item currentItem;
 
-    private void Awake()
+    private void Start()
     {
         animator = gameObject.GetComponent<Animator>();
         trackedMV.OnLeap += OnLeap;
@@ -48,6 +48,7 @@ public class FirstPerson : MonoBehaviour
 
     public void HideClientItem()
     {
+        StopAllCoroutines();
         itemFilter.mesh = null;
         int gripIndex = animator.GetLayerIndex("Grip");
         int itemIndex = animator.GetLayerIndex("Item");
@@ -76,5 +77,10 @@ public class FirstPerson : MonoBehaviour
         int gripIndex = animator.GetLayerIndex("Grip");
         animator.SetLayerWeight(gripIndex, 1f);
         animator.CrossFade(currentItem.holdPose, 0.5f);
+    }
+
+    public void ChangeArmMesh(Mesh mesh)
+    {
+        armsRenderer.sharedMesh = mesh;
     }
 }

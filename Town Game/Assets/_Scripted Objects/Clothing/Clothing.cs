@@ -7,7 +7,9 @@ public class Clothing : ScriptableObject
 {
     public BodyPart bodyPart;
     public Mesh maleModel;
+    public Mesh maleArmModel;
     public Mesh femaleModel;
+    public Mesh femaleArmModel;
     public Texture texture;
 
     public enum BodyPart

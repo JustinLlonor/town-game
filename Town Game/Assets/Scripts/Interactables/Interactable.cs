@@ -32,7 +32,8 @@ public class Interactable : MonoBehaviour
         if (ifi == null) return;
         if (ifi.currentInteraction == this)
         {
-            ifi.ResetInteractions();
+            CrosshairManager.instance.RemoveCrosshair(0);
+            ifi.iui.ClearInteractions();
         }
     }
 

@@ -10,10 +10,9 @@ public class AttackManager : MonoBehaviour
     public float weightLerp = 50f;
     public Collider[] colliders;
     public LayerMask dmgMask;
-    [HideInInspector] public LayerMask environmentMask;
+    public LayerMask environmentMask;
     [HideInInspector] public Animator animator;
     [HideInInspector] public PhotonView view;
-    public Animator itemAnimator;
     [HideInInspector] public Transform animHolder;
 
     FirstPerson fps;
@@ -74,10 +73,7 @@ public class AttackManager : MonoBehaviour
     public void ResetAttack()
     {
         StopAllCoroutines();
-        itemAnimator.enabled = false;
         isAttacking = false;
-        animHolder.localRotation = Quaternion.identity;
-        animTimer = -.0001f;
         currentAtk = 0;
         ResetAnimations();
     }
@@ -90,7 +86,6 @@ public class AttackManager : MonoBehaviour
         {
             animator.SetLayerWeight(animator.GetLayerIndex(layer), 0f);
             animator.Play("New State", animator.GetLayerIndex(layer));
-            itemAnimator.Play("New State", 0);
         }
         resetLayers.Clear();
     }
@@ -110,7 +105,6 @@ public class AttackManager : MonoBehaviour
         Item.AnimationState state = weapon.useAnimations[currentAtk];
         string cState = weapon.clientAnimations[currentAtk];
         animator.Play(state.animation, animator.GetLayerIndex(state.layer), 0f);
-        itemAnimator.enabled = true;
         fps.PlayItemUseAnimation(cState);
         view.RPC("AttackManagerPlay", RpcTarget.Others, state.animation, animator.GetLayerIndex(state.layer));
         tWeight = 1f;
@@ -136,9 +130,7 @@ public class AttackManager : MonoBehaviour
         yield return new WaitForSeconds(animLength - weapon.attackCharge);
         tWeight = 0f;
         isAttacking = false;
-        itemAnimator.enabled = false;
         animTimer = animationCooldown;
-        animHolder.localRotation = Quaternion.identity;
     }
 
     public void PlayShake(Shake shake)
@@ -168,8 +160,8 @@ public class AttackManager : MonoBehaviour
         RaycastHit hit2;
         if (Physics.Raycast(camTransform.position, camTransform.forward, out hit2, distance, (int)environmentMask))
         {
-            MeshRenderer hitRenderer = hit2.transform.GetComponent<MeshRenderer>();
-            Texture2D hitTex = (Texture2D)hitRenderer.material.mainTexture;
+            SoundMaterial hitSM = hit2.transform.GetComponent<SoundMaterial>();
+            Texture2D hitTex = hitSM.hitTexture;
             Vector2 uv = hit2.textureCoord;
             uv.x *= hitTex.width;
             uv.y *= hitTex.height;

@@ -17,6 +17,9 @@ public class CameraBobbing : MonoBehaviour
     public bool isBobbing = false;
     public bool isSprinting = false;
     public bool isCrouching = false;
+    public Transform fpsBob;
+    public float fpsXMultiplier;
+    public float fpsYMultiplier;
     float bobPosition;
     float previousLength = 1f;
     float previousAmplitude = 1f;
@@ -86,6 +89,7 @@ public class CameraBobbing : MonoBehaviour
         float y = (yCurrent - yPrevious) * currentWeight + yPrevious;
         float x = (xCurrent - xPrevious) * currentWeight + xPrevious;
         transform.localPosition = new Vector3(x, y, 0f);
+        fpsBob.localPosition = new Vector3(x * fpsXMultiplier, y * fpsYMultiplier, 0f);
         if (isCrouching)
         {
             float zRot = x * zTilt;
@@ -98,7 +102,11 @@ public class CameraBobbing : MonoBehaviour
         bobPosition = 0f;
         if (transform.localPosition != Vector3.zero)
         {
-            transform.localPosition = Vector3.Lerp(transform.localPosition, Vector3.zero, Time.deltaTime * resetSpeed);
+            transform.localPosition = Vector3.Slerp(transform.localPosition, Vector3.zero, Time.deltaTime * resetSpeed);
+        }
+        if (fpsBob.localPosition != Vector3.zero)
+        {
+            fpsBob.localPosition = Vector3.Slerp(fpsBob.localPosition, Vector3.zero, Time.deltaTime * resetSpeed);
         }
     }
 }

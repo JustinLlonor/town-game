@@ -8,12 +8,15 @@ public class ItemPhys : MonoBehaviour
 {
     public string itemName;
     public float interactTimer = .5f;
+    public Color inspectionColor;
     bool pickedUp = false;
 
     PlayerManager playerManager;
     PhotonView view;
     ObjectManager om;
     InteractableFinder finder;
+    Interactable interactable;
+    Item item;
 
     private void Awake()
     {
@@ -21,6 +24,7 @@ public class ItemPhys : MonoBehaviour
         playerManager = FindObjectOfType<PlayerManager>();
         view = gameObject.GetComponent<PhotonView>();
         om = FindObjectOfType<ObjectManager>();
+        interactable = gameObject.GetComponent<Interactable>();
     }
 
     private void Start()
@@ -40,6 +44,13 @@ public class ItemPhys : MonoBehaviour
                 gameObject.GetComponent<Interactable>().canInteract = true;
             }
         }
+    }
+
+    public void InspectItem()
+    {
+        interactable.hovers[1].interactKey = Interactable.InteractKey.None;
+        interactable.hovers[1].color = inspectionColor;
+        StartCoroutine(RollText(1, item.description));
     }
 
     public void PickUpItem()
@@ -75,7 +86,7 @@ public class ItemPhys : MonoBehaviour
     public void CreateItem()
     {
         gameObject.GetComponent<Interactable>().hovers[0].lore = "Pick up " + itemName;
-        Item item = FindObjectOfType<ObjectManager>().itemSearch[itemName];
+        item = FindObjectOfType<ObjectManager>().itemSearch[itemName];
         gameObject.GetComponent<MeshFilter>().mesh = item.mesh;
         gameObject.GetComponent<MeshRenderer>().material.SetTexture("_MainTex", item.texture);
         gameObject.GetComponent<MeshCollider>().sharedMesh = item.mesh;
@@ -85,5 +96,30 @@ public class ItemPhys : MonoBehaviour
     public void SetName(string name)
     {
         itemName = name;
+    }
+
+    IEnumerator RollText(int hoverIndex, string text, float characterDelay = .025f, float punctuationDelay = .1f)
+    {
+        string currentText = "";
+        int i = 0;
+        while (currentText.Length < text.Length)
+        {
+            char c = text[i];
+            currentText += text[i];
+            interactable.hovers[hoverIndex].lore = currentText;
+            i++;
+            if (c == ',')
+            {
+                yield return new WaitForSeconds(punctuationDelay);
+            }
+            else if (c == '.')
+            {
+                yield return new WaitForSeconds(punctuationDelay * 3f);
+            } 
+            else
+            {
+                yield return new WaitForSeconds(characterDelay);
+            }
+        }
     }
 }

@@ -73,6 +73,38 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+    trackLore: 0
+    trackColor: 0
+  - lore: Inspect
+    interactKey: 2
+    color: {r: 1, g: 1, b: 1, a: 1}
+    delay: 0.25
+    action:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 878983568128443568}
+          m_TargetAssemblyTypeName: ItemPhys, Assembly-CSharp
+          m_MethodName: InspectItem
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    trackLore: 1
+    trackColor: 1
+  - lore: 
+    interactKey: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+    delay: 0.1
+    action:
+      m_PersistentCalls:
+        m_Calls: []
+    trackLore: 1
+    trackColor: 0
   glow: 1
   renderers:
   - {fileID: 3440494748875919613}
@@ -91,6 +123,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: 
   interactTimer: 0
+  inspectionColor: {r: 0.7735849, g: 0.7735849, b: 0.7735849, a: 1}
 --- !u!33 &6346319758511634961
 MeshFilter:
   m_ObjectHideFlags: 0
