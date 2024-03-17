@@ -14,14 +14,17 @@ public class Item : ScriptableObject
     [Header("Usage")]
     public string useMethod;
     public string secondaryUseMethod;
-    [Header("Animation")]
+    [Header("Client Animation")]
+    public string holdPose = "ArmHoldNormal_f";
+    public string gripPose;
+    public string[] clientAnimations;
     public float yOffset = -0.14f;
     public float iYOffset = 0.1f;
     public float angleOffset = 30f;
     public float pullSpeed = 40f;
     public float dragSpeed = 120f;
+    [Header("Character Animation")]
     public AnimationState[] useAnimations;
-    public AnimationState[] clientAnimations;
     public AnimationState[] holdPoses;
     
     [System.Serializable]

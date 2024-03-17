@@ -16,6 +16,7 @@ public class AttackManager : MonoBehaviour
     public Animator itemAnimator;
     [HideInInspector] public Transform animHolder;
 
+    FirstPerson fps;
     CameraShake cShake;
     float tWeight;
     float currentWeight;
@@ -28,6 +29,7 @@ public class AttackManager : MonoBehaviour
     private void Awake()
     {
         cShake = FindObjectOfType<CameraShake>();
+        fps = FindObjectOfType<FirstPerson>();
         camTransform = Camera.main.transform;
         if (!view.IsMine) return;
         foreach(Collider collider in colliders)
@@ -106,12 +108,10 @@ public class AttackManager : MonoBehaviour
         StopAllCoroutines();
         if (currentAtk == weapon.useAnimations.Length) currentAtk = 0;
         Item.AnimationState state = weapon.useAnimations[currentAtk];
-        Item.AnimationState cState = weapon.clientAnimations[currentAtk];
+        string cState = weapon.clientAnimations[currentAtk];
         animator.Play(state.animation, animator.GetLayerIndex(state.layer), 0f);
         itemAnimator.enabled = true;
-        itemAnimator.Rebind();
-        itemAnimator.Update(0f);
-        itemAnimator.Play(cState.animation);
+        fps.PlayItemUseAnimation(cState);
         view.RPC("AttackManagerPlay", RpcTarget.Others, state.animation, animator.GetLayerIndex(state.layer));
         tWeight = 1f;
         if (!resetLayers.Contains(state.layer)) resetLayers.Add(state.layer);

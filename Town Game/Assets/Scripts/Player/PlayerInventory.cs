@@ -29,6 +29,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     [Header("Keybinds")]
     public KeyCode dropKey;
 
+    FirstPerson fps;
     Item equippedItem = null;
     AttackManager attackManager;
     PhotonView view;
@@ -71,6 +72,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         attackManager = gameObject.GetComponent<AttackManager>();
         rb = gameObject.GetComponent<Rigidbody>();
         mainCam = Camera.main.transform;
+        fps = FindObjectOfType<FirstPerson>();
     }
 
     private void Start()
@@ -246,6 +248,9 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         }
         // Client side
         if (!view.IsMine) return;
+        fps.ShowClientItem(equippedItem);
+
+        return; // For rework
         cFilter.mesh = equippedItem.mesh;
         cRenderer.material.SetTexture("_MainTex", equippedItem.texture);
         yOffset = equippedItem.yOffset;
@@ -261,7 +266,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         sFilter.mesh = null;
         ResetEquipLayers();
         if (!view.IsMine) return;
-        cFilter.mesh = null;
+        fps.HideClientItem();
     }
 
     void ResetEquipLayers()
