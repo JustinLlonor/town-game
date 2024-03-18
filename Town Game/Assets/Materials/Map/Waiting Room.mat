@@ -87,7 +87,7 @@ Material:
     m_Floats:
     - _AlphaClip: 0
     - _AlphaToMask: 0
-    - _Ambient: 0.01
+    - _Ambient: 0
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
@@ -103,6 +103,7 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
+    - _LightingSteps: 4
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
@@ -124,12 +125,13 @@ Material:
     - _UVSec: 0
     - _WorkflowMode: 1
     - _ZWrite: 1
+    - _text: 0.3
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
-    - _Tinting: {r: 0.44304022, g: 0.550868, b: 0.7169812, a: 0}
+    - _Tinting: {r: 0.2924528, g: 0.2924528, b: 0.2924528, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &85177057553839604
 MonoBehaviour:
