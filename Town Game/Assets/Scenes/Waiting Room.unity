@@ -209,7 +209,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6487521700480883308, guid: e11b4f359f8ec4a43a915e109017ea6c, type: 3}
       propertyPath: m_WarningMessage
-      value: 
+      value: "\nBinding warning: Some generic clip(s) animate transforms that are
+        already bound by a Humanoid avatar. These transforms can only be changed
+        by Humanoid clips.\n\tTransform 'neck'\n\tTransform 'head'\n\tTransform 'neck'\n\tTransform
+        'head'\n\tTransform 'neck'\n\tTransform 'head'"
       objectReference: {fileID: 0}
     - target: {fileID: 6671365715477415074, guid: e11b4f359f8ec4a43a915e109017ea6c, type: 3}
       propertyPath: m_CastShadows
@@ -719,7 +722,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &958127721
 Transform:
   m_ObjectHideFlags: 0

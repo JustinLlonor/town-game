@@ -48,6 +48,7 @@ public class PlayerInfoView : MonoBehaviourPunCallbacks
     void UpdateNickname()
     {
         if (updatedNick) return;
+        if (view.Owner == null) return;
         if (!((string)view.Owner.CustomProperties["name"]).IsNullOrEmpty())
         {
             view.RPC("SetNickname", RpcTarget.OthersBuffered, (string)view.Owner.CustomProperties["name"]);
