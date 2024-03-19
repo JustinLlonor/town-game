@@ -96,10 +96,31 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         PhotonNetwork.LoadLevel(1);
         ExitGames.Client.Photon.Hashtable playerProperties = new ExitGames.Client.Photon.Hashtable();
         // Initialize Properties
-        playerProperties["name"] = SessionData.nickname;
         playerProperties["isCultist"] = false;
         playerProperties["isMale"] = false;
+        playerProperties["name"] = CreateNewNickname();
+        Debug.Log((string)playerProperties["name"]);
         PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
+    }
+
+    public string CreateNewNickname()
+    {
+        string nickname = SessionData.nickname;
+        int copyIndex = 1;
+        int i = 0;
+        while (i < PhotonNetwork.PlayerList.Length)
+        {
+            Player player = PhotonNetwork.PlayerList[i];
+            if ((string)player.CustomProperties["name"] == nickname && (player != PhotonNetwork.LocalPlayer))
+            {
+                copyIndex++;
+                nickname = SessionData.nickname + " " + copyIndex;
+                i = 0;
+                continue;
+            }
+            i++;
+        }
+        return nickname;
     }
 
     public override void OnJoinRoomFailed(short returnCode, string message)

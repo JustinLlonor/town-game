@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using WebSocketSharp;
 
 public class PlayerInfoView : MonoBehaviourPunCallbacks
 {
@@ -14,6 +15,7 @@ public class PlayerInfoView : MonoBehaviourPunCallbacks
     public PhotonView view;
     Interactable vi;
     int previousIndex = -1;
+    bool updatedNick = false;
 
     private void Awake()
     {
@@ -23,33 +25,16 @@ public class PlayerInfoView : MonoBehaviourPunCallbacks
     private void Start()
     {
         if (!view.IsMine) return;
-        string nickname = SessionData.nickname;
-        int copyIndex = 1;
-        int i = 0;
-        while (i < PhotonNetwork.PlayerList.Length)
-        {
-            Player player = PhotonNetwork.PlayerList[i];
-            if ((string)player.CustomProperties["name"] == nickname && (player != PhotonNetwork.LocalPlayer))
-            {
-                copyIndex++;
-                nickname = SessionData.nickname + " " + copyIndex;
-                i = 0;
-                continue;
-            }
-            i++;
-        }
-        ExitGames.Client.Photon.Hashtable playerProperties = PhotonNetwork.LocalPlayer.CustomProperties;
-        playerProperties["name"] = nickname;
-        PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
-        view.RPC("SetNickname", RpcTarget.OthersBuffered, nickname);
         if (view.IsMine)
         {
             transform.GetComponent<BoxCollider>().enabled = false;
         }
     }
-
+        
     private void Update()
     {
+        if (vi == null) return;
+        UpdateNickname();
         UpdateHP(Mathf.Clamp01(stats.HP / stats.maxHP));
     }
 
@@ -58,6 +43,16 @@ public class PlayerInfoView : MonoBehaviourPunCallbacks
     {
         vi.hovers[0].lore = newName;
         vi.canInteract = true;
+    }
+
+    void UpdateNickname()
+    {
+        if (updatedNick) return;
+        if (!((string)view.Owner.CustomProperties["name"]).IsNullOrEmpty())
+        {
+            view.RPC("SetNickname", RpcTarget.OthersBuffered, (string)view.Owner.CustomProperties["name"]);
+            updatedNick = true;
+        }
     }
 
     void UpdateHP(float eval)

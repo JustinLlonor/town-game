@@ -11,6 +11,7 @@ public class Item : ScriptableObject
     public Mesh mesh;
     public Texture2D texture;
     public string[] equipSounds = new string[] { "Equip1", "Equip2", "Equip3" };
+    public bool leaveFingerprints = true;
     [Header("Usage")]
     public string useMethod;
     public string secondaryUseMethod;

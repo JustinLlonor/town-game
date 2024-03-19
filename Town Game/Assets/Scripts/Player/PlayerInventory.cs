@@ -4,12 +4,14 @@ using UnityEngine;
 using Photon.Pun;
 using WebSocketSharp;
 using UnityEngine.UI;
+using Photon.Realtime;
 
 public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
 {
     [Header("Hotbar")]
     public int equippedSlot;
     public List<string> hotbar = new List<string>();
+    public ItemData[] itemData;
     public GameObject hotbarSlot;
     public RectTransform hotbarUI;
     public GameObject largeUI;
@@ -53,6 +55,8 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Awake()
     {
+        itemData = new ItemData[hotbar.Count];
+        for (int i = 0; i < itemData.Length; i++) itemData[i] = null;
         camTransform = Camera.main.transform.parent;
         view = gameObject.GetComponent<PhotonView>();
         itemManager = FindObjectOfType<ObjectManager>();
@@ -90,7 +94,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
 
     private void OnDropItem()
     {
-        DropItem(itemManager.itemSearch[hotbar[equippedSlot]]);
+        DropItem(equippedSlot);
     }
 
     /// <summary>
@@ -260,19 +264,19 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     /// <param name="itemName">Name of item</param>
     /// <param name="slot">Slot to put item in, automatically finds a slot by default</param>
     [PunRPC]
-    public void GiveItem(string itemName, bool equipItem = false, int slot = -1)
+    public int GiveItem(string itemName, bool equipItem = false, int slot = -1)
     {
         int emptySlot;
         if (IsInventoryFull(out emptySlot))
         {
             Debug.LogError("Inventory is full!");
-            return;
+            return -1;
         }
         if (slot == -1)
         {
             slot = emptySlot;
         }
-        if (!hotbar[slot].IsNullOrEmpty()) return;
+        if (!hotbar[slot].IsNullOrEmpty()) return -1;
         if (itemManager.itemSearch.ContainsKey(itemName))
         {
             hotbar[slot] = itemName;
@@ -280,6 +284,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
             if (!equipItem) EquipItem(equippedSlot, slot == equippedSlot);
         }
         UpdateHotbarUI();
+        return slot;
     }
 
     /// <summary>
@@ -313,17 +318,48 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
         UpdateHotbarUI();
     }
 
-    public void DropItem(Item item)
+    public void DropItem(int itemIndex)
     {
+        Item item = itemManager.itemSearch[hotbar[itemIndex]];
         if (hotbar[equippedSlot].IsNullOrEmpty()) return;
         GameObject itemObj = PhotonNetwork.Instantiate(itemPrefab.name, mainCam.position, mainCam.rotation);
         itemObj.GetComponent<Interactable>().canInteract = false;
         Vector3 velocityAdd = Vector3.ClampMagnitude(rb.velocity / movementMultiplier, 3f);
         itemObj.GetComponent<Rigidbody>().velocity = mainCam.forward * dropVelocity + velocityAdd;
-        itemObj.GetComponent<PhotonView>().RPC("SetName", RpcTarget.All, item.name);
+        PhotonView itemView = itemObj.GetComponent<PhotonView>();
+        itemView.RPC("SetName", RpcTarget.All, item.name);
+        AddFingerprint(itemIndex);
+        TransferItemData(itemIndex, itemView);
         ItemPhys itemPhys = itemObj.GetComponent<ItemPhys>();
         itemPhys.interactTimer = pickupCooldown;
+
+        itemData[itemIndex] = null;
         RemoveItem(hotbar[equippedSlot], equippedSlot);
+    }
+
+    void AddFingerprint(int itemIndex)
+    {
+        if (!itemData[itemIndex].fingerprints.Contains(view.Owner)) itemData[itemIndex].fingerprints.Add(view.Owner);
+    }
+
+    void TransferItemData(int itemIndex, PhotonView itemView)
+    {
+        ItemData data = itemData[itemIndex];
+        foreach (Player player in data.fingerprints)
+        {
+            itemView.RPC("AddFingerprint", RpcTarget.AllBuffered, player);
+        }
+        foreach (KeyValuePair<string, string> pair in data.metadata)
+        {
+            itemView.RPC("AddMetadata", RpcTarget.AllBuffered, pair.Key, pair.Value);
+        }
+    }
+
+    public void CollectItemData(ItemData data, int itemIndex)
+    {
+        itemData[itemIndex] = new ItemData();
+        itemData[itemIndex].metadata = data.metadata;
+        itemData[itemIndex].fingerprints = data.fingerprints;
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

@@ -23,6 +23,7 @@ public class FirstPerson : MonoBehaviour
 
     private void Update()
     {
+        if (trackedMV == null) return;
         animator.SetBool("isRunning", trackedMV.isSprinting);
         animator.SetBool("isGrounded", trackedMV.isGrounded);
     }

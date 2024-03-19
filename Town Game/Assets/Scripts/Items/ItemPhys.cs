@@ -1,4 +1,5 @@
 using Photon.Pun;
+using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,6 +10,7 @@ public class ItemPhys : MonoBehaviour
     public string itemName;
     public float interactTimer = .5f;
     public Color inspectionColor;
+    public ItemData itemData = new ItemData();
     bool pickedUp = false;
 
     PlayerManager playerManager;
@@ -51,6 +53,21 @@ public class ItemPhys : MonoBehaviour
         interactable.hovers[1].interactKey = Interactable.InteractKey.None;
         interactable.hovers[1].color = inspectionColor;
         StartCoroutine(RollText(1, item.description));
+        string fingerprintText = "";
+        if (itemData.fingerprints.Count == 0)
+        {
+            fingerprintText = "Judging from the cleanliness, no one seems to have used it.";
+        } 
+        if (itemData.fingerprints.Count == 1)
+        {
+            fingerprintText = "There are a visible set of fingerprints on the object.";
+        }
+        if (itemData.fingerprints.Count > 1)
+        {
+            fingerprintText = "There seem to be many different smudges and scratches on the object.";
+        }
+        StartCoroutine(RollText(2, fingerprintText));
+
     }
 
     public void PickUpItem()
@@ -68,7 +85,9 @@ public class ItemPhys : MonoBehaviour
             }
         }
         if (inventory.IsInventoryFull()) return;
-        inventory.GiveItem(itemName, true);
+        int givenSlot = inventory.GiveItem(itemName, true);
+        if (givenSlot == -1) return;
+        inventory.CollectItemData(itemData, givenSlot);
         view.TransferOwnership(PhotonNetwork.LocalPlayer);
         view.RPC("RemoveItem", view.Owner);
         pickedUp = true;
@@ -85,7 +104,7 @@ public class ItemPhys : MonoBehaviour
     [PunRPC]
     public void CreateItem()
     {
-        gameObject.GetComponent<Interactable>().hovers[0].lore = "Pick up " + itemName;
+        gameObject.GetComponent<Interactable>().hovers[0].lore = "Pick up";
         item = FindObjectOfType<ObjectManager>().itemSearch[itemName];
         gameObject.GetComponent<MeshFilter>().mesh = item.mesh;
         gameObject.GetComponent<MeshRenderer>().material.SetTexture("_MainTex", item.texture);
@@ -98,7 +117,19 @@ public class ItemPhys : MonoBehaviour
         itemName = name;
     }
 
-    IEnumerator RollText(int hoverIndex, string text, float characterDelay = .025f, float punctuationDelay = .1f)
+    [PunRPC]
+    public void AddFingerprint(Player player)
+    {
+        itemData.fingerprints.Add(player);
+    }
+
+    [PunRPC]
+    public void AddMetadata(string key, string value)
+    {
+        itemData.metadata.Add(key, value);
+    }
+
+    IEnumerator RollText(int hoverIndex, string text, float characterDelay = .01f, float punctuationDelay = .1f)
     {
         string currentText = "";
         int i = 0;

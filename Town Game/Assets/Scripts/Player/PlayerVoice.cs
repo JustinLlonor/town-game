@@ -14,6 +14,7 @@ public class PlayerVoice : MonoBehaviour
     private void Awake()
     {
         rec = FindObjectOfType<Recorder>();
+        rec.RecordingEnabled = false;
     }
 
     private void Update()
@@ -21,12 +22,12 @@ public class PlayerVoice : MonoBehaviour
         if (Input.GetKeyDown(key))
         {
             animator.SetBool("isTalking", true);
-            rec.TransmitEnabled = true;
+            rec.RecordingEnabled = true;
         }
         if (Input.GetKeyUp(key))
         {
             animator.SetBool("isTalking", false);
-            rec.TransmitEnabled = false;
+            rec.RecordingEnabled = false;
         }
     }
 }

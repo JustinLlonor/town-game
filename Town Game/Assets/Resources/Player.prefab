@@ -693,6 +693,7 @@ MonoBehaviour:
   - 
   - 
   - 
+  itemData: []
   hotbarSlot: {fileID: 1340724474612461429, guid: dfc5d85edf9e2cc47bc5329f7e3e244d, type: 3}
   hotbarUI: {fileID: 0}
   largeUI: {fileID: 0}
@@ -1964,7 +1965,10 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
-  m_WarningMessage: 
+  m_WarningMessage: "\nBinding warning: Some generic clip(s) animate transforms that
+    are already bound by a Humanoid avatar. These transforms can only be changed
+    by Humanoid clips.\n\tTransform 'neck'\n\tTransform 'head'\n\tTransform 'neck'\n\tTransform
+    'head'\n\tTransform 'neck'\n\tTransform 'head'"
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
