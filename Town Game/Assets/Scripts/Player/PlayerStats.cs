@@ -18,6 +18,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField] float staminaRegenSpeed = 20f;
     [SerializeField] float regenCooldownPoint = 1f;
     public float staminaCooldown = 0f;
+    public float staminaRegenCooldown = .5f;
     public bool canRegenStamina = true;
     [Header("Death")]
     public GameObject corpsePrefab;
@@ -62,11 +63,9 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
         {
             Kill();
         }
-        if (staminaCooldown > 0f)
-        {
-            staminaCooldown -= Time.deltaTime;
-        }
-        if (staminaCooldown <= regenCooldownPoint && canRegenStamina && pm.isGrounded)
+        if (staminaCooldown > 0f) staminaCooldown -= Time.deltaTime;
+        if (staminaRegenCooldown > 0f) staminaRegenCooldown -= Time.deltaTime;
+        if (staminaCooldown <= regenCooldownPoint && canRegenStamina && pm.isGrounded && staminaRegenCooldown <= 0f)
         {
             RegenStamina();
         }

@@ -11,6 +11,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public float speed = 6f;
     public float movementMultiplier = 10f;
     public float sprintMultiplier = 1.67f;
+    public float sprintStaminaRegenCooldown = 0f;
     public float crouchMultiplier = 0.4f;
     public float sprintStaminaConsumption = 20f;
     public float groundDrag = 6f;
@@ -387,6 +388,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
                 {
                     if (!CanUncrouch()) return;
                 }
+                stats.staminaRegenCooldown = sprintStaminaRegenCooldown;
                 ExitCrouch();
                 isSprinting = true;
             }
