@@ -8,13 +8,14 @@ using UnityEngine.SceneManagement;
 
 public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
 {
+    public float testDmg = 10f;
     [Header("HP")]
     public float maxHP = 100f;
     public float HP = 100f;
     [SerializeField] float HPRegenSpeed = 5f;
     [Header("Stamina")]
-    [SerializeField] float maxStamina = 100f;
-    [SerializeField] float stamina = 100f;
+    public float maxStamina = 100f;
+    public float stamina = 100f;
     [SerializeField] float staminaRegenSpeed = 20f;
     [SerializeField] float regenCooldownPoint = 1f;
     public float staminaCooldown = 0f;
@@ -30,8 +31,9 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     public Shake softHurt;
     public Shake hardHurt;
     public float softThreshold = 30f;
-    [Header("Events")]
-    public OnDeathEvent OnDeath;
+
+    public delegate void OnDamage(float damage);
+    public OnDamage onDamage;
 
     CameraShake shake;
     PhotonView view;
@@ -57,7 +59,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
         if (!view.IsMine) return;
         if (Input.GetKeyDown(KeyCode.B))
         {
-            Damage(20f);
+            Damage(testDmg);
         }
         if (Input.GetKeyDown(KeyCode.K))
         {
@@ -93,6 +95,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     public void Damage(float amount, bool playShake = true)
     {
         HP -= amount;
+        onDamage.Invoke(amount);
         if (HP < 0f)
         {
             Kill();
@@ -130,7 +133,6 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     {
         GameObject corpse = PhotonNetwork.Instantiate(corpsePrefab.name, transform.position, transform.rotation);
         PhotonView corpseView = corpse.GetComponent<PhotonView>();
-        OnDeath.Invoke(corpse);
         pe.ApplyEvidence(corpse);
         Ragdoller ragdoller = corpse.GetComponent<Ragdoller>();
         ragdoller.SetPositionsToTarget(myRig);
@@ -219,12 +221,3 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     }
 }
 
-// parameter is the new HP
-public class OnChangeHP : UnityEvent<float, float>
-{
-}
-
-[System.Serializable]
-public class OnDeathEvent : UnityEvent<GameObject>
-{
-}

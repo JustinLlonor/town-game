@@ -163,9 +163,9 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     private void OnJump()
     {
         if (!canJump) return;
-        if (!stats.ConsumeStamina(jumpStaminaConsumption)) return;
         if (!isGrounded) return;
         if (!(jumpTimer <= 0f)) return;
+        if (!stats.ConsumeStamina(jumpStaminaConsumption)) return;
         if (isCrouching) rb.AddForce(transform.up * jumpHeight * crouchJumpMultiplier, ForceMode.Impulse);
         if (!isCrouching)
         {

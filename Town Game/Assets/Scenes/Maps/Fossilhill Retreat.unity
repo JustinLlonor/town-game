@@ -1111,7 +1111,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 388926364667245666, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_Color.a
-      value: 0.8784314
+      value: 0.77254903
       objectReference: {fileID: 0}
     - target: {fileID: 424444433582042927, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_text
@@ -1144,6 +1144,10 @@ PrefabInstance:
     - target: {fileID: 1263753044373701665, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_Name
       value: Sanity
+      objectReference: {fileID: 0}
+    - target: {fileID: 1574197244333472680, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+      propertyPath: m_Name
+      value: Health
       objectReference: {fileID: 0}
     - target: {fileID: 1673398680842972735, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_Name
@@ -1188,26 +1192,6 @@ PrefabInstance:
     - target: {fileID: 5427471237359597226, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_Name
       value: Nourishment
-      objectReference: {fileID: 0}
-    - target: {fileID: 7437216857790540501, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1.5960829
-      objectReference: {fileID: 0}
-    - target: {fileID: 7437216857790540501, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1.5960829
-      objectReference: {fileID: 0}
-    - target: {fileID: 7437216857790540501, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1.5960829
-      objectReference: {fileID: 0}
-    - target: {fileID: 7437216857790540501, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 135
-      objectReference: {fileID: 0}
-    - target: {fileID: 7437216857790540501, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -154
       objectReference: {fileID: 0}
     - target: {fileID: 7508710259353168503, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -1294,7 +1278,9 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 1263753044373701665, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+    - {fileID: 5427471237359597226, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}

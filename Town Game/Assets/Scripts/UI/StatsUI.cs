@@ -5,34 +5,52 @@ using UnityEngine.UI;
 
 public class StatsUI : MonoBehaviour
 {
-    public PlayerStats trackedStats;
 
-    [Header("Health Indicator Color")]
+    [Header("Health Indicator")]
     public Gradient healthGradient;
     [Range(0f, 1f)]
     public float flashThreshold = 0.1f;
     public float flashFrequency = 10f;
     public float flashUpperLimit = 1f;
     public float flashLowerLimit = .5f;
-    [Header("Health Indicator Speed")]
-    public float maxHPSpeed = 0.8f;
-    public float lowHPSpeed = 0.4f;
-    public float staminaMaxMultiplier = 2f;
-    public float staminaMinMultiplier = 0.5f;
+    public float maxHPSpeed = 0.6f;
+    public float lowHPSpeed = 2f;
+    public float damageShake = .1f;
+    public float shakeSnap = 8f;
     float flashTimer = 0f;
-
+    [Header("References")]
+    public PlayerStats trackedStats;
+    public Animator blobAnimator;
+    public RectTransform staminaBarTransform;
     public Transform healthIndicator;
+
     private Image blob;
+    private Vector3 originalHPPos;
+
+    float staminaMax = 0f;
 
     private void Awake()
     {
         blob = healthIndicator.GetComponent<Image>();
+        staminaMax = staminaBarTransform.localScale.x;
+        originalHPPos = healthIndicator.localPosition;
+        trackedStats.onDamage += ShakeBlob;
     }
 
     private void Update()
     {
         if (trackedStats == null) return;
         UpdateBlobColor();
+        UpdateBlobSpeed();
+        UpdateStaminaBar();
+        ResetShakePos();
+    }
+
+    void UpdateBlobSpeed()
+    {
+        float hpPercent = trackedStats.HP / trackedStats.maxHP;
+        float tweenMultiplier = lowHPSpeed - maxHPSpeed;
+        blobAnimator.SetFloat("speed", tweenMultiplier * hpPercent + maxHPSpeed);
     }
 
     void UpdateBlobColor()
@@ -47,5 +65,26 @@ public class StatsUI : MonoBehaviour
             return;
         }
         if (flashTimer != 0f) flashTimer = 0f;
+    }
+
+    void UpdateStaminaBar()
+    {
+        float staminaPercent = trackedStats.stamina / trackedStats.maxStamina;
+        staminaBarTransform.localScale = new Vector3(Mathf.SmoothStep(0f, staminaMax, staminaPercent), staminaBarTransform.localScale.y);
+    }
+
+    void ResetShakePos()
+    {
+        if (healthIndicator.localPosition != originalHPPos)
+        {
+            healthIndicator.localPosition = Vector3.Lerp(healthIndicator.localPosition, originalHPPos, Time.deltaTime * shakeSnap);
+        }
+    }
+
+    void ShakeBlob(float damage)
+    {
+        Vector3 shakeDirection = new Vector3(Random.Range(-100f, 100f), Random.Range(-100f, 100f)).normalized;
+        Debug.Log(damage);
+        healthIndicator.localPosition = healthIndicator.localPosition + shakeDirection * damageShake * (damage/30f);
     }
 }
