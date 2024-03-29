@@ -654,6 +654,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: efc2677e6c533a4478fed0a1da7cd129, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  testDmg: 10
   maxHP: 100
   HP: 100
   HPRegenSpeed: 1.5
@@ -672,9 +673,6 @@ MonoBehaviour:
   softHurt: {fileID: 11400000, guid: cbc5a66a3213cb34bbe1176d19a7783c, type: 2}
   hardHurt: {fileID: 11400000, guid: 3fc67d1eeeed61441a173c72eecb98fc, type: 2}
   softThreshold: 30
-  OnDeath:
-    m_PersistentCalls:
-      m_Calls: []
   anim: {fileID: 5001893267009733704}
 --- !u!114 &1106844264840172896
 MonoBehaviour:
@@ -783,7 +781,7 @@ MonoBehaviour:
   groundDrag: 6
   jumpHeight: 6.5
   jumpCooldown: 0.2
-  jumpStaminaConsumption: 20
+  jumpStaminaConsumption: 25
   canJump: 1
   airHandling: 0.2
   environmentMask:

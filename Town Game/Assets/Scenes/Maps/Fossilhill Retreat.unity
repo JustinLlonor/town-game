@@ -1141,6 +1141,10 @@ PrefabInstance:
       propertyPath: m_fontColor32.rgba
       value: 4278234879
       objectReference: {fileID: 0}
+    - target: {fileID: 798133723014758080, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+      propertyPath: tt
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 1263753044373701665, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_Name
       value: Sanity
@@ -1196,6 +1200,10 @@ PrefabInstance:
     - target: {fileID: 7508710259353168503, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 35.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8137187638069977019, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+      propertyPath: sceneViewId
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 9066231193298219586, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_Pivot.x
@@ -1281,6 +1289,7 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 1263753044373701665, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
     - {fileID: 5427471237359597226, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+    - {fileID: 3778669075131711042, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
