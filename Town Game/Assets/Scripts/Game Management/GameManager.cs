@@ -13,9 +13,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     [Header("Game Variables")]
     public Player campLeader;
     public Player[] cultists = new Player[] { };
+    public float gameTime = 0f;
+    public int currentPeriod;
+    public int currentDay = 0;
     [Header("Game Settings")]
     // When an index of this is true, a cultist is added when the players playing is equal to that number.
     public bool[] cultistAssignment = new bool[] { };
+    public float hourLength = 60f;
     PhotonView view;
 
     // Open when need new variable to synchronize
@@ -25,23 +29,33 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         {
             stream.SendNext(gamePhase);
             stream.SendNext(cultists);
+            stream.SendNext(gameTime);
         }
         else
         {
             gamePhase = (int)stream.ReceiveNext();
             cultists = (Player[])stream.ReceiveNext();
+            gameTime = (float)stream.ReceiveNext();
         }
     }
-        
+    
     private void Awake()
     {
         view = transform.GetComponent<PhotonView>();
     }
-
+    
     private void Update()
     {
         if (!PhotonNetwork.IsMasterClient) return;
+        UpdateGameTime();
         PhaseProperties();
+    }
+
+    void UpdateGameTime()
+    {
+        gameTime += Time.deltaTime;
+        currentDay = Mathf.FloorToInt(gameTime / (hourLength * 24f));
+        currentPeriod = Mathf.FloorToInt(gameTime / hourLength);
     }
 
     void PhaseProperties()

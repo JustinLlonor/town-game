@@ -7,7 +7,6 @@ using Photon.Pun;
 
 public class AnnouncementManager : MonoBehaviour
 {
-    public string testAnnouncement;
     public float panelSpace = 10f;
     public GameObject announcementPrefab;
     [Header("Animation")]
@@ -16,16 +15,6 @@ public class AnnouncementManager : MonoBehaviour
     public AnimationCurve pushDownCurve;
     public float fadeSpeed = 2f;
     List<IEnumerator> pdNumerators = new List<IEnumerator>();
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.U))
-        {
-            Announce(testAnnouncement);
-        }
-    }
-
-    // textmeshpro text preferred width updates when text is updated
 
     [PunRPC]
     public void Announce(string text, float lifespan = 3f)
