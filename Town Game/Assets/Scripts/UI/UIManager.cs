@@ -11,6 +11,7 @@ public class UIManager : MonoBehaviour
     public CorpseUI cUI;
     public OpenUI OnUIOpen;
     public CloseUI OnUIClose;
+    public GameObject gameplayUI;
 
     CursorManager cm;
     InteractableFinder iFinder;

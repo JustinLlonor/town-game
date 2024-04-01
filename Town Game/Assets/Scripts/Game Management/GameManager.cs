@@ -4,7 +4,6 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Linq;
-using Unity.VisualScripting;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -21,6 +20,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public bool[] cultistAssignment = new bool[] { };
     public float hourLength = 60f;
     PhotonView view;
+    public TimeChange OnTimeChange;
+
+    public delegate void TimeChange();
 
     // Open when need new variable to synchronize
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -51,13 +53,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         PhaseProperties();
     }
 
-    void UpdateGameTime()
-    {
-        gameTime += Time.deltaTime;
-        currentDay = Mathf.FloorToInt(gameTime / (hourLength * 24f));
-        currentPeriod = Mathf.FloorToInt(gameTime / hourLength);
-    }
-
     void PhaseProperties()
     {
         switch (gamePhase)
@@ -74,6 +69,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     void Phase0()
     {
         AssignRoles();
+        SetTime(7, 30);
     }
 
     void AssignRoles()
@@ -130,5 +126,42 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public void RevealRole()
     {
         Debug.LogError(PhotonNetwork.LocalPlayer.CustomProperties["isCultist"]);
+    }
+
+    void UpdateGameTime()
+    {
+        gameTime += Time.deltaTime;
+        currentDay = Mathf.FloorToInt(gameTime / (hourLength * 24f));
+        currentPeriod = Mathf.FloorToInt(gameTime / hourLength);
+    }
+
+    /// <summary>
+    /// Skips time forward to the specified time, only available for master client
+    /// </summary>
+    /// <param name="hour">Hour of the clock, number from 1 to 24</param>
+    /// <param name="minute">Minute of the clock, number from 0 to 59</param>
+    public void SetTime(int hour, int minute = 0)
+    {
+        if (!PhotonNetwork.IsMasterClient) return;
+        if (hour < 1 || hour > 24) return;
+        if (minute < 0 || minute > 59) return;
+
+        float timeAdd;
+
+        // Time add hours
+        int currentHour = currentPeriod - (currentDay * 24);
+        timeAdd = (hour - (currentHour + 1)) * hourLength;
+
+        // Time add minutes
+        int currentMinute = Mathf.FloorToInt(((gameTime - (currentPeriod * hourLength)) / hourLength) * 60f);
+        float minuteLength = hourLength / 60f;
+        int minDiff = minute - currentMinute;
+        timeAdd += minDiff * minuteLength;
+
+        // if time add is negative, cycle the day
+        if (timeAdd < 0f) timeAdd += hourLength * 24f;
+        gameTime += timeAdd;
+
+        OnTimeChange?.Invoke();
     }
 }

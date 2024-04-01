@@ -197,6 +197,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         if (iv.Get<float>() == 1f)
         {
             crouchPressed = true;
+            if (currentCrouchExit != null) StopCoroutine(currentCrouchExit);
             EnterCrouch();
             return;
         }
@@ -264,7 +265,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         {
             yield return null;
         }
-        if (crouchPressed) yield break;
         DisableCrouchHitboxes();
         view.RPC("DisableCrouchHitboxes", RpcTarget.Others);
         crouchMinus = 1f;

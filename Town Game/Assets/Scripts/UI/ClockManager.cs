@@ -18,6 +18,11 @@ public class ClockManager : MonoBehaviour
         gm = FindObjectOfType<GameManager>();
     }
 
+    private void Start()
+    {
+        gm.OnTimeChange += ResetMinuteRandom;
+    }
+
     private void Update()
     {
         if (gm == null) return;
@@ -54,5 +59,10 @@ public class ClockManager : MonoBehaviour
         if (hour > 12) hour -= 12;
 
         text.text = $"{hour}:{minDisplay} {meridiem}";
+    }
+
+    void ResetMinuteRandom()
+    {
+        minuteRandom = 0;
     }
 }
