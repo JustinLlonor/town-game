@@ -10,4 +10,12 @@ public class ScheduleUI : MonoBehaviour
     {
 
     }
+
+    public void ClearScheduleBlocks()
+    {
+        foreach (Transform child in transform)
+        {
+            Destroy(child);
+        }
+    }
 }
