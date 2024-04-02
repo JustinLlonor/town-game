@@ -697,7 +697,7 @@ MonoBehaviour:
   m_fontColor32:
     serializedVersion: 2
     rgba: 4285361603
-  m_fontColor: {r: 0.764151, g: 0.4289338, b: 0.4289338, a: 1}
+  m_fontColor: {r: 0.735849, g: 0.2880918, b: 0.2880918, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -783,7 +783,7 @@ RectTransform:
   m_GameObject: {fileID: 3984674237289843922}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.1488844, y: 1.1488844, z: 1.1488844}
+  m_LocalScale: {x: 1.1082714, y: 1.1082714, z: 1.1082714}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8854391684150977888}
@@ -795,7 +795,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -233, y: -94}
+  m_AnchoredPosition: {x: -228, y: -91}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6427993267166035833
@@ -819,8 +819,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   text: {fileID: 6871603111990002153}
-  minuteRandomMax: 6
-  minuteRandomMin: 1
+  minuteRandomMax: 9
+  minuteRandomMin: 3
 --- !u!1 &5427471237359597226
 GameObject:
   m_ObjectHideFlags: 0
@@ -1145,7 +1145,7 @@ RectTransform:
   m_GameObject: {fileID: 7578144085339147997}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.650844, y: 1.650844, z: 1.650844}
+  m_LocalScale: {x: 1.7822511, y: 1.7822511, z: 1.7822511}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1023798035313560980}
@@ -1330,7 +1330,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8854391684150977888}
   - component: {fileID: 5874753776448609879}
-  - component: {fileID: 937842050043598134}
   m_Layer: 5
   m_Name: Schedule Holder
   m_TagString: Untagged
@@ -1370,29 +1369,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scheduleBlockPrefab: {fileID: 2004452700610076260, guid: 3e84774653b9eee498592dcfd43bab09, type: 3}
---- !u!114 &937842050043598134
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9026963437773981005}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 1
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0

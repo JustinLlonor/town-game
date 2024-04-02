@@ -49,6 +49,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     private void Update()
     {
         if (!PhotonNetwork.IsMasterClient) return;
+        if (Input.GetKeyDown(KeyCode.P)) SetTime(5, 30);
         UpdateGameTime();
         PhaseProperties();
     }
@@ -147,13 +148,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         if (minute < 0 || minute > 59) return;
 
         float timeAdd;
+        Vector2Int clockTime = PeriodToClockTime((currentPeriod - (currentDay * 24)) + ((gameTime - (currentPeriod * hourLength)) / hourLength));
+        //Debug.Log(clockTime);
 
         // Time add hours
-        int currentHour = currentPeriod - (currentDay * 24);
+        int currentHour = clockTime.x;
         timeAdd = (hour - (currentHour + 1)) * hourLength;
 
         // Time add minutes
-        int currentMinute = Mathf.FloorToInt(((gameTime - (currentPeriod * hourLength)) / hourLength) * 60f);
+        int currentMinute = clockTime.y;
         float minuteLength = hourLength / 60f;
         int minDiff = minute - currentMinute;
         timeAdd += minDiff * minuteLength;
@@ -163,5 +166,19 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         gameTime += timeAdd;
 
         OnTimeChange?.Invoke();
+    }
+
+    /// <summary>
+    /// Converts period time to clock itme
+    /// </summary>
+    /// <param name="periodTime"></param>
+    /// <returns>Vector2Int(hour (0 - 23), minute (0-59))</returns>
+    public Vector2Int PeriodToClockTime(float periodTime)
+    {
+        int roundedPeriod = Mathf.FloorToInt(periodTime);
+        float periodProgress = periodTime - roundedPeriod;
+        while (roundedPeriod > 23) roundedPeriod -= 24;
+        int currentMinute = Mathf.FloorToInt(periodProgress * 60f);
+        return new Vector2Int(roundedPeriod, currentMinute);
     }
 }
