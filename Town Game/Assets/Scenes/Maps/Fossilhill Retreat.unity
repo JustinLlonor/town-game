@@ -1174,10 +1174,6 @@ PrefabInstance:
       propertyPath: tt
       value: 
       objectReference: {fileID: 0}
-    - target: {fileID: 910805778422222220, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 4
-      objectReference: {fileID: 0}
     - target: {fileID: 1263753044373701665, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_Name
       value: Sanity
@@ -1205,6 +1201,10 @@ PrefabInstance:
     - target: {fileID: 1673398680842972735, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_Name
       value: Stats Panel
+      objectReference: {fileID: 0}
+    - target: {fileID: 1673398680842972735, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2000632604952621165, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_fontSize
@@ -1293,6 +1293,14 @@ PrefabInstance:
     - target: {fileID: 7508710259353168503, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 35.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7573507964247518356, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8035800971491472685, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8137187638069977019, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: sceneViewId

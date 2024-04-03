@@ -34,6 +34,8 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
 
     public delegate void OnDamage(float damage);
     public OnDamage onDamage;
+    public delegate void Death();
+    public Death OnDeath;
 
     CameraShake shake;
     PhotonView view;
@@ -95,7 +97,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     public void Damage(float amount, bool playShake = true)
     {
         HP -= amount;
-        onDamage.Invoke(amount);
+        onDamage?.Invoke(amount);
         if (HP < 0f)
         {
             Kill();
@@ -131,6 +133,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
 
     public void Kill()
     {
+        OnDeath?.Invoke();
         GameObject corpse = PhotonNetwork.Instantiate(corpsePrefab.name, transform.position, transform.rotation);
         PhotonView corpseView = corpse.GetComponent<PhotonView>();
         pe.ApplyEvidence(corpse);

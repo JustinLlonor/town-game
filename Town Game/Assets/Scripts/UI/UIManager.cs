@@ -11,6 +11,7 @@ public class UIManager : MonoBehaviour
     public CorpseUI cUI;
     public OpenUI OnUIOpen;
     public CloseUI OnUIClose;
+    public StatsUI statsUI;
     public GameObject gameplayUI;
 
     CursorManager cm;
@@ -27,6 +28,8 @@ public class UIManager : MonoBehaviour
         OnUIClose += CloseCorpse;
         OnUIClose += SetOpenFalse;
         OnUIOpen += SetOpenTrue;
+        PlayerManager pm = FindObjectOfType<PlayerManager>();
+        if (pm != null && statsUI != null) pm.OnInstantiatePlayer += SetUITrackedStats;
     }
 
     private void OnExit()
@@ -58,5 +61,10 @@ public class UIManager : MonoBehaviour
     void SetOpenFalse()
     {
         uiOpened = false;
+    }
+
+    public void SetUITrackedStats(ref GameObject player)
+    {
+        statsUI.trackedStats = player.GetComponent<PlayerStats>();
     }
 }

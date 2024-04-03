@@ -20,6 +20,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     public CleanupMaster cm;
     public FirstPerson fps;
 
+    public InstantiatePlayer OnInstantiatePlayer;
+    public delegate void InstantiatePlayer(ref GameObject player);
+
     [System.Serializable]
     public class PlayerSettings
     {
@@ -27,10 +30,11 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         public bool canJump = true;
     }
 
-    private void Awake()
+    private void Start()
     {
         if (!PhotonNetwork.IsConnected) return;
         GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawn.position, spawn.rotation);
+        OnInstantiatePlayer?.Invoke(ref player);
         PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
         PlayerInventory playerInventory = player.GetComponent<PlayerInventory>();
         playerInventory.camTransform = camTransform;
@@ -39,6 +43,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         playerMovement.speed = playerSettings.speed;
         playerMovement.canJump = playerSettings.canJump;
         fps.trackedMV = playerMovement;
+        Debug.Log(fps.trackedMV);
 
         currentPlayer = player;
     }

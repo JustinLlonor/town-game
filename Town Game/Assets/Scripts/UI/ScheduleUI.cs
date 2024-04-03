@@ -88,6 +88,8 @@ public class ScheduleUI : MonoBehaviour
         if (clockTimeStart.x > 12) clockTimeStart.x -= 12;
         if (clockTimeEnd.x > 12) clockTimeEnd.x -= 12;
         nbt.GetChild(2).GetComponent<TextMeshProUGUI>().text = $"{clockTimeStart.x}:{startMins} {startMeridiem} - {clockTimeEnd.x}:{endMins} {endMeridiem}";
+
+
     }
 
     void RemoveScheduleBlock(ScheduleBlock block)

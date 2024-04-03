@@ -1,11 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class StatsUI : MonoBehaviour
 {
-
     [Header("Health Indicator")]
     public Gradient healthGradient;
     [Range(0f, 1f)]
@@ -18,6 +18,15 @@ public class StatsUI : MonoBehaviour
     public float damageShake = .1f;
     public float shakeSnap = 8f;
     float flashTimer = 0f;
+    [Header("Splatter")]
+    public AnimationCurve splatterSizeDistribution;
+    public float minSplatterSize;
+    public float maxSplatterSize;
+    public int splatterAmount;
+    public float velocityDivider = 2f;
+    public float shrinkDivider = 3f;
+    public Transform splatterHolder;
+    public GameObject splatterPrefab;
     [Header("References")]
     public PlayerStats trackedStats;
     public Animator blobAnimator;
@@ -29,17 +38,20 @@ public class StatsUI : MonoBehaviour
 
     float staminaMax = 0f;
 
-    private void Awake()
+    private void Start()
     {
         blob = healthIndicator.GetComponent<Image>();
         staminaMax = staminaBarTransform.localScale.x;
         originalHPPos = healthIndicator.localPosition;
         trackedStats.onDamage += ShakeBlob;
+        trackedStats.OnDeath += Splatter;
+        trackedStats.OnDeath += HideBlob;
     }
 
     private void Update()
     {
         if (trackedStats == null) return;
+        if (Input.GetKeyDown(KeyCode.N)) Splatter();
         UpdateBlobColor();
         UpdateBlobSpeed();
         UpdateStaminaBar();
@@ -83,8 +95,31 @@ public class StatsUI : MonoBehaviour
 
     void ShakeBlob(float damage)
     {
-        Vector3 shakeDirection = new Vector3(Random.Range(-100f, 100f), Random.Range(-100f, 100f)).normalized;
-        Debug.Log(damage);
-        healthIndicator.localPosition = healthIndicator.localPosition + shakeDirection * damageShake * (damage/30f);
+        Vector3 shakeDirection = Random.insideUnitCircle.normalized;
+        healthIndicator.localPosition = healthIndicator.localPosition + shakeDirection * damageShake * (damage / 30f);
+    }
+
+    void HideBlob()
+    {
+        healthIndicator.gameObject.SetActive(false);
+    }
+
+    void Splatter()
+    {
+        for (int i = 0; i < splatterAmount; i++)
+        {
+            GameObject droplet = Instantiate(splatterPrefab, splatterHolder);
+
+            // Randomize droplet size
+            float sizeEval = (float)i / (float)splatterAmount;
+            float size = splatterSizeDistribution.Evaluate(sizeEval) * (maxSplatterSize - minSplatterSize) + minSplatterSize;
+            droplet.transform.localScale = Vector3.one * size;
+
+            UISplatter uSplatter = droplet.GetComponent<UISplatter>();
+
+            uSplatter.direction = Random.insideUnitCircle;
+            uSplatter.velocity = velocityDivider / size;
+            uSplatter.shrinkSpeed = shrinkDivider / size;
+        }
     }
 }

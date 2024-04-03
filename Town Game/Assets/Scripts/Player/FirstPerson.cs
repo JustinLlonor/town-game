@@ -13,10 +13,11 @@ public class FirstPerson : MonoBehaviour
     Animator animator;
     Item currentItem;
 
-    private void Start()
+    private void Awake()
     {
+        PlayerManager pm = FindObjectOfType<PlayerManager>();
+        if (pm != null) pm.OnInstantiatePlayer += AssignPlayerReferences;
         animator = gameObject.GetComponent<Animator>();
-        trackedMV.OnLeap += OnLeap;
         itemFilter = itemTransform.GetComponent<MeshFilter>();
         itemRenderer = itemTransform.GetComponent<MeshRenderer>();
     }
@@ -26,6 +27,12 @@ public class FirstPerson : MonoBehaviour
         if (trackedMV == null) return;
         animator.SetBool("isRunning", trackedMV.isSprinting);
         animator.SetBool("isGrounded", trackedMV.isGrounded);
+    }
+
+    void AssignPlayerReferences(ref GameObject player)
+    {
+        trackedMV = player.GetComponent<PlayerMovement>();
+        trackedMV.OnLeap += OnLeap;
     }
 
     void OnLeap()
