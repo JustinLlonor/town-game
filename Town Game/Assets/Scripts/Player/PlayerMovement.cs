@@ -176,7 +176,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
         shake.StartShake(jumpShake.shakeProperties);
         jumpTimer = jumpCooldown;
-        OnLeap.Invoke();
+        OnLeap?.Invoke();
     }
 
     [PunRPC]

@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -38,14 +37,17 @@ public class StatsUI : MonoBehaviour
 
     float staminaMax = 0f;
 
+    private void Awake()
+    {
+        PlayerManager pm = FindObjectOfType<PlayerManager>();
+        pm.OnInstantiatePlayer += AssignPlayerReferences;
+    }
+
     private void Start()
     {
         blob = healthIndicator.GetComponent<Image>();
         staminaMax = staminaBarTransform.localScale.x;
         originalHPPos = healthIndicator.localPosition;
-        trackedStats.onDamage += ShakeBlob;
-        trackedStats.OnDeath += Splatter;
-        trackedStats.OnDeath += HideBlob;
     }
 
     private void Update()
@@ -56,6 +58,14 @@ public class StatsUI : MonoBehaviour
         UpdateBlobSpeed();
         UpdateStaminaBar();
         ResetShakePos();
+    }
+
+    void AssignPlayerReferences(ref GameObject player)
+    {
+        trackedStats = player.GetComponent<PlayerStats>();
+        trackedStats.onDamage += ShakeBlob;
+        trackedStats.OnDeath += Splatter;
+        trackedStats.OnDeath += HideBlob;
     }
 
     void UpdateBlobSpeed()

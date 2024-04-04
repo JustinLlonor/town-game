@@ -3,13 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using TMPro;
+using UnityEditor.ShaderGraph.Internal;
+using UnityEditor.Experimental.GraphView;
 
 public class ScheduleUI : MonoBehaviour
 {
-    public ScheduleBlock testBlock;
+    public int foresight = 3;
     public float blockDistance = 50f;
+    public float repositionSpeed = 3f;
     public GameObject scheduleBlockPrefab;
+    public Transform blockHolder;
+    public Transform minimapTransform;
+    public ScheduleBlock testBlock;
+    float minimapY;
     List<UIBlock> listedBlocks = new List<UIBlock>();
+    List<IEnumerator> sortRoutines = new List<IEnumerator>();
+    IEnumerator mapRoutine = null;
     GameManager gm;
     ScheduleManager sm;
 
@@ -29,16 +38,18 @@ public class ScheduleUI : MonoBehaviour
     {
         sm = FindObjectOfType<ScheduleManager>();
         gm = FindObjectOfType<GameManager>();
+        minimapY = minimapTransform.localPosition.y;
     }
 
     private void Start()
     {
         sm.OnUpdateSchedule += ReadSchedule;
+        ((RectTransform)blockHolder).SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, blockDistance * (float)foresight);
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.O)) AddScheduleBlock(testBlock);
+        if (Input.GetKeyDown(KeyCode.O)) AddScheduleBlock(new ScheduleBlock(testBlock.periodName, testBlock.room, testBlock.length, testBlock.time));
         if (Input.GetKeyDown(KeyCode.I)) RemoveScheduleBlock(testBlock);
     }
 
@@ -65,9 +76,17 @@ public class ScheduleUI : MonoBehaviour
 
     void AddScheduleBlock(ScheduleBlock block)
     {
-        GameObject newBlock = Instantiate(scheduleBlockPrefab, transform);
+        GameObject newBlock = Instantiate(scheduleBlockPrefab, blockHolder);
         Transform nbt = newBlock.transform;
-        listedBlocks.Add(new UIBlock(block, nbt));
+        nbt.localPosition = new Vector2(0f, blockDistance);
+
+        int setPos = 0;
+        for (int i = 0; i < listedBlocks.Count; i++)
+        {
+            if (block.time > listedBlocks[i].block.time) setPos++;
+        }
+        listedBlocks.Insert(setPos, new UIBlock(block, nbt));
+        if (setPos > foresight-1) nbt.localPosition = new Vector2(0f, -blockDistance * foresight);
 
         // Sets text data on block
         nbt.GetChild(0).GetComponent<TextMeshProUGUI>().text = block.periodName;
@@ -89,7 +108,7 @@ public class ScheduleUI : MonoBehaviour
         if (clockTimeEnd.x > 12) clockTimeEnd.x -= 12;
         nbt.GetChild(2).GetComponent<TextMeshProUGUI>().text = $"{clockTimeStart.x}:{startMins} {startMeridiem} - {clockTimeEnd.x}:{endMins} {endMeridiem}";
 
-
+        SortScheduleBlocks();
     }
 
     void RemoveScheduleBlock(ScheduleBlock block)
@@ -99,8 +118,10 @@ public class ScheduleUI : MonoBehaviour
             UIBlock checkBlock = listedBlocks[i];
             if (checkBlock.block.Equals(block))
             {
-                Destroy(checkBlock.transform.gameObject);
+                StartCoroutine(RemoveBlock(checkBlock.transform));
                 listedBlocks.RemoveAt(i);
+                SortScheduleBlocks();
+
                 return;
             }
         }
@@ -111,7 +132,17 @@ public class ScheduleUI : MonoBehaviour
     // Sorts the schedule blocks in the list and re-orders them in game
     void SortScheduleBlocks()
     {
-
+        foreach (IEnumerator routine in sortRoutines) StopCoroutine(routine);
+        sortRoutines.Clear();
+        for (int i = 0; i < listedBlocks.Count; i++)
+        {
+            IEnumerator newRoutine = SetBlockPosition(listedBlocks[i].transform, i);
+            StartCoroutine(newRoutine);
+            sortRoutines.Add(newRoutine);
+        }
+        if (mapRoutine != null) StopCoroutine(mapRoutine);
+        mapRoutine = SetMinimapPosition();
+        StartCoroutine(mapRoutine);
     }
 
     void ClearScheduleBlocks()
@@ -120,5 +151,49 @@ public class ScheduleUI : MonoBehaviour
         {
             Destroy(child);
         }
+    }
+
+    IEnumerator SetBlockPosition(Transform blockTransform, int index)
+    {
+        float desiredY = (float)index * -blockDistance;
+        float time = 0f;
+        float initialY = blockTransform.localPosition.y;
+        while (blockTransform.localPosition.y != desiredY)
+        {
+            time += Time.deltaTime * repositionSpeed;
+            float currentY = Mathf.SmoothStep(initialY, desiredY, time);
+            blockTransform.localPosition = new Vector3(0f, currentY);
+            yield return null;
+        }
+    }
+
+    IEnumerator RemoveBlock(Transform blockTransform)
+    {
+        float time = 0f;
+        float initialY = blockTransform.localPosition.y;
+        while (blockTransform.localPosition.y != blockDistance)
+        {
+            time += Time.deltaTime * repositionSpeed;
+            float currentY = Mathf.SmoothStep(initialY, blockDistance, time);
+            blockTransform.localPosition = new Vector3(0f, currentY);
+            yield return null;
+        }
+        Destroy(blockTransform.gameObject);
+    }
+
+    IEnumerator SetMinimapPosition()
+    {
+        float desiredY = minimapY + (Mathf.Clamp((float)listedBlocks.Count-1, 0, foresight-1) * -blockDistance);
+        float originalY = minimapTransform.localPosition.y;
+        float time = 0f;
+        while (minimapTransform.localPosition.y != desiredY)
+        {
+            time += Time.deltaTime * repositionSpeed;
+            float newY = Mathf.SmoothStep(originalY, desiredY, time);
+            minimapTransform.localPosition = new Vector3(minimapTransform.localPosition.x, newY);
+            yield return null;
+        }
+
+        yield return null;
     }
 }

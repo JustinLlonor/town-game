@@ -42,8 +42,6 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         playerInventory.largeUI = largeUI;
         playerMovement.speed = playerSettings.speed;
         playerMovement.canJump = playerSettings.canJump;
-        fps.trackedMV = playerMovement;
-        Debug.Log(fps.trackedMV);
 
         currentPlayer = player;
     }

@@ -29,7 +29,6 @@ public class UIManager : MonoBehaviour
         OnUIClose += SetOpenFalse;
         OnUIOpen += SetOpenTrue;
         PlayerManager pm = FindObjectOfType<PlayerManager>();
-        if (pm != null && statsUI != null) pm.OnInstantiatePlayer += SetUITrackedStats;
     }
 
     private void OnExit()
@@ -61,10 +60,5 @@ public class UIManager : MonoBehaviour
     void SetOpenFalse()
     {
         uiOpened = false;
-    }
-
-    public void SetUITrackedStats(ref GameObject player)
-    {
-        statsUI.trackedStats = player.GetComponent<PlayerStats>();
     }
 }
