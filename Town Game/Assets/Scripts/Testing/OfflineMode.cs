@@ -12,4 +12,10 @@ public class OfflineMode : MonoBehaviour
         if (FindObjectOfType<WaitingRoomManager>() != null) FindObjectOfType<WaitingRoomManager>().enabled = false;
         PhotonNetwork.OfflineMode = true;
     }
+
+    private void Start()
+    {
+        Debug.Log("invoking");
+        FindObjectOfType<PlayerManager>().OnInstantiatePlayer?.Invoke(transform.parent.gameObject);
+    }
 }

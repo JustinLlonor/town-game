@@ -89,7 +89,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     [HideInInspector] public bool isSprinting;
     bool previousGrounded = true;
     bool sprintPressed = false;
-    bool crouchPressed = false;
     RaycastHit slopeHit;
     Vector3 moveDirection;
     Vector3 slopeDirection;
@@ -107,13 +106,13 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         stats = gameObject.GetComponent<PlayerStats>();
         rb = gameObject.GetComponent<Rigidbody>();
         rb.freezeRotation = true;
-        CameraMovement cm = playerManager.camTransform.GetComponent<CameraMovement>();
-        cm.player = graphics;
-        cm.orientation = orientation;
-        cm.headAim = headAim;
+        //CameraMovement cm = playerManager.camTransform.GetComponent<CameraMovement>();
+        //cm.player = transform;
+        //cm.orientation = orientation;
+        //cm.headAim = headAim;
         bobbing = playerManager.camBobbing;
         shake = playerManager.camShake;
-        playerManager.camTransform.GetComponent<CamMove>().camPos = cameraPosition;
+        playerManager.camTransform.GetComponent<CameraManager>().SetTrackedFPSTransform(cameraPosition);
         stepRayUpper.localPosition = new Vector3(stepRayUpper.localPosition.x, stepHeight, stepRayUpper.localPosition.z);
         unCastDistance = uncrouchCastUpper.position.y - uncrouchCastLower.position.y;
     }
@@ -196,12 +195,12 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         if (iv.Get<float>() == 1f)
         {
-            crouchPressed = true;
+            //crouchPressed = true;
             if (currentCrouchExit != null) StopCoroutine(currentCrouchExit);
             EnterCrouch();
             return;
         }
-        crouchPressed = false;
+        //crouchPressed = false;
         ExitCrouch();
     }
 

@@ -21,7 +21,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     public FirstPerson fps;
 
     public InstantiatePlayer OnInstantiatePlayer;
-    public delegate void InstantiatePlayer(ref GameObject player);
+    public delegate void InstantiatePlayer(GameObject player);
 
     [System.Serializable]
     public class PlayerSettings
@@ -33,8 +33,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     private void Start()
     {
         if (!PhotonNetwork.IsConnected) return;
+        if (PhotonNetwork.CurrentRoom == null) return;
         GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawn.position, spawn.rotation);
-        OnInstantiatePlayer?.Invoke(ref player);
+        OnInstantiatePlayer?.Invoke(player);
         PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
         PlayerInventory playerInventory = player.GetComponent<PlayerInventory>();
         playerInventory.camTransform = camTransform;

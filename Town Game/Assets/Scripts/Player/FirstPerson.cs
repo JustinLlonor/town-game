@@ -1,3 +1,4 @@
+using Photon.Pun;
 using Photon.Pun.Demo.Cockpit;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,6 +13,8 @@ public class FirstPerson : MonoBehaviour
     MeshRenderer itemRenderer;
     Animator animator;
     Item currentItem;
+    CameraManager cameraManager;
+    bool visible = true;
 
     private void Awake()
     {
@@ -20,16 +23,19 @@ public class FirstPerson : MonoBehaviour
         animator = gameObject.GetComponent<Animator>();
         itemFilter = itemTransform.GetComponent<MeshFilter>();
         itemRenderer = itemTransform.GetComponent<MeshRenderer>();
+        cameraManager = FindObjectOfType<CameraManager>();
+        cameraManager.OnSwitchCameraMode += OnCameraModeChange;
     }
 
     private void Update()
     {
         if (trackedMV == null) return;
+        if (!visible) return;
         animator.SetBool("isRunning", trackedMV.isSprinting);
         animator.SetBool("isGrounded", trackedMV.isGrounded);
     }
 
-    void AssignPlayerReferences(ref GameObject player)
+    void AssignPlayerReferences(GameObject player)
     {
         trackedMV = player.GetComponent<PlayerMovement>();
         trackedMV.OnLeap += OnLeap;
@@ -90,5 +96,27 @@ public class FirstPerson : MonoBehaviour
     public void ChangeArmMesh(Mesh mesh)
     {
         armsRenderer.sharedMesh = mesh;
+    }
+
+    void OnCameraModeChange(CameraManager.CameraMode mode)
+    {
+        if (mode == CameraManager.CameraMode.FirstPerson)
+        {
+            Enable();
+            return;
+        }
+        Disable();
+    }
+
+    public void Disable()
+    {
+        visible = false;
+        armsRenderer.enabled = false;
+    }
+
+    public void Enable()
+    {
+        visible = true;
+        armsRenderer.enabled = true;
     }
 }

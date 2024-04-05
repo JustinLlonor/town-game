@@ -53,15 +53,15 @@ public class StatsUI : MonoBehaviour
     private void Update()
     {
         if (trackedStats == null) return;
-        if (Input.GetKeyDown(KeyCode.N)) Splatter();
         UpdateBlobColor();
         UpdateBlobSpeed();
         UpdateStaminaBar();
         ResetShakePos();
     }
 
-    void AssignPlayerReferences(ref GameObject player)
+    void AssignPlayerReferences(GameObject player)
     {
+        Debug.Log("assignign plaginyoer");
         trackedStats = player.GetComponent<PlayerStats>();
         trackedStats.onDamage += ShakeBlob;
         trackedStats.OnDeath += Splatter;

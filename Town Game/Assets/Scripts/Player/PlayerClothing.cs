@@ -55,6 +55,7 @@ public class PlayerClothing : MonoBehaviour
 
     public void RandomizeGender()
     {
+        if (PhotonNetwork.CurrentRoom == null) return;
         bool male = false;
         int randomGender = Random.Range((int)0, (int)2);
         if (randomGender == 0) male = true;

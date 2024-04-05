@@ -20,8 +20,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public bool[] cultistAssignment = new bool[] { };
     public float hourLength = 60f;
     PhotonView view;
-    public TimeChange OnTimeChange;
+    RoleRevealer rv;
 
+    public TimeChange OnTimeChange;
+    public RevealRoles OnRevealRoles;
+    public delegate void RevealRoles(bool isCultist);
     public delegate void TimeChange();
 
     // Open when need new variable to synchronize
@@ -43,13 +46,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     
     private void Awake()
     {
+        rv = gameObject.GetComponent<RoleRevealer>();
         view = transform.GetComponent<PhotonView>();
+        OnRevealRoles += rv.RevealRole;
     }
     
     private void Update()
     {
         if (!PhotonNetwork.IsMasterClient) return;
-        if (Input.GetKeyDown(KeyCode.P)) SetTime(5, 30);
         UpdateGameTime();
         PhaseProperties();
     }
@@ -126,7 +130,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     public void RevealRole()
     {
-        Debug.LogError(PhotonNetwork.LocalPlayer.CustomProperties["isCultist"]);
+        // Invokes reveal roles delegate for the role reveal sequence
+        OnRevealRoles?.Invoke((bool)PhotonNetwork.LocalPlayer.CustomProperties["isCultist"]);
     }
 
     void UpdateGameTime()

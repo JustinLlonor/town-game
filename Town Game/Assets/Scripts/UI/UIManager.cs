@@ -13,6 +13,7 @@ public class UIManager : MonoBehaviour
     public CloseUI OnUIClose;
     public StatsUI statsUI;
     public GameObject gameplayUI;
+    public GameObject hotbarUI;
 
     CursorManager cm;
     InteractableFinder iFinder;
@@ -29,6 +30,7 @@ public class UIManager : MonoBehaviour
         OnUIClose += SetOpenFalse;
         OnUIOpen += SetOpenTrue;
         PlayerManager pm = FindObjectOfType<PlayerManager>();
+        FindObjectOfType<CameraManager>().OnSwitchCameraMode += OnCameraChangeMode;
     }
 
     private void OnExit()
@@ -60,5 +62,14 @@ public class UIManager : MonoBehaviour
     void SetOpenFalse()
     {
         uiOpened = false;
+    }
+
+    void OnCameraChangeMode(CameraManager.CameraMode mode)
+    {
+        if (gameplayUI == null) return;
+
+        bool enabled = mode == CameraManager.CameraMode.FirstPerson;
+        gameplayUI.SetActive(enabled);
+        hotbarUI.SetActive(enabled);
     }
 }

@@ -10,12 +10,27 @@ public class ClientGFX : MonoBehaviour
     public GameObject[] renderers;
     public MeshRenderer serverItem;
     
-    private void Start()
+    private void Awake()
     {
         if (view.IsMine)
         {
             HideRenderers();
             serverItem.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+        }
+    }
+
+    public void ShowRenderers()
+    {
+        foreach (GameObject go in renderers)
+        {
+            if (go.GetComponent<SkinnedMeshRenderer>() != null)
+            {
+                go.GetComponent<SkinnedMeshRenderer>().shadowCastingMode = ShadowCastingMode.On;
+            }
+            if (go.GetComponent<MeshRenderer>() != null)
+            {
+                go.GetComponent<MeshRenderer>().shadowCastingMode = ShadowCastingMode.On;
+            }
         }
     }
 

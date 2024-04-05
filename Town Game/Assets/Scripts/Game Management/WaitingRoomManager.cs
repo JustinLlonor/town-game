@@ -28,6 +28,11 @@ public class WaitingRoomManager : MonoBehaviourPunCallbacks, IPunObservable
         gt = gameObject.GetComponent<GameTimer>();
     }
 
+    void Start()
+    {
+        //FindObjectOfType<CameraManager>().ChangeCameraMode(CameraManager.CameraMode.FirstPerson);
+    }
+
     void Update()
     {
         PhaseUI();

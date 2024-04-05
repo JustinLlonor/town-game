@@ -9,13 +9,19 @@ public class CameraMovement : MonoBehaviour
     public Transform orientation;
     public Transform headAim;
 
+    Transform fpsTransform;
     CursorManager cursorManager;
+    CameraManager cameraManager;
     float xRotation = 0f;
     float yRotation = 0f;
+    bool canMove = true;
 
     private void Awake()
     {
+        cameraManager = FindAnyObjectByType<CameraManager>();
         cursorManager = FindObjectOfType<CursorManager>();
+        FindObjectOfType<PlayerManager>().OnInstantiatePlayer += AssignReferences;
+        cameraManager.OnSwitchCameraMode += OnCameraModeChange;
     }
 
     private void Update()
@@ -26,6 +32,7 @@ public class CameraMovement : MonoBehaviour
 
     void CameraLook()
     {
+        if (!canMove) return;
         if (!cursorManager.isLocked) return;
         float mouseX = Input.GetAxisRaw("Mouse X") * mouseSensitivity;
         float mouseY = Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
@@ -36,5 +43,25 @@ public class CameraMovement : MonoBehaviour
         orientation.eulerAngles = new Vector3(0, yRotation, 0);
         player.eulerAngles = orientation.eulerAngles;
         headAim.position = transform.position + transform.forward;
+    }
+
+    void AssignReferences(GameObject player)
+    {
+        Debug.Log("Assigning References");
+        PlayerMovement mv = player.GetComponent<PlayerMovement>();
+        this.player = mv.graphics;
+        orientation = mv.orientation;
+        headAim = mv.headAim;
+
+        yRotation = player.transform.eulerAngles.y;
+    }
+
+    void OnCameraModeChange(CameraManager.CameraMode mode)
+    {
+        canMove = (mode == CameraManager.CameraMode.FirstPerson);
+        if (mode == CameraManager.CameraMode.Cinematic)
+        {
+            headAim.position = transform.position;
+        }
     }
 }

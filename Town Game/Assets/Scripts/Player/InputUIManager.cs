@@ -4,14 +4,22 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Photon.Pun;
 
+// For disabling and enabling input
 public class InputUIManager : MonoBehaviour
 {
     public bool disableOnUI = true;
     PlayerInput playerInput;
+    CameraManager cameraManager;
+
+    private void Awake()
+    {
+        playerInput = gameObject.GetComponent<PlayerInput>();
+        cameraManager = FindObjectOfType<CameraManager>();
+        cameraManager.OnSwitchCameraMode += OnCameraChangedMode;
+    }
 
     private void Start()
     {
-        playerInput = gameObject.GetComponent<PlayerInput>();
         if (gameObject.GetComponent<PhotonView>() != null)
         {
             if (!gameObject.GetComponent<PhotonView>().IsMine) return;
@@ -28,5 +36,15 @@ public class InputUIManager : MonoBehaviour
     public void DisableInputs()
     {
         playerInput.enabled = !disableOnUI;
+    }
+
+    void OnCameraChangedMode(CameraManager.CameraMode mode)
+    {
+        if (mode == CameraManager.CameraMode.FirstPerson)
+        {
+            EnableInputs();
+            return;
+        }
+        DisableInputs();
     }
 }

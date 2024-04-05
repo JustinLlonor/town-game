@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2720722952386314921}
-  - component: {fileID: 8279556526537794016}
+  - component: {fileID: 1799576483939133784}
   - component: {fileID: 1476666307285568578}
   m_Layer: 0
   m_Name: Camera Holder
@@ -34,7 +34,7 @@ Transform:
   - {fileID: 4369339764396634583}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8279556526537794016
+--- !u!114 &1799576483939133784
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -43,10 +43,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 736818722375070811}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42cf7050a0cf5c34c8d0fae9e5a1532a, type: 3}
+  m_Script: {fileID: 11500000, guid: 249ed8fbdbf6cba42a54ee41b03e724f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  camPos: {fileID: 0}
+  instance: {fileID: 0}
+  trackedTransform: {fileID: 0}
+  mode: 0
 --- !u!114 &1476666307285568578
 MonoBehaviour:
   m_ObjectHideFlags: 0
