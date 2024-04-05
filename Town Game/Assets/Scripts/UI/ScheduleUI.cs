@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using TMPro;
-using UnityEditor.ShaderGraph.Internal;
-using UnityEditor.Experimental.GraphView;
 
 public class ScheduleUI : MonoBehaviour
 {
