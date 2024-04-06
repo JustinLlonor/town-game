@@ -88,6 +88,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   camTPrefab: {fileID: 4526812312051103106, guid: c27b5aba2f1390b4e821c7516d86462d, type: 3}
+  uiFrontMask:
+    serializedVersion: 2
+    m_Bits: 32768
+  defaultMask:
+    serializedVersion: 2
+    m_Bits: 1
 --- !u!1 &3648747623983838247
 GameObject:
   m_ObjectHideFlags: 0

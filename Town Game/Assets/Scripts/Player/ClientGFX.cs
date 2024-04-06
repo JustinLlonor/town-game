@@ -48,4 +48,13 @@ public class ClientGFX : MonoBehaviour
             }
         }
     }
+
+    public void SetRenderersLayer(LayerMask layer)
+    {
+        foreach (GameObject go in renderers)
+        {
+            go.layer = (int)Mathf.Log((float)layer, 2);
+        }
+    }
+
 }
