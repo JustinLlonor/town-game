@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class BlackScreen : MonoBehaviour
 {
     Image img;
+    public TextMeshProUGUI[] texts;
 
     private void Awake()
     {
@@ -15,6 +17,10 @@ public class BlackScreen : MonoBehaviour
     public void SetAlpha(float alpha)
     {
         img.color = new Color(0f, 0f, 0f, alpha);
+        foreach (var t in texts)
+        {
+            t.color = new Color(t.color.r, t.color.g, t.color.b, alpha);
+        }
     }
 
     public void StartAlphaTransition(float to, float duration)

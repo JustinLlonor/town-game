@@ -7,18 +7,22 @@ public class RoleRevealer : MonoBehaviour
     public GameObject camTPrefab;
     public LayerMask uiFrontMask;
     public LayerMask defaultMask;
+    public Color cultistColor;
+    public Color innoColor;
     CameraManager cm;
     Transform playerTransform;
     ClientGFX cgfx;
+    RoleText rtxt;
     BlackScreen bs;
 
     private void Awake()
     {
         cm = FindObjectOfType<CameraManager>();
-        bs = FindAnyObjectByType<BlackScreen>();
+        bs = FindObjectOfType<BlackScreen>();
+        rtxt = FindObjectOfType<RoleText>();;
         FindObjectOfType<PlayerManager>().OnInstantiatePlayer += GetReferences;
     }
-
+    
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.J))
@@ -33,7 +37,7 @@ public class RoleRevealer : MonoBehaviour
         cgfx = player.GetComponentInChildren<ClientGFX>();
     }
 
-    public void RevealRole(bool role)
+    public void RevealRole(bool isCultist)
     {
         Debug.Log("playing sequence");
         GameObject camPrefab = Instantiate(camTPrefab);
@@ -44,8 +48,17 @@ public class RoleRevealer : MonoBehaviour
         bs.SetAlpha(1f);
         cgfx.ShowRenderers();
         cgfx.SetRenderersLayer(uiFrontMask);
-        StartCoroutine(SnapToFPS(3f, 1.5f));
-        StartCoroutine(FadeBlackScreen(2f));
+        StartCoroutine(SnapToFPS(5f, 1.5f));
+        StartCoroutine(FadeBlackScreen(3f));
+        rtxt.StartCursorBlink(1f, 5, 0f);
+        rtxt.StartCursorBlink(5, 25, 2f);
+        if (isCultist)
+        {
+            rtxt.StartTextRoll("Cultist", cultistColor, 1f, 1f);
+        } else
+        {
+            rtxt.StartTextRoll("Researcher", innoColor, 1f, 1f);
+        }
     }
 
     IEnumerator SnapToFPS(float waitDuration, float disappearDuration)
