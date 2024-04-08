@@ -46,4 +46,20 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 
         currentPlayer = player;
     }
+
+    [PunRPC]
+    public void Teleport(Vector3 location, Quaternion rotation)
+    {
+        if (currentPlayer == null) return;
+
+        Rigidbody rb = currentPlayer.GetComponent<Rigidbody>();
+        CameraMovement cm = FindObjectOfType<CameraMovement>();
+        currentPlayer.transform.position = location;
+        currentPlayer.transform.rotation = rotation;
+        rb.velocity = Vector3.zero;
+        rb.position = location;
+        rb.rotation = rotation;
+        cm.yRotation = rotation.eulerAngles.y;
+        cm.xRotation = rotation.eulerAngles.x;
+    }
 }

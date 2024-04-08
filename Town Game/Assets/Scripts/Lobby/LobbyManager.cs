@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using System.Runtime;
 using TMPro;
 using UnityEngine;
 using Photon.Pun;
@@ -99,6 +97,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         playerProperties["isCultist"] = false;
         playerProperties["isMale"] = false;
         playerProperties["name"] = CreateNewNickname();
+        playerProperties["room"] = -1;
         Debug.Log((string)playerProperties["name"]);
         PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
     }

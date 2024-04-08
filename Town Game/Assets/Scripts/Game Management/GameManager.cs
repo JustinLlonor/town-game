@@ -21,11 +21,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public float hourLength = 60f;
     PhotonView view;
     RoleRevealer rv;
+    RoomManager rm;
+    PlayerManager pm;
 
     public TimeChange OnTimeChange;
     public RevealRoles OnRevealRoles;
-    public delegate void RevealRoles(bool isCultist);
     public delegate void TimeChange();
+    public delegate void RevealRoles(bool isCultist);
 
     // Open when need new variable to synchronize
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -49,6 +51,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         rv = gameObject.GetComponent<RoleRevealer>();
         view = transform.GetComponent<PhotonView>();
         OnRevealRoles += rv.RevealRole;
+        rm = FindObjectOfType<RoomManager>();
+        pm = FindObjectOfType<PlayerManager>();
+    }
+
+    private void Start()
+    {
+        if (PhotonNetwork.IsMasterClient) AssignRooms();
     }
     
     private void Update()
@@ -75,6 +84,37 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         AssignRoles();
         SetTime(7, 30);
+    }
+
+    void AssignRooms()
+    {
+        if (PhotonNetwork.PlayerList.Length > rm.playerRooms.Count)
+        {
+            Debug.LogError("Not enough rooms!");
+            // Stop game function here
+            return;
+        }
+
+        int[] roomAssignment = new int[PhotonNetwork.PlayerList.Length];
+
+        for (int i = 0; i < roomAssignment.Length; i++) roomAssignment[i] = -1;
+
+        for (int i = 0; i < roomAssignment.Length; i++)
+        {
+            int randomRoom = Random.Range(0, rm.playerRooms.Count);
+            while (roomAssignment.Contains(randomRoom))
+            {
+                randomRoom = Random.Range(0, rm.playerRooms.Count);
+            }
+            roomAssignment[i] = randomRoom;
+        }
+
+        for (int i = 0; i < roomAssignment.Length; i++)
+        {
+            ExitGames.Client.Photon.Hashtable pProperties = PhotonNetwork.PlayerList[i].CustomProperties;
+            pProperties["room"] = roomAssignment[i];
+            PhotonNetwork.PlayerList[i].SetCustomProperties(pProperties);
+        }
     }
 
     void AssignRoles()
@@ -131,6 +171,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public void RevealRole()
     {
         // Invokes reveal roles delegate for the role reveal sequence
+        Transform roomT = rm.playerRooms[(int)PhotonNetwork.LocalPlayer.CustomProperties["room"]].spawnTransform;
+        pm.Teleport(roomT.position, roomT.rotation);
         OnRevealRoles?.Invoke((bool)PhotonNetwork.LocalPlayer.CustomProperties["isCultist"]);
     }
 

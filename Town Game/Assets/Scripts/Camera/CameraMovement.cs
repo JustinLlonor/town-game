@@ -12,8 +12,8 @@ public class CameraMovement : MonoBehaviour
     Transform fpsTransform;
     CursorManager cursorManager;
     CameraManager cameraManager;
-    float xRotation = 0f;
-    float yRotation = 0f;
+    [HideInInspector] public float xRotation = 0f;
+    [HideInInspector] public float yRotation = 0f;
     bool canMove = true;
 
     private void Awake()
