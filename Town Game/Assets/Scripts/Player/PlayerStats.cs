@@ -13,6 +13,12 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     public float maxHP = 100f;
     public float HP = 100f;
     [SerializeField] float HPRegenSpeed = 5f;
+    [Header("Nutrition")]
+    public float maxNutrition = 100f;
+    public float nutrition = 100f;
+    [Header("Sanity")]
+    public float maxSanity = 100f;
+    public float sanity = 100f;
     [Header("Stamina")]
     public float maxStamina = 100f;
     public float stamina = 100f;
