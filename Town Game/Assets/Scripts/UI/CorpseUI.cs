@@ -30,7 +30,6 @@ public class CorpseUI : MonoBehaviour
     public void CreateEvidenceList(List<Evidence> evidence, int depth)
     {
         ResetUI();
-        cm.Unlock();
         foreach (Evidence e in evidence)
         {
             GameObject newEvidence = Instantiate(evidencePrefab, eContent);

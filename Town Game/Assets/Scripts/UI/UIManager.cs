@@ -14,6 +14,7 @@ public class UIManager : MonoBehaviour
     public StatsUI statsUI;
     public GameObject gameplayUI;
     public GameObject hotbarUI;
+    public TabUI tabUI;
 
     CursorManager cm;
     InteractableFinder iFinder;
@@ -27,8 +28,10 @@ public class UIManager : MonoBehaviour
         cm = FindObjectOfType<CursorManager>();
         iFinder = FindObjectOfType<InteractableFinder>();
         OnUIClose += CloseCorpse;
+        OnUIClose += CloseTabMenu;
         OnUIClose += SetOpenFalse;
         OnUIOpen += SetOpenTrue;
+        OnUIOpen += cm.Unlock;
         PlayerManager pm = FindObjectOfType<PlayerManager>();
         FindObjectOfType<CameraManager>().OnSwitchCameraMode += OnCameraChangeMode;
     }
@@ -37,6 +40,13 @@ public class UIManager : MonoBehaviour
     {
         OnUIClose.Invoke();
         cm.Lock();
+    }
+
+    public void OpenPlayerMenu()
+    {
+        if (tabUI == null) return;
+        OnUIOpen.Invoke();
+        OpenTabMenu();
     }
 
     // Corpse code //
@@ -71,5 +81,17 @@ public class UIManager : MonoBehaviour
         bool enabled = mode == CameraManager.CameraMode.FirstPerson;
         gameplayUI.SetActive(enabled);
         hotbarUI.SetActive(enabled);
+    }
+
+    public void OpenTabMenu()
+    {
+        tabUI.gameObject.SetActive(true);
+        OnUIOpen.Invoke();
+        tabUI.UpdatePlayerList();
+    }
+
+    public void CloseTabMenu()
+    {
+        tabUI.gameObject.SetActive(false);
     }
 }

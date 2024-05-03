@@ -98,6 +98,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         playerProperties["isMale"] = false;
         playerProperties["name"] = CreateNewNickname();
         playerProperties["room"] = -1;
+        playerProperties["confirmedDead"] = false;
         Debug.Log((string)playerProperties["name"]);
         PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
     }
