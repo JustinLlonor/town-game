@@ -4,7 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using System.Linq;
 
-public class UIPlayerList : MonoBehaviour
+public class UIPlayerList : MonoBehaviourPunCallbacks
 {
     // If true, players will be removed from player list on disconnect. If false, players will be marked as dead on disconnect.
     public bool removeOnDC;
@@ -17,7 +17,6 @@ public class UIPlayerList : MonoBehaviour
     List<string> containedPlayers = new List<string>();
 
     // Updates player list off of players in room
-    // NTS: Make update while the menu is open in the future
     public void UpdatePlayerList()
     {
         List<GameObject> toDestroy = new List<GameObject>();
@@ -52,14 +51,11 @@ public class UIPlayerList : MonoBehaviour
 
         foreach (GameObject go in toDestroy) Destroy(go);
 
-        Debug.Log("lol");
         // Add missing players
         foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
         {
-            Debug.Log("Detected 1 player");
             if (!containedPlayers.Contains(player.CustomProperties["name"]))
             {
-                Debug.Log("Adding player");
                 AddPlayer((string)player.CustomProperties["name"]);
             }
         }
@@ -92,5 +88,15 @@ public class UIPlayerList : MonoBehaviour
                 tp.SetPanelColor(secondaryPanelColor);
             }
         }
+    }
+
+    public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
+    {
+        UpdatePlayerList();
+    }
+
+    public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
+    {
+        UpdatePlayerList();
     }
 }

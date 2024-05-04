@@ -14,12 +14,6 @@ public class ScheduleManager : MonoBehaviour
     [PunRPC]
     public void AddScheduleBlock(string periodName, string room, float time, float length = 1f)
     {
-        if (PeriodOverlaps(time, time + length))
-        {
-            Debug.LogError("Added schedule block overlaps!");
-            return;
-        }
-
         schedule.Add(new ScheduleBlock(periodName, room, time, length));
 
         OnUpdateSchedule?.Invoke();
