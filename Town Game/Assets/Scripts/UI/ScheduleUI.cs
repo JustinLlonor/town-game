@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using TMPro;
+using Unity.VisualScripting;
 
 public class ScheduleUI : MonoBehaviour
 {
@@ -12,7 +13,7 @@ public class ScheduleUI : MonoBehaviour
     public GameObject scheduleBlockPrefab;
     public Transform blockHolder;
     public Transform minimapTransform;
-    public ScheduleBlock testBlock;
+    public string emptyPeriod = "Camp Maintanence";
     float minimapY;
     List<UIBlock> listedBlocks = new List<UIBlock>();
     List<IEnumerator> sortRoutines = new List<IEnumerator>();
@@ -37,38 +38,60 @@ public class ScheduleUI : MonoBehaviour
         sm = FindObjectOfType<ScheduleManager>();
         gm = FindObjectOfType<GameManager>();
         minimapY = minimapTransform.localPosition.y;
+        sm.OnUpdateSchedule += ReadSchedule;
     }
 
     private void Start()
     {
-        sm.OnUpdateSchedule += ReadSchedule;
         ((RectTransform)blockHolder).SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, blockDistance * (float)foresight);
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.O)) AddScheduleBlock(new ScheduleBlock(testBlock.periodName, testBlock.room, testBlock.length, testBlock.time));
-        if (Input.GetKeyDown(KeyCode.I)) RemoveScheduleBlock(testBlock);
+        //if (Input.GetKeyDown(KeyCode.O)) AddScheduleBlock(new ScheduleBlock(testBlock.periodName, testBlock.room, testBlock.length, testBlock.time));
+        //if (Input.GetKeyDown(KeyCode.I)) RemoveScheduleBlock(testBlock);
     }
 
     void ReadSchedule()
     {
-        // Remove excess blocks
-        foreach (UIBlock uBlock in listedBlocks)
+        List<ScheduleBlock> blocks = new List<ScheduleBlock>();
+
+        // Add immutable blocks
+        foreach (ScheduleBlock block in sm.immutableBlocks)
         {
-            if (!sm.schedule.Any(n => n.Equals(uBlock.block)))
-            {
-                RemoveScheduleBlock(uBlock.block);
-            }
+            blocks.Add(block);
         }
 
-        // Add unadded blocks
+        // Add mutable blocks
         foreach (ScheduleBlock block in sm.schedule)
         {
-            if (!listedBlocks.Any(n => n.block.Equals(block)))
-            {
-                AddScheduleBlock(block);
-            }
+            blocks.Add(block);
+        }
+
+        // Sort blocks
+        blocks = blocks.OrderBy(o => o.time).ToList();
+
+        // Add empty spaces
+        List<ScheduleBlock> blocksCheck = new List<ScheduleBlock>(blocks);
+        for (int i = 0; i < blocksCheck.Count; i++)
+        {
+            int nextI = i + 1;
+            if (nextI >= blocksCheck.Count) break;
+            if (blocksCheck[i].time + blocksCheck[i].length == blocksCheck[nextI].time) continue; // Continue if there is no space in between blocks
+            blocks.Add(new ScheduleBlock(emptyPeriod, "Assigned Rooms", blocksCheck[nextI].time - (blocksCheck[i].time + blocksCheck[i].length), blocksCheck[i].time + blocksCheck[i].length));
+        }
+
+        Debug.Log(blocks.Count);
+        GroupAddScheduleBlocks(blocks);
+    }
+
+    void GroupAddScheduleBlocks(List<ScheduleBlock> blocks)
+    {
+        blocks = blocks.OrderBy(o => o.time).ToList();
+
+        foreach (ScheduleBlock block in blocks)
+        {
+            AddScheduleBlock(block);
         }
     }
 

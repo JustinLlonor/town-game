@@ -51,7 +51,7 @@ MonoBehaviour:
   currentPeriod: 0
   currentDay: 0
   cultistAssignment: 0100000000010000000001000000010000000100
-  hourLength: 35
+  hourLength: 30
 --- !u!114 &3042919538494657000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -165,6 +165,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gm: {fileID: 1676236008550905741}
   schedule: []
+  immutableBlocks:
+  - periodName: Roll Call
+    room: Meeting Room
+    length: 1
+    time: 7
+  - periodName: Breakfast
+    room: Cafeteria
+    length: 1
+    time: 8
+  - periodName: Dinner
+    room: Cafeteria
+    length: 1
+    time: 19
+  - periodName: Roll Call
+    room: Meeting Room
+    length: 1
+    time: 20
 --- !u!1 &5211516756420375758
 GameObject:
   m_ObjectHideFlags: 0

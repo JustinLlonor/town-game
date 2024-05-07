@@ -137,7 +137,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 553772930366547643, guid: e11b4f359f8ec4a43a915e109017ea6c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 948635299029419552, guid: e11b4f359f8ec4a43a915e109017ea6c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3209,19 +3209,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 3459647967433955565, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
   m_PrefabInstance: {fileID: 7453756831835282215}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2055590570
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2055590569}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aac83179ef7258748944b058ad221cd5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pl: {fileID: 0}
 --- !u!1 &2061589050
 GameObject:
   m_ObjectHideFlags: 0
@@ -3542,6 +3529,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1676236008550905741, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: hourLength
+      value: 50
+      objectReference: {fileID: 0}
     - target: {fileID: 3042919538494657000, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: sceneViewId
       value: 6
@@ -3549,6 +3540,30 @@ PrefabInstance:
     - target: {fileID: 5211516756420375758, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: m_Name
       value: Main Game Stuff
+      objectReference: {fileID: 0}
+    - target: {fileID: 5211516756420375758, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: schedule.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: schedule.Array.data[0].room
+      value: uwu room
+      objectReference: {fileID: 0}
+    - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: schedule.Array.data[0].time
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: schedule.Array.data[0].length
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: schedule.Array.data[0].periodName
+      value: uwu time
       objectReference: {fileID: 0}
     - target: {fileID: 8939135918072450520, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: sceneViewId
@@ -4244,10 +4259,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 9066231193298219586, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       insertIndex: 0
       addedObject: {fileID: 1154866880}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3459647967433955565, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2055590570}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
 --- !u!1001 &9037834216012764288
 PrefabInstance:
