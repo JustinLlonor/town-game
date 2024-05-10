@@ -54,6 +54,7 @@ public class ClockManager : MonoBehaviour
             prevHour = hour;
             minuteRandom = 0;
         }
+        if (hour == 0) hour = 24;
         string meridiem = "AM";
         if (hour > 11 && hour != 24) meridiem = "PM";
         if (hour > 12) hour -= 12;

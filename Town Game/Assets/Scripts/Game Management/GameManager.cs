@@ -192,7 +192,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     void UpdateGameTime()
     {
         gameTime += Time.deltaTime;
-        currentDay = Mathf.FloorToInt(gameTime / (hourLength * 24f));
+        currentDay = Mathf.FloorToInt((gameTime + hourLength) / (hourLength * 24f));
         currentPeriod = Mathf.FloorToInt(gameTime / hourLength);
     }
 
@@ -208,7 +208,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         if (minute < 0 || minute > 59) return;
 
         float timeAdd;
-        Vector2Int clockTime = PeriodToClockTime((currentPeriod - (currentDay * 24)) + ((gameTime - (currentPeriod * hourLength)) / hourLength));
+        int r = Mathf.FloorToInt(gameTime / (hourLength * 24f));
+        Vector2Int clockTime = PeriodToClockTime((currentPeriod - (r * 24)) + ((gameTime - (currentPeriod * hourLength)) / hourLength));
         //Debug.Log(clockTime);
 
         // Time add hours
