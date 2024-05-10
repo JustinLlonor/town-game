@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public float gameTime = 0f;
     public int currentPeriod;
     public int currentDay = 0;
+    int previousDay = -1;
     [Header("Game Settings")]
     // When an index of this is true, a cultist is added when the players playing is equal to that number.
     public bool[] cultistAssignment = new bool[] { };
@@ -26,8 +27,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     public TimeChange OnTimeChange;
     public RevealRoles OnRevealRoles;
+    public ChangeDay OnChangeDay;
     public delegate void TimeChange();
     public delegate void RevealRoles(bool isCultist);
+    public delegate void ChangeDay();
 
     // Open when need new variable to synchronize
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -64,7 +67,17 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (!PhotonNetwork.IsMasterClient) return;
         UpdateGameTime();
+        CheckDay();
         PhaseProperties();
+    }
+
+    void CheckDay()
+    {
+        if (previousDay != currentDay)
+        {
+            previousDay = currentDay;
+            OnChangeDay?.Invoke();
+        }
     }
 
     void PhaseProperties()

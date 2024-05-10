@@ -39,7 +39,7 @@ public class ScheduleUI : MonoBehaviour
         sm = FindObjectOfType<ScheduleManager>();
         gm = FindObjectOfType<GameManager>();
         minimapY = minimapTransform.localPosition.y;
-        sm.OnUpdateSchedule += ReadSchedule;
+        gm.OnChangeDay += ReadSchedule;
     }
 
     private void Start()
@@ -55,17 +55,23 @@ public class ScheduleUI : MonoBehaviour
 
     void ReadSchedule()
     {
+        ClearScheduleBlocks();
+
         List<ScheduleBlock> blocks = new List<ScheduleBlock>();
+        float minRange = gm.currentDay * 24 - 1;
+        float maxRange = gm.currentDay * 24 + 23;
 
         // Add immutable blocks
         foreach (ScheduleBlock block in sm.immutableBlocks)
         {
+            ScheduleBlock nBlock = new ScheduleBlock(block.periodName, block.room, block.length, block.time + (gm.currentDay * 24));
             blocks.Add(block);
         }
 
         // Add mutable blocks
         foreach (ScheduleBlock block in sm.schedule)
         {
+            if (block.time < minRange || block.time > maxRange) continue;
             blocks.Add(block);
         }
 
@@ -179,9 +185,11 @@ public class ScheduleUI : MonoBehaviour
 
     void ClearScheduleBlocks()
     {
-        foreach (Transform child in transform)
+        listedBlocks.Clear();
+        sortRoutines.Clear();
+        foreach (Transform child in blockHolder)
         {
-            Destroy(child);
+            Destroy(child.gameObject);
         }
     }
 

@@ -12,11 +12,6 @@ public class ScheduleManager : MonoBehaviour
 
     public delegate void UpdateSchedule();
 
-    private void Start()
-    {
-        OnUpdateSchedule.Invoke();
-    }
-
     [PunRPC]
     public void AddScheduleBlock(string periodName, string room, float time, float length = 1f)
     {
