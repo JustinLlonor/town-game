@@ -18,6 +18,7 @@ public class ScheduleUI : MonoBehaviour
     List<UIBlock> listedBlocks = new List<UIBlock>();
     List<IEnumerator> sortRoutines = new List<IEnumerator>();
     IEnumerator mapRoutine = null;
+    IEnumerator sequenceAdd = null;
     GameManager gm;
     ScheduleManager sm;
 
@@ -89,9 +90,19 @@ public class ScheduleUI : MonoBehaviour
     {
         blocks = blocks.OrderBy(o => o.time).ToList();
 
+        if (sequenceAdd != null) StopCoroutine(sequenceAdd);
+        sequenceAdd = null;
+        sequenceAdd = BlockSequence(blocks);
+        StartCoroutine(sequenceAdd);
+    }
+
+    IEnumerator BlockSequence(List<ScheduleBlock> blocks)
+    {
+        blocks.Reverse();
         foreach (ScheduleBlock block in blocks)
         {
             AddScheduleBlock(block);
+            yield return new WaitForSeconds(1f / repositionSpeed);
         }
     }
 
@@ -107,7 +118,7 @@ public class ScheduleUI : MonoBehaviour
             if (block.time > listedBlocks[i].block.time) setPos++;
         }
         listedBlocks.Insert(setPos, new UIBlock(block, nbt));
-        if (setPos > foresight-1) nbt.localPosition = new Vector2(0f, -blockDistance * foresight);
+        //if (setPos > foresight-1) nbt.localPosition = new Vector2(0f, -blockDistance * foresight);
 
         // Sets text data on block
         nbt.GetChild(0).GetComponent<TextMeshProUGUI>().text = block.periodName;
