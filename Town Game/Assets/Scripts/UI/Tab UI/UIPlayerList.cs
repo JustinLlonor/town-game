@@ -16,6 +16,16 @@ public class UIPlayerList : MonoBehaviourPunCallbacks
     public Color secondaryPanelColor;
     List<string> containedPlayers = new List<string>();
 
+    public ClickPlayer OnClickPlayer;
+    public DeselectPlayer OnDeselectPlayer;
+    public delegate void ClickPlayer(Photon.Realtime.Player player);
+    public delegate void DeselectPlayer(Photon.Realtime.Player player);
+
+    private void Awake()
+    {
+        
+    }
+
     // Updates player list off of players in room
     public void UpdatePlayerList()
     {
@@ -56,7 +66,7 @@ public class UIPlayerList : MonoBehaviourPunCallbacks
         {
             if (!containedPlayers.Contains(player.CustomProperties["name"]))
             {
-                AddPlayer((string)player.CustomProperties["name"]);
+                AddPlayer(player);
             }
         }
 
@@ -65,12 +75,16 @@ public class UIPlayerList : MonoBehaviourPunCallbacks
         UpdateColors();
     }
 
-    public void AddPlayer(string name)
+    public void AddPlayer(Photon.Realtime.Player player)
     {
+        string name = (string)player.CustomProperties["name"];
         GameObject newPlayer = Instantiate(tabPlayerPrefab, contentHolder);
         TabPlayer tp = newPlayer.GetComponent<TabPlayer>();
         tp.SetName(name);
         tp.SetNameColor(alivePlayerColor);
+        OnClickPlayer += tp.OnUIClick;
+        tp.uPlayerList = this;
+        tp.player = player;
         containedPlayers.Add(name);
         UpdateColors();
     }

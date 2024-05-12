@@ -30,12 +30,12 @@ public class InputUIManager : MonoBehaviour
 
     public void EnableInputs()
     {
-        playerInput.enabled = disableOnUI;
+        if (playerInput != null) playerInput.enabled = disableOnUI;
     }
 
     public void DisableInputs()
     {
-        playerInput.enabled = !disableOnUI;
+        if (playerInput != null) playerInput.enabled = !disableOnUI;
     }
 
     void OnCameraChangedMode(CameraManager.CameraMode mode)

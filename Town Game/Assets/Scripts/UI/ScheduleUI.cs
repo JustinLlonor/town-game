@@ -12,7 +12,7 @@ public class ScheduleUI : MonoBehaviour
     public GameObject scheduleBlockPrefab;
     public Transform blockHolder;
     public Transform minimapTransform;
-    public string emptyPeriod = "Camp Maintanence";
+    public string emptyPeriod = "Free Time";
     float minimapY;
     List<UIBlock> listedBlocks = new List<UIBlock>();
     List<IEnumerator> sortRoutines = new List<IEnumerator>();
@@ -44,6 +44,11 @@ public class ScheduleUI : MonoBehaviour
     private void Start()
     {
         ((RectTransform)blockHolder).SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, blockDistance * (float)foresight);
+    }
+
+    private void OnEnable()
+    {
+        ReadSchedule();
     }
 
     private void Update()
@@ -84,7 +89,7 @@ public class ScheduleUI : MonoBehaviour
             int nextI = i + 1;
             if (nextI >= blocksCheck.Count) break;
             if (blocksCheck[i].time + blocksCheck[i].length == blocksCheck[nextI].time) continue; // Continue if there is no space in between blocks
-            blocks.Add(new ScheduleBlock(emptyPeriod, "Assigned Rooms", blocksCheck[nextI].time - (blocksCheck[i].time + blocksCheck[i].length), blocksCheck[i].time + blocksCheck[i].length));
+            blocks.Add(new ScheduleBlock(emptyPeriod, "", blocksCheck[nextI].time - (blocksCheck[i].time + blocksCheck[i].length), blocksCheck[i].time + blocksCheck[i].length));
         }
 
         GroupAddScheduleBlocks(blocks);

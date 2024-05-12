@@ -433,7 +433,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   blockHolder: {fileID: 3473954962352148813}
   blockPrefab: {fileID: 5295724891062096127, guid: 8895afe9296eafb43b8542e091875a2b, type: 3}
-  dateText: {fileID: 0}
+  dateText: {fileID: 8286808696324652897}
   readDay: 0
   primaryColor: {r: 1, g: 1, b: 1, a: 1}
   secondaryColor: {r: 0.8396226, g: 0.8396226, b: 0.8396226, a: 1}
@@ -1183,7 +1183,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aac83179ef7258748944b058ad221cd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pl: {fileID: 6739196421060658664}
+  playerList: {fileID: 6739196421060658664}
+  tabSchedule: {fileID: 4435733405426817746}
 --- !u!1 &8618684519349136647
 GameObject:
   m_ObjectHideFlags: 0

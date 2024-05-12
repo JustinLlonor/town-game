@@ -4,8 +4,8 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Linq;
-using Photon.Pun.Demo.Procedural;
 using TMPro;
+using Steamworks;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public float gameTime = 0f;
     public int currentPeriod;
     public int currentDay = 0;
+    public string[] days;
     int previousDay = -1;
     [Header("Game Settings")]
     // When an index of this is true, a cultist is added when the players playing is equal to that number.
@@ -260,5 +261,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         clockTimeStart.x++;
         if (clockTimeStart.x > 12) clockTimeStart.x -= 12;
         return $"{clockTimeStart.x}:{startMins} {startMeridiem}";
+    }
+
+    public string GetDay(int day)
+    {
+        if (day < 0)
+        {
+            return days[0];
+        }
+        if (day > days.Length-1) day = day - (Mathf.FloorToInt(day / days.Length) * days.Length);
+        return days[day];
     }
 }
