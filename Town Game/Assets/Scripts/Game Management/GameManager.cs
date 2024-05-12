@@ -4,6 +4,8 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Linq;
+using Photon.Pun.Demo.Procedural;
+using TMPro;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -241,5 +243,22 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         while (roundedPeriod > 23) roundedPeriod -= 24;
         int currentMinute = Mathf.FloorToInt(periodProgress * 60f);
         return new Vector2Int(roundedPeriod, currentMinute);
+    }
+
+    /// <summary>
+    /// Converts period time to a clock string
+    /// </summary>
+    /// <param name="periodTime"></param>
+    /// <returns></returns>
+    public string PeriodToClockString(float periodTime)
+    {
+        Vector2Int clockTimeStart = PeriodToClockTime(periodTime);
+        string startMins = clockTimeStart.y.ToString();
+        if (startMins.Length == 1) startMins = "0" + startMins;
+        string startMeridiem = "AM";
+        if (clockTimeStart.x > 10 && clockTimeStart.x != 23) startMeridiem = "PM";
+        clockTimeStart.x++;
+        if (clockTimeStart.x > 12) clockTimeStart.x -= 12;
+        return $"{clockTimeStart.x}:{startMins} {startMeridiem}";
     }
 }

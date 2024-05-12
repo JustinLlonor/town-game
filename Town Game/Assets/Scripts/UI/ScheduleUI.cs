@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using TMPro;
-using Unity.VisualScripting;
 
 public class ScheduleUI : MonoBehaviour
 {
@@ -88,7 +87,6 @@ public class ScheduleUI : MonoBehaviour
             blocks.Add(new ScheduleBlock(emptyPeriod, "Assigned Rooms", blocksCheck[nextI].time - (blocksCheck[i].time + blocksCheck[i].length), blocksCheck[i].time + blocksCheck[i].length));
         }
 
-        Debug.Log(blocks.Count);
         GroupAddScheduleBlocks(blocks);
     }
 
