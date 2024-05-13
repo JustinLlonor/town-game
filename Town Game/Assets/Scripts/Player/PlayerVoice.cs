@@ -28,7 +28,7 @@ public class PlayerVoice : MonoBehaviour
         if (Input.GetKeyUp(key))
         {
             animator.SetBool("isTalking", false);
-            rec.RecordingEnabled = false;
+            rec.TransmitEnabled = false;
         }
     }
 }
