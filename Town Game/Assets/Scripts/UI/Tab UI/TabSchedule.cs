@@ -6,7 +6,6 @@ using Photon.Pun;
 using System.Linq;
 using Photon.Voice.Unity.Demos;
 using UnityEngine.UI;
-using Unity.VisualScripting;
 
 public class TabSchedule : MonoBehaviour
 {
@@ -102,6 +101,7 @@ public class TabSchedule : MonoBehaviour
     public void DeselectSchedule(Photon.Realtime.Player player = null)
     {
         ClearSchedule();
+        selectedPlayer = null;
         dateText.text = "...";
     }
 
