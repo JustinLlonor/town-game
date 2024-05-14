@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using TMPro;
+using UnityEngine.Animations.Rigging;
 
 public class ScheduleUI : MonoBehaviour
 {
@@ -55,6 +56,27 @@ public class ScheduleUI : MonoBehaviour
     {
         //if (Input.GetKeyDown(KeyCode.O)) AddScheduleBlock(new ScheduleBlock(testBlock.periodName, testBlock.room, testBlock.length, testBlock.time));
         //if (Input.GetKeyDown(KeyCode.I)) RemoveScheduleBlock(testBlock);
+        ScrollSchedule();
+    }
+
+    void ScrollSchedule()
+    {
+        if (listedBlocks.Count == 0) return;
+        if (BlockPassed(listedBlocks[0].block))
+        {
+            Debug.Log("passed");
+            RemoveScheduleBlock(0);
+        }
+    }
+
+    /// <summary>
+    /// Checks if the specified period has already passed in game time
+    /// </summary>
+    /// <param name="block"></param>
+    /// <returns></returns>
+    bool BlockPassed(ScheduleBlock block)
+    {
+        return block.time + block.length < gm.currentPeriod;
     }
 
     void ReadSchedule()
@@ -69,7 +91,7 @@ public class ScheduleUI : MonoBehaviour
         foreach (ScheduleBlock block in sm.immutableBlocks)
         {
             ScheduleBlock nBlock = new ScheduleBlock(block.periodName, block.room, block.length, block.time + (gm.currentDay * 24));
-            blocks.Add(block);
+            blocks.Add(nBlock);
         }
 
         // Add mutable blocks
@@ -170,6 +192,13 @@ public class ScheduleUI : MonoBehaviour
         Debug.LogWarning("Schedule block could not be found.");
     }
 
+    void RemoveScheduleBlock(int index)
+    {
+        StartCoroutine(RemoveBlock(listedBlocks[index].transform));
+        listedBlocks.RemoveAt(index);
+        SortScheduleBlocks();
+    }
+
     // Sorts the schedule blocks in the list and re-orders them in game
     void SortScheduleBlocks()
     {
@@ -207,6 +236,7 @@ public class ScheduleUI : MonoBehaviour
             float currentY = Mathf.SmoothStep(initialY, desiredY, time);
             blockTransform.localPosition = new Vector3(0f, currentY);
             yield return null;
+            if (blockTransform == null) break;
         }
     }
 

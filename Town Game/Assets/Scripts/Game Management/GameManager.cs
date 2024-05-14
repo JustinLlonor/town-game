@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public Player campLeader;
     public Player[] cultists = new Player[] { };
     public float gameTime = 0f;
-    public int currentPeriod;
+    public float currentPeriod;
     public int currentDay = 0;
     public string[] days;
     int previousDay = -1;
@@ -196,7 +196,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         gameTime += Time.deltaTime;
         currentDay = Mathf.FloorToInt((gameTime + hourLength) / (hourLength * 24f));
-        currentPeriod = Mathf.FloorToInt(gameTime / hourLength);
+        currentPeriod = gameTime / hourLength;
     }
 
     /// <summary>
@@ -212,7 +212,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
         float timeAdd;
         int r = Mathf.FloorToInt(gameTime / (hourLength * 24f));
-        Vector2Int clockTime = PeriodToClockTime((currentPeriod - (r * 24)) + ((gameTime - (currentPeriod * hourLength)) / hourLength));
+        Vector2Int clockTime = PeriodToClockTime((Mathf.FloorToInt(currentPeriod) - (r * 24)) + ((gameTime - (Mathf.FloorToInt(currentPeriod) * hourLength)) / hourLength));
         //Debug.Log(clockTime);
 
         // Time add hours
