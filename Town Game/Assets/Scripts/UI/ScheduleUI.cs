@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using TMPro;
-using UnityEngine.Animations.Rigging;
-using Photon.Pun.Demo.Procedural;
 
 public class ScheduleUI : MonoBehaviour
 {
@@ -16,13 +14,14 @@ public class ScheduleUI : MonoBehaviour
     public Transform minimapTransform;
     public string emptyPeriod = "Free Time";
     float minimapY;
-    List<UIBlock> listedBlocks = new List<UIBlock>();
+    [SerializeField] List<UIBlock> listedBlocks = new List<UIBlock>();
     List<IEnumerator> sortRoutines = new List<IEnumerator>();
     IEnumerator mapRoutine = null;
     IEnumerator sequenceAdd = null;
     GameManager gm;
     ScheduleManager sm;
 
+    [System.Serializable]
     public class UIBlock
     {
         public ScheduleBlock block;
@@ -65,6 +64,7 @@ public class ScheduleUI : MonoBehaviour
         if (listedBlocks.Count == 0) return;
         if (BlockPassed(listedBlocks[0].block))
         {
+            Debug.Log("Removing");
             RemoveScheduleBlock(0);
         }
     }
@@ -90,7 +90,7 @@ public class ScheduleUI : MonoBehaviour
         // Add immutable blocks
         foreach (ScheduleBlock block in sm.immutableBlocks)
         {
-            if (BlockPassed(block)) continue;
+            if (BlockPassed(new ScheduleBlock(block.periodName, block.room, block.length, block.time + (gm.currentDay * 24)))) continue;
             ScheduleBlock nBlock = new ScheduleBlock(block.periodName, block.room, block.length, block.time + (gm.currentDay * 24));
             blocks.Add(nBlock);
         }
