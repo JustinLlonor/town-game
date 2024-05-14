@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using TMPro;
 using UnityEngine.Animations.Rigging;
+using Photon.Pun.Demo.Procedural;
 
 public class ScheduleUI : MonoBehaviour
 {
@@ -64,7 +65,6 @@ public class ScheduleUI : MonoBehaviour
         if (listedBlocks.Count == 0) return;
         if (BlockPassed(listedBlocks[0].block))
         {
-            Debug.Log("passed");
             RemoveScheduleBlock(0);
         }
     }
@@ -90,6 +90,7 @@ public class ScheduleUI : MonoBehaviour
         // Add immutable blocks
         foreach (ScheduleBlock block in sm.immutableBlocks)
         {
+            if (BlockPassed(block)) continue;
             ScheduleBlock nBlock = new ScheduleBlock(block.periodName, block.room, block.length, block.time + (gm.currentDay * 24));
             blocks.Add(nBlock);
         }
@@ -97,6 +98,7 @@ public class ScheduleUI : MonoBehaviour
         // Add mutable blocks
         foreach (ScheduleBlock block in sm.schedule)
         {
+            if (BlockPassed(block)) continue;
             if (block.time < minRange || block.time > maxRange) continue;
             blocks.Add(block);
         }
@@ -111,6 +113,7 @@ public class ScheduleUI : MonoBehaviour
             int nextI = i + 1;
             if (nextI >= blocksCheck.Count) break;
             if (blocksCheck[i].time + blocksCheck[i].length == blocksCheck[nextI].time) continue; // Continue if there is no space in between blocks
+            if (BlockPassed(new ScheduleBlock(emptyPeriod, "", blocksCheck[nextI].time - (blocksCheck[i].time + blocksCheck[i].length), blocksCheck[i].time + blocksCheck[i].length))) continue; // ... fuck you
             blocks.Add(new ScheduleBlock(emptyPeriod, "", blocksCheck[nextI].time - (blocksCheck[i].time + blocksCheck[i].length), blocksCheck[i].time + blocksCheck[i].length));
         }
 
