@@ -64,7 +64,6 @@ public class ScheduleUI : MonoBehaviour
         if (listedBlocks.Count == 0) return;
         if (BlockPassed(listedBlocks[0].block))
         {
-            Debug.Log("Removing");
             RemoveScheduleBlock(0);
         }
     }

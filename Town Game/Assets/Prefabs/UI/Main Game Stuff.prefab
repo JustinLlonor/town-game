@@ -59,7 +59,7 @@ MonoBehaviour:
   - Saturday
   - Sunday
   cultistAssignment: 0100000000010000000100000001000000010000
-  hourLength: 50
+  hourLength: 40
 --- !u!114 &3042919538494657000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -190,6 +190,7 @@ MonoBehaviour:
     room: Meeting Room
     length: 1
     time: 20
+  orderedBlocks: []
 --- !u!1 &5211516756420375758
 GameObject:
   m_ObjectHideFlags: 0

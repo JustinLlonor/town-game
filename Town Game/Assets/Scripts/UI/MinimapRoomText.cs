@@ -24,7 +24,7 @@ public class MinimapRoomText : MonoBehaviour
         trackedPM.OnEnterRoom += PlayRoomText;
     }
 
-    void PlayRoomText(Room room)
+    void PlayRoomText(MapRoom room)
     {
         text.text = room.roomName;
         animator.Play("RoomPopup", 0, 0f);

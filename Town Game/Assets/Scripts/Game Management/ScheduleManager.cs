@@ -14,7 +14,7 @@ public class ScheduleManager : MonoBehaviour
     public List<ScheduleBlock> immutableBlocks = new List<ScheduleBlock>();
     public List<ScheduleBlock> orderedBlocks = new List<ScheduleBlock>();
     PhotonView view;
-    ScheduleBlock currentBlock = null;
+    public ScheduleBlock currentBlock = null;
     ScheduleBlock previousBlock = null;
 
     public UpdateSchedule OnUpdateSchedule;

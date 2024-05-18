@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class RoomManager : MonoBehaviour
 {
-    public List<Room> playerRooms = new List<Room>();
+    public List<MapRoom> playerRooms = new List<MapRoom>();
 
     private void Awake()
     {
         foreach (Transform child in transform)
         {
-            if (child.GetComponent<Room>().isLivingQuarters)
+            if (child.GetComponent<MapRoom>().isLivingQuarters)
             {
-                playerRooms.Add(child.GetComponent<Room>());
+                playerRooms.Add(child.GetComponent<MapRoom>());
             }
         }
     }

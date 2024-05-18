@@ -5,13 +5,13 @@ using Photon.Pun;
 
 public class PlayerRoom : MonoBehaviour
 {
-    public Room currentRoom;
+    public MapRoom currentRoom;
     public LayerMask roomMask;
     public EnterRoom OnEnterRoom;
     public ExitRoom OnExitRoom;
 
-    public delegate void EnterRoom(Room room);
-    public delegate void ExitRoom(Room room);
+    public delegate void EnterRoom(MapRoom room);
+    public delegate void ExitRoom(MapRoom room);
 
     private void Awake()
     {
@@ -24,7 +24,7 @@ public class PlayerRoom : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.layer != Mathf.Log(roomMask.value, 2)) return;
-        Room enteredRoom = other.gameObject.GetComponent<Room>();
+        MapRoom enteredRoom = other.gameObject.GetComponent<MapRoom>();
         if (enteredRoom == currentRoom) return;
         if (enteredRoom == null)
         {
@@ -40,7 +40,7 @@ public class PlayerRoom : MonoBehaviour
     {
         if (other.gameObject.layer != Mathf.Log(roomMask.value, 2)) return;
         if (currentRoom == null) return;
-        Room exitedRoom = other.gameObject.GetComponent<Room>();
+        MapRoom exitedRoom = other.gameObject.GetComponent<MapRoom>();
         currentRoom = null;
         OnExitRoom?.Invoke(exitedRoom);
         Debug.Log("Exited room: " + exitedRoom.roomName);

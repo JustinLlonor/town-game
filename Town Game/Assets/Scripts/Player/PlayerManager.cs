@@ -20,6 +20,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     public CleanupMaster cm;
     public FirstPerson fps;
 
+    // Delegate for when the player gets spawned
     public InstantiatePlayer OnInstantiatePlayer;
     public delegate void InstantiatePlayer(GameObject player);
 
