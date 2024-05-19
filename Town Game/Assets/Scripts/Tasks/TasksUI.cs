@@ -12,7 +12,7 @@ public class TasksUI : MonoBehaviour
     public GameObject physTaskPrefab;
     public Transform taskHolder;
     // For persistent states like patrol
-    public Transform PersistentStates;
+    public Transform stateTaskHolder;
     PlayerRoom pr;
     PlayerManager pm;
     ScheduleManager sm;
@@ -95,7 +95,14 @@ public class TasksUI : MonoBehaviour
     // Gets task holder of the state and calls get tasks
     void GetStateTasks(string state)
     {
-
+        foreach (Transform child in stateTaskHolder)
+        {
+            if (child.name == state)
+            {
+                GetTasks(child.GetComponent<TaskHolder>());
+                return;
+            }
+        }
     }
 
     // Gets tasks of selected task holder
@@ -150,14 +157,15 @@ public class TasksUI : MonoBehaviour
         PhysTask pt = newTask.GetComponent<PhysTask>();
         pt.SetTask(taskName);
         pt.SetProgress(progression);
+        physTasks.Add(new PTask(newTask, taskName));
     }
 
     void ClearTrackedTasks()
     {
+        ClearUI();
         if (trackedTasks == null) return;
         trackedTasks.OnTasksUpdate -= UpdateTasks;
         trackedTasks = null;
-        ClearUI();
     }
 
     void RemoveTask(string taskName)

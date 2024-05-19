@@ -38,7 +38,7 @@ public class ScheduleManager : MonoBehaviour
 
     private void Start()
     {
-        view.RPC("AddScheduleBlock", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer, PhotonNetwork.LocalPlayer.CustomProperties["name"], "booty cheeks", 13f, 1f);
+        view.RPC("AddScheduleBlock", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer, "Patrol", "", 13f, 1f);
     }
 
     private void Update()

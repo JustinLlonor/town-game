@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7010651056177408524}
   - component: {fileID: 152492044153854666}
+  - component: {fileID: 9039635718404144118}
   m_Layer: 5
   m_Name: Task
   m_TagString: Untagged
@@ -27,7 +28,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1844453912911905724}
   m_Father: {fileID: 0}
@@ -51,6 +52,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   taskName: 
   taskText: {fileID: 8606215635140393655}
+--- !u!95 &9039635718404144118
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3201832406534039677}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 75bb7062c52da0c42854092806e87b46, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &9047691321476425062
 GameObject:
   m_ObjectHideFlags: 0
@@ -125,7 +147,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 838860799
   m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3

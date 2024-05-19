@@ -937,6 +937,55 @@ Transform:
   m_Children: []
   m_Father: {fileID: 458516675}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &585955852
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 585955853}
+  - component: {fileID: 585955854}
+  m_Layer: 0
+  m_Name: Patrol
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &585955853
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 585955852}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 794650667}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &585955854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 585955852}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de452253259a0eb4aa019398f4edffd2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tasks:
+  - name: Become Him
+    type: 0
+    progress: 0.25123432
+  assigned: 1
 --- !u!1 &612210992
 GameObject:
   m_ObjectHideFlags: 0
@@ -1330,6 +1379,38 @@ Transform:
   m_Children: []
   m_Father: {fileID: 458516675}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!1 &794650666
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 794650667}
+  m_Layer: 0
+  m_Name: State Task Holder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &794650667
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 794650666}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 585955853}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &831536740
 GameObject:
   m_ObjectHideFlags: 0
@@ -3142,7 +3223,7 @@ PrefabInstance:
       objectReference: {fileID: 2609252055704013381}
     - target: {fileID: 1676236008550905741, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: hourLength
-      value: 20
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3042919538494657000, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: sceneViewId
@@ -3159,6 +3240,10 @@ PrefabInstance:
     - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: schedule.Array.size
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: immutableBlocks.Array.size
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: schedule.Array.data[0].room
@@ -3179,6 +3264,38 @@ PrefabInstance:
     - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: immutableBlocks.Array.data[0].time
       value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: immutableBlocks.Array.data[4].room
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: immutableBlocks.Array.data[4].time
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: immutableBlocks.Array.data[5].room
+      value: Meeting Room
+      objectReference: {fileID: 0}
+    - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: immutableBlocks.Array.data[5].time
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: immutableBlocks.Array.data[4].length
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: immutableBlocks.Array.data[5].length
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: immutableBlocks.Array.data[4].periodName
+      value: Patrol
+      objectReference: {fileID: 0}
+    - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: immutableBlocks.Array.data[5].periodName
+      value: Roll Call
       objectReference: {fileID: 0}
     - target: {fileID: 8939135918072450520, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: sceneViewId
@@ -3742,6 +3859,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4082809394937657932, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+      propertyPath: stateTaskHolder
+      value: 
+      objectReference: {fileID: 794650667}
     - target: {fileID: 5427471237359597226, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_Name
       value: Nourishment
@@ -3798,9 +3919,21 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7830215502892666087, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 205
+      objectReference: {fileID: 0}
+    - target: {fileID: 7962656928823952477, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4278190079
+      objectReference: {fileID: 0}
     - target: {fileID: 8035800971491472685, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8073660576447154355, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8137187638069977019, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: sceneViewId
@@ -3961,8 +4094,8 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 110649284601070364}
+  - {fileID: 794650667}
   - {fileID: 1122534626}
-  - {fileID: 69527090}
   - {fileID: 4651078421021443356}
   - {fileID: 2609252055704013379}
   - {fileID: 9037834216012764288}
@@ -3973,3 +4106,4 @@ SceneRoots:
   - {fileID: 13267438}
   - {fileID: 1689146873}
   - {fileID: 458516675}
+  - {fileID: 69527090}

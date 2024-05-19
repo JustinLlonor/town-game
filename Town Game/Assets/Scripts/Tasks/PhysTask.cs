@@ -7,6 +7,7 @@ public class PhysTask : MonoBehaviour
 {
     public string taskName;
     public TextMeshProUGUI taskText;
+    public int percentCharacters = 4;
     float progress;
 
     public void SetTask(string name)
@@ -22,6 +23,11 @@ public class PhysTask : MonoBehaviour
 
     void UpdateText()
     {
-        taskText.text = $"{taskName} [{Mathf.RoundToInt(progress * 100f)}%]";
+        string newPercent = (progress * 100f).ToString();
+        if (newPercent.Length > percentCharacters)
+        {
+            newPercent = newPercent.Substring(0, percentCharacters);
+        }
+        taskText.text = $"{taskName} [{newPercent}%]";
     }
 }
