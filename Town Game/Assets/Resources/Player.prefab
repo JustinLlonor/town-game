@@ -655,10 +655,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: efc2677e6c533a4478fed0a1da7cd129, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testDmg: 10
+  testAffecter:
+    name: 
+    description: 
+    stat: 0
+    changeRate: 0
+    timeLeft: 0
+    isInfinite: 0
+  affecters: []
   maxHP: 100
   HP: 100
-  HPRegenSpeed: 1.5
+  HPRegenSpeed: 0
   maxNutrition: 100
   nutrition: 100
   maxSanity: 100

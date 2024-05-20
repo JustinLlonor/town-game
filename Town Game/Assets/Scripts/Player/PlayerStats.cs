@@ -2,13 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-using System;
+using System.Linq;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
 {
-    public float testDmg = 10f;
+    public List<StatAffecter> affecters = new List<StatAffecter>();
     [Header("HP")]
     public float maxHP = 100f;
     public float HP = 100f;
@@ -39,9 +39,12 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     public float softThreshold = 30f;
 
     public delegate void OnDamage(float damage);
-    public OnDamage onDamage;
+    public OnDamage OnTakeDamage;
     public delegate void Death();
     public Death OnDeath;
+    public delegate void AffecterChange(StatAffecter affecter);
+    public AffecterChange OnRemoveAffecter;
+    public AffecterChange OnAddAffecter;
 
     CameraShake shake;
     PhotonView view;
@@ -65,7 +68,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     {
         FixDmg();
         if (!view.IsMine) return;
-        //if (Input.GetKeyDown(KeyCode.B)) Damage(testDmg);
+        CheckAffecters();
         //if (Input.GetKeyDown(KeyCode.K)) Kill();
         if (staminaCooldown > 0f) staminaCooldown -= Time.deltaTime;
         if (staminaRegenCooldown > 0f) staminaRegenCooldown -= Time.deltaTime;
@@ -77,6 +80,67 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
         {
             RegenHP();
         }
+    }
+
+    // Stat affecters
+    public void AddAffector(StatAffecter affecter)
+    {
+        affecters.Add(new StatAffecter(affecter.name, affecter.description, affecter.stat, affecter.changeRate, affecter.timeLeft, affecter.isInfinite));
+        OnAddAffecter?.Invoke(affecter);
+    }
+
+    public void RemoveAffecter(string name)
+    {
+        for (int i = 0; i < affecters.Count; i++)
+        {
+            if (affecters[i].name == name)
+            {
+                affecters.RemoveAt(i);
+                break;
+            }
+        }
+    }
+
+    void CheckAffecters()
+    {
+        List<StatAffecter> destroyed = new List<StatAffecter>();
+        for (int i = 0; i < affecters.Count; i++)
+        {
+            if (affecters[i].timeLeft <= 0f && !affecters[i].isInfinite)
+            {
+                destroyed.Add(affecters[i]);
+                break;
+            }
+
+            StatAffecter affecter = affecters[i];
+            float changeAmount = affecter.changeRate * Time.deltaTime;
+
+            switch (affecter.stat)
+            {
+                // Changes the stat with change amount
+                case StatAffecter.Stat.Health:
+                    HP = Mathf.Clamp(HP + changeAmount, 0f, maxHP);
+                    CheckDeath();
+                    break;
+                case StatAffecter.Stat.Nutrition:
+                    nutrition = Mathf.Clamp(nutrition + changeAmount, 0f, maxNutrition);
+                    break;
+                case StatAffecter.Stat.Sanity:
+                    sanity = Mathf.Clamp(sanity + changeAmount, 0f, maxSanity);
+                    break;
+            }
+
+            if (!affecter.isInfinite)
+            {
+                affecter.timeLeft -= Time.deltaTime;
+                if (affecter.timeLeft <= 0f)
+                {
+                    destroyed.Add(affecters[i]);
+                }
+            }
+        }
+
+        foreach (StatAffecter i in destroyed) affecters.Remove(i);
     }
 
     // HP
@@ -97,11 +161,8 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     public void Damage(float amount, bool playShake = true)
     {
         HP -= amount;
-        onDamage?.Invoke(amount);
-        if (HP < 0f)
-        {
-            Kill();
-        }
+        OnTakeDamage?.Invoke(amount);
+        CheckDeath();
         view.RPC("DamageAnimation", RpcTarget.All);
         if (playShake)
         {
@@ -121,6 +182,14 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     {
         hWeight = hurtWeight;
         anim.SetLayerWeight(hLayer, hWeight);
+    }
+
+    void CheckDeath()
+    {
+        if (HP <= 0f)
+        {
+            Kill();
+        }
     }
 
     void FixDmg()

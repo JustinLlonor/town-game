@@ -321,6 +321,7 @@ public class PlayerInventory : MonoBehaviourPunCallbacks, IPunObservable
     public void DropItem(int itemIndex)
     {
         Item item = itemManager.itemSearch[hotbar[itemIndex]];
+        if (item == null) return;
         if (hotbar[equippedSlot].IsNullOrEmpty()) return;
         GameObject itemObj = PhotonNetwork.Instantiate(itemPrefab.name, mainCam.position, mainCam.rotation);
         itemObj.GetComponent<Interactable>().canInteract = false;
