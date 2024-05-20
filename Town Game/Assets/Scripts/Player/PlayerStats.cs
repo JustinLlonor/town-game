@@ -69,7 +69,6 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
         FixDmg();
         if (!view.IsMine) return;
         CheckAffecters();
-        //if (Input.GetKeyDown(KeyCode.K)) Kill();
         if (staminaCooldown > 0f) staminaCooldown -= Time.deltaTime;
         if (staminaRegenCooldown > 0f) staminaRegenCooldown -= Time.deltaTime;
         if (staminaCooldown <= regenCooldownPoint && canRegenStamina && pm.isGrounded && staminaRegenCooldown <= 0f)
