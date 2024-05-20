@@ -1,5 +1,80 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &909105690884809603
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5255915126956937011}
+  - component: {fileID: 2159381145370194995}
+  - component: {fileID: 3917822310390697997}
+  m_Layer: 5
+  m_Name: Bar
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &5255915126956937011
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 909105690884809603}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 7257442132450140352}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 338.7038, y: 72}
+  m_Pivot: {x: 0, y: 1}
+--- !u!222 &2159381145370194995
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 909105690884809603}
+  m_CullTransparentMesh: 1
+--- !u!114 &3917822310390697997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 909105690884809603}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.6509434, g: 0.6509434, b: 0.6509434, a: 0.15686275}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &1886270470794919216
 GameObject:
   m_ObjectHideFlags: 0
@@ -188,6 +263,7 @@ RectTransform:
   - {fileID: 6986871610460234346}
   - {fileID: 8171786869125860159}
   - {fileID: 6211863987333872089}
+  - {fileID: 5255915126956937011}
   m_Father: {fileID: 6800354167176690816}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
@@ -795,6 +871,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6800354167176690816}
   - component: {fileID: 2420819445192480773}
+  - component: {fileID: 7945284793839452276}
   m_Layer: 5
   m_Name: Affecter
   m_TagString: Untagged
@@ -819,8 +896,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.524111}
   m_AnchorMax: {x: 0.5, y: 0.524111}
-  m_AnchoredPosition: {x: 0, y: 0.107299805}
-  m_SizeDelta: {x: 100, y: 47.7855}
+  m_AnchoredPosition: {x: 62.394592, y: 0.107299805}
+  m_SizeDelta: {x: 224.7892, y: 47.7855}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2420819445192480773
 MonoBehaviour:
@@ -835,11 +912,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   outerBorder: {fileID: 7257442132450140352}
+  bar: {fileID: 5255915126956937011}
   titleText: {fileID: 3882536978179911302}
   descriptionText: {fileID: 296008536201678153}
   changeText: {fileID: 7099121516000315163}
   openedHeight: 0
   closedHeight: 0
+  decimalPlaces: 2
+  maxTime: 0
+  time: 0
+  timeAffected: 0
+--- !u!95 &7945284793839452276
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7656767782198765292}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: bba50721b35e2ba48ad050ad66c35d8b, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &9077238771903584250
 GameObject:
   m_ObjectHideFlags: 0

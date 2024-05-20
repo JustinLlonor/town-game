@@ -220,8 +220,12 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5939449488344646629, guid: e11b4f359f8ec4a43a915e109017ea6c, type: 3}
+      propertyPath: testAffecter.display
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5939449488344646629, guid: e11b4f359f8ec4a43a915e109017ea6c, type: 3}
       propertyPath: testAffecter.timeLeft
-      value: 5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 5939449488344646629, guid: e11b4f359f8ec4a43a915e109017ea6c, type: 3}
       propertyPath: testAffecter.changeRate
@@ -3264,19 +3268,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: schedule.Array.data[0].room
-      value: ttt
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: schedule.Array.data[0].time
-      value: 13
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: schedule.Array.data[0].length
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: schedule.Array.data[0].periodName
-      value: rararar
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: immutableBlocks.Array.data[0].time

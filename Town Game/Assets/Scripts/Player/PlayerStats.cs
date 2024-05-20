@@ -147,7 +147,10 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
             }
         }
 
-        foreach (StatAffecter i in destroyed) affecters.Remove(i);
+        foreach (StatAffecter i in destroyed)
+        {
+            RemoveAffecter(i.name);
+        }
     }
 
     // HP
@@ -291,11 +294,19 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
         {
             stream.SendNext(HP);
             stream.SendNext(maxHP);
+            stream.SendNext(nutrition);
+            stream.SendNext(maxNutrition);
+            stream.SendNext(sanity);
+            stream.SendNext(maxSanity);
         }
         else
         {
             HP = (float)stream.ReceiveNext();
             maxHP = (float)stream.ReceiveNext();
+            nutrition = (float)stream.ReceiveNext();
+            maxNutrition = (float)stream.ReceiveNext();
+            sanity = (float)stream.ReceiveNext();
+            maxSanity = (float)stream.ReceiveNext();
         }
     }
 }
