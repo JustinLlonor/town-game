@@ -49,7 +49,7 @@ public class AffecterHolder : MonoBehaviour
 
     void RemoveAffecter(StatAffecter affecter)
     {
-        Debug.Log("removing...");
+        if (!affecters.ContainsKey(affecter.name)) return;
         Destroy(affecters[affecter.name]);
         affecters.Remove(affecter.name);
         OrganizeAffecters();
