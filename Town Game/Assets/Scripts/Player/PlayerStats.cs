@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 
 public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
 {
+    public StatAffecter testAffecter;
     public List<StatAffecter> affecters = new List<StatAffecter>();
     [Header("HP")]
     public float maxHP = 100f;
@@ -68,6 +69,10 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     {
         FixDmg();
         if (!view.IsMine) return;
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            AddAffector(testAffecter);
+        }
         CheckAffecters();
         if (staminaCooldown > 0f) staminaCooldown -= Time.deltaTime;
         if (staminaRegenCooldown > 0f) staminaRegenCooldown -= Time.deltaTime;
@@ -84,7 +89,9 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     // Stat affecters
     public void AddAffector(StatAffecter affecter)
     {
-        affecters.Add(new StatAffecter(affecter.name, affecter.description, affecter.stat, affecter.changeRate, affecter.timeLeft, affecter.isInfinite));
+        StatAffecter foundAffecter = affecters.FirstOrDefault(i => i.name == affecter.name);
+        if (foundAffecter != null) return;
+        affecters.Add(new StatAffecter(affecter.name, affecter.description, affecter.stat, affecter.changeRate, affecter.timeLeft, affecter.isInfinite, affecter.display));
         OnAddAffecter?.Invoke(affecter);
     }
 
@@ -94,6 +101,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
         {
             if (affecters[i].name == name)
             {
+                OnRemoveAffecter?.Invoke(affecters[i]);
                 affecters.RemoveAt(i);
                 break;
             }

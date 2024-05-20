@@ -22,15 +22,16 @@ public class StatAffecter
     /// If the affecter lasts forever
     /// </summary>
     public bool isInfinite = false;
+    public bool display = true;
 
     public enum Stat
     {
-        Health,
-        Nutrition,
-        Sanity,
+        Health = 0,
+        Nutrition = 1,
+        Sanity = 2,
     }
 
-    public StatAffecter(string name, string description, Stat stat, float changeRate, float timeLeft, bool isInfinite = false)
+    public StatAffecter(string name, string description, Stat stat, float changeRate, float timeLeft, bool isInfinite = false, bool display = false)
     {
         this.name = name;
         this.description = description;
@@ -38,5 +39,6 @@ public class StatAffecter
         this.changeRate = changeRate;
         this.timeLeft = timeLeft;
         this.isInfinite = isInfinite;
+        this.display = display; 
     }
 }

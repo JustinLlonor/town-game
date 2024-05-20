@@ -48,8 +48,8 @@ public class TabSchedule : MonoBehaviour
     // Shows the schedule a day before
     public void ScrollBackward()
     {
+        if (readDay == 0) return;
         readDay--;
-        if (readDay < 0) readDay = 0;
         if (selectedPlayer != null) DisplaySchedule(selectedPlayer);
     }
 
