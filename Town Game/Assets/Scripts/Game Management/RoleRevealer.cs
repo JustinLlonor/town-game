@@ -30,7 +30,7 @@ public class RoleRevealer : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.J))
         {
-            RevealRole(true);
+            //RevealRole(false);
         }
     }
 
