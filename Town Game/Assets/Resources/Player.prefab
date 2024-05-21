@@ -655,15 +655,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: efc2677e6c533a4478fed0a1da7cd129, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testAffecter:
-    name: 
-    description: 
-    stat: 0
-    changeRate: 0
-    timeLeft: 0
-    isInfinite: 0
-    display: 0
-  affecters: []
   maxHP: 100
   HP: 100
   HPRegenSpeed: 0
@@ -686,6 +677,15 @@ MonoBehaviour:
   softHurt: {fileID: 11400000, guid: cbc5a66a3213cb34bbe1176d19a7783c, type: 2}
   hardHurt: {fileID: 11400000, guid: 3fc67d1eeeed61441a173c72eecb98fc, type: 2}
   softThreshold: 30
+  hungerAffecter:
+    name: Hunger
+    description: Default Hunger Effect
+    stat: 1
+    changeRate: -0.2140816
+    timeLeft: 0
+    isInfinite: 1
+    display: 0
+  affecters: []
   anim: {fileID: 5001893267009733704}
 --- !u!114 &1106844264840172896
 MonoBehaviour:

@@ -137,7 +137,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 553772930366547643, guid: e11b4f359f8ec4a43a915e109017ea6c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 948635299029419552, guid: e11b4f359f8ec4a43a915e109017ea6c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3242,10 +3242,6 @@ PrefabInstance:
       propertyPath: bs
       value: 
       objectReference: {fileID: 2609252055704013381}
-    - target: {fileID: 1676236008550905741, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: hourLength
-      value: 5
-      objectReference: {fileID: 0}
     - target: {fileID: 3042919538494657000, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: sceneViewId
       value: 6
@@ -3257,14 +3253,6 @@ PrefabInstance:
     - target: {fileID: 5211516756420375758, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: m_IsActive
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: schedule.Array.size
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: immutableBlocks.Array.size
-      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: schedule.Array.data[0].room
@@ -3281,10 +3269,6 @@ PrefabInstance:
     - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: schedule.Array.data[0].periodName
       value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: immutableBlocks.Array.data[0].time
-      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 5478285723541767041, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: immutableBlocks.Array.data[4].room
@@ -3952,10 +3936,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Minimap Panel
       objectReference: {fileID: 0}
-    - target: {fileID: 2407588403785813219, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -26
-      objectReference: {fileID: 0}
     - target: {fileID: 2449438994026627246, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -4063,6 +4043,14 @@ PrefabInstance:
     - target: {fileID: 3741396257336311424, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4047875126582678638, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 24.199951
+      objectReference: {fileID: 0}
+    - target: {fileID: 4047875126582678638, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 84.69995
       objectReference: {fileID: 0}
     - target: {fileID: 4082809394937657932, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: stateTaskHolder

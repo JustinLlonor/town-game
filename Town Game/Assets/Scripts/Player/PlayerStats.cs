@@ -8,8 +8,6 @@ using UnityEngine.SceneManagement;
 
 public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
 {
-    public StatAffecter testAffecter;
-    public List<StatAffecter> affecters = new List<StatAffecter>();
     [Header("HP")]
     public float maxHP = 100f;
     public float HP = 100f;
@@ -38,6 +36,9 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     public Shake softHurt;
     public Shake hardHurt;
     public float softThreshold = 30f;
+    [Header("Affecter Stuff")]
+    public StatAffecter hungerAffecter;
+    public List<StatAffecter> affecters = new List<StatAffecter>();
 
     public delegate void OnDamage(float damage);
     public OnDamage OnTakeDamage;
@@ -63,16 +64,13 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
         pe = gameObject.GetComponent<PlayerEvidence>();
         if (!view.IsMine) return;
         shake = FindObjectOfType<CameraShake>();
+        AddAffector(hungerAffecter);
     }
 
     private void Update()
     {
         FixDmg();
         if (!view.IsMine) return;
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            AddAffector(testAffecter);
-        }
         CheckAffecters();
         if (staminaCooldown > 0f) staminaCooldown -= Time.deltaTime;
         if (staminaRegenCooldown > 0f) staminaRegenCooldown -= Time.deltaTime;
