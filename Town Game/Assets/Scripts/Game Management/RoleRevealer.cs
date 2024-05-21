@@ -15,6 +15,9 @@ public class RoleRevealer : MonoBehaviour
     RoleText rtxt;
     BlackScreen bs;
 
+    public GetRole OnGetRole;
+    public delegate void GetRole(bool isCultist);
+
     private void Awake()
     {
         cm = FindObjectOfType<CameraManager>();
@@ -39,7 +42,7 @@ public class RoleRevealer : MonoBehaviour
 
     public void RevealRole(bool isCultist)
     {
-        Debug.Log("playing sequence");
+        OnGetRole?.Invoke(isCultist);
         GameObject camPrefab = Instantiate(camTPrefab);
         camPrefab.transform.position = playerTransform.position;
         camPrefab.transform.rotation = playerTransform.rotation;
