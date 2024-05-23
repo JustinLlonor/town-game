@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using Photon.Pun;
 
 public class PlayerInfoUI : MonoBehaviour
 {
@@ -11,10 +12,13 @@ public class PlayerInfoUI : MonoBehaviour
     public RawImage[] folderImages = new RawImage[] { };
     public Color cultistColor;
     public Color researcherColor;
+    GameManager gm;
 
     private void Awake()
     {
+        gm = FindObjectOfType<GameManager>();
         FindObjectOfType<RoleRevealer>().OnGetRole += SetRole;
+        gm.OnUpdatePositions += OnUpdatePositions;
     }
 
     void SetRole(bool isCultist)
@@ -43,5 +47,16 @@ public class PlayerInfoUI : MonoBehaviour
     {
         TextMeshProUGUI lineText = lineHolder.GetChild(line).GetComponentInChildren<TextMeshProUGUI>();
         lineText.text = text;
+    }
+
+    void OnUpdatePositions()
+    {
+        string currentName = (string)PhotonNetwork.LocalPlayer.CustomProperties["name"];
+        if (gm.playerPositions.ContainsKey(currentName))
+        {
+            int currentPosition = (int)gm.playerPositions[currentName];
+            string newText = $"Position: {gm.positions[currentPosition]}";
+            SetLineText(0, newText);
+        }
     }
 }

@@ -6,23 +6,27 @@ using Photon.Realtime;
 using System.Linq;
 using TMPro;
 using Steamworks;
+using UnityEditor.ShaderGraph.Internal;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 {
     // gamePhase 0 = initialize game/assign roles 1 = main game 2 = results screen
     public int gamePhase = 0;
     [Header("Game Variables")]
-    public Player campLeader;
+    //public Player campLeader;
     public Player[] cultists = new Player[] { };
+    public Dictionary<string, Position> playerPositions = new Dictionary<string, Position>();
     public float gameTime = 0f;
     public float currentPeriod;
     public int currentDay = 0;
-    public string[] days;
     int previousDay = -1;
     [Header("Game Settings")]
     // When an index of this is true, a cultist is added when the players playing is equal to that number.
     public bool[] cultistAssignment = new bool[] { };
     public float hourLength = 60f;
+    [Header("Constants")]
+    public string[] days;
+    public string[] positions;
     PhotonView view;
     RoleRevealer rv;
     RoomManager rm;
@@ -31,9 +35,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public TimeChange OnTimeChange;
     public RevealRoles OnRevealRoles;
     public ChangeDay OnChangeDay;
+    public UpdatePositions OnUpdatePositions;
     public delegate void TimeChange();
     public delegate void RevealRoles(bool isCultist);
     public delegate void ChangeDay();
+    public delegate void UpdatePositions();
+
+    public enum Position
+    {
+        Habitant = 0,
+        Guard = 1,
+        Leader = 2,
+    }
 
     // Open when need new variable to synchronize
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -63,7 +76,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     private void Start()
     {
-        if (PhotonNetwork.IsMasterClient) AssignRooms();
+        if (PhotonNetwork.IsMasterClient)
+        {
+            AssignRooms();
+            InitiatePositions();
+        }
     }
     
     private void Update()
@@ -131,6 +148,30 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             pProperties["room"] = roomAssignment[i];
             PhotonNetwork.PlayerList[i].SetCustomProperties(pProperties);
         }
+    }
+
+    // Initiates the positions for every player in the lobby, gets removed on death
+    void InitiatePositions()
+    {
+        foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
+        {
+            view.RPC("CreatePositionToken", RpcTarget.AllBuffered, player.CustomProperties["name"], (int)Position.Habitant);
+        }
+    }
+
+    [PunRPC]
+    public void CreatePositionToken(string player, int position)
+    {
+        playerPositions.Add(player, (Position)position);
+        OnUpdatePositions?.Invoke();
+    }
+
+    [PunRPC]
+    public void RemovePositionToken(string player)
+    {
+        if (!playerPositions.ContainsKey(player)) return;
+        playerPositions.Remove(player);
+        OnUpdatePositions?.Invoke();
     }
 
     void AssignRoles()
@@ -271,5 +312,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
         if (day > days.Length-1) day = day - (Mathf.FloorToInt(day / days.Length) * days.Length);
         return days[day];
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        string name = (string)otherPlayer.CustomProperties["name"];
+        if (name == null) return;
+        if (!PhotonNetwork.IsMasterClient) return;
+        view.RPC("RemovePositionToken", RpcTarget.AllBuffered, name);
     }
 }

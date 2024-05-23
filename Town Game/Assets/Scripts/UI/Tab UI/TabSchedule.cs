@@ -28,7 +28,6 @@ public class TabSchedule : MonoBehaviour
 
     private void Start()
     {
-        Debug.Log(blockHolder.GetComponent<RectTransform>().sizeDelta.y);
         List<ScheduleBlock> sortedBlocks = sm.immutableBlocks.OrderBy(o => o.time).ToList();
         hourHeight = blockHolder.GetComponent<RectTransform>().sizeDelta.y / (sortedBlocks[sm.immutableBlocks.Count - 1].time - sortedBlocks[0].time + 1);
     }

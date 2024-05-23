@@ -50,6 +50,8 @@ MonoBehaviour:
   gameTime: 0
   currentPeriod: 0
   currentDay: 0
+  cultistAssignment: 0100000000010000000100000001000000010000
+  hourLength: 26
   days:
   - Monday
   - Tuesday
@@ -58,8 +60,10 @@ MonoBehaviour:
   - Friday
   - Saturday
   - Sunday
-  cultistAssignment: 0100000000010000000100000001000000010000
-  hourLength: 32
+  positions:
+  - Civilian
+  - Guard
+  - Mayor
 --- !u!114 &3042919538494657000
 MonoBehaviour:
   m_ObjectHideFlags: 0

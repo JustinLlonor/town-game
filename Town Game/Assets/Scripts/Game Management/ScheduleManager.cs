@@ -12,7 +12,7 @@ public class ScheduleManager : MonoBehaviour
     // this client's schedule
     public List<ScheduleBlock> schedule;
     public List<ScheduleBlock> immutableBlocks = new List<ScheduleBlock>();
-    public List<ScheduleBlock> orderedBlocks = new List<ScheduleBlock>();
+    [HideInInspector] public List<ScheduleBlock> orderedBlocks = new List<ScheduleBlock>();
     PhotonView view;
     public ScheduleBlock currentBlock = null;
     ScheduleBlock previousBlock = null;
