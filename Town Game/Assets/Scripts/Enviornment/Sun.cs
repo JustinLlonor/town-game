@@ -13,6 +13,7 @@ public class Sun : MonoBehaviour
     public float showAngle;
     public float maxBrightness;
     public AnimationCurve brightnessCurve;
+    public Gradient sunsetGradient;
     GameManager gm;
 
     private void Awake()
@@ -39,7 +40,10 @@ public class Sun : MonoBehaviour
         if (newAngle > showAngle) lightSource.enabled = true;
 
         // Brightness
-        float newBrightness = maxBrightness * brightnessCurve.Evaluate(sunTransform.eulerAngles.x / (hideAngle - showAngle));
+        float progress = sunTransform.eulerAngles.x / (hideAngle - showAngle);
+        Debug.Log(progress);
+        float newBrightness = maxBrightness * brightnessCurve.Evaluate(progress);
         lightSource.intensity = newBrightness;
+        lightSource.color = sunsetGradient.Evaluate(brightnessCurve.Evaluate(progress));
     }
 }

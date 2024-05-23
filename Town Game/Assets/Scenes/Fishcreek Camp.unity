@@ -3137,7 +3137,7 @@ PrefabInstance:
       objectReference: {fileID: 2609252055704013381}
     - target: {fileID: 1676236008550905741, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: hourLength
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3042919538494657000, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: sceneViewId
@@ -3221,6 +3221,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 458516675}
     m_Modifications:
+    - target: {fileID: 1683937215031459764, guid: c119e8885b36ec9428d108b802b255bb, type: 3}
+      propertyPath: normalColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1683937215031459764, guid: c119e8885b36ec9428d108b802b255bb, type: 3}
+      propertyPath: normalColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1683937215031459764, guid: c119e8885b36ec9428d108b802b255bb, type: 3}
+      propertyPath: normalColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1683937215031459764, guid: c119e8885b36ec9428d108b802b255bb, type: 3}
+      propertyPath: normalColor.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5588425201285211117, guid: c119e8885b36ec9428d108b802b255bb, type: 3}
       propertyPath: m_Name
       value: Sun Holder
