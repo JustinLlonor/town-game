@@ -99,7 +99,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         playerProperties["name"] = CreateNewNickname();
         playerProperties["room"] = -1;
         playerProperties["confirmedDead"] = false;
-        Debug.Log((string)playerProperties["name"]);
+        playerProperties["money"] = 0;
         PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
     }
 

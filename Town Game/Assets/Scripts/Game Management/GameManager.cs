@@ -6,7 +6,6 @@ using Photon.Realtime;
 using System.Linq;
 using TMPro;
 using Steamworks;
-using UnityEditor.ShaderGraph.Internal;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -24,6 +23,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     // When an index of this is true, a cultist is added when the players playing is equal to that number.
     public bool[] cultistAssignment = new bool[] { };
     public float hourLength = 60f;
+    public int startCurrency = 100;
     [Header("Constants")]
     public string[] days;
     public string[] positions;
@@ -80,6 +80,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         {
             AssignRooms();
             InitiatePositions();
+            SetCurrency();
         }
     }
     
@@ -156,6 +157,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
         {
             view.RPC("CreatePositionToken", RpcTarget.AllBuffered, player.CustomProperties["name"], (int)Position.Habitant);
+        }
+    }
+
+    void SetCurrency()
+    {
+        foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
+        {
+            ExitGames.Client.Photon.Hashtable properties = player.CustomProperties;
+            properties["money"] = 100;
+            player.SetCustomProperties(properties);
         }
     }
 
