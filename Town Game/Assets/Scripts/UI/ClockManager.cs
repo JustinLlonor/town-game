@@ -32,7 +32,7 @@ public class ClockManager : MonoBehaviour
     void UpdateTime()
     {
         // number from 0 to 1 of the day's progress
-        float dayProgress = (gm.gameTime - gm.hourLength * 24f * gm.currentDay) / (gm.hourLength * 24f);
+        float dayProgress = gm.GetDayProgress();
         //float dayProgress = (gm.currentPeriod - (gm.currentDay * 24f)) / 24f;
         int hour = Mathf.FloorToInt(dayProgress * 24) + 1;
         // number from 0 to 1 of the minute percentage

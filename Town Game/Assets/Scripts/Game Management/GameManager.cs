@@ -325,6 +325,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         return days[day];
     }
 
+    public float GetDayProgress()
+    {
+        return (gameTime - hourLength * 24f * currentDay) / (hourLength * 24f);
+    }
+
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
         string name = (string)otherPlayer.CustomProperties["name"];

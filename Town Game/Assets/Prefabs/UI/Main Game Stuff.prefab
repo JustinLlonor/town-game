@@ -52,6 +52,7 @@ MonoBehaviour:
   currentDay: 0
   cultistAssignment: 0100000000010000000100000001000000010000
   hourLength: 26
+  startCurrency: 100
   days:
   - Monday
   - Tuesday
@@ -180,20 +181,20 @@ MonoBehaviour:
   immutableBlocks:
   - periodName: Roll Call
     room: Meeting Room
-    length: 1
+    length: 1.5
     time: 7
   - periodName: Brunch
     room: Cafeteria
-    length: 1
-    time: 8
+    length: 3
+    time: 8.5
   - periodName: Dinner
     room: Cafeteria
-    length: 1
-    time: 19
+    length: 3
+    time: 16.5
   - periodName: Roll Call
     room: Meeting Room
-    length: 1
-    time: 20
+    length: 1.5
+    time: 19.5
   orderedBlocks: []
   currentBlock:
     periodName: 
