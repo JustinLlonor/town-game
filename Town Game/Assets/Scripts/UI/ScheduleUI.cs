@@ -252,8 +252,9 @@ public class ScheduleUI : MonoBehaviour
             float currentY = Mathf.SmoothStep(initialY, blockDistance, time);
             blockTransform.localPosition = new Vector3(0f, currentY);
             yield return null;
+            if (blockTransform == null) break;
         }
-        Destroy(blockTransform.gameObject);
+        if (blockTransform != null) Destroy(blockTransform.gameObject);
     }
 
     IEnumerator SetMinimapPosition()

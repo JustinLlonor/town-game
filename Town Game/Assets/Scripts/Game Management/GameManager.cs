@@ -9,6 +9,7 @@ using Steamworks;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 {
+    public Vector2Int testTime;
     // gamePhase 0 = initialize game/assign roles 1 = main game 2 = results screen
     public int gamePhase = 0;
     [Header("Game Variables")]
@@ -24,6 +25,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public bool[] cultistAssignment = new bool[] { };
     public float hourLength = 60f;
     public int startCurrency = 100;
+    [Header("Day/Night Cycle")]
+    public float timeSkipPeriod = 4.5f;
+    public float dayStartPeriod = 7.5f;
     [Header("Constants")]
     public string[] days;
     public string[] positions;
@@ -90,6 +94,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         UpdateGameTime();
         CheckDay();
         PhaseProperties();
+        if ((Input.GetKeyDown(KeyCode.Backspace))) SetTime(testTime.x, testTime.y);
     }
 
     void CheckDay()

@@ -41,7 +41,6 @@ public class Sun : MonoBehaviour
 
         // Brightness
         float progress = sunTransform.eulerAngles.x / (hideAngle - showAngle);
-        Debug.Log(progress);
         float newBrightness = maxBrightness * brightnessCurve.Evaluate(progress);
         lightSource.intensity = newBrightness;
         lightSource.color = sunsetGradient.Evaluate(brightnessCurve.Evaluate(progress));
