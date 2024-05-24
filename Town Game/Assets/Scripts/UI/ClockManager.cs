@@ -38,16 +38,23 @@ public class ClockManager : MonoBehaviour
         float dayProgress = gm.GetDayProgress();
         //float dayProgress = (gm.currentPeriod - (gm.currentDay * 24f)) / 24f;
         int hour = Mathf.FloorToInt(dayProgress * 24) + 1;
+        Debug.Log(hour);
         // number from 0 to 1 of the minute percentage
         float minuteProgress = dayProgress * 24 - hour + 1;
         int minute = Mathf.FloorToInt(minuteProgress * 60f);
         string minDisplay = minute.ToString();
+        if (prevHour !=  hour)
+        {
+            prevHour = hour;
+            minuteRandom = 0;
+        }
         if (minute >= minuteRandom)
         {
             minute = Mathf.FloorToInt(minuteProgress * 60f);
             prevMin = minute;
             minuteRandom = minute + Random.Range(minuteRandomMin, minuteRandomMax);
-        } else
+        } 
+        else
         {
             minDisplay = prevMin.ToString();
         }
