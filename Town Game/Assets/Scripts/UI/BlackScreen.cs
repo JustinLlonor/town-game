@@ -9,10 +9,21 @@ public class BlackScreen : MonoBehaviour
     Image img;
     public TextMeshProUGUI[] texts;
     public GameObject roleStuff;
+    public GameObject cover;
 
     private void Awake()
     {
         img = gameObject.GetComponent<Image>();
+    }
+
+    public void ShowCover()
+    {
+        cover.SetActive(true);
+    }
+
+    public void HideCover()
+    {
+        cover.SetActive(false);
     }
 
     public void HideTexts()

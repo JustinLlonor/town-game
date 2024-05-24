@@ -22,7 +22,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 
     // Delegate for when the player gets spawned
     public InstantiatePlayer OnInstantiatePlayer;
+    public PlayerEvent OnTeleportPlayer;
     public delegate void InstantiatePlayer(GameObject player);
+    public delegate void PlayerEvent();
 
     [System.Serializable]
     public class PlayerSettings
@@ -62,5 +64,6 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         rb.rotation = rotation;
         cm.yRotation = rotation.eulerAngles.y;
         cm.xRotation = rotation.eulerAngles.x;
+        OnTeleportPlayer?.Invoke();
     }
 }

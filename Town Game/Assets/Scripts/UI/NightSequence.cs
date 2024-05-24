@@ -42,6 +42,7 @@ public class NightSequence : MonoBehaviour
     IEnumerator Sequence()
     {
         nightText.text = "Night " + (gm.currentDay + 1);
+        SetCultistText();
         bs.StartAlphaTransition(1f, 2.5f);
         yield return new WaitForSeconds(3f);
         newNightUI.SetActive(true);
@@ -51,5 +52,15 @@ public class NightSequence : MonoBehaviour
         bs.StartAlphaTransition(0f, 2.5f);
         yield return new WaitForSeconds(4.1f);
         newNightUI.SetActive(false);
+    }
+
+    void SetCultistText()
+    {
+        if (gm.cultists.Length == 1)
+        {
+            cultistText.text = gm.cultists.Length + " cultist remains.";
+            return;
+        }
+        cultistText.text = gm.cultists.Length + " cultists remain.";
     }
 }

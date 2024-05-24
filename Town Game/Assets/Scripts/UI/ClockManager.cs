@@ -38,7 +38,6 @@ public class ClockManager : MonoBehaviour
         float dayProgress = gm.GetDayProgress();
         //float dayProgress = (gm.currentPeriod - (gm.currentDay * 24f)) / 24f;
         int hour = Mathf.FloorToInt(dayProgress * 24) + 1;
-        Debug.Log(hour);
         // number from 0 to 1 of the minute percentage
         float minuteProgress = dayProgress * 24 - hour + 1;
         int minute = Mathf.FloorToInt(minuteProgress * 60f);

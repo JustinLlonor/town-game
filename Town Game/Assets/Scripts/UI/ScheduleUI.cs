@@ -39,7 +39,6 @@ public class ScheduleUI : MonoBehaviour
         sm = FindObjectOfType<ScheduleManager>();
         gm = FindObjectOfType<GameManager>();
         minimapY = minimapTransform.localPosition.y;
-        gm.OnChangeDay += ReadSchedule;
     }
 
     private void Start()
@@ -49,7 +48,13 @@ public class ScheduleUI : MonoBehaviour
 
     private void OnEnable()
     {
+        gm.OnChangeDay += ReadSchedule;
         ReadSchedule();
+    }
+
+    private void OnDisable()
+    {
+        gm.OnChangeDay -= ReadSchedule;
     }
 
     private void Update()

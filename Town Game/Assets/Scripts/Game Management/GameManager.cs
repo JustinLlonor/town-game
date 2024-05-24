@@ -88,13 +88,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             SetCurrency();
         }
     }
-    
+
     private void Update()
     {
+        CheckDay();
+        UpdateGameTime();
         if (!PhotonNetwork.IsMasterClient) return;
         if (Input.GetKeyDown(KeyCode.Backspace)) SetTime(testTime.x, testTime.y);
-        UpdateGameTime();
-        CheckDay();
+        if (Input.GetKeyDown(KeyCode.P)) Debug.Log(cultists.Length);
         PhaseProperties();
         CheckNightSkip();
     }
@@ -372,5 +373,21 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         if (name == null) return;
         if (!PhotonNetwork.IsMasterClient) return;
         view.RPC("RemovePositionToken", RpcTarget.AllBuffered, name);
+        if (cultists.Contains(otherPlayer))
+        {
+            List<Player> newCultists = cultists.ToList();
+            newCultists.Remove(otherPlayer);
+            cultists = newCultists.ToArray();
+            CheckWinCondition();
+        }
+    }
+
+    public void  CheckWinCondition()
+    {
+        if (cultists.Length == 0)
+        {
+            // Inno win condition
+            Debug.LogError("Innos win!");
+        }
     }
 }

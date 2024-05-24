@@ -8,6 +8,12 @@ public class RoleText : MonoBehaviour
     public TextMeshProUGUI roleText;
     public TextMeshProUGUI cursorText;
 
+    public void SetFontSize(float size)
+    {
+        roleText.fontSize = size;
+        cursorText.fontSize = size;
+    }
+
     public void StartTextRoll(string text, Color color, float duration, float wait)
     {
         StartCoroutine(RollText(text, color, duration, wait));

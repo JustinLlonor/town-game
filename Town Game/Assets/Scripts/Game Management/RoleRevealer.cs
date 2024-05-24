@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,6 +24,7 @@ public class RoleRevealer : MonoBehaviour
         cm = FindObjectOfType<CameraManager>();
         bs = FindObjectOfType<BlackScreen>();
         rtxt = FindObjectOfType<RoleText>();;
+        if (PhotonNetwork.CurrentRoom != null) bs.ShowCover();
         FindObjectOfType<PlayerManager>().OnInstantiatePlayer += GetReferences;
     }
     
@@ -30,7 +32,7 @@ public class RoleRevealer : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.J))
         {
-            //RevealRole(false);
+            RevealRole(false);
         }
     }
 
@@ -43,6 +45,14 @@ public class RoleRevealer : MonoBehaviour
     public void RevealRole(bool isCultist)
     {
         OnGetRole?.Invoke(isCultist);
+        StartCoroutine(StartReveal(isCultist));
+    }
+
+    // make wait for other players later
+    IEnumerator StartReveal(bool isCultist)
+    {
+        yield return new WaitForSeconds(1f);
+        bs.HideCover();
         GameObject camPrefab = Instantiate(camTPrefab);
         camPrefab.transform.position = playerTransform.position;
         camPrefab.transform.rotation = playerTransform.rotation;
@@ -58,8 +68,10 @@ public class RoleRevealer : MonoBehaviour
         if (isCultist)
         {
             rtxt.StartTextRoll("Cultist", cultistColor, 1f, 1f);
-        } else
+        }
+        else
         {
+            rtxt.SetFontSize(60);
             rtxt.StartTextRoll("Researcher", innoColor, 1f, 1f);
         }
     }
