@@ -8,10 +8,19 @@ public class BlackScreen : MonoBehaviour
 {
     Image img;
     public TextMeshProUGUI[] texts;
+    public GameObject roleStuff;
 
     private void Awake()
     {
         img = gameObject.GetComponent<Image>();
+    }
+
+    public void HideTexts()
+    {
+        foreach (var t in texts)
+        {
+            t.enabled = false;
+        }
     }
 
     public void SetAlpha(float alpha)

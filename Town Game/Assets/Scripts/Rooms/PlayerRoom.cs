@@ -45,5 +45,4 @@ public class PlayerRoom : MonoBehaviour
         OnExitRoom?.Invoke(exitedRoom);
         Debug.Log("Exited room: " + exitedRoom.roomName);
     }
-
 }

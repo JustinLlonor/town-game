@@ -9,6 +9,7 @@ public class ClockManager : MonoBehaviour
     public int minuteRandomMax = 10;
     public int minuteRandomMin = 1;
     GameManager gm;
+    ScheduleManager sm;
     int minuteRandom;
     int prevMin;
     int prevHour = -1;
@@ -16,11 +17,13 @@ public class ClockManager : MonoBehaviour
     private void Awake()
     {
         gm = FindObjectOfType<GameManager>();
+        sm = FindObjectOfType<ScheduleManager>();
     }
 
     private void Start()
     {
         gm.OnTimeChange += ResetMinuteRandom;
+        sm.OnBlockChange += ResetMinuteBlockChange;
     }
 
     private void Update()
@@ -49,11 +52,6 @@ public class ClockManager : MonoBehaviour
             minDisplay = prevMin.ToString();
         }
         if (minDisplay.Length == 1) minDisplay = "0" + minDisplay;
-        if (prevHour != hour)
-        {
-            prevHour = hour;
-            minuteRandom = 0;
-        }
         if (hour == 0) hour = 24;
         string meridiem = "AM";
         if (hour > 11 && hour != 24) meridiem = "PM";
@@ -63,6 +61,11 @@ public class ClockManager : MonoBehaviour
     }
 
     void ResetMinuteRandom()
+    {
+        minuteRandom = 0;
+    }
+
+    void ResetMinuteBlockChange(ScheduleBlock from, ScheduleBlock to)
     {
         minuteRandom = 0;
     }

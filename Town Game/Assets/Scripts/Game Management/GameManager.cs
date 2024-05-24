@@ -26,7 +26,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public float hourLength = 60f;
     public int startCurrency = 100;
     [Header("Day/Night Cycle")]
-    public float timeSkipPeriod = 4.5f;
+    public float timeSkipPeriod = 21f;
+    public float timeSkippedPeriod = 4.5f;
     public float dayStartPeriod = 7.5f;
     [Header("Constants")]
     public string[] days;
@@ -35,15 +36,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     RoleRevealer rv;
     RoomManager rm;
     PlayerManager pm;
+    bool skippedNight = false;
 
-    public TimeChange OnTimeChange;
+    public GameEvent OnTimeChange;
     public RevealRoles OnRevealRoles;
-    public ChangeDay OnChangeDay;
-    public UpdatePositions OnUpdatePositions;
-    public delegate void TimeChange();
+    public GameEvent OnChangeDay;
+    public GameEvent OnUpdatePositions;
+    public GameEvent OnNightSkip;
+    public delegate void GameEvent();
     public delegate void RevealRoles(bool isCultist);
-    public delegate void ChangeDay();
-    public delegate void UpdatePositions();
 
     public enum Position
     {
@@ -91,10 +92,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     private void Update()
     {
         if (!PhotonNetwork.IsMasterClient) return;
+        if (Input.GetKeyDown(KeyCode.Backspace)) SetTime(testTime.x, testTime.y);
         UpdateGameTime();
         CheckDay();
         PhaseProperties();
-        if ((Input.GetKeyDown(KeyCode.Backspace))) SetTime(testTime.x, testTime.y);
+        CheckNightSkip();
     }
 
     void CheckDay()
@@ -123,6 +125,35 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         AssignRoles();
         SetTime(7, 30);
+    }
+
+    void CheckNightSkip()
+    {
+        if (skippedNight) return;
+        if (currentPeriod - (currentDay * 24f) > timeSkipPeriod)
+        {
+            NightSkip();
+        }
+    }
+
+    void NightSkip()
+    {
+        skippedNight = true;
+        view.RPC("NightSkipSequence", RpcTarget.All);
+    }
+
+    [PunRPC]
+    public void NightSkipSequence()
+    {
+        OnNightSkip?.Invoke();
+        Invoke("SetNightTime", 3f);
+    }
+
+    public void SetNightTime()
+    {
+        skippedNight = false;
+        Vector2Int newTime = PeriodToClockTime(timeSkippedPeriod);
+        SetTime(newTime.x, newTime.y);
     }
 
     void AssignRooms()
