@@ -15,6 +15,7 @@ public class Sun : MonoBehaviour
     public float maxBrightness;
     public float maxNightBrightness;
     public AnimationCurve brightnessCurve;
+    public AnimationCurve nightCurve;
     public Gradient sunsetGradient;
     GameManager gm;
 
@@ -44,10 +45,8 @@ public class Sun : MonoBehaviour
 
         // Brightness
         float progress = sunTransform.eulerAngles.x / (hideAngle - showAngle);
-        float brightnessEval = brightnessCurve.Evaluate(progress);
-        float newBrightness = maxBrightness * brightnessEval;
-        lightSource.intensity = newBrightness;
+        lightSource.intensity = maxBrightness * brightnessCurve.Evaluate(progress);
         lightSource.color = sunsetGradient.Evaluate(brightnessCurve.Evaluate(progress));
-        nightLight.intensity = maxNightBrightness * (1f - brightnessEval);
+        nightLight.intensity = maxNightBrightness * nightCurve.Evaluate(progress);
     }
 }

@@ -7433,6 +7433,14 @@ PrefabInstance:
       propertyPath: normalColor.r
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1683937215031459764, guid: c119e8885b36ec9428d108b802b255bb, type: 3}
+      propertyPath: nightCurve.m_Curve.Array.data[1].time
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 1683937215031459764, guid: c119e8885b36ec9428d108b802b255bb, type: 3}
+      propertyPath: nightCurve.m_Curve.Array.data[2].time
+      value: 0.95
+      objectReference: {fileID: 0}
     - target: {fileID: 3412305793019877099, guid: c119e8885b36ec9428d108b802b255bb, type: 3}
       propertyPath: m_IsActive
       value: 1
