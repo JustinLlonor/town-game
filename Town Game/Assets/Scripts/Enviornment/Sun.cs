@@ -8,10 +8,12 @@ public class Sun : MonoBehaviour
 {
     public Light lightSource;
     Transform sunTransform;
+    public Light nightLight;
     public Vector3 angleVector = Vector3.right;
     public float hideAngle;
     public float showAngle;
     public float maxBrightness;
+    public float maxNightBrightness;
     public AnimationCurve brightnessCurve;
     public Gradient sunsetGradient;
     GameManager gm;
@@ -35,14 +37,17 @@ public class Sun : MonoBehaviour
         if (newAngle > hideAngle)
         {
             lightSource.enabled = false;
+            nightLight.intensity = maxNightBrightness;
             return;
         }
         if (newAngle > showAngle) lightSource.enabled = true;
 
         // Brightness
         float progress = sunTransform.eulerAngles.x / (hideAngle - showAngle);
-        float newBrightness = maxBrightness * brightnessCurve.Evaluate(progress);
+        float brightnessEval = brightnessCurve.Evaluate(progress);
+        float newBrightness = maxBrightness * brightnessEval;
         lightSource.intensity = newBrightness;
         lightSource.color = sunsetGradient.Evaluate(brightnessCurve.Evaluate(progress));
+        nightLight.intensity = maxNightBrightness * (1f - brightnessEval);
     }
 }

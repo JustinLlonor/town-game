@@ -76,7 +76,7 @@ Light:
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 0.7028302, g: 0.838633, b: 1, a: 1}
-  m_Intensity: 0.15
+  m_Intensity: 0
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -197,10 +197,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lightSource: {fileID: 5686247076610818101}
+  nightLight: {fileID: 4769056264978436999}
   angleVector: {x: 1, y: 0, z: 0.2}
   hideAngle: 190
   showAngle: -10
   maxBrightness: 1.2
+  maxNightBrightness: 0.5
   brightnessCurve:
     serializedVersion: 2
     m_Curve:
