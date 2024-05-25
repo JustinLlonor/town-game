@@ -9,6 +9,7 @@ public class Door : MonoBehaviour
     public float openTime = .5f;
     public float closeTime = .25f;
     public AnimationCurve doorAnim;
+    public bool isHouseDoor = false;
     [Header("Assignables")]
     public Transform doorTransform;
     public GameObject interOpen;
