@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9f9def4262e76f4f8c1781626b806f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  testTime: {x: 22, y: 15}
   gamePhase: 0
   gameTime: 0
   currentPeriod: 0
@@ -53,9 +54,10 @@ MonoBehaviour:
   cultistAssignment: 0100000000010000000100000001000000010000
   hourLength: 26
   startCurrency: 100
+  startTime: {x: 7, y: 0}
   timeSkipPeriod: 21.5
   timeSkippedPeriod: 4.5
-  dayStartPeriod: 7.5
+  dayStartPeriod: 6.5
   days:
   - Monday
   - Tuesday

@@ -23,7 +23,9 @@ public class NightSequence : MonoBehaviour
         rm = FindObjectOfType<RoomManager>();
 
         gm.OnNightSkip += NightStuff;
+        gm.OnDayStart += DayStuff;
         pm.OnInstantiatePlayer += GetReferences;
+
     }
 
     void GetReferences(GameObject player)
@@ -32,24 +34,31 @@ public class NightSequence : MonoBehaviour
         Debug.Log(pr);
     }
 
+    void DayStuff()
+    {
+        bs.HideTexts();
+        bs.SetAlpha(0);
+        StartCoroutine(Sequence("Day ", false, false, false));
+    }
+
     void NightStuff()
     {
         bs.HideTexts();
         bs.SetAlpha(0);
-        StartCoroutine(Sequence());
+        StartCoroutine(Sequence("Night "));
     }
 
-    IEnumerator Sequence()
+    IEnumerator Sequence(string cycleText, bool teleport = true, bool blackScreen = true, bool waitForTransition = true)
     {
-        nightText.text = "Night " + (gm.currentDay + 1);
+        nightText.text = cycleText + (gm.currentDay + 1);
         SetCultistText();
-        bs.StartAlphaTransition(1f, 2.5f);
-        yield return new WaitForSeconds(3f);
+        if (blackScreen) bs.StartAlphaTransition(1f, 2.5f);
+        if (waitForTransition) yield return new WaitForSeconds(3f);
         newNightUI.SetActive(true);
         Transform tpTransform = rm.playerRooms[(int)PhotonNetwork.LocalPlayer.CustomProperties["room"]].spawnTransform;
-        pm.Teleport(tpTransform.position, tpTransform.rotation);
+        if (teleport) pm.Teleport(tpTransform.position, tpTransform.rotation);
         yield return new WaitForSeconds(1f);
-        bs.StartAlphaTransition(0f, 2.5f);
+        if (blackScreen) bs.StartAlphaTransition(0f, 2.5f);
         yield return new WaitForSeconds(4.1f);
         newNightUI.SetActive(false);
     }

@@ -24,6 +24,8 @@ public class ClockManager : MonoBehaviour
     {
         gm.OnTimeChange += ResetMinuteRandom;
         sm.OnBlockChange += ResetMinuteBlockChange;
+        gm.OnNightSkip += ResetMinuteRandom;
+        gm.OnDayStart += ResetMinuteRandom;
     }
 
     private void Update()

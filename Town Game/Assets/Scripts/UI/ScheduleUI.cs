@@ -48,13 +48,12 @@ public class ScheduleUI : MonoBehaviour
 
     private void OnEnable()
     {
-        gm.OnChangeDay += ReadSchedule;
-        ReadSchedule();
+        gm.OnDayStart += ReadSchedule;
     }
 
     private void OnDisable()
     {
-        gm.OnChangeDay -= ReadSchedule;
+        gm.OnDayStart -= ReadSchedule;
     }
 
     private void Update()

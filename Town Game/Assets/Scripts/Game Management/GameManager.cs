@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public bool[] cultistAssignment = new bool[] { };
     public float hourLength = 60f;
     public int startCurrency = 100;
+    public Vector2Int startTime;
     [Header("Day/Night Cycle")]
     public float timeSkipPeriod = 21f;
     public float timeSkippedPeriod = 4.5f;
@@ -37,12 +38,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     RoomManager rm;
     PlayerManager pm;
     bool skippedNight = false;
-
+    bool startedDay = false;
     public GameEvent OnTimeChange;
     public RevealRoles OnRevealRoles;
     public GameEvent OnChangeDay;
     public GameEvent OnUpdatePositions;
     public GameEvent OnNightSkip;
+    public GameEvent OnDayStart;
     public delegate void GameEvent();
     public delegate void RevealRoles(bool isCultist);
 
@@ -98,6 +100,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         if (Input.GetKeyDown(KeyCode.P)) Debug.Log(cultists.Length);
         PhaseProperties();
         CheckNightSkip();
+        CheckDayStart();
     }
 
     void CheckDay()
@@ -125,7 +128,26 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     void Phase0()
     {
         AssignRoles();
-        SetTime(7, 30);
+        SetTime(startTime.x, startTime.y);
+    }
+
+    void CheckDayStart()
+    {
+        if (startedDay) return;
+        if (currentPeriod - (currentDay * 24f) > dayStartPeriod)
+        {
+            Debug.Log(currentPeriod - (currentDay * 24f));
+            Debug.Log(dayStartPeriod);
+            startedDay = true;
+            view.RPC("DayStartSequence", RpcTarget.All);
+        }
+    }
+
+    [PunRPC]
+    public void DayStartSequence()
+    {
+        Debug.Log("Started day");
+        OnDayStart?.Invoke();
     }
 
     void CheckNightSkip()
@@ -136,6 +158,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             NightSkip();
         }
     }
+
 
     void NightSkip()
     {
@@ -155,6 +178,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         skippedNight = false;
         Vector2Int newTime = PeriodToClockTime(timeSkippedPeriod);
         SetTime(newTime.x, newTime.y);
+        startedDay = false;
     }
 
     void AssignRooms()
@@ -220,6 +244,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         if (!playerPositions.ContainsKey(player)) return;
         playerPositions.Remove(player);
         OnUpdatePositions?.Invoke();
+    }
+
+    [PunRPC]
+    public void ModifyPositionToken(string player, int position)
+    {
+        if (!playerPositions.ContainsKey(player)) return;
+        playerPositions[player] = (Position)position;
     }
 
     void AssignRoles()
