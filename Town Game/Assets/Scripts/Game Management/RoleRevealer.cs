@@ -17,7 +17,9 @@ public class RoleRevealer : MonoBehaviour
     BlackScreen bs;
 
     public GetRole OnGetRole;
+    public RevealerEvent OnSequenceEnd;
     public delegate void GetRole(bool isCultist);
+    public delegate void RevealerEvent(); // doesntwork
 
     private void Awake()
     {

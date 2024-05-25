@@ -136,8 +136,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         if (startedDay) return;
         if (currentPeriod - (currentDay * 24f) > dayStartPeriod)
         {
-            Debug.Log(currentPeriod - (currentDay * 24f));
-            Debug.Log(dayStartPeriod);
             startedDay = true;
             view.RPC("DayStartSequence", RpcTarget.All);
         }
@@ -146,7 +144,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     public void DayStartSequence()
     {
-        Debug.Log("Started day");
         OnDayStart?.Invoke();
     }
 

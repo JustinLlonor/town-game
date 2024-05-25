@@ -14,7 +14,8 @@ public class CameraMovement : MonoBehaviour
     CameraManager cameraManager;
     [HideInInspector] public float xRotation = 0f;
     [HideInInspector] public float yRotation = 0f;
-    bool canMove = true;
+    public bool canMove = true;
+    bool settable = true;
 
     private void Awake()
     {
@@ -22,12 +23,22 @@ public class CameraMovement : MonoBehaviour
         cursorManager = FindObjectOfType<CursorManager>();
         FindObjectOfType<PlayerManager>().OnInstantiatePlayer += AssignReferences;
         cameraManager.OnSwitchCameraMode += OnCameraModeChange;
+        GameManager gm = FindObjectOfType<GameManager>();
+        if (gm == null) return;
+        settable = false;
+        Invoke("EnableCanMove", 1f);
     }
 
     private void Update()
     {
         if (player == null) return;
         CameraLook();
+    }
+
+    void EnableCanMove()
+    {
+        canMove = true;
+        settable = true;
     }
 
     void CameraLook()
@@ -58,6 +69,7 @@ public class CameraMovement : MonoBehaviour
 
     void OnCameraModeChange(CameraManager.CameraMode mode)
     {
+        if (!settable && mode == CameraManager.CameraMode.FirstPerson) return;
         canMove = (mode == CameraManager.CameraMode.FirstPerson);
         if (mode == CameraManager.CameraMode.Cinematic)
         {
