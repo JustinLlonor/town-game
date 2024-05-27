@@ -78,9 +78,10 @@ public class Door : MonoBehaviour
 
     void DecideLock(bool isCultist)
     {
-        //if (isCultist) return;
-        gm.OnNightSkip += NightLockInvoke;
         gm.OnDayStart += NightUnlock;
+        if (PhotonNetwork.IsMasterClient) gm.OnNightSkip += ForceCloseInvoke;
+        if (isCultist) return;
+        gm.OnNightSkip += NightLockInvoke;
     }
 
     void NightLockInvoke()
@@ -88,10 +89,22 @@ public class Door : MonoBehaviour
         Invoke("NightLock", 2.9f);
     }
 
+    void ForceCloseInvoke()
+    {
+        Invoke("NightForceClose", 2.9f);
+    }
+
+    void NightForceClose()
+    {
+        if (doorOpened)
+        {
+            ForceClose();
+            view.RPC("ForceClose", RpcTarget.OthersBuffered);
+        }
+    }
+
     void NightLock()
     {
-        if (doorOpened) ForceClose();
-        Lock();
         SetLockText(0, "Curfew", lockedColor);
         SetLockText(1, "You can't leave during the night", lockedColor);
     }
@@ -118,6 +131,7 @@ public class Door : MonoBehaviour
         interClose.SetActive(doorOpened);
     }
 
+    [PunRPC]
     void ForceClose()
     {
         doorOpened = false;
@@ -126,6 +140,7 @@ public class Door : MonoBehaviour
         interClose.SetActive(doorOpened);
     }
 
+    [PunRPC]
     void ForceOpen()
     {
         doorOpened = true;
