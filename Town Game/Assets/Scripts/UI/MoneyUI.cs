@@ -12,6 +12,6 @@ public class MoneyUI : MonoBehaviour
     {
         if (!PhotonNetwork.InRoom) return;
         if (text == null) return;
-        text.text = "$" + PhotonNetwork.LocalPlayer.CustomProperties["money"];
+        text.text = $"{PhotonNetwork.LocalPlayer.CustomProperties["money"]}";
     }
 }
