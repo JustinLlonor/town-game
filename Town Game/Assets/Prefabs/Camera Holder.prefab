@@ -49,6 +49,7 @@ MonoBehaviour:
   mode: 0
   trackedFPSTransform: {fileID: 0}
   trackedCinematicTransform: {fileID: 0}
+  trackedObservableTransform: {fileID: 0}
 --- !u!114 &1476666307285568578
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -67,6 +68,7 @@ MonoBehaviour:
   headAim: {fileID: 0}
   xRotation: 0
   yRotation: 0
+  canMove: 0
 --- !u!1 &868676878932204292
 GameObject:
   m_ObjectHideFlags: 0

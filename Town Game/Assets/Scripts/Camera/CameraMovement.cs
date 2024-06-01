@@ -24,7 +24,11 @@ public class CameraMovement : MonoBehaviour
         FindObjectOfType<PlayerManager>().OnInstantiatePlayer += AssignReferences;
         cameraManager.OnSwitchCameraMode += OnCameraModeChange;
         GameManager gm = FindObjectOfType<GameManager>();
-        if (gm == null) return;
+        if (gm == null)
+        {
+            canMove = true;
+            return;
+        }
         settable = false;
         Invoke("EnableCanMove", 1f);
     }
@@ -40,9 +44,10 @@ public class CameraMovement : MonoBehaviour
         canMove = true;
         settable = true;
     }
-
+    
     void CameraLook()
     {
+        if (cameraManager.isTransitioning) return;
         if (!canMove) return;
         if (!cursorManager.isLocked) return;
         float mouseX = Input.GetAxisRaw("Mouse X") * mouseSensitivity;

@@ -7,16 +7,19 @@ public class CameraManager : MonoBehaviour
     public CameraMode mode;
     public Transform trackedFPSTransform;
     public Transform trackedCinematicTransform;
+    public Transform trackedObservableTransform;
+    public float observableGive;
 
     public SwitchCameraMode OnSwitchCameraMode;
     public delegate void SwitchCameraMode(CameraMode mode);
 
-    bool isTransitioning = false;
+    public bool isTransitioning = false;
 
     public enum CameraMode
     {
         FirstPerson = 0,
         Cinematic = 1,
+        Observe = 2
     }
 
     public void ChangeCameraMode(CameraMode newMode)
@@ -29,6 +32,14 @@ public class CameraManager : MonoBehaviour
         if (newMode == CameraMode.Cinematic)
         {
             if (trackedCinematicTransform != null) transform.position = trackedCinematicTransform.position;
+        }
+        if (newMode == CameraMode.Observe)
+        {
+            if (trackedObservableTransform != null)
+            {
+                transform.position = trackedObservableTransform.position;
+                transform.rotation = trackedObservableTransform.rotation;
+            }
         }
         OnSwitchCameraMode?.Invoke(mode);
     }
@@ -58,8 +69,17 @@ public class CameraManager : MonoBehaviour
         {
             if (trackedCinematicTransform != null)
             {
+                //Set to cinematic rotation and position
                 transform.position = trackedCinematicTransform.position;
                 transform.rotation = trackedCinematicTransform.rotation;
+            }
+        }
+        if (mode == CameraMode.Observe)
+        {
+            if (trackedObservableTransform != null)
+            {
+                transform.position = trackedObservableTransform.position;
+                transform.rotation = trackedObservableTransform.rotation;
             }
         }
     }
@@ -68,27 +88,39 @@ public class CameraManager : MonoBehaviour
     {
         if (mode == CameraMode.FirstPerson) return;
         StopAllCoroutines();
-        StartCoroutine(TransitionToFPS(duration));
+        StartCoroutine(TransitionToMode(duration, CameraMode.FirstPerson));
     }
 
-    IEnumerator TransitionToFPS(float duration)
+    public void StartModeTransition(float duration, CameraMode newMode)
+    {
+        if (mode == newMode) return;
+        if (newMode != CameraMode.FirstPerson) trackedFPSTransform.rotation = transform.rotation;
+        StopAllCoroutines();
+        StartCoroutine(TransitionToMode(duration, newMode));
+    }
+
+    IEnumerator TransitionToMode(float duration, CameraMode newMode)
     {
         isTransitioning = true;
         float time = 0f;
         Vector3 ogPos = transform.position;
         Quaternion ogRot = transform.rotation;
+        Transform newTransform = null;
+        if (newMode == CameraMode.FirstPerson) newTransform = trackedFPSTransform;
+        if (newMode == CameraMode.Cinematic) newTransform = trackedCinematicTransform;
+        if (newMode == CameraMode.Observe) newTransform = trackedObservableTransform;
         
         while (time < 1f)
         {
             time += Time.deltaTime * (1/duration);
 
-            transform.position = Vector3.Lerp(ogPos, trackedFPSTransform.position, Mathf.SmoothStep(0f, 1f, time));
-            transform.rotation = Quaternion.Lerp(ogRot, trackedFPSTransform.rotation, Mathf.SmoothStep(0f, 1f, time));
+            transform.position = Vector3.Lerp(ogPos, newTransform.position, Mathf.SmoothStep(0f, 1f, time));
+            transform.rotation = Quaternion.Lerp(ogRot, newTransform.rotation, Mathf.SmoothStep(0f, 1f, time));
 
             yield return null;
         }
 
-        ChangeCameraMode(CameraMode.FirstPerson);
         isTransitioning = false;
+        ChangeCameraMode(newMode);
     }
 }

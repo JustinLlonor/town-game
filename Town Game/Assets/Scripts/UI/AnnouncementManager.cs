@@ -15,9 +15,20 @@ public class AnnouncementManager : MonoBehaviour
     public AnimationCurve pushDownCurve;
     public float fadeSpeed = 2f;
     List<IEnumerator> pdNumerators = new List<IEnumerator>();
+    PhotonView view;
+
+    private void Awake()
+    {
+        view = gameObject.GetComponent<PhotonView>();
+    }
+
+    public void Announce(string text, RpcTarget target = RpcTarget.All, float lifespan = 5f)
+    {
+        view.RPC("AnnounceRPC", target, text, lifespan);
+    }
 
     [PunRPC]
-    public void Announce(string text, float lifespan = 3f)
+    public void AnnounceRPC(string text, float lifespan)
     {
         GameObject announcement = Instantiate(announcementPrefab, transform);
         announcement.transform.localPosition = new Vector3(0f, pushDown);

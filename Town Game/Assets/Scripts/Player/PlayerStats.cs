@@ -64,7 +64,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
         pe = gameObject.GetComponent<PlayerEvidence>();
         if (!view.IsMine) return;
         shake = FindObjectOfType<CameraShake>();
-        AddAffector(hungerAffecter);
+        if (FindObjectOfType<GameManager>() != null)AddAffector(hungerAffecter);
     }
 
     private void Update()
@@ -233,10 +233,10 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
             cpc.SetClothing(attire.clothing.name, cpc.isMale);
             corpseView.RPC("SetClothing", RpcTarget.OthersBuffered, attire.clothing.name, cpc.isMale);
         }
+        PhotonNetwork.Destroy(gameObject);
         return;
 
         //Destroy player
-        PhotonNetwork.Destroy(gameObject);
     }
 
     // Stamina

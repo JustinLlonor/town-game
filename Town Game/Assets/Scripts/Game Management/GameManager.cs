@@ -13,12 +13,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     // gamePhase 0 = initialize game/assign roles 1 = main game 2 = results screen
     public int gamePhase = 0;
     [Header("Game Variables")]
-    //public Player campLeader;
+    public Player campLeader;
     public Player[] cultists = new Player[] { };
+    public Player[] alivePlayers = new Player[] { };
     public Dictionary<string, Position> playerPositions = new Dictionary<string, Position>();
     public float gameTime = 0f;
     public float currentPeriod;
     public int currentDay = 0;
+    public bool timeStopped = false;
     int previousDay = -1;
     [Header("Game Settings")]
     // When an index of this is true, a cultist is added when the players playing is equal to that number.
@@ -45,6 +47,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public GameEvent OnUpdatePositions;
     public GameEvent OnNightSkip;
     public GameEvent OnDayStart;
+    public GameEvent OnTimeStop;
+    public GameEvent OnTimeResume;
     public delegate void GameEvent();
     public delegate void RevealRoles(bool isCultist);
 
@@ -156,7 +160,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
-
     void NightSkip()
     {
         skippedNight = true;
@@ -177,7 +180,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         SetTime(newTime.x, newTime.y);
         startedDay = false;
     }
-
+ 
     void AssignRooms()
     {
         if (PhotonNetwork.PlayerList.Length > rm.playerRooms.Count)
@@ -252,11 +255,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     void AssignRoles()
     {
-        // Sets isCultist to false for every player
+        List<Player> players = new List<Player>();
+        // Sets isCultist to false for every player, adds to playerlist
         foreach (Player player in PhotonNetwork.PlayerList)
         {
             AssignRole(player, false);
+            players.Add(player);
         }
+        alivePlayers = players.ToArray();
 
         // Sets cultistNumber to the amount of cultists in the game
         int cultistNumber = 0;
@@ -311,6 +317,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     void UpdateGameTime()
     {
+        if (timeStopped) return;
         gameTime += Time.deltaTime;
         currentDay = Mathf.FloorToInt((gameTime + hourLength) / (hourLength * 24f));
         currentPeriod = gameTime / hourLength;
@@ -363,6 +370,22 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         return new Vector2Int(roundedPeriod, currentMinute);
     }
 
+    public void StopTime()
+    {
+        if (!PhotonNetwork.IsMasterClient) return;
+        if (timeStopped) return;
+        timeStopped = true;
+        OnTimeStop?.Invoke();
+    }
+
+    public void ResumeTime()
+    {
+        if (!PhotonNetwork.IsMasterClient) return;
+        if (!timeStopped) return;
+        timeStopped = false;
+        OnTimeResume?.Invoke();
+    }
+
     /// <summary>
     /// Converts period time to a clock string
     /// </summary>
@@ -408,9 +431,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             cultists = newCultists.ToArray();
             CheckWinCondition();
         }
+        if (alivePlayers.Contains(otherPlayer))
+        {
+            List<Player> newPlayers = alivePlayers.ToList();
+            newPlayers.Remove(otherPlayer);
+            alivePlayers = newPlayers.ToArray();
+            CheckWinCondition();
+        }
     }
 
-    public void  CheckWinCondition()
+    public void CheckWinCondition()
     {
         if (cultists.Length == 0)
         {
