@@ -8,6 +8,8 @@ public class ClockManager : MonoBehaviour
     public TextMeshProUGUI text;
     public int minuteRandomMax = 10;
     public int minuteRandomMin = 1;
+    public GameObject am;
+    public GameObject pm;
     GameManager gm;
     ScheduleManager sm;
     int minuteRandom;
@@ -61,11 +63,19 @@ public class ClockManager : MonoBehaviour
         }
         if (minDisplay.Length == 1) minDisplay = "0" + minDisplay;
         if (hour == 0) hour = 24;
-        string meridiem = "AM";
-        if (hour > 11 && hour != 24) meridiem = "PM";
+        bool isAM = true;
+        if (hour > 11 && hour != 24) isAM = false;
+        SetMeridiem(isAM);
         if (hour > 12) hour -= 12;
 
-        text.text = $"{hour}:{minDisplay} {meridiem}";
+        text.text = $"{hour}:{minDisplay}";
+    }
+
+    void SetMeridiem(bool isAM)
+    {
+        if (am.activeSelf == isAM) return;
+        am.SetActive(isAM);
+        pm.SetActive(!isAM);
     }
 
     void ResetMinuteRandom()

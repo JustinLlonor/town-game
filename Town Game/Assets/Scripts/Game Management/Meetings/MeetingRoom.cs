@@ -11,10 +11,18 @@ public class MeetingRoom : MonoBehaviour
     public PhotonView view;
     GameManager gm;
     PlayerManager pm;
+    PlayerMovement playerMovement;
 
     private void Awake()
     {
         gm = FindObjectOfType<GameManager>();
+        pm = FindObjectOfType<PlayerManager>();
+        pm.OnInstantiatePlayer += GetReferences;
+    }
+
+    void GetReferences(GameObject player)
+    {
+        playerMovement = player.GetComponent<PlayerMovement>();
     }
 
     [PunRPC]
@@ -30,5 +38,6 @@ public class MeetingRoom : MonoBehaviour
             Transform teleportTransforom = higherSeatHolder.GetChild(seat);
             pm.Teleport(teleportTransforom.position, teleportTransforom.rotation);
         }
+        playerMovement.Freeze();
     }
 }

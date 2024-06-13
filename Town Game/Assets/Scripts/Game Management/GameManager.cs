@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     // When an index of this is true, a cultist is added when the players playing is equal to that number.
     public bool[] cultistAssignment = new bool[] { };
     public float hourLength = 60f;
+    public float timeSpeed = 1f;
     public int startCurrency = 100;
     public Vector2Int startTime;
     [Header("Day/Night Cycle")]
@@ -67,12 +68,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             stream.SendNext(gamePhase);
             stream.SendNext(cultists);
             stream.SendNext(gameTime);
+            stream.SendNext(timeSpeed);
         }
         else
         {
             gamePhase = (int)stream.ReceiveNext();
             cultists = (Player[])stream.ReceiveNext();
             gameTime = (float)stream.ReceiveNext();
+            timeSpeed = (float)stream.ReceiveNext();
         }
     }
     
@@ -318,7 +321,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     void UpdateGameTime()
     {
         if (timeStopped) return;
-        gameTime += Time.deltaTime;
+        gameTime += Time.deltaTime * timeSpeed;
         currentDay = Mathf.FloorToInt((gameTime + hourLength) / (hourLength * 24f));
         currentPeriod = gameTime / hourLength;
     }

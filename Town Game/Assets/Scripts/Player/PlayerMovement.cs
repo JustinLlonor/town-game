@@ -15,6 +15,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public float crouchMultiplier = 0.4f;
     public float sprintStaminaConsumption = 20f;
     public float groundDrag = 6f;
+    public bool canMove = true;
     
     [Header("Aerial")]
     public float jumpHeight = 3;
@@ -66,9 +67,9 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public Transform crouchPos;
     public Transform orientation;
 
-    public Leap OnLeap;
+    public MovementEvent OnLeap;
 
-    public delegate void Leap();
+    public delegate void MovementEvent();
 
     PlayerManager playerManager;
     PhotonView view;
@@ -128,7 +129,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         Sprint();
         Bobbing();
         UpdateAnimatorParemeters();
-        UpdateAnimatorSpeed();
+        if (canMove) UpdateAnimatorSpeed();
         if (!previousGrounded && isGrounded)
         {
             OnLand();
@@ -149,6 +150,24 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         StepClimb();
     }
 
+    public void Freeze(bool freezeVelocity = false)
+    {
+        canMove = false;
+        isMoving = false;
+        ExitCrouch();
+        isSprinting = false;
+        if (freezeVelocity)
+        {
+            rb.velocity = Vector3.zero;
+            peakYPosition = transform.position.y;
+        }
+    }
+
+    public void Unfreeze()
+    {
+        canMove = true;
+    }
+
     private void OnSprint(InputValue iv)
     {
         if (iv.Get<float>() == 1f)
@@ -161,6 +180,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     private void OnJump()
     {
+        if (!canMove) return;
         if (!canJump) return;
         if (!isGrounded) return;
         if (!(jumpTimer <= 0f)) return;
@@ -186,6 +206,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     private void OnMove(InputValue iv)
     {
+        if (!canMove) return;
         Vector2 mv = iv.Get<Vector2>();
         horizontalMovement = mv.x;
         verticalMovement = mv.y;
@@ -195,6 +216,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         if (iv.Get<float>() == 1f)
         {
+            if (!canMove) return;
             //crouchPressed = true;
             if (currentCrouchExit != null) StopCoroutine(currentCrouchExit);
             EnterCrouch();
@@ -434,6 +456,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     void MovePlayer()
     {
+        if (!canMove) return;
         if (isGrounded && !OnSlope())
         {
             rb.AddForce(moveDirection.normalized * speed * movementMultiplier * sprintGain * crouchMinus, ForceMode.Acceleration);

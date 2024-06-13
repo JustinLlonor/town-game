@@ -67,17 +67,18 @@ public class MeetingManager : MonoBehaviourPunCallbacks, IPunObservable
     void SetupSeats()
     {
         if (!PhotonNetwork.IsMasterClient) return;
-        List<int> takenCivilianSeats = new List<int>(meetingRoom.civilianSeatHolder.childCount);
+        List<int> takenCivilianSeats = new List<int>(new int[meetingRoom.civilianSeatHolder.childCount]);
         for (int i = 0; i < takenCivilianSeats.Count; i++) takenCivilianSeats[i] = i;
         foreach (Player player in gm.alivePlayers)
         {
             // if not civilian
             if ((int)gm.playerPositions[(string)player.CustomProperties["name"]] > 0) continue;
             int newSeat = Random.Range(0, takenCivilianSeats.Count);
+            Debug.LogWarning(takenCivilianSeats.Count);
             meetingRoom.view.RPC("TeleportToSeat", player, takenCivilianSeats[newSeat]);
             takenCivilianSeats.RemoveAt(newSeat);
         }
-        List<int> takenHigherSeats = new List<int>(meetingRoom.higherSeatHolder.childCount);
+        List<int> takenHigherSeats = new List<int>(new int[meetingRoom.higherSeatHolder.childCount]);
         for (int i = 0; i < takenHigherSeats.Count; i++) takenHigherSeats[i] = i;
         foreach (Player player in gm.alivePlayers)
         {
