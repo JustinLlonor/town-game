@@ -4,10 +4,11 @@ using System.Linq;
 using UnityEngine;
 using TMPro;
 using Photon.Pun.Demo.Procedural;
+using UnityEngine.UI;
+using Unity.VisualScripting;
 
 public class ScheduleUI : MonoBehaviour
 {
-    public ScheduleBlock testBlock;
     public int foresight = 3;
     public float hourLength = 50f;
     public float repositionSpeed = 3f;
@@ -15,11 +16,15 @@ public class ScheduleUI : MonoBehaviour
     public GameObject tearoutPrefab;
     public Transform blockHolder;
     public Transform tearoutHolder;
+    [Header("Block Settings")]
     public string emptyPeriod = "Free Time";
+    public Color primaryColor;
+    public Color secondaryColor;
     [SerializeField] List<UIBlock> listedBlocks = new List<UIBlock>();
     GameObject tearout;
     GameManager gm;
     ScheduleManager sm;
+    public float tearoutRemovalTime = -1;
 
     [System.Serializable]
     public class UIBlock
@@ -62,8 +67,9 @@ public class ScheduleUI : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.O)) AddScheduleBlock(new ScheduleBlock(testBlock.periodName, testBlock.room, testBlock.length, testBlock.time));
+        //if (Input.GetKeyDown(KeyCode.O)) AddScheduleBlock(new ScheduleBlock(testBlock.periodName, testBlock.room, testBlock.length, testBlock.time));
         ScrollSchedule();
+        CheckTearout();
     }
 
     void ScrollSchedule()
@@ -75,6 +81,21 @@ public class ScheduleUI : MonoBehaviour
         }
         float currentPeriod = gm.currentPeriod - (gm.currentDay * 24f);
         blockHolder.localPosition = new Vector2(0f, hourLength * currentPeriod);
+    }
+
+    void CheckTearout()
+    {
+        if (tearoutRemovalTime == -1f) return;
+        if (!(gm.currentPeriod >= tearoutRemovalTime)) return;
+        DestroyTearout();
+        tearoutRemovalTime = -1f;
+    }
+
+    void DestroyTearout()
+    {
+        if (tearout == null) return;
+        StartCoroutine(RemoveTearout(tearout.transform));
+        tearout = null;
     }
 
     /// <summary>
@@ -155,12 +176,19 @@ public class ScheduleUI : MonoBehaviour
         listedBlocks.Insert(setPos, new UIBlock(block, nbt));
 
         // Sets text data on block
-        nbt.GetChild(0).GetComponent<TextMeshProUGUI>().text = block.periodName;
-        nbt.GetChild(1).GetComponent<TextMeshProUGUI>().text = block.room;
+        nbt.GetChild(1).GetComponent<TextMeshProUGUI>().text = block.periodName;
+        nbt.GetChild(2).GetComponent<TextMeshProUGUI>().text = block.room;
         // Time data
         string clockTimeStart = gm.PeriodToClockString(block.time);
         string clockTimeEnd = gm.PeriodToClockString(block.time + block.length);
-        nbt.GetChild(2).GetComponent<TextMeshProUGUI>().text = $"{clockTimeStart} - {clockTimeEnd}";
+        nbt.GetChild(3).GetComponent<TextMeshProUGUI>().text = $"{clockTimeStart} - {clockTimeEnd}";
+
+        Color newColor = primaryColor;
+        if (setPos % 2 != 0) newColor = secondaryColor;
+        foreach (Transform child in nbt.GetChild(0))
+        {
+            child.GetComponent<RawImage>().color = newColor;
+        }
     }
 
     void RemoveScheduleBlock(int index)
@@ -177,15 +205,53 @@ public class ScheduleUI : MonoBehaviour
 
     void UpdateTearout(ScheduleBlock from, ScheduleBlock to)
     {
-        if (tearout != null) Destroy(tearout);
-        if (to == null) return;
+        if (tearout != null) DestroyTearout();
+        string periodName;
+        string room = "";
+        float timeStart;
+        float timeEnd;
+        // Empty periods
+        if (to == null)
+        {
+            int afterIndex = sm.orderedBlocks.IndexOf(from) + 1;
+            if (afterIndex > sm.orderedBlocks.Count - 1) return;
+            timeStart = from.time + from.length;
+            timeEnd = sm.orderedBlocks[afterIndex].time;
+            periodName = emptyPeriod;
+        }
+        else
+        {
+            periodName = to.periodName;
+            room = to.room;
+            timeStart = to.time;
+            timeEnd = to.time + to.length;
+        }
+        // Removal Time
+        tearoutRemovalTime = timeEnd - 0.95f;
+        // Text data
         GameObject newTearout = Instantiate(tearoutPrefab, tearoutHolder);
         Transform nbt = newTearout.transform;
-        nbt.GetChild(0).GetComponent<TextMeshProUGUI>().text = to.periodName;
-        nbt.GetChild(1).GetComponent<TextMeshProUGUI>().text = to.room;
+        tearout = newTearout;
+        nbt.GetChild(0).GetComponent<TextMeshProUGUI>().text = periodName;
+        nbt.GetChild(1).GetComponent<TextMeshProUGUI>().text = room;
         // Time data
-        string clockTimeStart = gm.PeriodToClockString(to.time);
-        string clockTimeEnd = gm.PeriodToClockString(to.time + to.length);
+        string clockTimeStart = gm.PeriodToClockString(timeStart);
+        string clockTimeEnd = gm.PeriodToClockString(timeEnd);
         nbt.GetChild(2).GetComponent<TextMeshProUGUI>().text = $"{clockTimeStart} - {clockTimeEnd}";
+    }
+
+    IEnumerator RemoveTearout(Transform t)
+    {
+        float time = 0f;
+        float endX = t.localPosition.x + 365f;
+        float ogX = t.localPosition.x;
+        while (time < 1f)
+        {
+            yield return null;
+            time += Time.deltaTime;
+            float newX = Mathf.SmoothStep(ogX, endX, time);
+            t.localPosition = new Vector2(newX, t.localPosition.y);
+        }
+        Destroy(t.gameObject);
     }
 }

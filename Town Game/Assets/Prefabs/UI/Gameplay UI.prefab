@@ -6626,16 +6626,16 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3640724613868678596}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 391633198826504785}
+  m_Father: {fileID: 8854391684150977888}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -0.43999863}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &3658225916284680196
@@ -13881,7 +13881,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3359297049121747234}
-  - {fileID: 2536651124546061966}
   m_Father: {fileID: 8854391684150977888}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
@@ -16459,6 +16458,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 391633198826504785}
+  - {fileID: 2536651124546061966}
   m_Father: {fileID: 1814489297561873607}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
@@ -16478,19 +16478,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fc146cdf0d429948afe730093dd8a7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testBlock:
-    periodName: 
-    room: 
-    length: 0
-    time: 0
   foresight: 5
   hourLength: 50
   repositionSpeed: 2
   scheduleBlockPrefab: {fileID: 2004452700610076260, guid: 3e84774653b9eee498592dcfd43bab09, type: 3}
-  tearoutPrefab: {fileID: 2004452700610076260, guid: 3e84774653b9eee498592dcfd43bab09, type: 3}
+  tearoutPrefab: {fileID: 6061856520135300402, guid: ed49a4dd65dd9c0468eae51dbbf9e864, type: 3}
   blockHolder: {fileID: 3359297049121747234}
   tearoutHolder: {fileID: 2536651124546061966}
   emptyPeriod: Free Time
+  primaryColor: {r: 1, g: 1, b: 1, a: 1}
+  secondaryColor: {r: 0.8679245, g: 0.8679245, b: 0.8679245, a: 1}
   listedBlocks: []
 --- !u!1 &9041724090090855877
 GameObject:

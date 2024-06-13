@@ -9725,10 +9725,6 @@ PrefabInstance:
       propertyPath: bs
       value: 
       objectReference: {fileID: 2609252055704013381}
-    - target: {fileID: 1676236008550905741, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: cultistAssignment.Array.data[1]
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 2033373573955012660, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: sceneViewId
       value: 22
@@ -10910,6 +10906,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3640724613868678596, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3741396257336311424, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -11113,22 +11113,6 @@ PrefabInstance:
     - target: {fileID: 5797561401644588685, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5874753776448609879, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
-      propertyPath: testBlock.room
-      value: Room
-      objectReference: {fileID: 0}
-    - target: {fileID: 5874753776448609879, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
-      propertyPath: testBlock.time
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 5874753776448609879, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
-      propertyPath: testBlock.length
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5874753776448609879, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
-      propertyPath: testBlock.periodName
-      value: Period Name
       objectReference: {fileID: 0}
     - target: {fileID: 6001088928901726073, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_Name
