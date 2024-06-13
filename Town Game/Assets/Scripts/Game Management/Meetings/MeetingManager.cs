@@ -46,6 +46,7 @@ public class MeetingManager : MonoBehaviourPunCallbacks, IPunObservable
     void CheckQueue(ScheduleBlock from, ScheduleBlock to)
     {
         if (!PhotonNetwork.IsMasterClient) return;
+        if (!meetingQueued) return;
         // admire the spaghetti in all its glory, and also fuck you because i ain't making this look better
         if (from != null)
         {

@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using TMPro;
+using Photon.Pun.Demo.Procedural;
 
 public class ScheduleUI : MonoBehaviour
 {
+    public ScheduleBlock testBlock;
     public int foresight = 3;
-    public float blockDistance = 50f;
+    public float hourLength = 50f;
     public float repositionSpeed = 3f;
     public GameObject scheduleBlockPrefab;
+    public GameObject tearoutPrefab;
     public Transform blockHolder;
-    public Transform minimapTransform;
+    public Transform tearoutHolder;
     public string emptyPeriod = "Free Time";
-    float minimapY;
     [SerializeField] List<UIBlock> listedBlocks = new List<UIBlock>();
-    List<IEnumerator> sortRoutines = new List<IEnumerator>();
-    IEnumerator mapRoutine = null;
-    IEnumerator sequenceAdd = null;
+    GameObject tearout;
     GameManager gm;
     ScheduleManager sm;
 
@@ -38,28 +38,31 @@ public class ScheduleUI : MonoBehaviour
     {
         sm = FindObjectOfType<ScheduleManager>();
         gm = FindObjectOfType<GameManager>();
-        minimapY = minimapTransform.localPosition.y;
     }
 
     private void Start()
     {
-        ((RectTransform)blockHolder).SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, blockDistance * (float)foresight);
+        ((RectTransform)blockHolder).SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, hourLength * (float)foresight);
     }
 
     private void OnEnable()
     {
+        ReadSchedule();
         gm.OnDayStart += ReadSchedule;
+        sm.OnUpdateSchedule += ReadSchedule;
+        sm.OnBlockChange += UpdateTearout;
     }
 
     private void OnDisable()
     {
         gm.OnDayStart -= ReadSchedule;
+        sm.OnUpdateSchedule -= ReadSchedule;
+        sm.OnBlockChange -= UpdateTearout;
     }
 
     private void Update()
     {
-        //if (Input.GetKeyDown(KeyCode.O)) AddScheduleBlock(new ScheduleBlock(testBlock.periodName, testBlock.room, testBlock.length, testBlock.time));
-        //if (Input.GetKeyDown(KeyCode.I)) RemoveScheduleBlock(testBlock);
+        if (Input.GetKeyDown(KeyCode.O)) AddScheduleBlock(new ScheduleBlock(testBlock.periodName, testBlock.room, testBlock.length, testBlock.time));
         ScrollSchedule();
     }
 
@@ -70,6 +73,8 @@ public class ScheduleUI : MonoBehaviour
         {
             RemoveScheduleBlock(0);
         }
+        float currentPeriod = gm.currentPeriod - (gm.currentDay * 24f);
+        blockHolder.localPosition = new Vector2(0f, hourLength * currentPeriod);
     }
 
     /// <summary>
@@ -127,19 +132,9 @@ public class ScheduleUI : MonoBehaviour
     {
         blocks = blocks.OrderBy(o => o.time).ToList();
 
-        if (sequenceAdd != null) StopCoroutine(sequenceAdd);
-        sequenceAdd = null;
-        sequenceAdd = BlockSequence(blocks);
-        StartCoroutine(sequenceAdd);
-    }
-
-    IEnumerator BlockSequence(List<ScheduleBlock> blocks)
-    {
-        blocks.Reverse();
         foreach (ScheduleBlock block in blocks)
         {
             AddScheduleBlock(block);
-            yield return new WaitForSeconds(1f / repositionSpeed);
         }
     }
 
@@ -147,7 +142,10 @@ public class ScheduleUI : MonoBehaviour
     {
         GameObject newBlock = Instantiate(scheduleBlockPrefab, blockHolder);
         Transform nbt = newBlock.transform;
-        nbt.localPosition = new Vector2(0f, blockDistance);
+        float currentPosition = (block.time - (gm.currentDay * 24f)) * hourLength;
+        nbt.localPosition = new Vector2(0f, -currentPosition);
+        RectTransform rt = (RectTransform)nbt;
+        rt.sizeDelta = new Vector2(rt.sizeDelta.x, block.length * hourLength);
 
         int setPos = 0;
         for (int i = 0; i < listedBlocks.Count; i++)
@@ -155,125 +153,39 @@ public class ScheduleUI : MonoBehaviour
             if (block.time > listedBlocks[i].block.time) setPos++;
         }
         listedBlocks.Insert(setPos, new UIBlock(block, nbt));
-        //if (setPos > foresight-1) nbt.localPosition = new Vector2(0f, -blockDistance * foresight);
 
         // Sets text data on block
         nbt.GetChild(0).GetComponent<TextMeshProUGUI>().text = block.periodName;
         nbt.GetChild(1).GetComponent<TextMeshProUGUI>().text = block.room;
-        // Time data, also i know this is some spaghetti and can be simplified but give me a break smh
-        Vector2Int clockTimeStart = gm.PeriodToClockTime(block.time);
-        Vector2Int clockTimeEnd = gm.PeriodToClockTime(block.time + block.length);
-        string startMins = clockTimeStart.y.ToString();
-        if (startMins.Length == 1) startMins = "0" + startMins;
-        string endMins = clockTimeEnd.y.ToString();
-        if (endMins.Length == 1) endMins = "0" + endMins;
-        string startMeridiem = "AM";
-        if (clockTimeStart.x > 10 && clockTimeStart.x != 23) startMeridiem = "PM";
-        string endMeridiem = "AM";
-        if (clockTimeEnd.x > 10 && clockTimeEnd.x != 23) endMeridiem = "PM";
-        clockTimeStart.x++;
-        clockTimeEnd.x++;
-        if (clockTimeStart.x > 12) clockTimeStart.x -= 12;
-        if (clockTimeEnd.x > 12) clockTimeEnd.x -= 12;
-        nbt.GetChild(2).GetComponent<TextMeshProUGUI>().text = $"{clockTimeStart.x}:{startMins} {startMeridiem} - {clockTimeEnd.x}:{endMins} {endMeridiem}";
-
-        SortScheduleBlocks();
-    }
-
-    void RemoveScheduleBlock(ScheduleBlock block)
-    {
-        for (int i = 0; i < listedBlocks.Count; i++)
-        {
-            UIBlock checkBlock = listedBlocks[i];
-            if (checkBlock.block.Equals(block))
-            {
-                StartCoroutine(RemoveBlock(checkBlock.transform));
-                listedBlocks.RemoveAt(i);
-                SortScheduleBlocks();
-
-                return;
-            }
-        }
-
-        Debug.LogWarning("Schedule block could not be found.");
+        // Time data
+        string clockTimeStart = gm.PeriodToClockString(block.time);
+        string clockTimeEnd = gm.PeriodToClockString(block.time + block.length);
+        nbt.GetChild(2).GetComponent<TextMeshProUGUI>().text = $"{clockTimeStart} - {clockTimeEnd}";
     }
 
     void RemoveScheduleBlock(int index)
     {
-        StartCoroutine(RemoveBlock(listedBlocks[index].transform));
+        Destroy(listedBlocks[index].transform.gameObject);
         listedBlocks.RemoveAt(index);
-        SortScheduleBlocks();
-    }
-
-    // Sorts the schedule blocks in the list and re-orders them in game
-    void SortScheduleBlocks()
-    {
-        foreach (IEnumerator routine in sortRoutines) StopCoroutine(routine);
-        sortRoutines.Clear();
-        for (int i = 0; i < listedBlocks.Count; i++)
-        {
-            IEnumerator newRoutine = SetBlockPosition(listedBlocks[i].transform, i);
-            StartCoroutine(newRoutine);
-            sortRoutines.Add(newRoutine);
-        }
-        if (mapRoutine != null) StopCoroutine(mapRoutine);
-        mapRoutine = SetMinimapPosition();
-        StartCoroutine(mapRoutine);
     }
 
     void ClearScheduleBlocks()
     {
         listedBlocks.Clear();
-        sortRoutines.Clear();
-        foreach (Transform child in blockHolder)
-        {
-            Destroy(child.gameObject);
-        }
+        foreach (Transform child in blockHolder) Destroy(child.gameObject);
     }
 
-    IEnumerator SetBlockPosition(Transform blockTransform, int index)
+    void UpdateTearout(ScheduleBlock from, ScheduleBlock to)
     {
-        float desiredY = (float)index * -blockDistance;
-        float time = 0f;
-        float initialY = blockTransform.localPosition.y;
-        while (blockTransform.localPosition.y != desiredY)
-        {
-            time += Time.deltaTime * repositionSpeed;
-            float currentY = Mathf.SmoothStep(initialY, desiredY, time);
-            blockTransform.localPosition = new Vector3(0f, currentY);
-            yield return null;
-            if (blockTransform == null) break;
-        }
-    }
-
-    IEnumerator RemoveBlock(Transform blockTransform)
-    {
-        float time = 0f;
-        float initialY = blockTransform.localPosition.y;
-        while (blockTransform.localPosition.y != blockDistance)
-        {
-            time += Time.deltaTime * repositionSpeed;
-            float currentY = Mathf.SmoothStep(initialY, blockDistance, time);
-            blockTransform.localPosition = new Vector3(0f, currentY);
-            yield return null;
-            if (blockTransform == null) break;
-        }
-        if (blockTransform != null) Destroy(blockTransform.gameObject);
-    }
-
-    IEnumerator SetMinimapPosition()
-    {
-        float desiredY = minimapY + (Mathf.Clamp((float)listedBlocks.Count-1, 0, foresight-1) * -blockDistance);
-        float originalY = minimapTransform.localPosition.y;
-        float time = 0f;
-        while (minimapTransform.localPosition.y != desiredY)
-        {
-            time += Time.deltaTime * repositionSpeed;
-            float newY = Mathf.SmoothStep(originalY, desiredY, time);
-            minimapTransform.localPosition = new Vector3(minimapTransform.localPosition.x, newY);
-            yield return null;
-        }
-
-        yield return null;
+        if (tearout != null) Destroy(tearout);
+        if (to == null) return;
+        GameObject newTearout = Instantiate(tearoutPrefab, tearoutHolder);
+        Transform nbt = newTearout.transform;
+        nbt.GetChild(0).GetComponent<TextMeshProUGUI>().text = to.periodName;
+        nbt.GetChild(1).GetComponent<TextMeshProUGUI>().text = to.room;
+        // Time data
+        string clockTimeStart = gm.PeriodToClockString(to.time);
+        string clockTimeEnd = gm.PeriodToClockString(to.time + to.length);
+        nbt.GetChild(2).GetComponent<TextMeshProUGUI>().text = $"{clockTimeStart} - {clockTimeEnd}";
     }
 }
