@@ -2186,7 +2186,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: -0.0000076293945}
-  m_SizeDelta: {x: 300, y: 294.2321}
+  m_SizeDelta: {x: 300, y: 300}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &254890751061700331
 CanvasRenderer:
@@ -16397,7 +16397,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fc146cdf0d429948afe730093dd8a7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  foresight: 3
+  foresight: 5
   blockDistance: 50
   repositionSpeed: 2
   scheduleBlockPrefab: {fileID: 2004452700610076260, guid: 3e84774653b9eee498592dcfd43bab09, type: 3}
