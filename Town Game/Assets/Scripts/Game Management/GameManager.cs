@@ -9,7 +9,8 @@ using Steamworks;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 {
-    public Vector2Int testTime;
+    //public Vector2Int testTime;
+    public GlobalEvent testevent;
     // gamePhase 0 = initialize game/assign roles 1 = main game 2 = results screen
     public int gamePhase = 0;
     [Header("Game Variables")]
@@ -40,6 +41,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     RoleRevealer rv;
     RoomManager rm;
     PlayerManager pm;
+    ScheduleManager sm;
     bool skippedNight = false;
     bool startedDay = false;
     public GameEvent OnTimeChange;
@@ -86,6 +88,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         OnRevealRoles += rv.RevealRole;
         rm = FindObjectOfType<RoomManager>();
         pm = FindObjectOfType<PlayerManager>();
+        sm = FindObjectOfType<ScheduleManager>();
     }
 
     private void Start()
@@ -103,8 +106,17 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         CheckDay();
         UpdateGameTime();
         if (!PhotonNetwork.IsMasterClient) return;
-        if (Input.GetKeyDown(KeyCode.Backspace)) SetTime(testTime.x, testTime.y);
-        if (Input.GetKeyDown(KeyCode.P)) Debug.Log(cultists.Length);
+        //if (Input.GetKeyDown(KeyCode.Backspace)) SetTime(testTime.x, testTime.y);
+        if (Input.GetKeyDown(KeyCode.Backspace))
+        {
+            string[] newStrings = new string[] { testevent.name };
+            float[] newTimes = new float[] { testevent.time };
+            float[] newLengths = new float[] { testevent.length };
+            bool[] newCultistEvents = new bool[] { testevent.cultistEvent };
+            PhotonNetwork.OpCleanRpcBuffer(sm.GetComponent<PhotonView>());
+            // Filter cultists events when making function
+            sm.GetComponent<PhotonView>().RPC("AddGlobalEvents", RpcTarget.AllBuffered, (object)newStrings, (object)newTimes, (object)newLengths, (object)newCultistEvents);
+        }
         PhaseProperties();
         CheckNightSkip();
         CheckDayStart();
@@ -177,7 +189,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     public void SetNightTime()
-    {
+    {   
         skippedNight = false;
         Vector2Int newTime = PeriodToClockTime(timeSkippedPeriod);
         SetTime(newTime.x, newTime.y);

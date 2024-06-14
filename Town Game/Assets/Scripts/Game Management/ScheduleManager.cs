@@ -6,7 +6,6 @@ using System.Linq;
 
 public class ScheduleManager : MonoBehaviour
 {
-    public GameManager gm;
     // Dictionary for the schedules of each player
     public Dictionary<Photon.Realtime.Player, List<ScheduleBlock>> playerSchedules = new Dictionary<Photon.Realtime.Player, List<ScheduleBlock>>();
     // this client's schedule
@@ -14,12 +13,18 @@ public class ScheduleManager : MonoBehaviour
     public List<ScheduleBlock> immutableBlocks = new List<ScheduleBlock>();
     [HideInInspector] public List<ScheduleBlock> orderedBlocks = new List<ScheduleBlock>();
     PhotonView view;
-    public ScheduleBlock currentBlock = null;
+    [HideInInspector] public ScheduleBlock currentBlock = null;
     ScheduleBlock previousBlock = null;
+    
+    // This room's global events
+    public List<GlobalEvent> globalEvents = new List<GlobalEvent>();
 
-    public UpdateSchedule OnUpdateSchedule;
+    [HideInInspector] public GameManager gm;
+
+    public ScheduleEvent OnUpdateSchedule;
+    public ScheduleEvent OnUpdateGlobalEvents;
     public BlockChange OnBlockChange;
-    public delegate void UpdateSchedule();
+    public delegate void ScheduleEvent();
     /// <summary>
     /// Called when a schedule block ends and another begins
     /// </summary>
@@ -91,6 +96,18 @@ public class ScheduleManager : MonoBehaviour
         schedule.Clear();
 
         OnUpdateSchedule?.Invoke();
+    }
+
+    [PunRPC]
+    public void AddGlobalEvents(string[] names, float[] times, float[] lengths, bool[] cultistEvents) // The data of all global events, cast arrays into object for RPC to work
+    {
+        globalEvents.Clear();
+        for (int i = 0; i < names.Length; i++)
+        {
+            globalEvents.Add(new GlobalEvent(names[i], times[i], lengths[i], cultistEvents[i]));
+        }
+
+        OnUpdateGlobalEvents?.Invoke();
     }
 
     public bool PeriodOverlaps(float startTime, float endTime, Photon.Realtime.Player player)

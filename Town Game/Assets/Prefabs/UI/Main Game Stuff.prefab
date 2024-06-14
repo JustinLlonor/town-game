@@ -123,11 +123,11 @@ MonoBehaviour:
   currentDay: 0
   timeStopped: 0
   cultistAssignment: 0100000000010000000100000001000000010000
-  hourLength: 20
+  hourLength: 15
   timeSpeed: 1
   startCurrency: 100
   startTime: {x: 7, y: 0}
-  timeSkipPeriod: 21.5
+  timeSkipPeriod: 22.5
   timeSkippedPeriod: 4.5
   dayStartPeriod: 6.5
   days:
@@ -258,12 +258,12 @@ MonoBehaviour:
   immutableBlocks:
   - periodName: Brunch
     room: Cafeteria
-    length: 3
+    length: 2.5
     time: 7
   - periodName: Dinner
     room: Cafeteria
-    length: 3
-    time: 18
+    length: 2.5
+    time: 20
   orderedBlocks: []
   currentBlock:
     periodName: 

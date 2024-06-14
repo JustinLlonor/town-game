@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using TMPro;
-using Photon.Pun.Demo.Procedural;
 using UnityEngine.UI;
-using Unity.VisualScripting;
+using Photon.Pun.Demo.Procedural;
+using Photon.Voice.PUN;
 
 public class ScheduleUI : MonoBehaviour
 {
@@ -14,13 +14,19 @@ public class ScheduleUI : MonoBehaviour
     public float repositionSpeed = 3f;
     public GameObject scheduleBlockPrefab;
     public GameObject tearoutPrefab;
+    public GameObject bookmarkPrefab;
     public Transform blockHolder;
     public Transform tearoutHolder;
+    public Transform bookmarkHolder;
     [Header("Block Settings")]
     public string emptyPeriod = "Free Time";
     public Color primaryColor;
     public Color secondaryColor;
-    [SerializeField] List<UIBlock> listedBlocks = new List<UIBlock>();
+    [Header("Bookmarks")]
+    public float bookmarkOffset = 5f;
+    public Color innoBookmark;
+    public Color cultistBookmark;
+    List<UIBlock> listedBlocks = new List<UIBlock>();
     GameObject tearout;
     GameManager gm;
     ScheduleManager sm;
@@ -43,6 +49,7 @@ public class ScheduleUI : MonoBehaviour
     {
         sm = FindObjectOfType<ScheduleManager>();
         gm = FindObjectOfType<GameManager>();
+        sm.OnUpdateGlobalEvents += AddBookmarks;
     }
 
     private void Start()
@@ -53,14 +60,14 @@ public class ScheduleUI : MonoBehaviour
     private void OnEnable()
     {
         ReadSchedule();
-        gm.OnDayStart += ReadSchedule;
-        sm.OnUpdateSchedule += ReadSchedule;
+        gm.OnChangeDay += ReadSchedule;
+        sm.OnUpdateSchedule += ReadSchedule; // Make so that tearout is updated when schedule is updated
         sm.OnBlockChange += UpdateTearout;
     }
 
     private void OnDisable()
     {
-        gm.OnDayStart -= ReadSchedule;
+        gm.OnChangeDay -= ReadSchedule;
         sm.OnUpdateSchedule -= ReadSchedule;
         sm.OnBlockChange -= UpdateTearout;
     }
@@ -81,6 +88,7 @@ public class ScheduleUI : MonoBehaviour
         }
         float currentPeriod = gm.currentPeriod - (gm.currentDay * 24f);
         blockHolder.localPosition = new Vector2(0f, hourLength * currentPeriod);
+        bookmarkHolder.localPosition = new Vector2(0f, hourLength * currentPeriod);
     }
 
     void CheckTearout()
@@ -253,5 +261,32 @@ public class ScheduleUI : MonoBehaviour
             t.localPosition = new Vector2(newX, t.localPosition.y);
         }
         Destroy(t.gameObject);
+    }
+
+    void AddBookmarks()
+    {
+        ClearBookmarks();
+        foreach (GlobalEvent ge in sm.globalEvents)
+        {
+            Color newColor = innoBookmark;
+            if (ge.cultistEvent) newColor = cultistBookmark;
+
+            GameObject newBookmark = Instantiate(bookmarkPrefab, bookmarkHolder);
+            float currentPosition = -ge.time * hourLength;
+            float offset = -bookmarkOffset;
+            if (ge.cultistEvent) offset = bookmarkOffset;
+            RectTransform rt = newBookmark.GetComponent<RectTransform>();
+            rt.sizeDelta = new Vector2(rt.sizeDelta.x, ge.length * hourLength);
+            rt.localPosition = new Vector2(offset, currentPosition + hourLength * 3); // idk why its this number specifically
+            newBookmark.GetComponent<RawImage>().color = newColor;
+        }
+    }
+
+    void ClearBookmarks()
+    {
+        foreach (Transform child in bookmarkHolder)
+        {
+            Destroy(child.gameObject);
+        }
     }
 }
