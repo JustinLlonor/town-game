@@ -5569,6 +5569,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1122534626}
   - component: {fileID: 1122534627}
+  - component: {fileID: 1122534628}
   m_Layer: 0
   m_Name: Room Holder
   m_TagString: Untagged
@@ -5617,7 +5618,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21622c27f8215ac4e8343416e8a8bef5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  testRoom: 
   playerRooms: []
+  workRooms: []
+--- !u!114 &1122534628
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1122534625}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 25
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!114 &1122958390 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5939449488344646629, guid: e11b4f359f8ec4a43a915e109017ea6c, type: 3}
@@ -10399,6 +10424,10 @@ PrefabInstance:
       propertyPath: roomName
       value: Cafeteria
       objectReference: {fileID: 0}
+    - target: {fileID: 5021797308567165770, guid: e4182a93f6f36da49902806272b5e851, type: 3}
+      propertyPath: roomType
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7672904466477095405, guid: e4182a93f6f36da49902806272b5e851, type: 3}
       propertyPath: m_LocalPosition.x
       value: -98.35
@@ -10697,7 +10726,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roomName: Meeting Room
-  isLivingQuarters: 0
+  roomType: 0
   spawnTransform: {fileID: 0}
   taskHolder: {fileID: 0}
 --- !u!224 &6172742886535201663 stripped
@@ -11547,6 +11576,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7851023285296718899, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7855048012547292984, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7962656928823952477, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}

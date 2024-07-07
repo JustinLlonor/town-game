@@ -6,7 +6,15 @@ using UnityEngine;
 public class MapRoom : MonoBehaviour
 {
     public string roomName;
-    public bool isLivingQuarters = false;
+    public RoomType roomType = RoomType.Living;
     public Transform spawnTransform;
     public TaskHolder taskHolder;
+    public List<Photon.Realtime.Player> workers = new List<Photon.Realtime.Player>();
+
+    public enum RoomType
+    {
+        Work = 0,
+        Living = 1,
+        Misc = 2
+    }
 }

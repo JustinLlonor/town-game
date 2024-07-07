@@ -103,7 +103,7 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _LightingSteps: 4
+    - _LightingSteps: 8
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
@@ -116,6 +116,8 @@ Material:
     - _RimBrightness: 0
     - _RimPower: 0.48
     - _RimStep: 0
+    - _RoughnessLength: 8
+    - _RoughnessSize: 1441
     - _Smoothness: 0.02
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1

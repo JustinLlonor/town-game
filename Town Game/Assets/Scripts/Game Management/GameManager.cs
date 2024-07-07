@@ -30,6 +30,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public float timeSpeed = 1f;
     public int startCurrency = 100;
     public Vector2Int startTime;
+    public float buildingChooseTimer = 8f;
     [Header("Day/Night Cycle")]
     public float timeSkipPeriod = 21f;
     public float timeSkippedPeriod = 4.5f;

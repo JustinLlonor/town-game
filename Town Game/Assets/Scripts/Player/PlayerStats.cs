@@ -64,7 +64,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
         pe = gameObject.GetComponent<PlayerEvidence>();
         if (!view.IsMine) return;
         shake = FindObjectOfType<CameraShake>();
-        if (FindObjectOfType<GameManager>() != null)AddAffector(hungerAffecter);
+        //if (FindObjectOfType<GameManager>() != null)AddAffector(hungerAffecter);
     }
 
     private void Update()

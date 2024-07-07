@@ -116,14 +116,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9f9def4262e76f4f8c1781626b806f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testTime: {x: 22, y: 15}
+  testevent:
+    name: 
+    time: 0
+    length: 0
+    cultistEvent: 0
   gamePhase: 0
   gameTime: 0
   currentPeriod: 0
   currentDay: 0
   timeStopped: 0
   cultistAssignment: 0100000000010000000100000001000000010000
-  hourLength: 15
+  hourLength: 12
   timeSpeed: 1
   startCurrency: 100
   startTime: {x: 7, y: 0}
@@ -253,15 +257,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c87901ce9d0863419c1bbaecf62ca08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gm: {fileID: 1676236008550905741}
   schedule: []
   immutableBlocks:
-  - periodName: Brunch
-    room: Cafeteria
+  - periodName: Town Meeting
+    room: Town Hall
     length: 2.5
     time: 7
-  - periodName: Dinner
-    room: Cafeteria
+  - periodName: Town Meeting
+    room: Town Hall
     length: 2.5
     time: 20
   orderedBlocks: []
@@ -270,6 +273,8 @@ MonoBehaviour:
     room: 
     length: 0
     time: 0
+  globalEvents: []
+  gm: {fileID: 1676236008550905741}
 --- !u!1 &5211516756420375758
 GameObject:
   m_ObjectHideFlags: 0
