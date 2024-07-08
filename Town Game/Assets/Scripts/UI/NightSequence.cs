@@ -22,7 +22,7 @@ public class NightSequence : MonoBehaviour
         pm = FindObjectOfType<PlayerManager>();
         rm = FindObjectOfType<RoomManager>();
 
-        gm.OnNightSkip += NightStuff;
+        //gm.OnNightSkip += NightStuff;
         gm.OnDayStart += DayStuff;
         pm.OnInstantiatePlayer += GetReferences;
 

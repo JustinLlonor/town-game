@@ -100,6 +100,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         playerProperties["room"] = -1;
         playerProperties["confirmedDead"] = false;
         playerProperties["money"] = 0;
+        playerProperties["energy"] = 2;
         PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);
     }
 

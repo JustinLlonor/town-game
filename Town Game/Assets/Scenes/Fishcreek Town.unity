@@ -9925,6 +9925,14 @@ PrefabInstance:
       propertyPath: sceneViewId
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 3042919538494657000, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: ObservedComponents.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3042919538494657000, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: ObservedComponents.Array.data[1]
+      value: 
+      objectReference: {fileID: 110649284601070365}
     - target: {fileID: 5211516756420375758, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: m_Name
       value: Main Game Stuff
@@ -9994,6 +10002,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+--- !u!114 &110649284601070365 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3265226037120561301, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+  m_PrefabInstance: {fileID: 110649284601070364}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93e80c0d6411fac47aa6a89115cce7e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &361995279573289457 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2392533051715847090, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}

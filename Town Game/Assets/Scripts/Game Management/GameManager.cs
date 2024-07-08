@@ -6,6 +6,7 @@ using Photon.Realtime;
 using System.Linq;
 using TMPro;
 using Steamworks;
+using System;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -16,8 +17,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     [Header("Game Variables")]
     public Player campLeader;
     public Player[] cultists = new Player[] { };
-    public Player[] alivePlayers = new Player[] { };
+    public Player[] alivePlayers = new Player[] { }; // doesn't update with alive players yet
     public Dictionary<string, Position> playerPositions = new Dictionary<string, Position>();
+    public Dictionary<Player, string> chosenBuildings = new Dictionary<Player, string>();
     public float gameTime = 0f;
     public float currentPeriod;
     public int currentDay = 0;
@@ -45,6 +47,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     ScheduleManager sm;
     bool skippedNight = false;
     bool startedDay = false;
+    GameTimer gt;
     public GameEvent OnTimeChange;
     public RevealRoles OnRevealRoles;
     public GameEvent OnChangeDay;
@@ -90,6 +93,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         rm = FindObjectOfType<RoomManager>();
         pm = FindObjectOfType<PlayerManager>();
         sm = FindObjectOfType<ScheduleManager>();
+        gt = gameObject.GetComponent<GameTimer>();
     }
 
     private void Start()
@@ -186,15 +190,48 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public void NightSkipSequence()
     {
         OnNightSkip?.Invoke();
-        Invoke("SetNightTime", 3f);
+        gt.StartTimer(buildingChooseTimer);
+        StopTime();
+        gt.onTimerFinish.AddListener(SetNightTime);
+        ResetChosenBuildings(); // Resets the building data for all clients
     }
 
     public void SetNightTime()
-    {   
+    {
+        if (!PhotonNetwork.IsMasterClient) return;
         skippedNight = false;
         Vector2Int newTime = PeriodToClockTime(timeSkippedPeriod);
         SetTime(newTime.x, newTime.y);
         startedDay = false;
+        ResumeTime();
+    }
+
+    // Call to every client
+    [PunRPC]
+    public void SetChosenBuilding(string buildingName, PhotonMessageInfo info) 
+    {
+        Player player = info.Sender;
+        string newBuilding = "";
+        if (buildingName == "playerhouse") // "playerhouse" as building variable if player chooses their house
+        {
+            newBuilding = rm.playerRooms[(int)player.CustomProperties["room"]].roomName;
+        } 
+        else
+        {
+            if (Array.Find(rm.workRooms.ToArray(), room => room.roomName == buildingName) != null) // if the room is found
+            {
+                if (chosenBuildings.ContainsKey(player)) chosenBuildings[player] = buildingName; // Set the chosen building
+            } 
+        }
+    }
+
+    void ResetChosenBuildings()
+    {
+        chosenBuildings.Clear();
+        foreach (Player player in alivePlayers)
+        {
+            chosenBuildings.Add(player, rm.playerRooms[(int)player.CustomProperties["room"]].roomName); // Adds the player's home as the default building
+        }
     }
  
     void AssignRooms()
@@ -212,10 +249,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
         for (int i = 0; i < roomAssignment.Length; i++)
         {
-            int randomRoom = Random.Range(0, rm.playerRooms.Count);
+            int randomRoom = UnityEngine.Random.Range(0, rm.playerRooms.Count);
             while (roomAssignment.Contains(randomRoom))
             {
-                randomRoom = Random.Range(0, rm.playerRooms.Count);
+                randomRoom = UnityEngine.Random.Range(0, rm.playerRooms.Count);
             }
             roomAssignment[i] = randomRoom;
         }
@@ -295,7 +332,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         Debug.Log("Player list count: " + assignedCultists.Count);
         while (assignedCultists.Count > cultistNumber)
         {
-            int removalIndex = Random.Range(0, assignedCultists.Count);
+            int removalIndex = UnityEngine.Random.Range(0, assignedCultists.Count);
             Debug.Log("Removing at " + removalIndex);
             assignedCultists.RemoveAt(removalIndex);
         }

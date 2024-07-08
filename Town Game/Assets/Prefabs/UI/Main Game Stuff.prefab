@@ -82,6 +82,7 @@ GameObject:
   - component: {fileID: 1676236008550905741}
   - component: {fileID: 3042919538494657000}
   - component: {fileID: 1646914702507024258}
+  - component: {fileID: 3265226037120561301}
   m_Layer: 0
   m_Name: Game Manager
   m_TagString: Untagged
@@ -131,6 +132,7 @@ MonoBehaviour:
   timeSpeed: 1
   startCurrency: 100
   startTime: {x: 7, y: 0}
+  buildingChooseTimer: 8
   timeSkipPeriod: 22.5
   timeSkippedPeriod: 4.5
   dayStartPeriod: 6.5
@@ -190,6 +192,31 @@ MonoBehaviour:
     m_Bits: 1
   cultistColor: {r: 1, g: 0, b: 0.1181407, a: 1}
   innoColor: {r: 0, g: 1, b: 0.14043593, a: 1}
+--- !u!114 &3265226037120561301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1395259030610307795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93e80c0d6411fac47aa6a89115cce7e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isTicking: 0
+  onTimerStart:
+    m_PersistentCalls:
+      m_Calls: []
+  onTimerStop:
+    m_PersistentCalls:
+      m_Calls: []
+  onTimerFinish:
+    m_PersistentCalls:
+      m_Calls: []
+  timerText: {fileID: 0}
+  gameTimer: 0
+  clientTimer: 0
 --- !u!1 &3648747623983838247
 GameObject:
   m_ObjectHideFlags: 0
