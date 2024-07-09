@@ -7,6 +7,7 @@ using System.Linq;
 using TMPro;
 using Steamworks;
 using System;
+using WebSocketSharp;
 
 public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 {
@@ -45,6 +46,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     RoomManager rm;
     PlayerManager pm;
     ScheduleManager sm;
+    CameraManager cm;
     bool skippedNight = false;
     bool startedDay = false;
     GameTimer gt;
@@ -52,6 +54,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public RevealRoles OnRevealRoles;
     public GameEvent OnChangeDay;
     public GameEvent OnUpdatePositions;
+    public GameEvent OnNightSkipStart;
     public GameEvent OnNightSkip;
     public GameEvent OnDayStart;
     public GameEvent OnTimeStop;
@@ -94,6 +97,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         pm = FindObjectOfType<PlayerManager>();
         sm = FindObjectOfType<ScheduleManager>();
         gt = gameObject.GetComponent<GameTimer>();
+        cm = FindObjectOfType<CameraManager>();
     }
 
     private void Start()
@@ -189,8 +193,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     public void NightSkipSequence()
     {
-        OnNightSkip?.Invoke();
-        gt.StartTimer(buildingChooseTimer);
+        OnNightSkipStart?.Invoke();
+        gt.StartTimer(buildingChooseTimer + 1f);
         StopTime();
         gt.onTimerFinish.AddListener(SetNightTime);
         ResetChosenBuildings(); // Resets the building data for all clients
@@ -204,6 +208,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         SetTime(newTime.x, newTime.y);
         startedDay = false;
         ResumeTime();
+        TeleportToBuildings();
     }
 
     // Call to every client
@@ -212,11 +217,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         Player player = info.Sender;
         string newBuilding = "";
-        if (buildingName == "playerhouse") // "playerhouse" as building variable if player chooses their house
-        {
-            newBuilding = rm.playerRooms[(int)player.CustomProperties["room"]].roomName;
-        } 
-        else
+        if (buildingName != "house")
         {
             if (Array.Find(rm.workRooms.ToArray(), room => room.roomName == buildingName) != null) // if the room is found
             {
@@ -225,12 +226,38 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+    [PunRPC]
+    public void NightSkipEvent()
+    {
+        OnNightSkip?.Invoke();
+    }
+
+    void TeleportToBuildings()
+    {
+        foreach (KeyValuePair<Player, string> pair in  chosenBuildings)
+        {
+            Transform tpTransform = null;
+            if (pair.Value == "house" || pair.Value.IsNullOrEmpty())
+            {
+                tpTransform = rm.playerRooms[(int)pair.Key.CustomProperties["room"]].spawnTransform;
+                Debug.Log("house set");
+            }
+            else
+            {
+                tpTransform = rm.GetWorkBuilding(pair.Value).spawnTransform;
+            }
+            Debug.Log(tpTransform.position);
+            pm.photonView.RPC("Teleport", pair.Key, tpTransform.position, tpTransform.rotation);
+        }
+        view.RPC("NightSkipEvent", RpcTarget.All);
+    }
+
     void ResetChosenBuildings()
     {
         chosenBuildings.Clear();
         foreach (Player player in alivePlayers)
         {
-            chosenBuildings.Add(player, rm.playerRooms[(int)player.CustomProperties["room"]].roomName); // Adds the player's home as the default building
+            chosenBuildings.Add(player, "house"); // Adds the player's home as the default building
         }
     }
  

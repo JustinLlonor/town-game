@@ -91,6 +91,7 @@ public class CameraManager : MonoBehaviour
         StartCoroutine(TransitionToMode(duration, CameraMode.FirstPerson));
     }
 
+    // Starts a new mode transition, smoothly interpolates the camera to the corresponding mode transform
     public void StartModeTransition(float duration, CameraMode newMode)
     {
         if (mode == newMode) return;

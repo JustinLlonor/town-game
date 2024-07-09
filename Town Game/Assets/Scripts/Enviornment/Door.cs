@@ -79,9 +79,9 @@ public class Door : MonoBehaviour
     void DecideLock(bool isCultist)
     {
         gm.OnDayStart += NightUnlock;
-        if (PhotonNetwork.IsMasterClient) gm.OnNightSkip += ForceCloseInvoke;
+        if (PhotonNetwork.IsMasterClient) gm.OnNightSkipStart += ForceCloseInvoke;
         if (isCultist) return;
-        gm.OnNightSkip += NightLockInvoke;
+        gm.OnNightSkipStart += NightLockInvoke;
     }
 
     void NightLockInvoke()

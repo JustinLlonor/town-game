@@ -56,9 +56,11 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         if (currentPlayer == null) return;
 
         Rigidbody rb = currentPlayer.GetComponent<Rigidbody>();
+        PlayerMovement pm = currentPlayer.GetComponent<PlayerMovement>();
         CameraMovement cm = FindObjectOfType<CameraMovement>();
         currentPlayer.transform.position = location;
         currentPlayer.transform.rotation = rotation;
+        pm.cameraPosition.eulerAngles = new Vector3 (0, rotation.eulerAngles.y, 0);
         rb.velocity = Vector3.zero;
         rb.position = location;
         rb.rotation = rotation;
