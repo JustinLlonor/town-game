@@ -35,13 +35,13 @@ public class TasksUI : MonoBehaviour
         sm = FindObjectOfType<ScheduleManager>();
         pm = FindObjectOfType<PlayerManager>();
         pm.OnInstantiatePlayer += GetPlayerReferences;
-        sm.OnBlockChange += PeriodChange;
+        //sm.OnBlockChange += PeriodChange;
     }
 
     void GetPlayerReferences(GameObject player)
     {
         pr = player.GetComponent<PlayerRoom>();
-        pr.OnEnterRoom += OnEnterRoom;
+        //pr.OnEnterRoom += OnEnterRoom;
     }
 
     void OnEnterRoom(MapRoom room)
