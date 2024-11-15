@@ -47,6 +47,7 @@ public class RoomManager : MonoBehaviour
 
     private void Update()
     {
+        // Debug inputs
         if (Input.GetKeyDown(KeyCode.U)) AddWorker(PhotonNetwork.LocalPlayer, testRoom); // test
         if (Input.GetKeyDown(KeyCode.RightArrow)) ScrollRight();
         if (Input.GetKeyDown(KeyCode.LeftArrow)) ScrollLeft();
@@ -81,6 +82,9 @@ public class RoomManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Building start seqeunce
+    /// </summary>
     void BuildingChooseStart()
     {
         if (!gm.alivePlayers.Contains(PhotonNetwork.LocalPlayer)) return;

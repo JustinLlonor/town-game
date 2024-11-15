@@ -194,7 +194,16 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
         shake.StartShake(jumpShake.shakeProperties);
         jumpTimer = jumpCooldown;
+        SetAirSpeed();
         OnLeap?.Invoke();
+    }
+
+    // Sets the airspeed depending on the movement state of the player
+    private void SetAirSpeed()
+    {
+        if (isSprinting) airSpeed = speed * sprintMultiplier;
+        if (!isSprinting) airSpeed = speed;
+        if (isCrouching) airSpeed = speed * crouchMultiplier;
     }
 
     [PunRPC]
@@ -349,9 +358,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     void OnAir()
     {
-        if (isSprinting) airSpeed = speed * sprintMultiplier;
-        if (!isSprinting) airSpeed = speed;
-        if (isCrouching) airSpeed = speed * crouchMultiplier;
+        
     }
 
     void OnLand()
