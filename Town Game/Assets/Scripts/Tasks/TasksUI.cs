@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using WebSocketSharp;
 using System.Linq;
+using UnityEngine.UI;
 
 public class TasksUI : MonoBehaviour
 {
@@ -156,8 +157,10 @@ public class TasksUI : MonoBehaviour
         GameObject newTask = Instantiate(physTaskPrefab, taskHolder);
         PhysTask pt = newTask.GetComponent<PhysTask>();
         pt.SetTask(taskName);
-        pt.SetProgress(progression);
+        //pt.SetProgress(progression);
         physTasks.Add(new PTask(newTask, taskName));
+        ContentSizeFitter csf = newTask.GetComponent<ContentSizeFitter>();
+        csf.enabled = true;
     }
 
     void ClearTrackedTasks()

@@ -9,10 +9,12 @@ public class PhysTask : MonoBehaviour
     public TextMeshProUGUI taskText;
     public int percentCharacters = 4;
     float progress;
+    public float textOffset;
 
     public void SetTask(string name)
     {
         taskName = name;
+        UpdateText();
     }
 
     public void SetProgress(float newProgress)
@@ -23,6 +25,8 @@ public class PhysTask : MonoBehaviour
 
     void UpdateText()
     {
+        taskText.text = taskName;
+        return;
         string newPercent = (progress * 100f).ToString();
         if (newPercent.Length > percentCharacters)
         {
