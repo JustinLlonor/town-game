@@ -152,12 +152,12 @@ public class TasksUI : MonoBehaviour
         }
     }
 
-    void AddTask(string taskName, float progression)
+    void AddTask(string taskName, float progression = -1f)
     {
         GameObject newTask = Instantiate(physTaskPrefab, taskHolder);
         PhysTask pt = newTask.GetComponent<PhysTask>();
         pt.SetTask(taskName);
-        //pt.SetProgress(progression);
+        if (progression >= 0f) pt.SetProgress(progression);
         physTasks.Add(new PTask(newTask, taskName));
         ContentSizeFitter csf = newTask.GetComponent<ContentSizeFitter>();
         csf.enabled = true;

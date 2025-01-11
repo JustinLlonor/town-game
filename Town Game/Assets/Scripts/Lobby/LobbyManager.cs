@@ -54,7 +54,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         ro.CleanupCacheOnLeave = false;
         if (SteamManager.Initialized)
         {
-            ro.IsOpen = false;
+            ro.IsOpen = true;
             ro.IsVisible = false;
         }
         PhotonNetwork.CreateRoom(createText.text, ro);

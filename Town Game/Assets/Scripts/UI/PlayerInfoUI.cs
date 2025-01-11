@@ -8,8 +8,6 @@ using Photon.Pun;
 public class PlayerInfoUI : MonoBehaviour
 {
     public TextMeshProUGUI roleText;
-    public Transform lineHolder;
-    public RawImage[] folderImages = new RawImage[] { };
     public Color cultistColor;
     public Color researcherColor;
     GameManager gm;
@@ -18,7 +16,7 @@ public class PlayerInfoUI : MonoBehaviour
     {
         gm = FindObjectOfType<GameManager>();
         FindObjectOfType<RoleRevealer>().OnGetRole += SetRole;
-        gm.OnUpdatePositions += OnUpdatePositions;
+        //gm.OnUpdatePositions += OnUpdatePositions;
     }
 
     void SetRole(bool isCultist)
@@ -31,11 +29,11 @@ public class PlayerInfoUI : MonoBehaviour
         } 
         else
         {
-            roleText.text = "Researcher";
+            roleText.text = "Civilian";
             setColor = researcherColor;
         }
 
-        foreach (RawImage img in folderImages) img.color = setColor;
+        roleText.color = setColor;
     }
 
     /// <summary>
@@ -45,18 +43,18 @@ public class PlayerInfoUI : MonoBehaviour
     /// <param name="text"></param>
     public void SetLineText(int line, string text)
     {
-        TextMeshProUGUI lineText = lineHolder.GetChild(line).GetComponentInChildren<TextMeshProUGUI>();
-        lineText.text = text;
+        //TextMeshProUGUI lineText = lineHolder.GetChild(line).GetComponentInChildren<TextMeshProUGUI>();
+        //lineText.text = text;
     }
 
-    void OnUpdatePositions()
-    {
-        string currentName = (string)PhotonNetwork.LocalPlayer.CustomProperties["name"];
-        if (gm.playerPositions.ContainsKey(currentName))
-        {
-            int currentPosition = (int)gm.playerPositions[currentName];
-            string newText = $"Position: {gm.positions[currentPosition]}";
-            SetLineText(0, newText);
-        }
-    }
+  //  void OnUpdatePositions()
+  //  {
+  //      string currentName = (string)PhotonNetwork.LocalPlayer.CustomProperties["name"];
+  //      if (gm.playerPositions.ContainsKey(currentName))
+  //      {
+  //          int currentPosition = (int)gm.playerPositions[currentName];
+  //          string newText = $"Position: {gm.positions[currentPosition]}";
+  //          SetLineText(0, newText);
+  //      }
+  //  }
 }

@@ -2476,14 +2476,14 @@ RectTransform:
   m_GameObject: {fileID: 1490301103601975917}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.47186378, y: 0.47186378, z: 0.47186378}
+  m_LocalScale: {x: 0.3174229, y: 0.3174229, z: 0.3174229}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 11824761408175247}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -65.1}
+  m_AnchoredPosition: {x: 0, y: -62.6}
   m_SizeDelta: {x: 314.2, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!95 &6709570071462894922
@@ -3617,7 +3617,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 3f4ea7e3247f20b468820358fecb8b7f, type: 3}
+  m_Texture: {fileID: 0}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -4078,7 +4078,7 @@ RectTransform:
   m_GameObject: {fileID: 2398188855579113303}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.1082714, y: 1.1082714, z: 1.1082714}
+  m_LocalScale: {x: 1.1498675, y: 1.1498675, z: 1.1498675}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1371768772612007547}
@@ -4087,8 +4087,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 46.55275, y: -501}
-  m_SizeDelta: {x: 210.9075, y: 210.9075}
+  m_AnchoredPosition: {x: 15, y: -517}
+  m_SizeDelta: {x: 189.0605, y: 189.0578}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3368737656145698508
 CanvasRenderer:
@@ -4118,7 +4118,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 3f4ea7e3247f20b468820358fecb8b7f, type: 3}
+  m_Texture: {fileID: 0}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -13008,10 +13008,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roleText: {fileID: 8050014072696006971}
-  lineHolder: {fileID: 1189450812698583137}
-  folderImages:
-  - {fileID: 6206799694900219521}
-  - {fileID: 1888234251357180271}
   cultistColor: {r: 0.85882354, g: 0.4509804, b: 0.5036722, a: 1}
   researcherColor: {r: 0.48235294, g: 0.85882354, b: 0.4509804, a: 1}
 --- !u!95 &2256040506149261050

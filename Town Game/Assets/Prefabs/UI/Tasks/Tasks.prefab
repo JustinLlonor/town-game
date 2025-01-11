@@ -270,6 +270,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7487158461393184451}
   - component: {fileID: 1171937819935708030}
+  - component: {fileID: 7975886129811220155}
   m_Layer: 5
   m_Name: Tasks
   m_TagString: Untagged
@@ -314,6 +315,23 @@ MonoBehaviour:
   physTaskPrefab: {fileID: 3201832406534039677, guid: cb50ca930099a6040ba0260e3c6dbe39, type: 3}
   taskHolder: {fileID: 4950745809732843362}
   stateTaskHolder: {fileID: 0}
+--- !u!114 &7975886129811220155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5684387999265211453}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4362ce1e0679b144cb830c331c890ba6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  roleText: {fileID: 1550496435449591346}
+  lineHolder: {fileID: 0}
+  folderImages: []
+  cultistColor: {r: 0.8490566, g: 0.27634388, b: 0.27634388, a: 1}
+  researcherColor: {r: 0.47058824, g: 0.69803923, b: 0.40392157, a: 1}
 --- !u!1 &6404652186911547777
 GameObject:
   m_ObjectHideFlags: 0
@@ -437,7 +455,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Inhabitant
+  m_text: Civilian
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 446d24c8e75c4004f9f47472e0912266, type: 2}
   m_sharedMaterial: {fileID: -7106828267311449158, guid: 446d24c8e75c4004f9f47472e0912266, type: 2}
@@ -447,7 +465,7 @@ MonoBehaviour:
   m_fontColor32:
     serializedVersion: 2
     rgba: 4284985976
-  m_fontColor: {r: 0.47159708, g: 0.6981132, b: 0.40503737, a: 1}
+  m_fontColor: {r: 0.47058824, g: 0.69803923, b: 0.40392157, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:

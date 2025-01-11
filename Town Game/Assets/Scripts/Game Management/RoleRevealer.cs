@@ -74,7 +74,7 @@ public class RoleRevealer : MonoBehaviour
         else
         {
             rtxt.SetFontSize(60);
-            rtxt.StartTextRoll("Researcher", innoColor, 1f, 1f);
+            rtxt.StartTextRoll("Civilian", innoColor, 1f, 1f);
         }
     }
 
