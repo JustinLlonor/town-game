@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Photon.Pun;
 
 // For disabling and enabling input
 public class InputUIManager : MonoBehaviour
@@ -20,10 +19,10 @@ public class InputUIManager : MonoBehaviour
 
     private void Start()
     {
-        if (gameObject.GetComponent<PhotonView>() != null)
-        {
-            if (!gameObject.GetComponent<PhotonView>().IsMine) return;
-        }
+        //if (gameObject.GetComponent<PhotonView>() != null)
+        //{
+        //    if (!gameObject.GetComponent<PhotonView>().IsMine) return;
+        //}
         UIManager.instance.OnUIOpen += DisableInputs;
         UIManager.instance.OnUIClose += EnableInputs;
     }

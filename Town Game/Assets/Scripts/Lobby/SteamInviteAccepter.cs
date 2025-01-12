@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Steamworks;
-using Photon.Pun;
-using WebSocketSharp;
+//using Photon.Pun;
+//using WebSocketSharp;
 
 public class SteamInviteAccepter : MonoBehaviour
 {
@@ -31,9 +31,9 @@ public class SteamInviteAccepter : MonoBehaviour
     private void OnLobbyEntered(LobbyEnter_t callback)
     {
         string roomName = (string)SteamMatchmaking.GetLobbyData((CSteamID)callback.m_ulSteamIDLobby, "roomname");
-        if (roomName.IsNullOrEmpty()) return;
+        //if (roomName.IsNullOrEmpty()) return;
         Debug.LogError("Accepting invite to room: " + roomName);
-        PhotonNetwork.JoinRoom(roomName);
+        //PhotonNetwork.JoinRoom(roomName);
     }
 
     private void OnAcceptedInvite(GameLobbyJoinRequested_t callback)

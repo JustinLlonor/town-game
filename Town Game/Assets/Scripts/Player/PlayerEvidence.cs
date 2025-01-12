@@ -1,13 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
 
-public class PlayerEvidence : MonoBehaviourPunCallbacks
+public class PlayerEvidence : MonoBehaviour//PunCallbacks
 {
     public Dictionary<string, Evidence> evidence = new Dictionary<string, Evidence>();
 
-    [PunRPC]
+    //[PunRPC]
     public void AddEvidence(string name, string[] icons, string[] descriptions, float time = 0f)
     {
         if (evidence.ContainsKey(name))
@@ -22,11 +21,11 @@ public class PlayerEvidence : MonoBehaviourPunCallbacks
 
     public void ApplyEvidence(GameObject corpse)
     {
-        PhotonView view = corpse.GetComponent<PhotonView>();
+        //PhotonView view = corpse.GetComponent<PhotonView>();
         foreach (KeyValuePair<string, Evidence> p in evidence)
         {
             Evidence e = evidence[p.Key];
-            view.RPC("AddEvidence", RpcTarget.All, e.icons, e.descriptions, e.time);
+        //    view.RPC("AddEvidence", RpcTarget.All, e.icons, e.descriptions, e.time);
         }
     }
 }

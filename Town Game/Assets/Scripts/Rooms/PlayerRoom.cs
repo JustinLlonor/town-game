@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
 
 public class PlayerRoom : MonoBehaviour
 {
@@ -15,10 +14,10 @@ public class PlayerRoom : MonoBehaviour
 
     private void Awake()
     {
-        if (!gameObject.GetComponent<PhotonView>().IsMine)
-        {
-            Destroy(this);
-        }
+        //if (!gameObject.GetComponent<PhotonView>().IsMine)
+        //{
+        //    Destroy(this);
+        //}
     }
 
     private void OnTriggerEnter(Collider other)

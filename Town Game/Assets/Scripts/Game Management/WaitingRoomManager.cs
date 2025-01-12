@@ -1,9 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
 
-public class WaitingRoomManager : MonoBehaviourPunCallbacks, IPunObservable
+public class WaitingRoomManager : MonoBehaviour//PunCallbacks, IPunObservable
 {
     // 0 = not ready 1 = ready 2 = starting
     public int roomPhase = 0;
@@ -17,14 +16,14 @@ public class WaitingRoomManager : MonoBehaviourPunCallbacks, IPunObservable
     public void LaunchGame()
     {
         Debug.Log("Loading game...");
-        if (!PhotonNetwork.IsMasterClient) return;
-        PhotonNetwork.LoadLevel(2);
-        PhotonNetwork.CurrentRoom.IsOpen = false;
+        //if (!PhotonNetwork.IsMasterClient) return;
+        //PhotonNetwork.LoadLevel(2);
+        //PhotonNetwork.CurrentRoom.IsOpen = false;
     }
 
     void Awake()
     {
-        PhotonNetwork.AutomaticallySyncScene = true;
+        //PhotonNetwork.AutomaticallySyncScene = true;
         gt = gameObject.GetComponent<GameTimer>();
     }
 
@@ -36,7 +35,7 @@ public class WaitingRoomManager : MonoBehaviourPunCallbacks, IPunObservable
     void Update()
     {
         PhaseUI();
-        if (!PhotonNetwork.IsMasterClient) return;
+        //if (!PhotonNetwork.IsMasterClient) return;
         PhaseLogic();
     }
 
@@ -44,41 +43,41 @@ public class WaitingRoomManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (roomPhase == 0)
         {
-            if (PhotonNetwork.CurrentRoom.PlayerCount >= playersRequired)
-            {
-                roomPhase = 1;
-            }
-            if (PhotonNetwork.IsMasterClient) hostUI.SetActive(false);
+            //if (PhotonNetwork.CurrentRoom.PlayerCount >= playersRequired)
+            //{
+            //    roomPhase = 1;
+            //}
+            //if (PhotonNetwork.IsMasterClient) hostUI.SetActive(false);
         }
         if (roomPhase == 1)
         {
-            if (PhotonNetwork.CurrentRoom.PlayerCount < playersRequired)
-            {
-                roomPhase = 0;
-                return;
-            }
-            if (PhotonNetwork.IsMasterClient)
-            {
-                hostUI.SetActive(true);
-                if (Input.GetKeyDown(KeyCode.T))
-                {
-                    roomPhase = 2;
-                    StartTimer();
-                    return;
-                }
-            }
+            //if (PhotonNetwork.CurrentRoom.PlayerCount < playersRequired)
+            //{
+            //    roomPhase = 0;
+            //    return;
+            //}
+            //if (PhotonNetwork.IsMasterClient)
+            //{
+            //    hostUI.SetActive(true);
+            //    if (Input.GetKeyDown(KeyCode.T))
+            //    {
+            //        roomPhase = 2;
+            //        StartTimer();
+            //        return;
+            //    }
+            //}
         }
         if (roomPhase == 2)
         {
-            if (PhotonNetwork.IsMasterClient)
-            {
-                hostUI.SetActive(false);
-                if (Input.GetKeyDown(KeyCode.T))
-                {
-                    roomPhase = 1;
-                    gt.StopTimer();
-                }
-            }
+            //if (PhotonNetwork.IsMasterClient)
+            //{
+            //    hostUI.SetActive(false);
+            //    if (Input.GetKeyDown(KeyCode.T))
+            //    {
+            //        roomPhase = 1;
+            //        gt.StopTimer();
+            //    }
+            //}
         }
     }
 
@@ -99,14 +98,14 @@ public class WaitingRoomManager : MonoBehaviourPunCallbacks, IPunObservable
         phaseUI[roomPhase].SetActive(true);
     }
 
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info) 
-    {
-        if (stream.IsWriting)
-        {
-            stream.SendNext(roomPhase);
-        } else
-        {
-            roomPhase = (int)stream.ReceiveNext();
-        }
-    }
+    //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info) 
+    //{
+    //    if (stream.IsWriting)
+    //    {
+    //        stream.SendNext(roomPhase);
+    //    } else
+    //    {
+    //        roomPhase = (int)stream.ReceiveNext();
+    //    }
+    //}
 }   

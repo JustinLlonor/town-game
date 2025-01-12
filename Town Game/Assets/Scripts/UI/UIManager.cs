@@ -87,7 +87,7 @@ public class UIManager : MonoBehaviour
         tabUI.gameObject.SetActive(true);
         OnUIOpen.Invoke();
         tabUI.UpdatePlayerList();
-        tabUI.playerList.OnDeselectPlayer?.Invoke(null);
+        //tabUI.playerList.OnDeselectPlayer?.Invoke(null);
     }
 
     public void CloseTabMenu()

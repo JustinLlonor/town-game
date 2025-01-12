@@ -1,4 +1,4 @@
-using Photon.Pun;
+//using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -55,8 +55,8 @@ public class NightSequence : MonoBehaviour
         if (blackScreen) bs.StartAlphaTransition(1f, 2.5f);
         if (waitForTransition) yield return new WaitForSeconds(3f);
         newNightUI.SetActive(true);
-        Transform tpTransform = rm.playerRooms[(int)PhotonNetwork.LocalPlayer.CustomProperties["room"]].spawnTransform;
-        if (teleport) pm.Teleport(tpTransform.position, tpTransform.rotation);
+        //Transform tpTransform = rm.playerRooms[(int)PhotonNetwork.LocalPlayer.CustomProperties["room"]].spawnTransform;
+        //if (teleport) pm.Teleport(tpTransform.position, tpTransform.rotation);
         yield return new WaitForSeconds(1f);
         if (blackScreen) bs.StartAlphaTransition(0f, 2.5f);
         yield return new WaitForSeconds(4.1f);
@@ -65,11 +65,11 @@ public class NightSequence : MonoBehaviour
 
     void SetCultistText()
     {
-        if (gm.cultists.Length == 1)
-        {
-            cultistText.text = gm.cultists.Length + " cultist remains.";
-            return;
-        }
-        cultistText.text = gm.cultists.Length + " cultists remain.";
+        //if (gm.cultists.Length == 1)
+        //{
+        //    cultistText.text = gm.cultists.Length + " cultist remains.";
+        //    return;
+        //}
+        //cultistText.text = gm.cultists.Length + " cultists remain.";
     }
 }

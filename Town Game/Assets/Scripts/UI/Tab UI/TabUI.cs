@@ -11,9 +11,9 @@ public class TabUI : MonoBehaviour
     {
         if (tabSchedule != null)
         {
-            playerList.OnClickPlayer += tabSchedule.ResetReadDay;
-            playerList.OnClickPlayer += tabSchedule.DisplaySchedule;
-            playerList.OnDeselectPlayer += tabSchedule.DeselectSchedule;
+            //playerList.OnClickPlayer += tabSchedule.ResetReadDay;
+            //playerList.OnClickPlayer += tabSchedule.DisplaySchedule;
+            //playerList.OnDeselectPlayer += tabSchedule.DeselectSchedule;
         }
     }
 

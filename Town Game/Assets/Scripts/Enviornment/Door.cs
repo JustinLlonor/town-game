@@ -1,6 +1,6 @@
 using System.Collections;
 using UnityEngine;
-using Photon.Pun;
+//using Photon.Pun;
 using UnityEngine.UIElements;
 
 public class Door : MonoBehaviour
@@ -19,14 +19,14 @@ public class Door : MonoBehaviour
     float originalAngle;
     [Header("Info")]
     public bool doorOpened = false;
-    public bool doorLocked = false;
-    PhotonView view;
+    //public bool doorLocked = false;
+    //PhotonView view;
     GameManager gm;
 
     private void Awake()
     {
         gm = FindObjectOfType<GameManager>();
-        view = transform.GetComponent<PhotonView>();
+        //view = transform.GetComponent<PhotonView>();
         originalAngle = doorTransform.localEulerAngles.y;
         // Sets all other colliders to the open collider
         BoxCollider bc = interOpen.GetComponent<BoxCollider>();
@@ -45,25 +45,25 @@ public class Door : MonoBehaviour
 
     public void OpenDoorRPC()
     {
-        PhotonNetwork.OpCleanRpcBuffer(view);
+        //PhotonNetwork.OpCleanRpcBuffer(view);
         OpenDoor();
-        view.RPC("OpenDoor", RpcTarget.OthersBuffered);
+        //view.RPC("OpenDoor", RpcTarget.OthersBuffered);
     }
 
     public void CloseDoorRPC()
     {
-        PhotonNetwork.OpCleanRpcBuffer(view);
+        //PhotonNetwork.OpCleanRpcBuffer(view);
         CloseDoor();
-        view.RPC("CloseDoor", RpcTarget.OthersBuffered);
+        //view.RPC("CloseDoor", RpcTarget.OthersBuffered);
     }
 
-    [PunRPC]
+    //[PunRPC]
     public void OpenDoor()
     {
         StartCoroutine(DoorOpenAnim());
     }
 
-    [PunRPC]
+    //[PunRPC]
     public void CloseDoor()
     {
         StartCoroutine(DoorCloseAnim());
@@ -79,7 +79,7 @@ public class Door : MonoBehaviour
     void DecideLock(bool isCultist)
     {
         gm.OnDayStart += NightUnlock;
-        if (PhotonNetwork.IsMasterClient) gm.OnNightSkipStart += ForceCloseInvoke;
+        //if (PhotonNetwork.IsMasterClient) gm.OnNightSkipStart += ForceCloseInvoke;
         if (isCultist) return;
         gm.OnNightSkipStart += NightLockInvoke;
     }
@@ -99,7 +99,7 @@ public class Door : MonoBehaviour
         if (doorOpened)
         {
             ForceClose();
-            view.RPC("ForceClose", RpcTarget.OthersBuffered);
+            //view.RPC("ForceClose", RpcTarget.OthersBuffered);
         }
     }
 
@@ -114,16 +114,16 @@ public class Door : MonoBehaviour
         Unlock();
     }
 
-    [PunRPC]
+    //[PunRPC]
     void Lock()
     {
-        if (doorLocked) return;
+        //if (doorLocked) return;
         interOpen.SetActive(false);
         interClose.SetActive(false);
         interLocked.SetActive(true);
     }
 
-    [PunRPC]
+    //[PunRPC]
     void Unlock()
     {
         interLocked.SetActive(false);
@@ -131,7 +131,7 @@ public class Door : MonoBehaviour
         interClose.SetActive(doorOpened);
     }
 
-    [PunRPC]
+    //[PunRPC]
     void ForceClose()
     {
         doorOpened = false;
@@ -140,7 +140,7 @@ public class Door : MonoBehaviour
         interClose.SetActive(doorOpened);
     }
 
-    [PunRPC]
+    //[PunRPC]
     void ForceOpen()
     {
         doorOpened = true;

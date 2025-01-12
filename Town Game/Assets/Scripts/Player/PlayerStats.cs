@@ -1,12 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
+//using Photon.Pun;
 using System.Linq;
-using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
-public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
+public class PlayerStats : MonoBehaviour//PunCallbacks, IPunObservable
 {
     [Header("HP")]
     public float maxHP = 100f;
@@ -49,7 +48,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     public AffecterChange OnAddAffecter;
 
     CameraShake shake;
-    PhotonView view;
+    //PhotonView view;
     PlayerEvidence pe;
     PlayerMovement pm;
     [HideInInspector] public Animator anim;
@@ -60,9 +59,9 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     {
         pm = gameObject.GetComponent<PlayerMovement>();
         hLayer = anim.GetLayerIndex(hurtLayer);
-        view = gameObject.GetComponent<PhotonView>();
+        //view = gameObject.GetComponent<PhotonView>();
         pe = gameObject.GetComponent<PlayerEvidence>();
-        if (!view.IsMine) return;
+        //if (!view.IsMine) return;
         shake = FindObjectOfType<CameraShake>();
         //if (FindObjectOfType<GameManager>() != null)AddAffector(hungerAffecter);
     }
@@ -70,7 +69,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     private void Update()
     {
         FixDmg();
-        if (!view.IsMine) return;
+        //if (!view.IsMine) return;
         CheckAffecters();
         if (staminaCooldown > 0f) staminaCooldown -= Time.deltaTime;
         if (staminaRegenCooldown > 0f) staminaRegenCooldown -= Time.deltaTime;
@@ -165,13 +164,13 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     /// Instantly removes the specified amount of HP.
     /// </summary>
     /// <param name="amount"></param>
-    [PunRPC]
+    //[PunRPC]
     public void Damage(float amount, bool playShake = true)
     {
         HP -= amount;
         OnTakeDamage?.Invoke(amount);
         CheckDeath();
-        view.RPC("DamageAnimation", RpcTarget.All);
+        //view.RPC("DamageAnimation", RpcTarget.All);
         if (playShake)
         {
             if (amount < softThreshold)
@@ -185,7 +184,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
-    [PunRPC]
+    //[PunRPC]
     public void DamageAnimation()
     {
         hWeight = hurtWeight;
@@ -196,7 +195,7 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (HP <= 0f)
         {
-            Kill();
+            //Kill();
         }
     }
 
@@ -208,36 +207,36 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
         if (hWeight < 0.001f) hWeight = 0f;
     }
 
-    public void Kill()
-    {
-        OnDeath?.Invoke();
-        GameObject corpse = PhotonNetwork.Instantiate(corpsePrefab.name, transform.position, transform.rotation);
-        PhotonView corpseView = corpse.GetComponent<PhotonView>();
-        pe.ApplyEvidence(corpse);
-        Ragdoller ragdoller = corpse.GetComponent<Ragdoller>();
-        ragdoller.SetPositionsToTarget(myRig);
-        FindObjectOfType<CameraBobbing>().isBobbing = false;
-
-        // Set corpse nickname
-        Corpse co = corpse.GetComponent<Corpse>();
-        co.SetVelocity(gameObject.GetComponent<Rigidbody>().velocity);
-        co.SetCorpseData(view.Owner);
-        corpseView.RPC("SetCorpseData", RpcTarget.OthersBuffered, view.Owner);
+    //public void Kill()
+    //{
+    //    OnDeath?.Invoke();
+    //    GameObject corpse = PhotonNetwork.Instantiate(corpsePrefab.name, transform.position, transform.rotation);
+    //    PhotonView corpseView = corpse.GetComponent<PhotonView>();
+    //    pe.ApplyEvidence(corpse);
+    //    Ragdoller ragdoller = corpse.GetComponent<Ragdoller>();
+    //    ragdoller.SetPositionsToTarget(myRig);
+    //    FindObjectOfType<CameraBobbing>().isBobbing = false;
+    //
+    //    // Set corpse nickname
+    //    Corpse co = corpse.GetComponent<Corpse>();
+    //    co.SetVelocity(gameObject.GetComponent<Rigidbody>().velocity);
+    //    co.SetCorpseData(view.Owner);
+    //    corpseView.RPC("SetCorpseData", RpcTarget.OthersBuffered, view.Owner);
 
         // Sets corpse clothing to this player's clothing
-        PlayerClothing cpc = corpse.GetComponent<PlayerClothing>();
-        PlayerClothing pc = gameObject.GetComponent<PlayerClothing>();
-        foreach (PlayerClothing.Attire attire in pc.attires)
-        {
-            if (attire.clothing == null) continue;
-            cpc.SetClothing(attire.clothing.name, cpc.isMale);
-            corpseView.RPC("SetClothing", RpcTarget.OthersBuffered, attire.clothing.name, cpc.isMale);
-        }
-        PhotonNetwork.Destroy(gameObject);
-        return;
+    //    PlayerClothing cpc = corpse.GetComponent<PlayerClothing>();
+    //    PlayerClothing pc = gameObject.GetComponent<PlayerClothing>();
+    //    foreach (PlayerClothing.Attire attire in pc.attires)
+    //    {
+    //        if (attire.clothing == null) continue;
+    //        cpc.SetClothing(attire.clothing.name, cpc.isMale);
+    //        corpseView.RPC("SetClothing", RpcTarget.OthersBuffered, attire.clothing.name, cpc.isMale);
+    //    }
+    //    PhotonNetwork.Destroy(gameObject);
+    //    return;
 
         //Destroy player
-    }
+    //}
 
     // Stamina
     void RegenStamina()
@@ -281,31 +280,31 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
         return true;
     }
 
-    public override void OnLeftRoom()
-    {
-        SceneManager.LoadScene(0);
-    }
+    //public override void OnLeftRoom()
+    //{
+    //    SceneManager.LoadScene(0);
+    //}
 
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.IsWriting)
-        {
-            stream.SendNext(HP);
-            stream.SendNext(maxHP);
-            stream.SendNext(nutrition);
-            stream.SendNext(maxNutrition);
-            stream.SendNext(sanity);
-            stream.SendNext(maxSanity);
-        }
-        else
-        {
-            HP = (float)stream.ReceiveNext();
-            maxHP = (float)stream.ReceiveNext();
-            nutrition = (float)stream.ReceiveNext();
-            maxNutrition = (float)stream.ReceiveNext();
-            sanity = (float)stream.ReceiveNext();
-            maxSanity = (float)stream.ReceiveNext();
-        }
-    }
+    //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    //{
+    //    if (stream.IsWriting)
+    //    {
+    //        stream.SendNext(HP);
+    //        stream.SendNext(maxHP);
+    //        stream.SendNext(nutrition);
+    //        stream.SendNext(maxNutrition);
+    //        stream.SendNext(sanity);
+    //        stream.SendNext(maxSanity);
+    //    }
+    //    else
+    //    {
+    //        HP = (float)stream.ReceiveNext();
+    //        maxHP = (float)stream.ReceiveNext();
+    //        nutrition = (float)stream.ReceiveNext();
+    //        maxNutrition = (float)stream.ReceiveNext();
+    //        sanity = (float)stream.ReceiveNext();
+    //        maxSanity = (float)stream.ReceiveNext();
+    //    }
+    //}
 }
 

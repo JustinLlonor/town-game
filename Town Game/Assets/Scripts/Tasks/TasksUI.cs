@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using WebSocketSharp;
+//using WebSocketSharp;
 using System.Linq;
 using UnityEngine.UI;
 
@@ -62,11 +62,11 @@ public class TasksUI : MonoBehaviour
             return;
         }
         // If period, try to get state tasks
-        if (to.room.IsNullOrEmpty())
-        {
-            GetStateTasks(to.periodName);
-            return;
-        }
+        //if (to.room.IsNullOrEmpty())
+        //{
+        //    GetStateTasks(to.periodName);
+        //    return;
+        //}
         // If our current room is equal to the room of the block that was just switched to, get the room tass
         if (pr.currentRoom != null)
         {

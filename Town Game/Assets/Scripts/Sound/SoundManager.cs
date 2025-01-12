@@ -1,7 +1,7 @@
 using UnityEngine.Audio;
 using System;
 using UnityEngine;
-using Photon.Pun;
+//using Photon.Pun;
 
 public class SoundManager : MonoBehaviour
 {
@@ -25,7 +25,7 @@ public class SoundManager : MonoBehaviour
     public SoundGroup[] soundGroups;
     public GameObject soundInstance;
     public static SoundManager instance;
-    public PhotonView view;
+    //public PhotonView view;
 
     private void Awake()
     {
@@ -60,7 +60,7 @@ public class SoundManager : MonoBehaviour
     /// Plays a 2D sound
     /// </summary>
     /// <param name="name">Name of the sound</param>
-    [PunRPC]
+    //[PunRPC]
     public void Play(string name)
     {
         SoundGroup sg = null;
@@ -89,7 +89,7 @@ public class SoundManager : MonoBehaviour
     /// </summary>
     /// <param name="name">Name of the sound</param>
     /// <param name="position">Position of the sound</param>
-    [PunRPC]
+    //[PunRPC]
     public void Play3D(string name, Vector3 position, bool global = true)
     {
         SoundGroup sg = null;
@@ -121,7 +121,7 @@ public class SoundManager : MonoBehaviour
 
         if (global)
         {
-            view.RPC("Play3D", RpcTarget.Others, name, position, false);
+            //view.RPC("Play3D", RpcTarget.Others, name, position, false);
         }
     }
 }

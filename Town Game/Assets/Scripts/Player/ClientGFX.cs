@@ -1,4 +1,3 @@
-using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,17 +5,17 @@ using UnityEngine.Rendering;
 
 public class ClientGFX : MonoBehaviour
 {
-    public PhotonView view;
+    //public PhotonView view;
     public GameObject[] renderers;
     public MeshRenderer serverItem;
     
     private void Awake()
     {
-        if (view.IsMine)
-        {
-            HideRenderers();
-            serverItem.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
-        }
+        //if (view.IsMine)
+        //{
+        //    HideRenderers();
+        //    serverItem.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+        //}
     }
 
     public void ShowRenderers()

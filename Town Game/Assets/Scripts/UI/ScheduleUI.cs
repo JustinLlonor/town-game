@@ -4,8 +4,6 @@ using System.Linq;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using Photon.Pun.Demo.Procedural;
-using Photon.Voice.PUN;
 
 public class ScheduleUI : MonoBehaviour
 {

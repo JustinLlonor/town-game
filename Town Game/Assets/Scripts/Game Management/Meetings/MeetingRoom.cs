@@ -1,14 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
+//using Photon.Pun;
 
 // For client side part of meetings
 public class MeetingRoom : MonoBehaviour
 {
     public Transform higherSeatHolder;
     public Transform civilianSeatHolder;
-    public PhotonView view;
+    //public PhotonView view;
     GameManager gm;
     PlayerManager pm;
     PlayerMovement playerMovement;
@@ -16,7 +16,7 @@ public class MeetingRoom : MonoBehaviour
     private void Awake()
     {
         gm = FindObjectOfType<GameManager>();
-        pm = FindObjectOfType<PlayerManager>();
+        //pm = FindObjectOfType<PlayerManager>();
         pm.OnInstantiatePlayer += GetReferences;
     }
 
@@ -25,19 +25,19 @@ public class MeetingRoom : MonoBehaviour
         playerMovement = player.GetComponent<PlayerMovement>();
     }
 
-    [PunRPC]
+    //[PunRPC]
     public void TeleportToSeat(int seat)
     {
-        if ((int)gm.playerPositions[(string)PhotonNetwork.LocalPlayer.CustomProperties["name"]] == 0)
-        {
-            Transform teleportTransforom = civilianSeatHolder.GetChild(seat);
-            pm.Teleport(teleportTransforom.position, teleportTransforom.rotation);
-        } 
-        else
-        {
-            Transform teleportTransforom = higherSeatHolder.GetChild(seat);
-            pm.Teleport(teleportTransforom.position, teleportTransforom.rotation);
-        }
-        playerMovement.Freeze();
+        //if ((int)gm.playerPositions[(string)PhotonNetwork.LocalPlayer.CustomProperties["name"]] == 0)
+        //{
+        //    Transform teleportTransforom = civilianSeatHolder.GetChild(seat);
+        //    pm.Teleport(teleportTransforom.position, teleportTransforom.rotation);
+        //} 
+        //else
+        //{
+        //    Transform teleportTransforom = higherSeatHolder.GetChild(seat);
+        //    pm.Teleport(teleportTransforom.position, teleportTransforom.rotation);
+        //}
+        //playerMovement.Freeze();
     }
 }

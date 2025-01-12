@@ -1,18 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
-using Photon.Realtime;
-using WebSocketSharp;
+//using Photon.Pun;
+//using Photon.Realtime;
+//using WebSocketSharp;
 
-public class PlayerInfoView : MonoBehaviourPunCallbacks
+public class PlayerInfoView : MonoBehaviour//PunCallbacks
 {
     public Gradient healthGradient = new Gradient();
     public string[] healthTextGradient = new string[] { };
     public Gradient sanityGradient = new Gradient();
     public string[] sanityTextGradient = new string[] { };
     public PlayerStats stats;
-    public PhotonView view;
+    //public PhotonView view;
     Interactable vi;
     int previousIndex = -1;
     bool updatedNick = false;
@@ -24,11 +24,11 @@ public class PlayerInfoView : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        if (!view.IsMine) return;
-        if (view.IsMine)
-        {
-            transform.GetComponent<BoxCollider>().enabled = false;
-        }
+        //if (!view.IsMine) return;
+        //if (view.IsMine)
+        //{
+        //    transform.GetComponent<BoxCollider>().enabled = false;
+        //}
     }
         
     private void Update()
@@ -38,7 +38,7 @@ public class PlayerInfoView : MonoBehaviourPunCallbacks
         UpdateHP(Mathf.Clamp01(stats.HP / stats.maxHP));
     }
 
-    [PunRPC]
+    //[PunRPC]
     public void SetNickname(string newName)
     {
         vi.hovers[0].lore = newName;
@@ -48,17 +48,17 @@ public class PlayerInfoView : MonoBehaviourPunCallbacks
     void UpdateNickname()
     {
         if (updatedNick) return;
-        if (view.Owner == null) return;
-        if (!((string)view.Owner.CustomProperties["name"]).IsNullOrEmpty())
-        {
-            view.RPC("SetNickname", RpcTarget.OthersBuffered, (string)view.Owner.CustomProperties["name"]);
-            updatedNick = true;
-        }
+        //if (view.Owner == null) return;
+        //if (!((string)view.Owner.CustomProperties["name"]).IsNullOrEmpty())
+        //{
+        //    view.RPC("SetNickname", RpcTarget.OthersBuffered, (string)view.Owner.CustomProperties["name"]);
+        //    updatedNick = true;
+        //}
     }
 
     void UpdateHP(float eval)
     {
-        if (view.IsMine) return;
+        //if (view.IsMine) return;
         int newIndex = Mathf.FloorToInt(healthTextGradient.Length*(1-eval));
         if (newIndex != previousIndex)
         {

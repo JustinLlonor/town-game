@@ -1,11 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
+//using Photon.Pun;
 using UnityEngine.Events;
 using TMPro;
 
-public class GameTimer : MonoBehaviourPunCallbacks, IPunObservable
+public class GameTimer : MonoBehaviour//PunCallbacks, IPunObservable
 {
     public bool isTicking = false;
     public UnityEvent onTimerStart;
@@ -14,7 +14,7 @@ public class GameTimer : MonoBehaviourPunCallbacks, IPunObservable
     public TextMeshProUGUI timerText;
     public float gameTimer;
     public float clientTimer;
-    PhotonView view;
+    //PhotonView view;
 
     public void StartTimer(float time)
     {
@@ -42,14 +42,14 @@ public class GameTimer : MonoBehaviourPunCallbacks, IPunObservable
 
     void Awake()
     {
-        view = gameObject.GetComponent<PhotonView>();
+        //view = gameObject.GetComponent<PhotonView>();
     }
 
     void Update()
     {
         ClientTimer();
         TimerUI();
-        if (!PhotonNetwork.IsMasterClient) return;
+        //if (!PhotonNetwork.IsMasterClient) return;
         Timer();
     }
 
@@ -78,7 +78,7 @@ public class GameTimer : MonoBehaviourPunCallbacks, IPunObservable
 
     void ClientTimer()
     {
-        if (PhotonNetwork.IsMasterClient) return;
+        //if (PhotonNetwork.IsMasterClient) return;
         if (!isTicking) return;
 
         if (clientTimer > gameTimer)
@@ -94,17 +94,17 @@ public class GameTimer : MonoBehaviourPunCallbacks, IPunObservable
         if (clientTimer < 0f) clientTimer = -0.1f;
     }
 
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.IsWriting)
-        {
-            stream.SendNext(gameTimer);
-            stream.SendNext(isTicking);
-        }
-        else
-        {
-            gameTimer = (float)stream.ReceiveNext();
-            isTicking = (bool)stream.ReceiveNext();
-        }
-    }
+    //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    //{
+    //    if (stream.IsWriting)
+    //    {
+    //        stream.SendNext(gameTimer);
+    //        stream.SendNext(isTicking);
+    //    }
+    //    else
+    //    {
+    //        gameTimer = (float)stream.ReceiveNext();
+    //        isTicking = (bool)stream.ReceiveNext();
+    //    }
+    //}
 }

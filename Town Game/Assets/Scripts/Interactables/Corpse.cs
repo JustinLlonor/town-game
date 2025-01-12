@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
+//using Photon.Pun;
 
-public class Corpse : MonoBehaviourPunCallbacks
+public class Corpse : MonoBehaviour//PunCallbacks
 {
     public string nickname;
     public bool isCultist;
@@ -16,21 +16,20 @@ public class Corpse : MonoBehaviourPunCallbacks
         ui = FindObjectOfType<UIManager>();
     }
 
-    [PunRPC]
+    //[PunRPC]
     public void AddEvidence(string[] icons, string[] descriptions, float time)
     {
         evidence.Add(new Evidence(icons, descriptions, time));
     }
 
-    [PunRPC]
-    public void SetCorpseData(Photon.Realtime.Player player)
-    {
-        nickname = (string)player.CustomProperties["name"];
-        isCultist = (bool)player.CustomProperties["isCultist"];
-        PlayerClothing pc = transform.GetComponent<PlayerClothing>();
-        pc.isMale = (bool)player.CustomProperties["isMale"];
-
-    }
+    //[PunRPC]
+    //public void SetCorpseData(Photon.Realtime.Player player)
+    //{
+    //    nickname = (string)player.CustomProperties["name"];
+    //    isCultist = (bool)player.CustomProperties["isCultist"];
+    //    PlayerClothing pc = transform.GetComponent<PlayerClothing>();
+    //    pc.isMale = (bool)player.CustomProperties["isMale"];
+    //}
 
     public void InspectCorpse()
     {

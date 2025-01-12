@@ -2,9 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using Photon.Pun;
+//using Photon.Pun;
 using System.Linq;
-using Photon.Voice.Unity.Demos;
 using UnityEngine.UI;
 
 public class TabSchedule : MonoBehaviour
@@ -15,7 +14,7 @@ public class TabSchedule : MonoBehaviour
     public int readDay;
     public Color primaryColor;
     public Color secondaryColor;
-    Photon.Realtime.Player selectedPlayer;
+    //Photon.Realtime.Player selectedPlayer;
     ScheduleManager sm;
     GameManager gm;
     public float hourHeight = 0f;
@@ -35,14 +34,14 @@ public class TabSchedule : MonoBehaviour
 
     private void OnDisable()
     {
-        selectedPlayer = null;
+        //selectedPlayer = null;
     }
 
     // Shows the schedule a day in advance
     public void ScrollForward()
     {
         readDay++;
-        if (selectedPlayer != null) DisplaySchedule(selectedPlayer);
+        //if (selectedPlayer != null) DisplaySchedule(selectedPlayer);
     }
 
     // Shows the schedule a day before
@@ -50,12 +49,12 @@ public class TabSchedule : MonoBehaviour
     {
         if (readDay == 0) return;
         readDay--;
-        if (selectedPlayer != null) DisplaySchedule(selectedPlayer);
+        //if (selectedPlayer != null) DisplaySchedule(selectedPlayer);
     }
 
-    public void DisplaySchedule(Photon.Realtime.Player player)
+    public void DisplaySchedule()//Photon.Realtime.Player player)
     {
-        selectedPlayer = player;
+        //selectedPlayer = player;
         List<ScheduleBlock> blocks = new List<ScheduleBlock>();
         float minRange = readDay * 24 - 1;
         float maxRange = readDay * 24 + 23;
@@ -68,11 +67,11 @@ public class TabSchedule : MonoBehaviour
         }
 
         // Add mutable blocks from selected player
-        foreach (ScheduleBlock block in sm.playerSchedules[player])
-        {
-            if (block.time < minRange || block.time > maxRange) continue;
-            blocks.Add(block);
-        }
+        //foreach (ScheduleBlock block in sm.playerSchedules[player])
+        //{
+        //    if (block.time < minRange || block.time > maxRange) continue;
+        //    blocks.Add(block);
+        //}
 
         // Sort blocks
         blocks = blocks.OrderBy(o => o.time).ToList();
@@ -95,17 +94,17 @@ public class TabSchedule : MonoBehaviour
     }
 
     // Sets the read day to the current day
-    public void ResetReadDay(Photon.Realtime.Player player = null)
-    {
-        readDay = gm.currentDay;
-    }
+    //public void ResetReadDay(Photon.Realtime.Player player = null)
+    //{
+    //    readDay = gm.currentDay;
+    //}
 
-    public void DeselectSchedule(Photon.Realtime.Player player = null)
-    {
-        ClearSchedule();
-        selectedPlayer = null;
-        dateText.text = "...";
-    }
+    //public void DeselectSchedule(Photon.Realtime.Player player = null)
+    //{
+    //    ClearSchedule();
+    //    selectedPlayer = null;
+    //    dateText.text = "...";
+    //}
 
     void UpdateSchedule(List<ScheduleBlock> blocks)
     {
@@ -120,7 +119,7 @@ public class TabSchedule : MonoBehaviour
             GameObject newBlock = Instantiate(blockPrefab, blockHolder);
             RectTransform bt = newBlock.GetComponent<RectTransform>();
 
-            bt.SetHeight(block.length * hourHeight);
+            //bt.SetHeight(block.length * hourHeight);
             bt.GetChild(0).GetComponent<TextMeshProUGUI>().text = block.periodName;
 
             if (block.length < 1f)

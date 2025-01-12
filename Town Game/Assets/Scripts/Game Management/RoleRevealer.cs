@@ -1,4 +1,4 @@
-using Photon.Pun;
+//using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -26,8 +26,8 @@ public class RoleRevealer : MonoBehaviour
         cm = FindObjectOfType<CameraManager>();
         bs = FindObjectOfType<BlackScreen>();
         rtxt = FindObjectOfType<RoleText>();;
-        if (PhotonNetwork.CurrentRoom != null) bs.ShowCover();
-        FindObjectOfType<PlayerManager>().OnInstantiatePlayer += GetReferences;
+        //if (PhotonNetwork.CurrentRoom != null) bs.ShowCover();
+        //FindObjectOfType<PlayerManager>().OnInstantiatePlayer += GetReferences;
     }
     
     private void Update()

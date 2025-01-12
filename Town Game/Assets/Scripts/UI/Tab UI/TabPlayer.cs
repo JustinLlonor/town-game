@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using Photon.Pun;
+//using Photon.Pun;
 using System.Linq;
 
 public class TabPlayer : MonoBehaviour
@@ -15,7 +15,7 @@ public class TabPlayer : MonoBehaviour
     public RawImage panel;
     public float iconX = 80.7f;
     public bool selected = false;
-    [HideInInspector] public Photon.Realtime.Player player = null;
+    //[HideInInspector] public Photon.Realtime.Player player = null;
     [HideInInspector] public UIPlayerList uPlayerList;
     float ogX;
 
@@ -43,12 +43,12 @@ public class TabPlayer : MonoBehaviour
     private void OnEnable()
     {
         selected = false;
-        if (uPlayerList != null) uPlayerList.OnClickPlayer += OnUIClick;
+        //if (uPlayerList != null) uPlayerList.OnClickPlayer += OnUIClick;
     }
 
     private void OnDisable()
     {
-        uPlayerList.OnClickPlayer -= OnUIClick;
+        //uPlayerList.OnClickPlayer -= OnUIClick;
     }
 
     public void SetName(string name)
@@ -93,25 +93,25 @@ public class TabPlayer : MonoBehaviour
         panel.color = color;
     }
 
-    public void OnUIClick(Photon.Realtime.Player sPlayer = null)
-    {
-        if (sPlayer != player)
-        {
-            selected = false;
-            return;
-        }
-        if (selected)
-        {
-            selected = false;
-            uPlayerList.OnDeselectPlayer?.Invoke(player);
-            return;
-        }
-        selected = true;
-    }
+    //public void OnUIClick(Photon.Realtime.Player sPlayer = null)
+    //{
+    //    if (sPlayer != player)
+    //    {
+    //        selected = false;
+    //        return;
+    //    }
+    //    if (selected)
+    //    {
+    //        selected = false;
+    //        uPlayerList.OnDeselectPlayer?.Invoke(player);
+    //        return;
+    //    }
+    //    selected = true;
+    //}
 
     public void PlayerClick()
     {
-        if (!PhotonNetwork.PlayerList.Contains(player)) return;
-        uPlayerList.OnClickPlayer?.Invoke(player);
+        //if (!PhotonNetwork.PlayerList.Contains(player)) return;
+        //uPlayerList.OnClickPlayer?.Invoke(player);
     }
 }

@@ -1,10 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
 using UnityEngine.InputSystem;
 
-public class PlayerMovement : MonoBehaviourPunCallbacks
+public class PlayerMovement : MonoBehaviour//PunCallbacks
 {
     [Header("Movement")]
     public float speed = 6f;
@@ -71,7 +70,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public delegate void MovementEvent();
 
     PlayerManager playerManager;
-    PhotonView view;
+    //PhotonView view;
     PlayerStats stats;
     PlayerInput playerInput;
     Rigidbody rb;
@@ -98,11 +97,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     private void Awake()
     {
         airSpeed = speed;
-        view = gameObject.GetComponent<PhotonView>();
-        playerManager = FindObjectOfType<PlayerManager>();
+        //view = gameObject.GetComponent<PhotonView>();
+        //playerManager = FindObjectOfType<PlayerManager>(); Fix without Fusion
         playerInput = gameObject.GetComponent<PlayerInput>();
-        if (!view.IsMine) Destroy(playerInput);
-        if (!view.IsMine) return;
+        //if (!view.IsMine) Destroy(playerInput);
+        //if (!view.IsMine) return;
         stats = gameObject.GetComponent<PlayerStats>();
         rb = gameObject.GetComponent<Rigidbody>();
         rb.freezeRotation = true;
@@ -119,7 +118,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     private void Update()
     {
-        if (!view.IsMine) return;
+        //if (!view.IsMine) return;
         isGrounded = Physics.CheckSphere(groundCheck.position, groundedRadius, environmentMask);
         Inputs();
         ControlDrag();
@@ -143,7 +142,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     private void FixedUpdate()
     {
-        if (!view.IsMine) return;
+        //if (!view.IsMine) return;
         MovePlayer();
         CapAirVelocity();
         StepClimb();
@@ -188,7 +187,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         if (!isCrouching)
         {
             animator.Play("Jump");
-            view.RPC("JumpAnimation", RpcTarget.Others);
+            //view.RPC("JumpAnimation", RpcTarget.Others);
             rb.AddForce(transform.up * jumpHeight, ForceMode.Impulse);
             SoundManager.instance.Play3D("Jump", groundCheck.position);
         }
@@ -206,7 +205,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         if (isCrouching) airSpeed = speed * crouchMultiplier;
     }
 
-    [PunRPC]
+    //[PunRPC]
     public void JumpAnimation()
     {
         animator.Play("Jump");
@@ -243,7 +242,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             isSprinting = false;
         }
         EnableCrouchHitboxes();
-        view.RPC("EnableCrouchHitboxes", RpcTarget.Others);
+        //view.RPC("EnableCrouchHitboxes", RpcTarget.Others);
         crouchMinus = crouchMultiplier;
         StartCamLerp(cameraPosition, crouchPos);
         isCrouching = true;
@@ -295,7 +294,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             yield return null;
         }
         DisableCrouchHitboxes();
-        view.RPC("DisableCrouchHitboxes", RpcTarget.Others);
+        //view.RPC("DisableCrouchHitboxes", RpcTarget.Others);
         crouchMinus = 1f;
         StartCamLerp(cameraPosition, standPos);
         isCrouching = false;
@@ -312,14 +311,14 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         Destroy(obj);
     }
 
-    [PunRPC]
+    //[PunRPC]
     void EnableCrouchHitboxes() 
     {
         SetColliders(crouchingColliders, true);
         SetColliders(standingColliders, false);
     }
 
-    [PunRPC]
+    //[PunRPC]
     void DisableCrouchHitboxes()
     {
         SetColliders(crouchingColliders, false);

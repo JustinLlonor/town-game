@@ -1,10 +1,10 @@
-using Photon.Pun;
-using Photon.Realtime;
+//using Photon.Pun;
+//using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerManager : MonoBehaviourPunCallbacks
+public class PlayerManager : MonoBehaviour//PunCallbacks
 {
     public GameObject currentPlayer;
     public GameObject playerPrefab;
@@ -35,22 +35,22 @@ public class PlayerManager : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        if (!PhotonNetwork.IsConnected) return;
-        if (PhotonNetwork.CurrentRoom == null) return;
-        GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawn.position, spawn.rotation);
-        OnInstantiatePlayer?.Invoke(player);
-        PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
-        PlayerInventory playerInventory = player.GetComponent<PlayerInventory>();
-        playerInventory.camTransform = camTransform;
-        playerInventory.hotbarUI = hotbar;
-        playerInventory.largeUI = largeUI;
-        playerMovement.speed = playerSettings.speed;
-        playerMovement.canJump = playerSettings.canJump;
+        //if (!PhotonNetwork.IsConnected) return;
+        //if (PhotonNetwork.CurrentRoom == null) return;
+        //GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawn.position, spawn.rotation);
+        //OnInstantiatePlayer?.Invoke(player);
+        //PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
+        //PlayerInventory playerInventory = player.GetComponent<PlayerInventory>();
+        //playerInventory.camTransform = camTransform;
+        //playerInventory.hotbarUI = hotbar;
+        //playerInventory.largeUI = largeUI;
+        //playerMovement.speed = playerSettings.speed;
+        //playerMovement.canJump = playerSettings.canJump;
 
-        currentPlayer = player;
+        //currentPlayer = player;
     }
 
-    [PunRPC]
+    //[PunRPC]
     public void Teleport(Vector3 location, Quaternion rotation)
     {
         if (currentPlayer == null) return;

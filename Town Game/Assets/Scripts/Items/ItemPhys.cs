@@ -1,9 +1,9 @@
-using Photon.Pun;
-using Photon.Realtime;
+//using Photon.Pun;
+//using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using WebSocketSharp;
+//using WebSocketSharp;
 
 public class ItemPhys : MonoBehaviour
 {
@@ -14,7 +14,7 @@ public class ItemPhys : MonoBehaviour
     bool pickedUp = false;
 
     PlayerManager playerManager;
-    PhotonView view;
+    //PhotonView view;
     ObjectManager om;
     InteractableFinder finder;
     Interactable interactable;
@@ -23,8 +23,8 @@ public class ItemPhys : MonoBehaviour
     private void Awake()
     {
         finder = FindObjectOfType<InteractableFinder>();
-        playerManager = FindObjectOfType<PlayerManager>();
-        view = gameObject.GetComponent<PhotonView>();
+        //playerManager = FindObjectOfType<PlayerManager>();
+        //view = gameObject.GetComponent<PhotonView>();
         om = FindObjectOfType<ObjectManager>();
         interactable = gameObject.GetComponent<Interactable>();
     }
@@ -32,7 +32,7 @@ public class ItemPhys : MonoBehaviour
     private void Start()
     {
         CreateItem();
-        view.RPC("CreateItem", RpcTarget.Others);
+        //view.RPC("CreateItem", RpcTarget.Others);
         //view.TransferOwnership(0);
     }
     
@@ -54,18 +54,18 @@ public class ItemPhys : MonoBehaviour
         interactable.hovers[1].color = inspectionColor;
         StartCoroutine(RollText(1, item.description));
         string fingerprintText = "";
-        if (itemData.fingerprints.Count == 0)
-        {
-            fingerprintText = "Judging from the cleanliness, no one seems to have used it.";
-        } 
-        if (itemData.fingerprints.Count == 1)
-        {
-            fingerprintText = "There are a visible set of fingerprints on the object.";
-        }
-        if (itemData.fingerprints.Count > 1)
-        {
-            fingerprintText = "There seem to be many different smudges and scratches on the object.";
-        }
+        //if (itemData.fingerprints.Count == 0)
+        //{
+        //    fingerprintText = "Judging from the cleanliness, no one seems to have used it.";
+        //} 
+        //if (itemData.fingerprints.Count == 1)
+        //{
+        //    fingerprintText = "There are a visible set of fingerprints on the object.";
+        //}
+        //if (itemData.fingerprints.Count > 1)
+        //{
+        //    fingerprintText = "There seem to be many different smudges and scratches on the object.";
+        //}
         StartCoroutine(RollText(2, fingerprintText));
 
     }
@@ -75,33 +75,33 @@ public class ItemPhys : MonoBehaviour
         if (pickedUp) return;
         PlayerInventory inventory = playerManager.currentPlayer.GetComponent<PlayerInventory>();
         string eName = inventory.hotbar[inventory.equippedSlot];
-        if (!eName.IsNullOrEmpty())
-        {
-            Item item = om.itemSearch[inventory.hotbar[inventory.equippedSlot]];
-            if (item.large)
-            {
-                finder.iValid = false;
-                return;
-            }
-        }
-        if (inventory.IsInventoryFull()) return;
-        int givenSlot = inventory.GiveItem(itemName, true);
-        if (givenSlot == -1) return;
-        inventory.CollectItemData(itemData, givenSlot);
-        view.TransferOwnership(PhotonNetwork.LocalPlayer);
-        view.RPC("RemoveItem", view.Owner);
-        pickedUp = true;
-        gameObject.GetComponent<MeshRenderer>().enabled = false;
-        gameObject.GetComponent<Interactable>().canInteract = false;
+        //if (!eName.IsNullOrEmpty())
+        //{
+        //    Item item = om.itemSearch[inventory.hotbar[inventory.equippedSlot]];
+        //    if (item.large)
+        //    {
+        //        finder.iValid = false;
+        //        return;
+        //    }
+        //}
+        //if (inventory.IsInventoryFull()) return;
+        //int givenSlot = inventory.GiveItem(itemName, true);
+        //if (givenSlot == -1) return;
+        //inventory.CollectItemData(itemData, givenSlot);
+        //view.TransferOwnership(PhotonNetwork.LocalPlayer);
+        //view.RPC("RemoveItem", view.Owner);
+        //pickedUp = true;
+        //gameObject.GetComponent<MeshRenderer>().enabled = false;
+        //gameObject.GetComponent<Interactable>().canInteract = false;
     }
 
-    [PunRPC]
+    //[PunRPC]
     public void RemoveItem()
     {
-        PhotonNetwork.Destroy(gameObject);
+        //PhotonNetwork.Destroy(gameObject);
     }
 
-    [PunRPC]
+    //[PunRPC]
     public void CreateItem()
     {
         gameObject.GetComponent<Interactable>().hovers[0].lore = "Pick up";
@@ -111,19 +111,19 @@ public class ItemPhys : MonoBehaviour
         gameObject.GetComponent<MeshCollider>().sharedMesh = item.mesh;
     }
 
-    [PunRPC]
+    //[PunRPC]
     public void SetName(string name)
     {
         itemName = name;
     }
 
-    [PunRPC]
-    public void AddFingerprint(Player player)
+    //[PunRPC]
+    public void AddFingerprint()//Player player)
     {
-        itemData.fingerprints.Add(player);
+        //itemData.fingerprints.Add(player);
     }
 
-    [PunRPC]
+    //[PunRPC]
     public void AddMetadata(string key, string value)
     {
         itemData.metadata.Add(key, value);

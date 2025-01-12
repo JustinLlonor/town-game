@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
+//using Photon.Pun;
 
 public class OfflineMode : MonoBehaviour
 {
@@ -10,7 +10,7 @@ public class OfflineMode : MonoBehaviour
         FindObjectOfType<PlayerManager>().currentPlayer = transform.parent.gameObject;
         FindObjectOfType<FirstPerson>().trackedMV = transform.parent.GetComponent<PlayerMovement>();
         if (FindObjectOfType<WaitingRoomManager>() != null) FindObjectOfType<WaitingRoomManager>().enabled = false;
-        PhotonNetwork.OfflineMode = true;
+        //PhotonNetwork.OfflineMode = true;
     }
 
     private void Start()

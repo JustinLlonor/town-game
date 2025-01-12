@@ -1,11 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
+//using Photon.Pun;
 using Steamworks;
 using System;
 
-public class SteamLobbyManager : MonoBehaviourPunCallbacks
+public class SteamLobbyManager : MonoBehaviour//PunCallbacks
 {
     protected Callback<LobbyCreated_t> LobbyCreated;
     protected Callback<LobbyEnter_t> LobbyEntered;
@@ -37,14 +37,14 @@ public class SteamLobbyManager : MonoBehaviourPunCallbacks
     private void OnLobbyCreated(LobbyCreated_t callback)
     {
         // Sets the room name in steam lobby
-        SteamMatchmaking.SetLobbyData((CSteamID)callback.m_ulSteamIDLobby, "roomname", PhotonNetwork.CurrentRoom.Name);
+        //SteamMatchmaking.SetLobbyData((CSteamID)callback.m_ulSteamIDLobby, "roomname", PhotonNetwork.CurrentRoom.Name);
         // Sets the steam lobby id in photon lobby
-        ExitGames.Client.Photon.Hashtable roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
-        roomProperties["steamID"] = callback.m_ulSteamIDLobby.ToString();
-        PhotonNetwork.CurrentRoom.SetCustomProperties(roomProperties);
+        //ExitGames.Client.Photon.Hashtable roomProperties = PhotonNetwork.CurrentRoom.CustomProperties;
+        //roomProperties["steamID"] = callback.m_ulSteamIDLobby.ToString();
+        //PhotonNetwork.CurrentRoom.SetCustomProperties(roomProperties);
         // Makes the room joinable
-        PhotonNetwork.CurrentRoom.IsOpen = true;
-        PhotonNetwork.CurrentRoom.IsVisible = true;
+        //PhotonNetwork.CurrentRoom.IsOpen = true;
+        //PhotonNetwork.CurrentRoom.IsVisible = true;
     }
 
     private void OnLobbyEntered(LobbyEnter_t callback)
@@ -61,12 +61,12 @@ public class SteamLobbyManager : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        ulong steamID = Convert.ToUInt64(PhotonNetwork.CurrentRoom.CustomProperties["steamID"]);
-        if (SteamManager.Initialized && !PhotonNetwork.IsMasterClient)
-        {
-            Debug.Log("Joining Steam lobby: " + steamID);
-            SteamMatchmaking.JoinLobby((CSteamID)steamID);
-        }
+        //ulong steamID = Convert.ToUInt64(PhotonNetwork.CurrentRoom.CustomProperties["steamID"]);
+        //if (SteamManager.Initialized && !PhotonNetwork.IsMasterClient)
+        //{
+        //    Debug.Log("Joining Steam lobby: " + steamID);
+        //    SteamMatchmaking.JoinLobby((CSteamID)steamID);
+        //}
     }
 
     private void Update()
@@ -77,8 +77,8 @@ public class SteamLobbyManager : MonoBehaviourPunCallbacks
         }
     }
 
-    public override void OnLeftLobby()
-    {
-        SteamMatchmaking.LeaveLobby((CSteamID)SessionData.steamIdLobby);
-    }
+    //public override void OnLeftLobby()
+    //{
+    //    SteamMatchmaking.LeaveLobby((CSteamID)SessionData.steamIdLobby);
+    //}
 }

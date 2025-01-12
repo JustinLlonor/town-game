@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
+//using Photon.Pun;
 using System.Linq;
 
-public class UIPlayerList : MonoBehaviourPunCallbacks
+public class UIPlayerList : MonoBehaviour//PunCallbacks
 {
     // If true, players will be removed from player list on disconnect. If false, players will be marked as dead on disconnect.
     public bool removeOnDC;
@@ -16,10 +16,10 @@ public class UIPlayerList : MonoBehaviourPunCallbacks
     public Color secondaryPanelColor;
     List<string> containedPlayers = new List<string>();
 
-    public ClickPlayer OnClickPlayer;
-    public DeselectPlayer OnDeselectPlayer;
-    public delegate void ClickPlayer(Photon.Realtime.Player player);
-    public delegate void DeselectPlayer(Photon.Realtime.Player player);
+    //public ClickPlayer OnClickPlayer;
+    //public DeselectPlayer OnDeselectPlayer;
+    //public delegate void ClickPlayer(Photon.Realtime.Player player);
+    //public delegate void DeselectPlayer(Photon.Realtime.Player player);
 
     private void Awake()
     {
@@ -37,14 +37,14 @@ public class UIPlayerList : MonoBehaviourPunCallbacks
 
             // Disconnected behaviour
             bool disconnected = true;
-            foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
-            {
-                if ((string)player.CustomProperties["name"] == tp.nick)
-                {
-                    disconnected = false;
-                    break;
-                }
-            }
+            //foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
+            //{
+            //    if ((string)player.CustomProperties["name"] == tp.nick)
+            //    {
+            //        disconnected = false;
+            //        break;
+            //    }
+            //}
             if (disconnected)
             {
                 if (removeOnDC)
@@ -62,31 +62,31 @@ public class UIPlayerList : MonoBehaviourPunCallbacks
         foreach (GameObject go in toDestroy) Destroy(go);
 
         // Add missing players
-        foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
-        {
-            if (!containedPlayers.Contains(player.CustomProperties["name"]))
-            {
-                AddPlayer(player);
-            }
-        }
+        //foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
+        //{
+        //    if (!containedPlayers.Contains(player.CustomProperties["name"]))
+        //    {
+        //        AddPlayer(player);
+        //    }
+        //}
 
         // Have something which updates positions later
 
         UpdateColors();
     }
 
-    public void AddPlayer(Photon.Realtime.Player player)
+    public void AddPlayer()//Photon.Realtime.Player player)
     {
-        string name = (string)player.CustomProperties["name"];
-        GameObject newPlayer = Instantiate(tabPlayerPrefab, contentHolder);
-        TabPlayer tp = newPlayer.GetComponent<TabPlayer>();
-        tp.SetName(name);
-        tp.SetNameColor(alivePlayerColor);
-        OnClickPlayer += tp.OnUIClick;
-        tp.uPlayerList = this;
-        tp.player = player;
-        containedPlayers.Add(name);
-        UpdateColors();
+        //string name = (string)player.CustomProperties["name"];
+        //GameObject newPlayer = Instantiate(tabPlayerPrefab, contentHolder);
+        //TabPlayer tp = newPlayer.GetComponent<TabPlayer>();
+        //tp.SetName(name);
+        //tp.SetNameColor(alivePlayerColor);
+        //OnClickPlayer += tp.OnUIClick;
+        //tp.uPlayerList = this;
+        //tp.player = player;
+        //containedPlayers.Add(name);
+        //UpdateColors();
     }
 
     void UpdateColors()
@@ -104,13 +104,13 @@ public class UIPlayerList : MonoBehaviourPunCallbacks
         }
     }
 
-    public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
-    {
-        UpdatePlayerList();
-    }
+    //public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
+    //{
+    //    UpdatePlayerList();
+    //}
 
-    public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
-    {
-        UpdatePlayerList();
-    }
+    //public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
+    //{
+    //    UpdatePlayerList();
+    //}
 }
