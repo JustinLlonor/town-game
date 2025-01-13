@@ -1,5 +1,6 @@
 //using Photon.Pun;
 //using Photon.Realtime;
+using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,7 +8,7 @@ using UnityEngine;
 public class PlayerManager : MonoBehaviour//PunCallbacks
 {
     public GameObject currentPlayer;
-    public GameObject playerPrefab;
+    public NetworkPrefabRef playerPrefab;
     public Transform spawn;
 
     public PlayerSettings playerSettings;
@@ -48,6 +49,11 @@ public class PlayerManager : MonoBehaviour//PunCallbacks
         //playerMovement.canJump = playerSettings.canJump;
 
         //currentPlayer = player;
+    }
+
+    public void SpawnPlayer(NetworkRunner runner, PlayerRef player)
+    {
+        runner.Spawn(playerPrefab, spawn.position, Quaternion.identity, player);
     }
 
     //[PunRPC]

@@ -44,11 +44,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38b8182a1f2d2a2438ddfbdb8a89e85f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 1787190705143953567, guid: c95f5f72671cf3e45ac91a88a1fdb528, type: 3}
+  currentPlayer: {fileID: 0}
+  playerPrefab:
+    RawGuidValue: c95f5f72671cf3e45ac91a88a1fdb528
   spawn: {fileID: 0}
   playerSettings:
     speed: 3
-    airspeed: 2.5
     canJump: 1
   camTransform: {fileID: 0}
   camBobbing: {fileID: 0}
+  camShake: {fileID: 0}
+  hotbar: {fileID: 0}
+  largeUI: {fileID: 0}
+  cm: {fileID: 0}
+  fps: {fileID: 0}

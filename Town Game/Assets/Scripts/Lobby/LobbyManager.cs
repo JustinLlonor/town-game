@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 //using Photon.Pun;
 //using Photon.Realtime;
-using WebSocketSharp;
+//using WebSocketSharp;
 using Steamworks;
 using Fusion;
 using UnityEngine.SceneManagement;
@@ -16,9 +16,9 @@ public class LobbyManager : MonoBehaviour//PunCallbacks
     public TextMeshProUGUI createText;
     public TextMeshProUGUI joinText;
     public TMP_InputField nicknameText;
-    public string waitingRoomName;
+    public int waitingRoomIndex = 1;
     string previousNick;
-    private NetworkRunner runner;
+    private RunnerManager runnerManager;
 
     private void FixedUpdate()
     {
@@ -31,13 +31,14 @@ public class LobbyManager : MonoBehaviour//PunCallbacks
         if (SteamManager.Initialized) defaultNick = SteamFriends.GetPersonaName();
         SessionData.nickname = defaultNick;
         previousNick = SessionData.nickname;
+        runnerManager = FindObjectOfType<RunnerManager>();
     }
 
     public void OnChangedNickname(string newNick)
     {
         bool nickValid = true;
         if (newNick.Length > 32) nickValid = false;
-        if (newNick.IsNullOrEmpty()) nickValid = false;
+        //if (newNick.IsNullOrEmpty()) nickValid = false;
         if (!nickValid)
         {
             nicknameText.text = previousNick;
@@ -47,33 +48,9 @@ public class LobbyManager : MonoBehaviour//PunCallbacks
         nicknameText.text = SessionData.nickname;
     }
 
-    private void StartGame(GameMode mode, string name)
-    {
-        // Create the Fusion runner and let it know that we will be providing user input
-        runner = gameObject.AddComponent<NetworkRunner>();
-        runner.ProvideInput = true;
-
-        // Create the NetworkSceneInfo from the current scene
-        var scene = SceneRef.FromIndex(SceneManager.GetSceneByName(waitingRoomName).buildIndex);
-        var sceneInfo = new NetworkSceneInfo();
-        if (scene.IsValid)
-        {
-            sceneInfo.AddSceneRef(scene, LoadSceneMode.Additive);
-        }
-
-        // Start or join (depends on gamemode) a session with a specific name
-        runner.StartGame(new StartGameArgs()
-        {
-            GameMode = mode,
-            SessionName = name,
-            Scene = scene,
-            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
-        });
-    }
-
     public void CreatePress()
     {
-        if (nicknameText.text.IsNullOrEmpty()) return;
+        //if (nicknameText.text.IsNullOrEmpty()) return;
         //RoomOptions ro = new RoomOptions();
         //ro.MaxPlayers = 15;
         //ro.CleanupCacheOnLeave = false;
@@ -84,16 +61,16 @@ public class LobbyManager : MonoBehaviour//PunCallbacks
         }
         //PhotonNetwork.CreateRoom(createText.text, ro);
         if (SteamManager.Initialized) SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePrivate, 15);
-        StartGame(GameMode.Host, createText.text);
+        runnerManager.StartGame(GameMode.Host, createText.text, waitingRoomIndex);
     }
 
     public void JoinPress()
     {
-        if (nicknameText.text.IsNullOrEmpty()) return;
+        //if (nicknameText.text.IsNullOrEmpty()) return;
         //Debug.Log("Joining");
         //Debug.Log(PhotonNetwork.IsConnected);
         //PhotonNetwork.JoinRoom(joinText.text);
-        StartGame(GameMode.Client, createText.text);
+        runnerManager.StartGame(GameMode.Client, createText.text, waitingRoomIndex);
     }
 
     //public override void OnConnectedToMaster()

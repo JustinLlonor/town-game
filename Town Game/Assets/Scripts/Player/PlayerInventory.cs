@@ -103,6 +103,7 @@ public class PlayerInventory : MonoBehaviour//PunCallbacks, IPunObservable
     /// <param name="previous"></param>
     private void OnUnequip(int previous)
     {
+        return;
         //if (hotbar[previous].IsNullOrEmpty()) return;
         if (itemManager.itemSearch[hotbar[previous]] as Weapon)
         {
