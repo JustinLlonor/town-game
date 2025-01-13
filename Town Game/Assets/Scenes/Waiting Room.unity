@@ -137,7 +137,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 553772930366547643, guid: e11b4f359f8ec4a43a915e109017ea6c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 948635299029419552, guid: e11b4f359f8ec4a43a915e109017ea6c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -507,7 +507,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a86f533fd9917dd4da8601e9eb542c96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LogLevel: 0
+  LogLevel: 2
 --- !u!4 &612210994
 Transform:
   m_ObjectHideFlags: 0
@@ -748,11 +748,9 @@ MonoBehaviour:
   prefixField: -1
   Synchronization: 3
   OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents:
-  - {fileID: 958127722}
-  - {fileID: 958127723}
-  sceneViewId: 6
+  observableSearch: 0
+  ObservedComponents: []
+  sceneViewId: 7
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!1 &1071034346
@@ -3634,6 +3632,10 @@ PrefabInstance:
       propertyPath: largeUI
       value: 
       objectReference: {fileID: 361995279573289457}
+    - target: {fileID: 5709288198271284562, guid: 510253d1d4f227543af658125b506bb6, type: 3}
+      propertyPath: sceneViewId
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 6343291171063278774, guid: 510253d1d4f227543af658125b506bb6, type: 3}
       propertyPath: iui
       value: 

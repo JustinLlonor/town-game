@@ -98,17 +98,17 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
     {
         airSpeed = speed;
         //view = gameObject.GetComponent<PhotonView>();
-        //playerManager = FindObjectOfType<PlayerManager>(); Fix without Fusion
+        playerManager = FindObjectOfType<PlayerManager>();
         playerInput = gameObject.GetComponent<PlayerInput>();
         //if (!view.IsMine) Destroy(playerInput);
         //if (!view.IsMine) return;
         stats = gameObject.GetComponent<PlayerStats>();
         rb = gameObject.GetComponent<Rigidbody>();
         rb.freezeRotation = true;
-        //CameraMovement cm = playerManager.camTransform.GetComponent<CameraMovement>();
-        //cm.player = transform;
-        //cm.orientation = orientation;
-        //cm.headAim = headAim;
+        CameraMovement cm = playerManager.camTransform.GetComponent<CameraMovement>();
+        cm.player = transform;
+        cm.orientation = orientation;
+        cm.headAim = headAim;
         bobbing = playerManager.camBobbing;
         shake = playerManager.camShake;
         playerManager.camTransform.GetComponent<CameraManager>().SetTrackedFPSTransform(cameraPosition);
@@ -512,11 +512,11 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         }
         if (isMoving)
         {
-            //animator.SetFloat("moveMultiplier", speed / aniSpeedFactor);
+            animator.SetFloat("moveMultiplier", speed / aniSpeedFactor);
         } 
         else
         {
-            //animator.SetFloat("moveMultiplier", 1f);
+            animator.SetFloat("moveMultiplier", 1f);
         }
     }
     

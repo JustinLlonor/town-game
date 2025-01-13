@@ -11,11 +11,9 @@ public class ClientGFX : MonoBehaviour
     
     private void Awake()
     {
-        //if (view.IsMine)
-        //{
-        //    HideRenderers();
-        //    serverItem.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
-        //}
+        // Add client check here
+        HideRenderers();
+        serverItem.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
     }
 
     public void ShowRenderers()
