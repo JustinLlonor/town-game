@@ -54,6 +54,7 @@ public class PlayerManager : MonoBehaviour//PunCallbacks
     public void SpawnPlayer(NetworkRunner runner, PlayerRef player)
     {
         runner.Spawn(playerPrefab, spawn.position, Quaternion.identity, player);
+        // Add OnInstantiate later
     }
 
     //[PunRPC]

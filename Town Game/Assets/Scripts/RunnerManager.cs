@@ -8,7 +8,8 @@ using UnityEngine.SceneManagement;
 
 public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
 {
-    private NetworkRunner nRunner;
+    public NetworkRunner nRunner;
+    public Vector2 moveDirection;
 
     public void StartGame(GameMode mode, string name, int sceneIndex)
     {
@@ -44,11 +45,16 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        
+        var data = new NetworkInputData();
+
+        data.direction = moveDirection;
+
+        input.Set(data);
     }
+
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }

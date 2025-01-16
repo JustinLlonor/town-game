@@ -1,3 +1,4 @@
+using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -71,11 +72,13 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
 
     PlayerManager playerManager;
     //PhotonView view;
+    NetworkObject no;
     PlayerStats stats;
     PlayerInput playerInput;
     Rigidbody rb;
     CameraBobbing bobbing;
-    CameraShake shake;  
+    CameraShake shake;
+    RunnerManager runnerManager;
     float sprintGain = 1f;
     float crouchMinus = 1f;
     float jumpTimer = 0f;
@@ -88,6 +91,7 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
     [HideInInspector] public bool isSprinting;
     bool previousGrounded = true;
     bool sprintPressed = false;
+    bool initialized = false;
     RaycastHit slopeHit;
     Vector3 moveDirection;
     Vector3 slopeDirection;
@@ -97,11 +101,20 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
     private void Awake()
     {
         airSpeed = speed;
+        no = gameObject.GetComponent<NetworkObject>();
         //view = gameObject.GetComponent<PhotonView>();
         playerManager = FindObjectOfType<PlayerManager>();
         playerInput = gameObject.GetComponent<PlayerInput>();
         //if (!view.IsMine) Destroy(playerInput);
         //if (!view.IsMine) return;
+        gameObject.GetComponent<Player>().Init += Init;
+    }
+
+    public void Init() // Client side initialization
+    {
+        initialized = true;
+        runnerManager = FindObjectOfType<RunnerManager>();
+        if (!no.HasInputAuthority) { Destroy(playerInput); return; }
         stats = gameObject.GetComponent<PlayerStats>();
         rb = gameObject.GetComponent<Rigidbody>();
         rb.freezeRotation = true;
@@ -119,6 +132,8 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
     private void Update()
     {
         //if (!view.IsMine) return;
+        if (!initialized) return;
+        if (!runnerManager.nRunner.IsServer && !no.HasInputAuthority) return; // If not the server or the inputter, then return
         isGrounded = Physics.CheckSphere(groundCheck.position, groundedRadius, environmentMask);
         Inputs();
         ControlDrag();
@@ -143,6 +158,7 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
     private void FixedUpdate()
     {
         //if (!view.IsMine) return;
+        //if (!no.HasInputAuthority) return;
         MovePlayer();
         CapAirVelocity();
         StepClimb();
@@ -215,6 +231,7 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
     {
         if (!canMove) return;
         Vector2 mv = iv.Get<Vector2>();
+        runnerManager.moveDirection = mv;
         horizontalMovement = mv.x;
         verticalMovement = mv.y;
     }

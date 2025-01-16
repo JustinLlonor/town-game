@@ -1,3 +1,4 @@
+using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,10 +9,18 @@ public class ClientGFX : MonoBehaviour
     //public PhotonView view;
     public GameObject[] renderers;
     public MeshRenderer serverItem;
-    
+    public NetworkObject no;
+    public Player playerScript;
+
     private void Awake()
     {
+        playerScript.Init += SetupRenderers;
+    }
+
+    private void SetupRenderers()
+    {
         // Add client check here
+        if (!no.HasInputAuthority) return;
         HideRenderers();
         serverItem.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
     }
