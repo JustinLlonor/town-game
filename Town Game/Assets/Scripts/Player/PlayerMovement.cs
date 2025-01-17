@@ -82,8 +82,8 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
     float sprintGain = 1f;
     float crouchMinus = 1f;
     float jumpTimer = 0f;
-    float horizontalMovement;
-    float verticalMovement;
+    [HideInInspector] public float horizontalMovement;
+    [HideInInspector] public float verticalMovement;
     float previousYVel;
     float peakYPosition;
     float unCastDistance;
@@ -105,6 +105,7 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         //view = gameObject.GetComponent<PhotonView>();
         playerManager = FindObjectOfType<PlayerManager>();
         playerInput = gameObject.GetComponent<PlayerInput>();
+        rb = gameObject.GetComponent<Rigidbody>();
         //if (!view.IsMine) Destroy(playerInput);
         //if (!view.IsMine) return;
         gameObject.GetComponent<Player>().Init += Init;
@@ -116,7 +117,6 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         runnerManager = FindObjectOfType<RunnerManager>();
         if (!no.HasInputAuthority) { Destroy(playerInput); return; }
         stats = gameObject.GetComponent<PlayerStats>();
-        rb = gameObject.GetComponent<Rigidbody>();
         rb.freezeRotation = true;
         CameraMovement cm = playerManager.camTransform.GetComponent<CameraMovement>();
         cm.player = transform;
@@ -135,7 +135,8 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         if (!initialized) return;
         if (!runnerManager.nRunner.IsServer && !no.HasInputAuthority) return; // If not the server or the inputter, then return
         isGrounded = Physics.CheckSphere(groundCheck.position, groundedRadius, environmentMask);
-        Inputs();
+        // Sets moveDirection
+        if (!no.HasInputAuthority) return;
         ControlDrag();
         slopeDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
         if (jumpTimer > 0f && isGrounded) jumpTimer -= Time.deltaTime;
@@ -157,6 +158,7 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
 
     private void FixedUpdate()
     {
+        return;
         //if (!view.IsMine) return;
         //if (!no.HasInputAuthority) return;
         MovePlayer();
@@ -232,8 +234,9 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         if (!canMove) return;
         Vector2 mv = iv.Get<Vector2>();
         runnerManager.moveDirection = mv;
-        horizontalMovement = mv.x;
-        verticalMovement = mv.y;
+        return;
+        //horizontalMovement = data.direction.X;
+        //verticalMovement = data.direction.Y;
     }
 
     private void OnCrouch(InputValue iv)
@@ -462,7 +465,7 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         
     }
 
-    void CapAirVelocity()
+    public void CapAirVelocity()
     {
         if (!isGrounded)
         {
@@ -476,7 +479,7 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         }
     }
 
-    void MovePlayer()
+    public void MovePlayer()
     {
         if (!canMove) return;
         if (isGrounded && !OnSlope())
@@ -493,7 +496,7 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         }
     }
 
-    void Inputs()
+    public void Inputs()
     {
         moveDirection = orientation.forward * verticalMovement + orientation.right * horizontalMovement;
     }
@@ -549,7 +552,7 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         return false;
     }
 
-    void StepClimb()
+    public void StepClimb()
     {
         //if (OnSlope()) return; // May be changed later
         if (!isMoving) return;

@@ -12,6 +12,7 @@ public class CameraMovement : MonoBehaviour
     Transform fpsTransform;
     CursorManager cursorManager;
     CameraManager cameraManager;
+    RunnerManager runnerManager;
     [HideInInspector] public float xRotation = 0f;
     [HideInInspector] public float yRotation = 0f;
     public bool canMove = true;
@@ -21,6 +22,7 @@ public class CameraMovement : MonoBehaviour
     {
         cameraManager = FindAnyObjectByType<CameraManager>();
         cursorManager = FindObjectOfType<CursorManager>();
+        runnerManager = FindObjectOfType<RunnerManager>();
         FindObjectOfType<PlayerManager>().OnInstantiatePlayer += AssignReferences;
         cameraManager.OnSwitchCameraMode += OnCameraModeChange;
         GameManager gm = FindObjectOfType<GameManager>();
@@ -59,6 +61,7 @@ public class CameraMovement : MonoBehaviour
         orientation.eulerAngles = new Vector3(0, yRotation, 0);
         player.eulerAngles = orientation.eulerAngles;
         headAim.position = transform.position + transform.forward;
+        runnerManager.orientation = yRotation;
     }
 
     void AssignReferences(GameObject player)

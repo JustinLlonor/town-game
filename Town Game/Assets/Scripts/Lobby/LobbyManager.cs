@@ -70,7 +70,7 @@ public class LobbyManager : MonoBehaviour//PunCallbacks
         //Debug.Log("Joining");
         //Debug.Log(PhotonNetwork.IsConnected);
         //PhotonNetwork.JoinRoom(joinText.text);
-        runnerManager.StartGame(GameMode.Client, createText.text, waitingRoomIndex);
+        runnerManager.StartGame(GameMode.Client, joinText.text, waitingRoomIndex);
     }
 
     //public override void OnConnectedToMaster()

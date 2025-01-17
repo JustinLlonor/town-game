@@ -10,10 +10,10 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     public NetworkRunner nRunner;
     public Vector2 moveDirection;
+    public float orientation;
 
-    public void StartGame(GameMode mode, string name, int sceneIndex)
+    public async void StartGame(GameMode mode, string name, int sceneIndex)
     {
-        Debug.Log("Starting Game");
         // Create the Fusion runner and let it know that we will be providing user input
         nRunner = gameObject.AddComponent<NetworkRunner>();
         nRunner.ProvideInput = true;
@@ -26,8 +26,9 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
             sceneInfo.AddSceneRef(scene, LoadSceneMode.Additive);
         }
 
+        Debug.Log("Starting Game");
         // Start or join (depends on gamemode) a session with a specific name
-        nRunner.StartGame(new StartGameArgs()
+        await nRunner.StartGame(new StartGameArgs()
         {
             GameMode = mode,
             SessionName = name,
@@ -50,6 +51,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         var data = new NetworkInputData();
 
         data.direction = moveDirection;
+        data.camDirection = orientation;
 
         input.Set(data);
     }

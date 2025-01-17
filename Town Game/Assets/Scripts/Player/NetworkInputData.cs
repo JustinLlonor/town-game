@@ -6,6 +6,7 @@ public struct NetworkInputData : INetworkInput
 {
     public const byte jumpButton = 1;
 
+    public float camDirection;
     public NetworkButtons buttons;
     public Vector2Compressed direction;
 }

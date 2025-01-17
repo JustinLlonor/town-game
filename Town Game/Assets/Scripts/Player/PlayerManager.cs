@@ -51,6 +51,20 @@ public class PlayerManager : MonoBehaviour//PunCallbacks
         //currentPlayer = player;
     }
 
+    public void SetupOnClient(GameObject player)
+    {
+        OnInstantiatePlayer?.Invoke(player);
+        PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
+        PlayerInventory playerInventory = player.GetComponent<PlayerInventory>();
+        playerInventory.camTransform = camTransform;
+        playerInventory.hotbarUI = hotbar;
+        playerInventory.largeUI = largeUI;
+        playerMovement.speed = playerSettings.speed;
+        playerMovement.canJump = playerSettings.canJump;
+
+        currentPlayer = player;
+    }
+
     public void SpawnPlayer(NetworkRunner runner, PlayerRef player)
     {
         runner.Spawn(playerPrefab, spawn.position, Quaternion.identity, player);
