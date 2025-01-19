@@ -498,7 +498,6 @@ GameObject:
   - component: {fileID: 1317372394872903684}
   - component: {fileID: 9069154022521576282}
   - component: {fileID: 2540704478665164047}
-  - component: {fileID: 3730005838918938665}
   - component: {fileID: 3091803339169035289}
   - component: {fileID: 5552705410368871873}
   - component: {fileID: 1106844264840172896}
@@ -516,6 +515,7 @@ GameObject:
   - component: {fileID: 3145977071549816313}
   - component: {fileID: 4262745249595203894}
   - component: {fileID: 4613987656612589359}
+  - component: {fileID: 8955853161711163047}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -576,31 +576,8 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 9069154022521576282}
-  - {fileID: 3730005838918938665}
+  - {fileID: 8955853161711163047}
   ForceRemoteRenderTimeframe: 0
---- !u!114 &3730005838918938665
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1787190705143953567}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a591d221a634417e9827eb58e17de84, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _stateAuthorityChangeErrorCorrectionDelta: 0.15
-  SyncScale: 0
-  SyncParent: 1
-  _interpolationTarget: {fileID: 0}
-  UsePreciseRotation: 1
-  UseRenderSleepThresholds: 1
-  RenderThresholds:
-    UseEnergy: 1
-    Position: 0.01
-    Rotation: 0.01
-    Scale: 0.01
 --- !u!114 &3091803339169035289
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1151,6 +1128,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a8a1e8986c0e8443a1ac52cc6f4f05d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &8955853161711163047
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1787190705143953567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a591d221a634417e9827eb58e17de84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stateAuthorityChangeErrorCorrectionDelta: 0.15
+  SyncScale: 0
+  SyncParent: 1
+  _interpolationTarget: {fileID: 0}
+  UsePreciseRotation: 0
+  UseRenderSleepThresholds: 1
+  RenderThresholds:
+    UseEnergy: 1
+    Position: 0.01
+    Rotation: 0.01
+    Scale: 0.01
 --- !u!1 &2255715054737852972
 GameObject:
   m_ObjectHideFlags: 0

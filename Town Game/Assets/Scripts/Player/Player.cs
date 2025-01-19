@@ -1,4 +1,5 @@
 using Fusion;
+using Fusion.Addons.Physics;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,12 +16,12 @@ public class Player : NetworkBehaviour
     [Networked] float camDirectionX { get; set; }
     [Networked] Vector2 direction { get; set; }
 
-    Rigidbody rb;
+    NetworkRigidbody3D rb;
 
     private void Awake()
     {
         playerManager = FindObjectOfType<PlayerManager>();   
-        rb = GetComponent<Rigidbody>();
+        rb = GetComponent<NetworkRigidbody3D>();
     }
 
     private void Start()
@@ -45,7 +46,7 @@ public class Player : NetworkBehaviour
             pm.verticalMovement = data.direction.Y;
             if (!HasInputAuthority)
             {
-                rb.rotation = Quaternion.Euler(0f, data.camDirection, 0f);
+                rb.RBRotation = Quaternion.Euler(0f, data.camDirection, 0f);
                 pm.SetCamRotation(data.camDirectionX);
             }
             if (HasStateAuthority)
@@ -66,7 +67,6 @@ public class Player : NetworkBehaviour
         //pm.horizontalMovement = direction.x;
         //pm.verticalMovement = direction.y;
         //transform.rotation = Quaternion.Euler(0f, camDirection, 0f);
-        rb.rotation = (Quaternion.Euler(0f, camDirection, 0f));
         pm.SetDirection(direction);
         return;
         pm.Inputs();
