@@ -10,6 +10,7 @@ public class CameraMovement : MonoBehaviour
     public Transform headAim;
 
     Transform fpsTransform;
+    Rigidbody playerRb;
     CursorManager cursorManager;
     CameraManager cameraManager;
     RunnerManager runnerManager;
@@ -59,14 +60,16 @@ public class CameraMovement : MonoBehaviour
         yRotation += mouseX;
         transform.eulerAngles = new Vector3(xRotation, yRotation, 0f);
         orientation.eulerAngles = new Vector3(0, yRotation, 0);
-        player.eulerAngles = orientation.eulerAngles;
+        playerRb.rotation = Quaternion.Euler(orientation.eulerAngles);
         headAim.position = transform.position + transform.forward;
         runnerManager.orientation = yRotation;
+        runnerManager.camOrientation = xRotation;
     }
 
     void AssignReferences(GameObject player)
     {
         Debug.Log("Assigning References");
+        playerRb = player.GetComponent<Rigidbody>();
         PlayerMovement mv = player.GetComponent<PlayerMovement>();
         this.player = mv.graphics;
         orientation = mv.orientation;

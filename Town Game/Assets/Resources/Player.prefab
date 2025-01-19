@@ -577,7 +577,6 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 9069154022521576282}
   - {fileID: 3730005838918938665}
-  - {fileID: 2103148908042066006}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &3730005838918938665
 MonoBehaviour:
@@ -1161,7 +1160,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 854407532444519849}
-  - component: {fileID: 2103148908042066006}
   m_Layer: 0
   m_Name: Head Target
   m_TagString: Untagged
@@ -1184,23 +1182,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1317372394872903684}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2103148908042066006
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2255715054737852972}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _stateAuthorityChangeErrorCorrectionDelta: 0.15
-  SyncScale: 0
-  SyncParent: 0
-  _autoAOIOverride: 1
-  DisableSharedModeInterpolation: 0
 --- !u!1 &2413108747177772070
 GameObject:
   m_ObjectHideFlags: 0

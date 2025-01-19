@@ -11,6 +11,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
     public NetworkRunner nRunner;
     public Vector2 moveDirection;
     public float orientation;
+    public float camOrientation;
 
     public async void StartGame(GameMode mode, string name, int sceneIndex)
     {
@@ -52,6 +53,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
 
         data.direction = moveDirection;
         data.camDirection = orientation;
+        data.camDirectionX = camOrientation;
 
         input.Set(data);
     }

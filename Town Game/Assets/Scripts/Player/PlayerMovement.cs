@@ -109,15 +109,23 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         //if (!view.IsMine) Destroy(playerInput);
         //if (!view.IsMine) return;
         gameObject.GetComponent<Player>().Init += Init;
+        stats = gameObject.GetComponent<PlayerStats>();
+        runnerManager = FindObjectOfType<RunnerManager>();
+        stepRayUpper.localPosition = new Vector3(stepRayUpper.localPosition.x, stepHeight, stepRayUpper.localPosition.z);
+        unCastDistance = uncrouchCastUpper.position.y - uncrouchCastLower.position.y;
+        rb.freezeRotation = true;
     }
 
     public void Init() // Client side initialization
     {
         initialized = true;
-        runnerManager = FindObjectOfType<RunnerManager>();
-        if (!no.HasInputAuthority) { Destroy(playerInput); return; }
-        stats = gameObject.GetComponent<PlayerStats>();
-        rb.freezeRotation = true;
+        if (!no.HasInputAuthority) 
+        { 
+            Destroy(playerInput);
+            headAim.parent = cameraPosition; // Sets the headaim position to be synced on all clients
+            headAim.localPosition = new Vector3(0f, 0f, 1f);
+            return; 
+        }
         CameraMovement cm = playerManager.camTransform.GetComponent<CameraMovement>();
         cm.player = transform;
         cm.orientation = orientation;
@@ -125,25 +133,27 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         bobbing = playerManager.camBobbing;
         shake = playerManager.camShake;
         playerManager.camTransform.GetComponent<CameraManager>().SetTrackedFPSTransform(cameraPosition);
-        stepRayUpper.localPosition = new Vector3(stepRayUpper.localPosition.x, stepHeight, stepRayUpper.localPosition.z);
-        unCastDistance = uncrouchCastUpper.position.y - uncrouchCastLower.position.y;
+    }
+
+    public void SetCamRotation(float xRotation)
+    {
+        cameraPosition.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
     }
 
     private void Update()
     {
         //if (!view.IsMine) return;
         if (!initialized) return;
-        if (!runnerManager.nRunner.IsServer && !no.HasInputAuthority) return; // If not the server or the inputter, then return
         isGrounded = Physics.CheckSphere(groundCheck.position, groundedRadius, environmentMask);
-        // Sets moveDirection
-        if (!no.HasInputAuthority) return;
-        ControlDrag();
-        slopeDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
-        if (jumpTimer > 0f && isGrounded) jumpTimer -= Time.deltaTime;
-        Sprint();
-        Bobbing();
         UpdateAnimatorParemeters();
         if (canMove) UpdateAnimatorSpeed();
+        if (!runnerManager.nRunner.IsServer && !no.HasInputAuthority) return; // If not the server or the inputter, then return
+        // Sets moveDirection
+        slopeDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
+        ControlDrag();
+        if (jumpTimer > 0f && isGrounded) jumpTimer -= Time.deltaTime;
+        Sprint();
+        if (no.HasInputAuthority) Bobbing();
         if (!previousGrounded && isGrounded)
         {
             OnLand();
@@ -353,6 +363,14 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         }
     }
 
+    public void SetDirection(Vector2 direction)
+    {
+        horizontalMovement = direction.x;
+        verticalMovement = direction.y;
+        moveDirection = new Vector3(direction.x, 0f, direction.y);
+        Debug.Log(moveDirection);
+    }
+
     bool CanUncrouch()
     {
         Ray ray = new Ray(uncrouchCastLower.position, Vector3.up);
@@ -387,7 +405,7 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         if (fallDistance < 0.4f) return;
         if (fallDistance > mercyDistance)
         {
-            shake.StartShake(hardFall.shakeProperties);
+            shake?.StartShake(hardFall.shakeProperties);
             stats.Damage(fallDistance * fallDamageMultiplier, false);
             RaycastHit hit;
             if (Physics.Raycast(groundCheck.position, groundCheck.up * -1f, out hit, Mathf.Infinity, (int)environmentMask))
@@ -400,7 +418,7 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         }
         else
         {
-            shake.StartShake(softFall.shakeProperties);
+            shake?.StartShake(softFall.shakeProperties);
             RaycastHit hit;
             if (Physics.Raycast(groundCheck.position, groundCheck.up * -1f, out hit, Mathf.Infinity, (int)environmentMask))
             {
