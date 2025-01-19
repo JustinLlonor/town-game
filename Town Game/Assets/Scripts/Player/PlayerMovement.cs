@@ -135,11 +135,6 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         playerManager.camTransform.GetComponent<CameraManager>().SetTrackedFPSTransform(cameraPosition);
     }
 
-    public void SetCamRotation(float xRotation)
-    {
-        cameraPosition.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
-    }
-
     private void Update()
     {
         //if (!view.IsMine) return;
@@ -368,7 +363,6 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         horizontalMovement = direction.x;
         verticalMovement = direction.y;
         moveDirection = new Vector3(direction.x, 0f, direction.y);
-        Debug.Log(moveDirection);
     }
 
     bool CanUncrouch()

@@ -1,3 +1,4 @@
+using Fusion;
 using Fusion.Addons.Physics;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ public class CameraMovement : MonoBehaviour
 
     Transform fpsTransform;
     NetworkRigidbody3D playerRb;
+    Transform playerGFX;
     CursorManager cursorManager;
     CameraManager cameraManager;
     RunnerManager runnerManager;
@@ -61,7 +63,7 @@ public class CameraMovement : MonoBehaviour
         yRotation += mouseX;
         transform.eulerAngles = new Vector3(xRotation, yRotation, 0f);
         orientation.eulerAngles = new Vector3(0, yRotation, 0);
-        playerRb.RBRotation = orientation.rotation;
+        player.rotation = orientation.rotation;
         headAim.position = transform.position + transform.forward;
         runnerManager.orientation = yRotation;
         runnerManager.camOrientation = xRotation;
