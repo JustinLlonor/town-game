@@ -1,4 +1,5 @@
 using Fusion;
+using Fusion.Addons.Physics;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -141,6 +142,10 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         if (!initialized) return;
         isGrounded = Physics.CheckSphere(groundCheck.position, groundedRadius, environmentMask);
         UpdateAnimatorParemeters();
+        if (Input.GetKeyDown(KeyCode.Z))
+        {
+            rb.position = Vector3.zero;
+        }
         if (canMove) UpdateAnimatorSpeed();
         if (!runnerManager.nRunner.IsServer && !no.HasInputAuthority) return; // If not the server or the inputter, then return
         // Sets moveDirection
@@ -163,9 +168,10 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
 
     private void FixedUpdate()
     {
-        return;
         //if (!view.IsMine) return;
-        //if (!no.HasInputAuthority) return;
+        if (!no.HasInputAuthority || no.Runner.IsServer) return;
+        Inputs();
+        Debug.LogError(moveDirection);
         MovePlayer();
         CapAirVelocity();
         StepClimb();
@@ -239,9 +245,8 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         if (!canMove) return;
         Vector2 mv = iv.Get<Vector2>();
         runnerManager.moveDirection = mv;
-        return;
-        //horizontalMovement = data.direction.X;
-        //verticalMovement = data.direction.Y;
+        horizontalMovement = mv.x;
+        verticalMovement = mv.y;
     }
 
     private void OnCrouch(InputValue iv)

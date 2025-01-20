@@ -19,8 +19,6 @@ public class Player : NetworkBehaviour
     [Networked] float camDirectionX { get; set; }
     [Networked] Vector2 direction { get; set; }
 
-    NetworkRigidbody3D rb;
-
     private void Awake()
     {
         playerManager = FindObjectOfType<PlayerManager>();
@@ -45,6 +43,11 @@ public class Player : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
+        if (HasInputAuthority && !Runner.IsServer)
+        {
+            //Debug.LogError(Runner.DeltaTime);
+            //Debug.LogError(HasStateAuthority);
+        }
         if (GetInput(out NetworkInputData data))
         {
             pm.horizontalMovement = data.direction.X;
@@ -85,7 +88,7 @@ public class Player : NetworkBehaviour
         //pm.CapAirVelocity();
         //pm.StepClimb();
     }
-
+    
     public override void Spawned()
     {
         Init?.Invoke();
