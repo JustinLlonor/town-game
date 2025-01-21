@@ -27,6 +27,8 @@ public class PlayerManager : MonoBehaviour//PunCallbacks
     public delegate void InstantiatePlayer(GameObject player);
     public delegate void PlayerEvent();
 
+    private NetworkRunner networkRunner;
+
     [System.Serializable]
     public class PlayerSettings
     {
@@ -36,6 +38,7 @@ public class PlayerManager : MonoBehaviour//PunCallbacks
 
     private void Start()
     {
+        networkRunner = FindObjectOfType<NetworkRunner>();
         //if (!PhotonNetwork.IsConnected) return;
         //if (PhotonNetwork.CurrentRoom == null) return;
         //GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawn.position, spawn.rotation);
@@ -51,16 +54,31 @@ public class PlayerManager : MonoBehaviour//PunCallbacks
         //currentPlayer = player;
     }
 
+    private void Update()
+    {
+        if (!networkRunner.IsServer)
+        {
+            if (Physics.simulationMode == SimulationMode.Script)
+            {
+                Physics.simulationMode = SimulationMode.FixedUpdate;
+            }
+        }
+    }
+
+    public void SetupMovementSettings(GameObject player)
+    {
+        PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
+        playerMovement.speed = playerSettings.speed;
+        playerMovement.canJump = playerSettings.canJump;
+    }
+
     public void SetupOnClient(GameObject player)
     {
         OnInstantiatePlayer?.Invoke(player);
-        PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
         PlayerInventory playerInventory = player.GetComponent<PlayerInventory>();
         playerInventory.camTransform = camTransform;
         playerInventory.hotbarUI = hotbar;
         playerInventory.largeUI = largeUI;
-        playerMovement.speed = playerSettings.speed;
-        playerMovement.canJump = playerSettings.canJump;
 
         currentPlayer = player;
     }

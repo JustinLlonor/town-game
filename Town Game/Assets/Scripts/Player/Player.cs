@@ -12,23 +12,24 @@ public class Player : NetworkBehaviour
     [HideInInspector] public PlayerMovement pm;
     Transform playerGFX;
     Transform cameraPosition;
-    Transform headAim;
     PlayerManager playerManager;
     // To sync the inputs on all other clients
     [Networked] float camDirection { get; set; }
     [Networked] float camDirectionX { get; set; }
     [Networked] Vector2 direction { get; set; }
+    [Networked] Vector3 networkPosition { get; set; }
+    [Networked] int tick { get; set; }
 
     private void Awake()
     {
         playerManager = FindObjectOfType<PlayerManager>();
         playerGFX = pm.graphics;
         cameraPosition = pm.cameraPosition;
-        headAim = pm.headAim;
     }
 
     private void Start()
     {
+        playerManager.SetupMovementSettings(gameObject);
         if (!HasInputAuthority) return;
         playerManager.SetupOnClient(gameObject);
     }
@@ -43,11 +44,11 @@ public class Player : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        if (HasInputAuthority && !Runner.IsServer)
-        {
-            //Debug.LogError(Runner.DeltaTime);
-            //Debug.LogError(HasStateAuthority);
-        }
+        //if (!HasInputAuthority && Runner.IsServer)
+        //{
+        //    networkPosition = transform.position;
+        //    tick = 
+        //}
         if (GetInput(out NetworkInputData data))
         {
             pm.horizontalMovement = data.direction.X;
@@ -66,27 +67,15 @@ public class Player : NetworkBehaviour
                 camDirectionX = data.camDirectionX;
                 direction = data.direction;
             }
-            pm.Inputs();
-            pm.MovePlayer();
-            pm.CapAirVelocity();
-            pm.StepClimb();
         }
     }
 
     //Prediction for the player movement, executed on proxies
     private void Prediction()
     {
-        //pm.horizontalMovement = direction.x;
-        //pm.verticalMovement = direction.y;
-        //transform.rotation = Quaternion.Euler(0f, camDirection, 0f);
         playerGFX.rotation = Quaternion.Euler(0f, camDirection, 0f);
         cameraPosition.rotation = Quaternion.Euler(camDirectionX, camDirection, 0f);
         pm.SetDirection(direction);
-        //headAim.localRotation = Quaternion.Euler(camDirectionX, 0f, 0f);
-        //pm.Inputs();
-        //pm.MovePlayer();
-        //pm.CapAirVelocity();
-        //pm.StepClimb();
     }
     
     public override void Spawned()

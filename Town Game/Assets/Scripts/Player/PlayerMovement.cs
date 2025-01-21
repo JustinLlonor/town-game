@@ -67,6 +67,9 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
     public Transform crouchPos;
     public Transform orientation;
 
+    [Header("Networking")]
+    public float errorDistance = 0.15f;
+
     public MovementEvent OnLeap;
 
     public delegate void MovementEvent();
@@ -80,6 +83,7 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
     CameraBobbing bobbing;
     CameraShake shake;
     RunnerManager runnerManager;
+    NetworkRigidbody3D nrb;
     float sprintGain = 1f;
     float crouchMinus = 1f;
     float jumpTimer = 0f;
@@ -107,6 +111,7 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         playerManager = FindObjectOfType<PlayerManager>();
         playerInput = gameObject.GetComponent<PlayerInput>();
         rb = gameObject.GetComponent<Rigidbody>();
+        nrb = gameObject.GetComponent<NetworkRigidbody3D>();
         //if (!view.IsMine) Destroy(playerInput);
         //if (!view.IsMine) return;
         gameObject.GetComponent<Player>().Init += Init;
@@ -142,10 +147,6 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         if (!initialized) return;
         isGrounded = Physics.CheckSphere(groundCheck.position, groundedRadius, environmentMask);
         UpdateAnimatorParemeters();
-        if (Input.GetKeyDown(KeyCode.Z))
-        {
-            rb.position = Vector3.zero;
-        }
         if (canMove) UpdateAnimatorSpeed();
         if (!runnerManager.nRunner.IsServer && !no.HasInputAuthority) return; // If not the server or the inputter, then return
         // Sets moveDirection
@@ -169,12 +170,13 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
     private void FixedUpdate()
     {
         //if (!view.IsMine) return;
-        if (!no.HasInputAuthority || no.Runner.IsServer) return;
+        
+        if (!no.HasInputAuthority && !no.Runner.IsServer) return;
         Inputs();
-        Debug.LogError(moveDirection);
         MovePlayer();
         CapAirVelocity();
         StepClimb();
+        //SyncClientPrediction();
     }
 
     public void Freeze(bool freezeVelocity = false)
