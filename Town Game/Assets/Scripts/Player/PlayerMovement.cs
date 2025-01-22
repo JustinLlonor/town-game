@@ -173,7 +173,7 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         return;
         if (!no.HasInputAuthority && !no.Runner.IsServer) return;
         Inputs();
-        MovePlayer();
+        //MovePlayer();
         CapAirVelocity();
         StepClimb();
         //SyncClientPrediction();
@@ -498,6 +498,11 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         }
     }
 
+    public void Inputs()
+    {
+        moveDirection = orientation.forward * verticalMovement + orientation.right * horizontalMovement;
+    }
+
     public void MovePlayer()
     {
         if (!canMove) return;
@@ -515,10 +520,6 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         }
     }
 
-    public void Inputs()
-    {
-        moveDirection = orientation.forward * verticalMovement + orientation.right * horizontalMovement;
-    }
 
     void ControlDrag()
     {

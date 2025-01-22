@@ -14,7 +14,6 @@ public class Player : NetworkBehaviour
     Transform playerGFX;
     Transform cameraPosition;
     PlayerManager playerManager;
-    NetworkObject no;
     // To sync the inputs on all other clients
     [Networked] float camDirection { get; set; }
     [Networked] float camDirectionX { get; set; }
@@ -25,7 +24,6 @@ public class Player : NetworkBehaviour
     private void Awake()
     {
         playerManager = FindObjectOfType<PlayerManager>();
-        no = GetComponent<NetworkObject>();
         playerGFX = pm.graphics;
         cameraPosition = pm.cameraPosition;
     }
@@ -35,6 +33,11 @@ public class Player : NetworkBehaviour
         playerManager.SetupMovementSettings(gameObject);
         if (!HasInputAuthority) return;
         playerManager.SetupOnClient(gameObject);
+    }
+
+    public override void Spawned()
+    {
+        Init?.Invoke();
     }
 
     private void Update()
@@ -60,30 +63,24 @@ public class Player : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        //if (!HasInputAuthority && Runner.IsServer)
-        //{
-        //    networkPosition = transform.position;
-        //    tick = 
-        //}
         if (GetInput(out NetworkInputData data))
         {
             pm.horizontalMovement = data.direction.X;
             pm.verticalMovement = data.direction.Y;
-            if (!HasInputAuthority)
+            if (!HasInputAuthority) // Syncs player rotation, rotates player models
             {
-                playerGFX.rotation = Quaternion.Euler(0f, data.camDirection, 0f);
-                pm.orientation.rotation = Quaternion.Euler(0f, data.camDirection, 0f);
-                //pm.SetCamRotation(data.camDirectionX);
+                playerGFX.rotation = Quaternion.Euler(0f, data.camDirection, 0f); 
+                pm.orientation.rotation = Quaternion.Euler(0f, data.camDirection, 0f); // Orientation transform is the direction the player moves in
                 cameraPosition.rotation = Quaternion.Euler(camDirectionX, camDirection, 0f);
-                //headAim.localRotation = Quaternion.Euler(camDirectionX, 0f, 0f);
             }
-            if (HasStateAuthority)
+            if (HasStateAuthority) // Sets properties
             {
                 camDirection = data.camDirection;
                 camDirectionX = data.camDirectionX;
                 direction = data.direction;
             }
-            Simulate();
+            pm.Inputs();
+            pm.MovePlayer();
         }
     }
 
@@ -101,11 +98,5 @@ public class Player : NetworkBehaviour
         playerGFX.rotation = Quaternion.Euler(0f, camDirection, 0f);
         cameraPosition.rotation = Quaternion.Euler(camDirectionX, camDirection, 0f);
         pm.SetDirection(direction);
-    }
-    
-    public override void Spawned()
-    {
-        Init?.Invoke();
-        Runner.SetPlayerObject(Runner.LocalPlayer, Object);
     }
 }
