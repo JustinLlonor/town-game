@@ -170,7 +170,7 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
     private void FixedUpdate()
     {
         //if (!view.IsMine) return;
-        
+        return;
         if (!no.HasInputAuthority && !no.Runner.IsServer) return;
         Inputs();
         MovePlayer();

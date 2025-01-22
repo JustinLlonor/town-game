@@ -9,20 +9,23 @@ public class Player : NetworkBehaviour
 {
     public delegate void PlayerEvent();
     public PlayerEvent Init;
+    public int simulationTickDistance = 2;
     [HideInInspector] public PlayerMovement pm;
     Transform playerGFX;
     Transform cameraPosition;
     PlayerManager playerManager;
+    NetworkObject no;
     // To sync the inputs on all other clients
     [Networked] float camDirection { get; set; }
     [Networked] float camDirectionX { get; set; }
     [Networked] Vector2 direction { get; set; }
-    [Networked] Vector3 networkPosition { get; set; }
-    [Networked] int tick { get; set; }
+    float timer = 0f;
+    int simCount = 0;
 
     private void Awake()
     {
         playerManager = FindObjectOfType<PlayerManager>();
+        no = GetComponent<NetworkObject>();
         playerGFX = pm.graphics;
         cameraPosition = pm.cameraPosition;
     }
@@ -39,6 +42,19 @@ public class Player : NetworkBehaviour
         if (IsProxy)
         {
             Prediction();
+        }
+
+        if (!HasInputAuthority) return;
+
+        if (timer <= 0f)
+        {
+            Debug.LogError(simCount);
+            timer = 1f;
+            simCount = 0;
+        } 
+        else
+        {
+            timer -= Time.deltaTime;
         }
     }
 
@@ -67,7 +83,16 @@ public class Player : NetworkBehaviour
                 camDirectionX = data.camDirectionX;
                 direction = data.direction;
             }
+            Simulate();
         }
+    }
+
+    private void Simulate()
+    {
+        pm.Inputs();
+        pm.MovePlayer();
+        pm.CapAirVelocity();
+        pm.StepClimb();
     }
 
     //Prediction for the player movement, executed on proxies
@@ -81,5 +106,6 @@ public class Player : NetworkBehaviour
     public override void Spawned()
     {
         Init?.Invoke();
+        Runner.SetPlayerObject(Runner.LocalPlayer, Object);
     }
 }

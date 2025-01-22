@@ -594,13 +594,13 @@ MonoBehaviour:
   _stateAuthorityChangeErrorCorrectionDelta: 1
   SyncScale: 0
   SyncParent: 1
-  _interpolationTarget: {fileID: 6748732434187779059}
+  _interpolationTarget: {fileID: 0}
   UsePreciseRotation: 0
   UseRenderSleepThresholds: 1
   RenderThresholds:
     UseEnergy: 1
     Position: 1
-    Rotation: 0
+    Rotation: 0.01
     Scale: 0.01
 --- !u!114 &3091803339169035289
 MonoBehaviour:

@@ -60,7 +60,7 @@ public class PlayerManager : MonoBehaviour//PunCallbacks
         {
             if (Physics.simulationMode == SimulationMode.Script)
             {
-                Physics.simulationMode = SimulationMode.FixedUpdate;
+                //Physics.simulationMode = SimulationMode.FixedUpdate;
             }
         }
     }
