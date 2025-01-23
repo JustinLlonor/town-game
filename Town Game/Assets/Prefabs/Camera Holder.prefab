@@ -50,6 +50,8 @@ MonoBehaviour:
   trackedFPSTransform: {fileID: 0}
   trackedCinematicTransform: {fileID: 0}
   trackedObservableTransform: {fileID: 0}
+  observableGive: 0
+  isTransitioning: 0
 --- !u!114 &1476666307285568578
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -114,7 +116,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd5c4db1794ee6f469cff219b7fe2175, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  walkLength: 0.9725
+  walkLength: 1.0503
   sprintLength: 0.5525
   crouchLength: 1
   wAmplitude: 0.03

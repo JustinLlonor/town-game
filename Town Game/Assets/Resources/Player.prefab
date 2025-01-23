@@ -824,7 +824,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 3.75
   movementMultiplier: 10
-  sprintMultiplier: 1.666666
+  sprintMultiplier: 2
   sprintStaminaRegenCooldown: 0.5
   crouchMultiplier: 0.7
   sprintStaminaConsumption: 15
@@ -889,7 +889,7 @@ MonoBehaviour:
   hardFall: {fileID: 11400000, guid: 2eabfcc77b915034684d5160ef7ae947, type: 2}
   movementCollider: {fileID: 8835480446840007214}
   animator: {fileID: 5001893267009733704}
-  aniSpeedFactor: 1.8
+  aniSpeedFactor: 1.6
   headAim: {fileID: 854407532444519849}
   graphics: {fileID: 1342524613149204641}
   cameraPosition: {fileID: 8806967224018203518}

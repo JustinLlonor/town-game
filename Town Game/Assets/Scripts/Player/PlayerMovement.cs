@@ -143,13 +143,11 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
 
     private void Update()
     {
-        //if (!view.IsMine) return;
         if (!initialized) return;
         isGrounded = Physics.CheckSphere(groundCheck.position, groundedRadius, environmentMask);
         UpdateAnimatorParemeters();
         if (canMove) UpdateAnimatorSpeed();
         if (!runnerManager.nRunner.IsServer && !no.HasInputAuthority) return; // If not the server or the inputter, then return
-        // Sets moveDirection
         ControlDrag();
         if (jumpTimer > 0f && isGrounded) jumpTimer -= Time.deltaTime;
         Sprint();
@@ -168,14 +166,7 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
 
     private void FixedUpdate()
     {
-        //if (!view.IsMine) return;
-        return;
-        if (!no.HasInputAuthority && !no.Runner.IsServer) return;
-        Inputs();
-        //MovePlayer();
-        CapAirVelocity();
-        //StepClimb();
-        //SyncClientPrediction();
+        
     }
 
     public void Freeze(bool freezeVelocity = false)
@@ -505,7 +496,7 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
 
     public void MovePlayer()
     {
-        if (!canMove) return;
+        if (!canMove) return;   
         if (isGrounded && !OnSlope())
         {
             rb.AddForce(moveDirection.normalized * speed * movementMultiplier * sprintGain * crouchMinus, ForceMode.Acceleration);
@@ -560,13 +551,14 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         if (moveDirection != Vector3.zero)
         {
             isMoving = true;
-        } else
+        } 
+        else
         {
             isMoving = false;
         }
         if (isMoving)
         {
-            animator.SetFloat("moveMultiplier", speed / aniSpeedFactor);
+            animator.SetFloat("moveMultiplier", (speed / aniSpeedFactor));
         } 
         else
         {

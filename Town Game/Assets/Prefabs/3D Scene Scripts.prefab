@@ -79,7 +79,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5541120355576515176}
-  - component: {fileID: 8929639921756441606}
   - component: {fileID: 8447958778269745316}
   m_Layer: 0
   m_Name: Cleanup Master
@@ -103,28 +102,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8927670568152924241}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8929639921756441606
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9196370192044856765}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents: []
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!114 &8447958778269745316
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -193,7 +170,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: Particle Manager
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1867394593001268340, guid: 607cd7bc7bdace9459f89bbfc9090717, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -259,7 +237,10 @@ PrefabInstance:
       propertyPath: recordingEnabled
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 640016581107584655, guid: 2e0a9492536f4884290f0baa788f8977, type: 3}
+    - {fileID: 6999537366342726188, guid: 2e0a9492536f4884290f0baa788f8977, type: 3}
+    - {fileID: 5680319831133966569, guid: 2e0a9492536f4884290f0baa788f8977, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -406,43 +387,13 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2984718625898795549, guid: 00b86e8be9c97a24e98cfbdeab7f72cf, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5709288198271284562}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 00b86e8be9c97a24e98cfbdeab7f72cf, type: 3}
 --- !u!4 &3479522405540841677 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7795883315039441122, guid: 00b86e8be9c97a24e98cfbdeab7f72cf, type: 3}
   m_PrefabInstance: {fileID: 6663416099428915247}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &8436064973073205810 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2984718625898795549, guid: 00b86e8be9c97a24e98cfbdeab7f72cf, type: 3}
-  m_PrefabInstance: {fileID: 6663416099428915247}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &5709288198271284562
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8436064973073205810}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents: []
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!1001 &8582622432131805566
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -499,7 +450,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: Sound Manager
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1445171470900705614, guid: e385a28ba1414f247a98e8a40698eb7b, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

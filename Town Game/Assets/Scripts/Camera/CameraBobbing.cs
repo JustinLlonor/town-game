@@ -1,4 +1,3 @@
-//using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -26,11 +25,23 @@ public class CameraBobbing : MonoBehaviour
     float currentLength = 1f;
     float currentAmplitude = 1f;
     float currentWeight = 1f;
+    PlayerMovement mv;
 
     private void Awake()
     {
         currentLength = walkLength;
         currentAmplitude = wAmplitude;
+        FindObjectOfType<PlayerManager>().OnInstantiatePlayer += SetupReferences;
+    }
+
+    void SetupReferences(GameObject player)
+    {
+        mv = player.GetComponent<PlayerMovement>();
+    }
+
+    private void Update()
+    {
+        if (mv != null) walkLength = 1.167f / (mv.speed / mv.aniSpeedFactor); // Sets the bobbing speed to adjust to the player animation
     }
 
     private void LateUpdate()

@@ -18,8 +18,6 @@ public class Player : NetworkBehaviour
     [Networked] float camDirection { get; set; }
     [Networked] float camDirectionX { get; set; }
     [Networked] Vector2 direction { get; set; }
-    float timer = 0f;
-    int simCount = 0;
 
     private void Awake()
     {
