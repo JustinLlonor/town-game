@@ -49,6 +49,7 @@ public class Player : NetworkBehaviour
 
         if (!HasInputAuthority) return;
 
+        /**
         if (timer <= 0f)
         {
             Debug.LogError(simCount);
@@ -59,19 +60,20 @@ public class Player : NetworkBehaviour
         {
             timer -= Time.deltaTime;
         }
+        **/
     }
 
     public override void FixedUpdateNetwork()
     {
         if (GetInput(out NetworkInputData data))
         {
-            pm.horizontalMovement = data.direction.X;
+            pm.horizontalMovement = data.direction.X; // Horizontal and vertical movement inputs
             pm.verticalMovement = data.direction.Y;
             if (!HasInputAuthority) // Syncs player rotation, rotates player models
             {
                 playerGFX.rotation = Quaternion.Euler(0f, data.camDirection, 0f); 
-                pm.orientation.rotation = Quaternion.Euler(0f, data.camDirection, 0f); // Orientation transform is the direction the player moves in
-                cameraPosition.rotation = Quaternion.Euler(camDirectionX, camDirection, 0f);
+                pm.orientation.rotation = Quaternion.Euler(0f, data.camDirection, 0f); // Orientation transform points toward the direction the player moves in
+                cameraPosition.rotation = Quaternion.Euler(camDirectionX, camDirection, 0f); 
             }
             if (HasStateAuthority) // Sets properties
             {
@@ -79,8 +81,7 @@ public class Player : NetworkBehaviour
                 camDirectionX = data.camDirectionX;
                 direction = data.direction;
             }
-            pm.Inputs();
-            pm.MovePlayer();
+            Simulate();
         }
     }
 
@@ -89,7 +90,7 @@ public class Player : NetworkBehaviour
         pm.Inputs();
         pm.MovePlayer();
         pm.CapAirVelocity();
-        pm.StepClimb();
+        pm.StepClimb(Runner.DeltaTime);
     }
 
     //Prediction for the player movement, executed on proxies

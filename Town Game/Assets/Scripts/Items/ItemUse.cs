@@ -40,6 +40,7 @@ public class ItemUse : MonoBehaviour
 
     void UseItem()
     {
+        return; // Change later
         //if (inventory.hotbar[inventory.equippedSlot].IsNullOrEmpty()) return;
         Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot]];
         if (item as Weapon)

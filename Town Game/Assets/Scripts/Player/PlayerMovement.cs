@@ -150,7 +150,6 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         if (canMove) UpdateAnimatorSpeed();
         if (!runnerManager.nRunner.IsServer && !no.HasInputAuthority) return; // If not the server or the inputter, then return
         // Sets moveDirection
-        slopeDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
         ControlDrag();
         if (jumpTimer > 0f && isGrounded) jumpTimer -= Time.deltaTime;
         Sprint();
@@ -175,7 +174,7 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         Inputs();
         //MovePlayer();
         CapAirVelocity();
-        StepClimb();
+        //StepClimb();
         //SyncClientPrediction();
     }
 
@@ -500,7 +499,8 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
 
     public void Inputs()
     {
-        moveDirection = orientation.forward * verticalMovement + orientation.right * horizontalMovement;
+        moveDirection = orientation.forward * verticalMovement + orientation.right * horizontalMovement; // Turns horizontal and vertical movement variables into a movedirection vector
+        slopeDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal); // For slope movement
     }
 
     public void MovePlayer()
@@ -520,6 +520,20 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         }
     }
 
+    /**
+        if (isGrounded && !OnSlope())
+        {
+            rb.AddForce(moveDirection.normalized * speed * movementMultiplier * sprintGain * crouchMinus, ForceMode.Acceleration);
+        }
+        else if (isGrounded && OnSlope())
+        {
+            rb.AddForce(slopeDirection.normalized * speed * movementMultiplier * sprintGain * crouchMinus, ForceMode.Acceleration);
+        }
+        else
+        {
+            rb.AddForce(moveDirection.normalized * speed * movementMultiplier * airHandling * sprintGain * crouchMinus, ForceMode.Acceleration);
+        }
+    **/
 
     void ControlDrag()
     {
@@ -572,7 +586,7 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         return false;
     }
 
-    public void StepClimb()
+    public void StepClimb(float deltaTime)
     {
         //if (OnSlope()) return; // May be changed later
         if (!isMoving) return;
@@ -582,7 +596,7 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
             bool upper = Physics.Raycast(stepRayUpper.position, moveDirection, stepDistance + .05f, environmentMask);
             if (!upper)
             {
-                rb.position -= new Vector3(0f, -stepSmooth, 0f);
+                rb.AddForce(new Vector3(0f, stepSmooth, 0f));
             }
         }
     }

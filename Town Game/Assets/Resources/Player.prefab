@@ -558,6 +558,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ef44717e53c57d448b0d9e97ba73f63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  simulationTickDistance: 2
   pm: {fileID: 6160271850420175375}
 --- !u!114 &2540704478665164047
 MonoBehaviour:
@@ -878,8 +879,8 @@ MonoBehaviour:
   - {fileID: 847193838002151960}
   - {fileID: 5432845057157182992}
   stepHeight: 0.3
-  stepSmooth: 0.02
-  stepDistance: 0.25
+  stepSmooth: 20
+  stepDistance: 0.1
   stepRayLower: {fileID: 6757060838315044995}
   stepRayUpper: {fileID: 6393881673779276614}
   fallDamageMultiplier: 6
