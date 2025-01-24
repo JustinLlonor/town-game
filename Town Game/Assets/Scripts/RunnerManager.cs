@@ -10,9 +10,12 @@ using UnityEngine.SceneManagement;
 public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     public NetworkRunner nRunner;
+    [Header("Input")]
     public Vector2 moveDirection;
     public float orientation;
     public float camOrientation;
+    public bool jump = false;
+    public bool crouch = false;
 
     public async void StartGame(GameMode mode, string name, int sceneIndex)
     {
@@ -57,6 +60,9 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         data.direction = moveDirection;
         data.camDirection = orientation;
         data.camDirectionX = camOrientation;
+        data.buttons.Set(NetworkInputData.Buttons.Jump, jump);
+        jump = false;
+        data.buttons.Set(NetworkInputData.Buttons.Crouch, crouch);
 
         input.Set(data);
     }

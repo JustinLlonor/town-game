@@ -579,6 +579,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 9069154022521576282}
   - {fileID: 2442258754578231911}
+  - {fileID: 6160271850420175375}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &2442258754578231911
 MonoBehaviour:
@@ -824,7 +825,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 3.75
   movementMultiplier: 10
-  sprintMultiplier: 2
+  sprintMultiplier: 1.8
   sprintStaminaRegenCooldown: 0.5
   crouchMultiplier: 0.7
   sprintStaminaConsumption: 15
@@ -841,7 +842,7 @@ MonoBehaviour:
   groundCheck: {fileID: 4579068949193498039}
   jumpShake: {fileID: 11400000, guid: 75956f023138a7244a7a58663cb0ed13, type: 2}
   groundedRadius: 0.2
-  isGrounded: 1
+  _isGrounded: 0
   crouchJumpMultiplier: 0.7
   crouchTime: 0.2
   crouchCurve:
@@ -896,7 +897,6 @@ MonoBehaviour:
   standPos: {fileID: 6575205651289647044}
   crouchPos: {fileID: 884615722293357098}
   orientation: {fileID: 7162067020350182232}
-  errorDistance: 0.15
   horizontalMovement: 0
   verticalMovement: 0
   isMoving: 0

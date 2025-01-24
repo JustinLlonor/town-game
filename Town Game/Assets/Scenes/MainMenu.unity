@@ -1113,7 +1113,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f4ad50cd901a1543924ade031204c9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 0}
+  nRunner: {fileID: 0}
+  moveDirection: {x: 0, y: 0}
+  orientation: 0
+  camOrientation: 0
+  jump: 0
 --- !u!4 &1669553461
 Transform:
   m_ObjectHideFlags: 0

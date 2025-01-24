@@ -63,6 +63,7 @@ public class Player : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
+        pm.SetGrounded();
         if (GetInput(out NetworkInputData data))
         {
             pm.horizontalMovement = data.direction.X; // Horizontal and vertical movement inputs
@@ -79,8 +80,12 @@ public class Player : NetworkBehaviour
                 camDirectionX = data.camDirectionX;
                 direction = data.direction;
             }
-            Simulate();
+            if (data.buttons.IsSet(NetworkInputData.Buttons.Jump))
+            {
+                pm.Jump(HasInputAuthority);
+            }
         }
+        Simulate();
     }
 
     private void Simulate()
@@ -88,7 +93,8 @@ public class Player : NetworkBehaviour
         pm.Inputs();
         pm.MovePlayer();
         pm.CapAirVelocity();
-        pm.StepClimb(Runner.DeltaTime);
+        pm.StepClimb();
+        pm.GroundSim();
     }
 
     //Prediction for the player movement, executed on proxies

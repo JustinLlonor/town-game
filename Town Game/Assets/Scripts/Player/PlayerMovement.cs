@@ -4,8 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static Fusion.NetworkBehaviour;
 
-public class PlayerMovement : MonoBehaviour//PunCallbacks
+public class PlayerMovement : NetworkBehaviour//PunCallbacks
 {
     [Header("Movement")]
     public float speed = 6f;
@@ -16,7 +17,7 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
     public float sprintStaminaConsumption = 20f;
     public float groundDrag = 6f;
     public bool canMove = true;
-    
+
     [Header("Aerial")]
     public float jumpHeight = 3;
     public float jumpCooldown = 0.5f;
@@ -28,13 +29,13 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
     public Transform groundCheck;
     public Shake jumpShake;
     public float groundedRadius = 0.2f;
-    public bool isGrounded = true;
+    [Networked] public bool isGrounded { get; set; }
 
     [Header("Crouching")]
     public float crouchJumpMultiplier = 0.6f;
     public float crouchTime = .2f;
     public AnimationCurve crouchCurve;
-    public bool isCrouching = false;
+    [Networked] public bool isCrouching { get; set; } = false;
     public float playerRadius;
     public Transform uncrouchCastUpper;
     public Transform uncrouchCastLower;
@@ -67,9 +68,6 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
     public Transform crouchPos;
     public Transform orientation;
 
-    [Header("Networking")]
-    public float errorDistance = 0.15f;
-
     public MovementEvent OnLeap;
 
     public delegate void MovementEvent();
@@ -83,17 +81,16 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
     CameraBobbing bobbing;
     CameraShake shake;
     RunnerManager runnerManager;
-    NetworkRigidbody3D nrb;
     float sprintGain = 1f;
     float crouchMinus = 1f;
-    float jumpTimer = 0f;
+    //float jumpTimer = 0f;
     [HideInInspector] public float horizontalMovement;
     [HideInInspector] public float verticalMovement;
     float previousYVel;
     float peakYPosition;
     float unCastDistance;
     [HideInInspector] public bool isMoving;
-    [HideInInspector] public bool isSprinting;
+    [HideInInspector] [Networked] public bool isSprinting { get; set; }
     bool previousGrounded = true;
     bool sprintPressed = false;
     bool initialized = false;
@@ -103,6 +100,11 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
     IEnumerator currentCamLerp;
     IEnumerator currentCrouchExit;
 
+    // Client Feedback
+    [Networked]
+    int jumpCount { get; set; }
+    int lastJump;
+
     private void Awake()
     {
         airSpeed = speed;
@@ -111,7 +113,6 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         playerManager = FindObjectOfType<PlayerManager>();
         playerInput = gameObject.GetComponent<PlayerInput>();
         rb = gameObject.GetComponent<Rigidbody>();
-        nrb = gameObject.GetComponent<NetworkRigidbody3D>();
         //if (!view.IsMine) Destroy(playerInput);
         //if (!view.IsMine) return;
         gameObject.GetComponent<Player>().Init += Init;
@@ -144,14 +145,40 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
     private void Update()
     {
         if (!initialized) return;
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundedRadius, environmentMask);
         UpdateAnimatorParemeters();
         if (canMove) UpdateAnimatorSpeed();
         if (!runnerManager.nRunner.IsServer && !no.HasInputAuthority) return; // If not the server or the inputter, then return
-        ControlDrag();
-        if (jumpTimer > 0f && isGrounded) jumpTimer -= Time.deltaTime;
         Sprint();
+        //if (jumpTimer > 0f && isGrounded) jumpTimer -= Time.deltaTime;
         if (no.HasInputAuthority) Bobbing();
+    }
+
+    public override void Spawned()
+    {
+        jumpCount = lastJump;
+    }
+
+    public override void Render()
+    {
+        if (jumpCount > lastJump)
+        {
+            if (!isCrouching)
+            {
+                animator.Play("Jump");
+                if (!HasInputAuthority) SoundManager.instance.Play3D("Jump", groundCheck.position);
+            }
+            jumpCount = lastJump;
+        }
+    }
+
+    public void SetGrounded()
+    {
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundedRadius, environmentMask);
+    }
+
+    public void GroundSim()
+    {
+        ControlDrag();
         if (!previousGrounded && isGrounded)
         {
             OnLand();
@@ -162,11 +189,6 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         }
         previousGrounded = isGrounded;
         Fall();
-    }
-
-    private void FixedUpdate()
-    {
-        
     }
 
     public void Freeze(bool freezeVelocity = false)
@@ -199,22 +221,31 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
 
     private void OnJump()
     {
+        runnerManager.jump = true; // Set the jump button to true to be networked
+    }
+
+    public void Jump(bool inputAuthority)
+    {
         if (!canMove) return;
         if (!canJump) return;
         if (!isGrounded) return;
-        if (!(jumpTimer <= 0f)) return;
-        if (!stats.ConsumeStamina(jumpStaminaConsumption)) return;
-        if (isCrouching) rb.AddForce(transform.up * jumpHeight * crouchJumpMultiplier, ForceMode.Impulse);
+        //if (!(jumpTimer <= 0f)) return;
+        //if (!stats.ConsumeStamina(jumpStaminaConsumption)) return; Fix this later
+        if (!Runner.IsResimulation && inputAuthority) ClientJump();
+        if (!inputAuthority) jumpCount++;
+        if (isCrouching) rb.AddForce(Vector3.up * jumpHeight * crouchJumpMultiplier, ForceMode.Impulse);
         if (!isCrouching)
         {
-            animator.Play("Jump");
-            //view.RPC("JumpAnimation", RpcTarget.Others);
-            rb.AddForce(transform.up * jumpHeight, ForceMode.Impulse);
-            SoundManager.instance.Play3D("Jump", groundCheck.position);
+            rb.AddForce(Vector3.up * jumpHeight, ForceMode.Impulse);
         }
-        shake.StartShake(jumpShake.shakeProperties);
-        jumpTimer = jumpCooldown;
+        //jumpTimer = jumpCooldown;
         SetAirSpeed();
+    }
+
+    public void ClientJump()
+    {
+        SoundManager.instance.Play3D("Jump", groundCheck.position);
+        shake.StartShake(jumpShake.shakeProperties);
         OnLeap?.Invoke();
     }
 
@@ -237,8 +268,6 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         if (!canMove) return;
         Vector2 mv = iv.Get<Vector2>();
         runnerManager.moveDirection = mv;
-        horizontalMovement = mv.x;
-        verticalMovement = mv.y;
     }
 
     private void OnCrouch(InputValue iv)
@@ -246,12 +275,11 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         if (iv.Get<float>() == 1f)
         {
             if (!canMove) return;
-            //crouchPressed = true;
+            runnerManager.crouch = true;
             if (currentCrouchExit != null) StopCoroutine(currentCrouchExit);
             EnterCrouch();
             return;
         }
-        //crouchPressed = false;
         ExitCrouch();
     }
 
@@ -281,6 +309,18 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         StartCoroutine(currentCrouchExit);
     }
 
+    IEnumerator CheckCrouchExit()
+    {
+        while (!CanUncrouch())
+        {
+            yield return null;
+        }
+        DisableCrouchHitboxes();
+        crouchMinus = 1f;
+        StartCamLerp(cameraPosition, standPos);
+        isCrouching = false;
+    }
+
     void StartCamLerp(Transform from, Transform to)
     {
         if (currentCamLerp != null)
@@ -307,19 +347,6 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
             lerpTime += Time.deltaTime;
         }
         cameraPosition.position = to.position;
-    }
-
-    IEnumerator CheckCrouchExit()
-    {
-        while (!CanUncrouch())
-        {
-            yield return null;
-        }
-        DisableCrouchHitboxes();
-        //view.RPC("DisableCrouchHitboxes", RpcTarget.Others);
-        crouchMinus = 1f;
-        StartCamLerp(cameraPosition, standPos);
-        isCrouching = false;
     }
 
     IEnumerator LifeTimer(GameObject obj)
@@ -578,7 +605,7 @@ public class PlayerMovement : MonoBehaviour//PunCallbacks
         return false;
     }
 
-    public void StepClimb(float deltaTime)
+    public void StepClimb()
     {
         //if (OnSlope()) return; // May be changed later
         if (!isMoving) return;
