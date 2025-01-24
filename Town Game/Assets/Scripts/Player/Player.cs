@@ -63,16 +63,15 @@ public class Player : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        pm.SetGrounded();
         if (GetInput(out NetworkInputData data))
         {
             pm.horizontalMovement = data.direction.X; // Horizontal and vertical movement inputs
             pm.verticalMovement = data.direction.Y;
             if (!HasInputAuthority) // Syncs player rotation, rotates player models
             {
-                playerGFX.rotation = Quaternion.Euler(0f, data.camDirection, 0f); 
+                playerGFX.rotation = Quaternion.Euler(0f, data.camDirection, 0f);
                 pm.orientation.rotation = Quaternion.Euler(0f, data.camDirection, 0f); // Orientation transform points toward the direction the player moves in
-                cameraPosition.rotation = Quaternion.Euler(camDirectionX, camDirection, 0f); 
+                cameraPosition.rotation = Quaternion.Euler(camDirectionX, camDirection, 0f);
             }
             if (HasStateAuthority) // Sets properties
             {
@@ -82,22 +81,24 @@ public class Player : NetworkBehaviour
             }
             if (data.buttons.IsSet(NetworkInputData.Buttons.Jump))
             {
-                pm.Jump(HasInputAuthority);
+                pm.Jump();
             }
             if (data.buttons.IsSet(NetworkInputData.Buttons.Crouch))
             {
                 pm.EnterCrouch();
-            } 
+            }
             else
             {
                 pm.ExitCrouch();
             }
+            pm.sprintPressed = data.buttons.IsSet(NetworkInputData.Buttons.Sprint);
         }
         Simulate();
     }
 
     private void Simulate()
     {
+        pm.SetIsMoving();
         pm.Inputs();
         pm.MovePlayer();
         pm.CapAirVelocity();

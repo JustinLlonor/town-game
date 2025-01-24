@@ -7,7 +7,8 @@ public struct NetworkInputData : INetworkInput
     public enum Buttons
     {
         Jump = 0,
-        Crouch = 1
+        Crouch = 1,
+        Sprint = 2
     }
 
     public NetworkButtons buttons;

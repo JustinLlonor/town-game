@@ -89,14 +89,15 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
     float previousYVel;
     float peakYPosition;
     float unCastDistance;
-    [HideInInspector] public bool isMoving;
+    [HideInInspector] [Networked] public bool isMoving { get; set; }
     [HideInInspector] [Networked] public bool isSprinting { get; set; }
     bool previousGrounded = true;
-    bool sprintPressed = false;
+    public bool sprintPressed = false;
     bool initialized = false;
     RaycastHit slopeHit;
     Vector3 moveDirection;
     Vector3 slopeDirection;
+    Vector3 groundCheckOffset;
     IEnumerator currentCamLerp;
 
     // Client Feedback
@@ -108,7 +109,7 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
 
     private void Awake()
     {
-        airSpeed = speed;
+        groundCheckOffset = groundCheck.localPosition;
         no = gameObject.GetComponent<NetworkObject>();
         //view = gameObject.GetComponent<PhotonView>();
         playerManager = FindObjectOfType<PlayerManager>();
@@ -149,13 +150,13 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         UpdateAnimatorParemeters();
         if (canMove) UpdateAnimatorSpeed();
         if (!runnerManager.nRunner.IsServer && !no.HasInputAuthority) return; // If not the server or the inputter, then return
-        Sprint();
         //if (jumpTimer > 0f && isGrounded) jumpTimer -= Time.deltaTime;
         if (no.HasInputAuthority) Bobbing();
     }
 
     public override void Spawned()
     {
+        airSpeed = speed;
         jumpCount = lastJump;
         changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
     }
@@ -183,9 +184,15 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         }
     }
 
+    public override void FixedUpdateNetwork()
+    {
+        SetGrounded();
+        Sprint();
+    }
+
     public void SetGrounded()
     {
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundedRadius, environmentMask);
+        isGrounded = Physics.CheckSphere(rb.position + groundCheckOffset, groundedRadius, environmentMask);
     }
 
     public void GroundSim()
@@ -225,10 +232,10 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
     {
         if (iv.Get<float>() == 1f)
         {
-            sprintPressed = true;
+            runnerManager.sprint = true;
             return;
         }
-        sprintPressed = false;
+        runnerManager.sprint = false;
     }
 
     private void OnJump()
@@ -236,15 +243,15 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         runnerManager.jump = true; // Set the jump button to true to be networked
     }
 
-    public void Jump(bool inputAuthority)
+    public void Jump()
     {
         if (!canMove) return;
         if (!canJump) return;
         if (!isGrounded) return;
         //if (!(jumpTimer <= 0f)) return;
         //if (!stats.ConsumeStamina(jumpStaminaConsumption)) return; Fix this later
-        if (!Runner.IsResimulation && inputAuthority) ClientJump();
-        if (!inputAuthority) jumpCount++;
+        if (!Runner.IsResimulation && HasInputAuthority) ClientJump();
+        if (!HasInputAuthority) jumpCount++;
         if (isCrouching) rb.AddForce(Vector3.up * jumpHeight * crouchJumpMultiplier, ForceMode.Impulse);
         if (!isCrouching)
         {
@@ -548,16 +555,20 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         animator.SetBool("isCrouching", isCrouching);
     }
 
-    void UpdateAnimatorSpeed()
+    public void SetIsMoving()
     {
         if (moveDirection != Vector3.zero)
         {
             isMoving = true;
-        } 
+        }
         else
         {
             isMoving = false;
         }
+    }
+
+    void UpdateAnimatorSpeed()
+    {
         if (isMoving)
         {
             animator.SetFloat("moveMultiplier", (speed / aniSpeedFactor));

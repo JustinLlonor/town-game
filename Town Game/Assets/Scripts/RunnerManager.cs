@@ -16,6 +16,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
     public float camOrientation;
     public bool jump = false;
     public bool crouch = false;
+    public bool sprint = false;
 
     public async void StartGame(GameMode mode, string name, int sceneIndex)
     {
@@ -63,6 +64,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         data.buttons.Set(NetworkInputData.Buttons.Jump, jump);
         jump = false;
         data.buttons.Set(NetworkInputData.Buttons.Crouch, crouch);
+        data.buttons.Set(NetworkInputData.Buttons.Sprint, sprint);
 
         input.Set(data);
     }
