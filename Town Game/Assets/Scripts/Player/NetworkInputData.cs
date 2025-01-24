@@ -4,7 +4,11 @@ using Fusion;
 
 public struct NetworkInputData : INetworkInput
 {
-    public const byte jumpButton = 1;
+    public enum Buttons
+    {
+        Jump = 0,
+        Crouch = 1
+    }
 
     public NetworkButtons buttons;
     public float camDirection;
