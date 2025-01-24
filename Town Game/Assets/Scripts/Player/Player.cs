@@ -84,6 +84,14 @@ public class Player : NetworkBehaviour
             {
                 pm.Jump(HasInputAuthority);
             }
+            if (data.buttons.IsSet(NetworkInputData.Buttons.Crouch))
+            {
+                pm.EnterCrouch();
+            } 
+            else
+            {
+                pm.ExitCrouch();
+            }
         }
         Simulate();
     }

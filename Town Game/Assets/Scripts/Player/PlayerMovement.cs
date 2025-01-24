@@ -98,12 +98,13 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
     Vector3 moveDirection;
     Vector3 slopeDirection;
     IEnumerator currentCamLerp;
-    IEnumerator currentCrouchExit;
 
     // Client Feedback
     [Networked]
     int jumpCount { get; set; }
     int lastJump;
+
+    ChangeDetector changeDetector;
 
     private void Awake()
     {
@@ -156,6 +157,7 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
     public override void Spawned()
     {
         jumpCount = lastJump;
+        changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
     }
 
     public override void Render()
@@ -168,6 +170,16 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
                 if (!HasInputAuthority) SoundManager.instance.Play3D("Jump", groundCheck.position);
             }
             jumpCount = lastJump;
+        }
+
+        foreach (var change in changeDetector.DetectChanges(this))
+        {
+            switch (change)
+            {
+                case nameof(isCrouching):
+                    ChangeCrouchHitboxes(isCrouching);
+                    break;
+            }
         }
     }
 
@@ -257,7 +269,6 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         if (isCrouching) airSpeed = speed * crouchMultiplier;
     }
 
-    //[PunRPC]
     public void JumpAnimation()
     {
         animator.Play("Jump");
@@ -276,48 +287,35 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         {
             if (!canMove) return;
             runnerManager.crouch = true;
-            if (currentCrouchExit != null) StopCoroutine(currentCrouchExit);
-            EnterCrouch();
             return;
         }
-        ExitCrouch();
+        runnerManager.crouch = false;
     }
 
-    void EnterCrouch()
+    public void EnterCrouch()
     {
         if (isCrouching) return;
+        isCrouching = true;
         if (isSprinting)
         {
             sprintPressed = false;
             isSprinting = false;
         }
-        EnableCrouchHitboxes();
-        //view.RPC("EnableCrouchHitboxes", RpcTarget.Others);
         crouchMinus = crouchMultiplier;
-        StartCamLerp(cameraPosition, crouchPos);
-        isCrouching = true;
+        if (HasInputAuthority && !Runner.IsResimulation) StartCamLerp(cameraPosition, crouchPos);
     }
 
-    void ExitCrouch()
+    public void ExitCrouch()
+    {
+        CheckCrouchExit();
+    }
+
+    void CheckCrouchExit()
     {
         if (!isCrouching) return;
-        if (currentCrouchExit != null)
-        {
-            StopCoroutine(currentCrouchExit);
-        }
-        currentCrouchExit = CheckCrouchExit();
-        StartCoroutine(currentCrouchExit);
-    }
-
-    IEnumerator CheckCrouchExit()
-    {
-        while (!CanUncrouch())
-        {
-            yield return null;
-        }
-        DisableCrouchHitboxes();
+        if (!CanUncrouch()) return;
         crouchMinus = 1f;
-        StartCamLerp(cameraPosition, standPos);
+        if (HasInputAuthority && !Runner.IsResimulation) StartCamLerp(cameraPosition, standPos);
         isCrouching = false;
     }
 
@@ -360,18 +358,10 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         Destroy(obj);
     }
 
-    //[PunRPC]
-    void EnableCrouchHitboxes() 
+    void ChangeCrouchHitboxes(bool enabled) 
     {
-        SetColliders(crouchingColliders, true);
-        SetColliders(standingColliders, false);
-    }
-
-    //[PunRPC]
-    void DisableCrouchHitboxes()
-    {
-        SetColliders(crouchingColliders, false);
-        SetColliders(standingColliders, true);
+        SetColliders(crouchingColliders, enabled);
+        SetColliders(standingColliders, !enabled);
     }
 
     void SetColliders(Collider[] colliders, bool isActive)
@@ -537,21 +527,6 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
             rb.AddForce(moveDirection.normalized * speed * movementMultiplier * airHandling * sprintGain * crouchMinus, ForceMode.Acceleration);
         }
     }
-
-    /**
-        if (isGrounded && !OnSlope())
-        {
-            rb.AddForce(moveDirection.normalized * speed * movementMultiplier * sprintGain * crouchMinus, ForceMode.Acceleration);
-        }
-        else if (isGrounded && OnSlope())
-        {
-            rb.AddForce(slopeDirection.normalized * speed * movementMultiplier * sprintGain * crouchMinus, ForceMode.Acceleration);
-        }
-        else
-        {
-            rb.AddForce(moveDirection.normalized * speed * movementMultiplier * airHandling * sprintGain * crouchMinus, ForceMode.Acceleration);
-        }
-    **/
 
     void ControlDrag()
     {
