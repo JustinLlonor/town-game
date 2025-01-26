@@ -14,6 +14,7 @@ public class FirstPerson : MonoBehaviour
     Animator animator;
     Item currentItem;
     CameraManager cameraManager;
+    PlayerStats stats;
     bool visible = true;
 
     private void Awake()
@@ -39,6 +40,7 @@ public class FirstPerson : MonoBehaviour
     {
         trackedMV = player.GetComponent<PlayerMovement>();
         trackedMV.OnLeap += OnLeap;
+        stats = player.GetComponent<PlayerStats>();
     }
 
     void OnLeap()

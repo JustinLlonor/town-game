@@ -17,13 +17,13 @@ public class Corpse : NetworkBehaviour//PunCallbacks
         ui = FindObjectOfType<UIManager>();
     }
 
-    public void Init(PlayerEvidence playerEvidence, Vector3 velocity)
+    public void Init(PlayerEvidence playerEvidence, Vector3 velocity, bool isMale)
     {
         rootRb.velocity = velocity;
+        GetComponent<PlayerClothing>().isMale = isMale;
         //playerEvidence.ApplyEvidence(gameObject);
     }
 
-    //[PunRPC]
     public void AddEvidence(string[] icons, string[] descriptions, float time)
     {
         evidence.Add(new Evidence(icons, descriptions, time));

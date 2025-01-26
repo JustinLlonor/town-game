@@ -12,6 +12,7 @@ public class PlayerInfoView : MonoBehaviour//PunCallbacks
     public Gradient sanityGradient = new Gradient();
     public string[] sanityTextGradient = new string[] { };
     public PlayerStats stats;
+    public float recievedHP = 100f;
     //public PhotonView view;
     Interactable vi;
     int previousIndex = -1;
@@ -35,7 +36,7 @@ public class PlayerInfoView : MonoBehaviour//PunCallbacks
     {
         if (vi == null) return;
         UpdateNickname();
-        UpdateHP(Mathf.Clamp01(stats.HP / stats.maxHP));
+        UpdateHP(Mathf.Clamp01(recievedHP / stats.maxHP));
     }
 
     //[PunRPC]

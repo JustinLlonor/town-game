@@ -15,7 +15,7 @@ public class Player : NetworkBehaviour
     Transform cameraPosition;
     PlayerManager playerManager;
     // To sync the inputs on all other clients
-    [Networked] float camDirection { get; set; }
+    [Networked] public float camDirection { get; set; }
     [Networked] float camDirectionX { get; set; }
     [Networked] Vector2 direction { get; set; }
 
@@ -46,7 +46,6 @@ public class Player : NetworkBehaviour
         }
 
         if (!HasInputAuthority) return;
-
         /**
         if (timer <= 0f)
         {

@@ -1,35 +1,49 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using JetBrains.Annotations;
-using Unity.VisualScripting;
+using System;
 using Fusion;
 
 public class PlayerClothing : NetworkBehaviour
 {
-    public bool isMale;
+    [Networked] public bool isMale { get; set; }
     public bool isCorpse = false;
+    [Tooltip("Change the capacity in code when adding/removing attires")]
     public Attire[] attires;
+    [Networked, Capacity(5)] public NetworkArray<int> nAttires { get; } = MakeInitializer(new int[5]); // Change this number as you add more clothes
     public RandomizedClothing[] randomizedClothing;
     ObjectManager om;
+    ChangeDetector changeDetector;
+    FirstPerson fps;
     //PhotonView view;
-
-    private void Awake()
-    {
-        om = FindObjectOfType<ObjectManager>();
-    //    view = gameObject.GetComponent<PhotonView>();
-    }
 
     private void Start()
     {
-        if (isCorpse) return;
-        RandomizeGender();
-        RandomizeClothing();
+        RenderAllClothing();
     }
 
     public override void Spawned()
     {
-        
+        fps = FindObjectOfType<FirstPerson>();
+        om = FindObjectOfType<ObjectManager>();
+        changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
+;        if (isCorpse) return;
+        if (!HasStateAuthority) return;
+        RandomizeGender();
+        RandomizeClothing();
+    }
+
+    public override void Render()
+    {
+        foreach (var change in changeDetector.DetectChanges(this))
+        {
+            switch (change)
+            {
+                case nameof(nAttires): // goofy ahh code
+                    RenderAllClothing();
+                    break;
+            }
+        }
     }
 
     public void Init()
@@ -37,9 +51,21 @@ public class PlayerClothing : NetworkBehaviour
 
     }
 
-    public void SetClothing(string clothingName, bool male)
+    void RenderAllClothing()
     {
-        isMale = male;
+        foreach (int clothingIndex in nAttires)
+        {
+            if (clothingIndex == -1) continue;
+            if (!HasStateAuthority) SetClothing(om.clothings[clothingIndex]);
+            foreach (Attire attire in attires)
+            {
+                RenderClothing(attire);
+            }
+        }
+    }
+
+    public void SetClothing(string clothingName)
+    {
         Clothing clothing = om.clothingSearch[clothingName];
         int i = 0;
 
@@ -51,28 +77,45 @@ public class PlayerClothing : NetworkBehaviour
             }
             i++;
         }
-        attires[i].clothing = clothing;
+        //attires[i].clothing = clothing;
+        /**
+        Attire indexedAttire = attires[i];
+        Clothing.BodyPart[] hiddenParts = new Clothing.BodyPart[indexedAttire.hiddenParts.Length];
+        for (int n = 0; n < indexedAttire.hiddenParts.Length; n++)
+        {
+            hiddenParts[n] = indexedAttire.hiddenParts[n];
+        }
+        **/
 
-        RenderClothing(attires[i]);
+        attires[i].clothing = clothing;
+        if (HasStateAuthority) nAttires.Set(i, Array.IndexOf(om.clothings, clothing)); // Sets the networked array clotyhing to the name of the clothing
+    }
+    public void SetClothing(Clothing clothing)
+    {
+        int i = 0;
+
+        foreach (Attire attire in attires)
+        {
+            if (attire.bodyPart == clothing.bodyPart)
+            {
+                break;
+            }
+            i++;
+        }
+
+        attires[i].clothing = clothing;
     }
 
-    //[PunRPC]
     public void SetSex(bool male)
     {
         isMale = male;
     }
-
+    
     public void RandomizeGender()
     {
-    //    if (PhotonNetwork.CurrentRoom == null) return;
-    //    bool male = false;
-    //    int randomGender = Random.Range((int)0, (int)2);
-    //    if (randomGender == 0) male = true;
-    //    ExitGames.Client.Photon.Hashtable playerProperties = view.Owner.CustomProperties;
-    //    playerProperties["isMale"] = male;
-    //    view.Owner.SetCustomProperties(playerProperties);
-    //    SetSex(male);
-    //    view.RPC("SetSex", RpcTarget.OthersBuffered, male);
+        int randomGender = UnityEngine.Random.Range((int)0, (int)2);
+        bool male = (randomGender == 0);
+        SetSex(male);
     }
 
     public void RandomizeClothing()
@@ -81,20 +124,20 @@ public class PlayerClothing : NetworkBehaviour
         {
             if (rc.nullChance != 0f)
             {
-                if (Random.value <= rc.nullChance) continue;
+                if (UnityEngine.Random.value <= rc.nullChance) continue;
             }
-            Clothing selectedClothing = rc.clothings[Random.Range(0, rc.clothings.Length)];
-            SetClothing(selectedClothing.name, isMale);
-            //view.RPC("SetClothing", RpcTarget.OthersBuffered, selectedClothing.name, isMale);
+            Clothing selectedClothing = rc.clothings[UnityEngine.Random.Range(0, rc.clothings.Length)];
+            SetClothing(selectedClothing.name);
         }
     }
 
     void RenderClothing(Attire attire)
     {
-        if (attire.clothing != null) attire.renderer.material.mainTexture = attire.clothing.texture;
+        if (attire.clothing == null) return;
+        attire.renderer.material.mainTexture = attire.clothing.texture;
         if (isMale)
         {
-            if (attire.clothing.maleArmModel != null) FindObjectOfType<FirstPerson>().ChangeArmMesh(attire.clothing.maleArmModel);
+            if (attire.clothing.maleArmModel != null && HasInputAuthority) fps.ChangeArmMesh(attire.clothing.maleArmModel);
             if (attire.renderer.transform.GetComponent<MeshFilter>() != null)
             {
                 attire.renderer.transform.GetComponent<MeshFilter>().mesh = attire.clothing.maleModel;
@@ -105,7 +148,7 @@ public class PlayerClothing : NetworkBehaviour
         }
         else
         {
-            if (attire.clothing.femaleArmModel != null) FindObjectOfType<FirstPerson>().ChangeArmMesh(attire.clothing.femaleArmModel);
+            if (attire.clothing.femaleArmModel != null && HasInputAuthority) fps.ChangeArmMesh(attire.clothing.femaleArmModel);
             if (attire.renderer.transform.GetComponent<MeshFilter>() != null)
             {
                 attire.renderer.transform.GetComponent<MeshFilter>().mesh = attire.clothing.femaleModel;
@@ -124,6 +167,14 @@ public class PlayerClothing : NetworkBehaviour
         public Renderer renderer;
         public Clothing clothing;
         public Clothing.BodyPart[] hiddenParts;
+
+        public Attire(Clothing.BodyPart bodyPart, Renderer renderer, Clothing clothing, Clothing.BodyPart[] hiddenParts)
+        {
+            this.bodyPart = bodyPart;
+            this.renderer = renderer;
+            this.clothing = clothing;
+            this.hiddenParts = hiddenParts;
+        }
     }
 
     [System.Serializable]
