@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 //using Photon.Pun;
 using System.Linq;
+using Fusion;
 using UnityEngine.SceneManagement;
 
-public class PlayerStats : MonoBehaviour//PunCallbacks, IPunObservable
+public class PlayerStats : NetworkBehaviour
 {
     [Header("HP")]
     public float maxHP = 100f;
-    public float HP = 100f;
+    [Networked] public float HP { get; set; } = 100f;
     [SerializeField] float HPRegenSpeed = 5f;
     [Header("Nutrition")]
     public float maxNutrition = 100f;
@@ -17,12 +18,12 @@ public class PlayerStats : MonoBehaviour//PunCallbacks, IPunObservable
     [Header("Sanity")]
     public float maxSanity = 100f;
     public float sanity = 100f;
-    [Header("Stamina")]
+    [Header("Stamina")] // Networking
     public float maxStamina = 100f;
-    public float stamina = 100f;
+    [Networked] public float stamina { get; set; } = 100f;
     [SerializeField] float staminaRegenSpeed = 20f;
     [SerializeField] float regenCooldownPoint = 1f;
-    public float staminaCooldown = 0f;
+    [Networked] public float staminaCooldown { get; set; }
     public float staminaRegenCooldown = .5f;
     public bool canRegenStamina = true;
     [Header("Death")]
@@ -50,14 +51,14 @@ public class PlayerStats : MonoBehaviour//PunCallbacks, IPunObservable
     CameraShake shake;
     //PhotonView view;
     PlayerEvidence pe;
-    PlayerMovement pm;
+    [HideInInspector] public PlayerMovement pm;
     [HideInInspector] public Animator anim;
     int hLayer;
     float hWeight;
 
     private void Start()
     {
-        pm = gameObject.GetComponent<PlayerMovement>();
+        //pm = gameObject.GetComponent<PlayerMovement>();
         hLayer = anim.GetLayerIndex(hurtLayer);
         //view = gameObject.GetComponent<PhotonView>();
         pe = gameObject.GetComponent<PlayerEvidence>();
@@ -68,11 +69,22 @@ public class PlayerStats : MonoBehaviour//PunCallbacks, IPunObservable
 
     private void Update()
     {
-        FixDmg();
+        FixDmg(); //Dmg animation
         //if (!view.IsMine) return;
-        CheckAffecters();
-        if (staminaCooldown > 0f) staminaCooldown -= Time.deltaTime;
-        if (staminaRegenCooldown > 0f) staminaRegenCooldown -= Time.deltaTime;
+        //CheckAffecters();
+    }
+
+    public override void Spawned()
+    {
+        pm.SetGrounded();
+        stamina = 100f;
+        staminaCooldown = 0f;
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (staminaCooldown > 0f) staminaCooldown -= Runner.DeltaTime;
+        if (staminaRegenCooldown > 0f) staminaRegenCooldown -= Runner.DeltaTime;
         if (staminaCooldown <= regenCooldownPoint && canRegenStamina && pm.isGrounded && staminaRegenCooldown <= 0f)
         {
             RegenStamina();
@@ -153,18 +165,13 @@ public class PlayerStats : MonoBehaviour//PunCallbacks, IPunObservable
     // HP
     void RegenHP()
     {
-        HP += HPRegenSpeed * Time.deltaTime;
+        HP += HPRegenSpeed * Runner.DeltaTime;
         if (HP > maxHP)
         {
             HP = maxHP; 
         }
     }
 
-    /// <summary>
-    /// Instantly removes the specified amount of HP.
-    /// </summary>
-    /// <param name="amount"></param>
-    //[PunRPC]
     public void Damage(float amount, bool playShake = true)
     {
         HP -= amount;
@@ -184,7 +191,6 @@ public class PlayerStats : MonoBehaviour//PunCallbacks, IPunObservable
         }
     }
 
-    //[PunRPC]
     public void DamageAnimation()
     {
         hWeight = hurtWeight;
@@ -244,11 +250,8 @@ public class PlayerStats : MonoBehaviour//PunCallbacks, IPunObservable
         if (stamina == maxStamina) return;
         if (stamina <= maxStamina)
         {
-            stamina += staminaRegenSpeed * Time.deltaTime;
-        }
-        else
-        {
-            stamina = maxStamina;
+            stamina += staminaRegenSpeed * Runner.DeltaTime;
+            if (stamina > maxStamina) stamina = maxStamina;
         }
     }
 
@@ -275,7 +278,7 @@ public class PlayerStats : MonoBehaviour//PunCallbacks, IPunObservable
     {
         if (stamina <= 0f) return false;
         if (staminaCooldown > 0f) return false;
-        stamina -= rate * Time.deltaTime;
+        stamina -= rate * Runner.DeltaTime;
         
         return true;
     }

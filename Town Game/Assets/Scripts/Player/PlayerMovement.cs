@@ -249,7 +249,7 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         if (!canJump) return;
         if (!isGrounded) return;
         //if (!(jumpTimer <= 0f)) return;
-        //if (!stats.ConsumeStamina(jumpStaminaConsumption)) return; Fix this later
+        if (!stats.ConsumeStamina(jumpStaminaConsumption)) return;
         if (!Runner.IsResimulation && HasInputAuthority) ClientJump();
         if (!HasInputAuthority) jumpCount++;
         if (isCrouching) rb.AddForce(Vector3.up * jumpHeight * crouchJumpMultiplier, ForceMode.Impulse);

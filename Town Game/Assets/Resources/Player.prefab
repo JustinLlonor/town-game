@@ -579,6 +579,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 9069154022521576282}
   - {fileID: 2442258754578231911}
+  - {fileID: 5552705410368871873}
   - {fileID: 6160271850420175375}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &2442258754578231911
@@ -702,10 +703,10 @@ MonoBehaviour:
   maxSanity: 100
   sanity: 100
   maxStamina: 120
-  stamina: 120
+  _stamina: 100
   staminaRegenSpeed: 25
   regenCooldownPoint: 1
-  staminaCooldown: 0
+  _staminaCooldown: 0
   staminaRegenCooldown: 0
   canRegenStamina: 1
   corpsePrefab: {fileID: 1324774699613132895, guid: 7fed3915b4c981048bf3b085ed791f3c, type: 3}
@@ -725,6 +726,7 @@ MonoBehaviour:
     isInfinite: 1
     display: 0
   affecters: []
+  pm: {fileID: 6160271850420175375}
   anim: {fileID: 5001893267009733704}
 --- !u!114 &1106844264840172896
 MonoBehaviour:
@@ -831,7 +833,7 @@ MonoBehaviour:
   sprintStaminaConsumption: 15
   groundDrag: 6
   canMove: 1
-  jumpHeight: 6.5
+  jumpHeight: 5
   jumpCooldown: 0
   jumpStaminaConsumption: 25
   canJump: 1
@@ -869,7 +871,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  isCrouching: 0
+  _isCrouching: 0
   playerRadius: 0.19
   uncrouchCastUpper: {fileID: 477552824089262698}
   uncrouchCastLower: {fileID: 106252941851045372}
@@ -899,8 +901,9 @@ MonoBehaviour:
   orientation: {fileID: 7162067020350182232}
   horizontalMovement: 0
   verticalMovement: 0
-  isMoving: 0
-  isSprinting: 0
+  _isMoving: 0
+  _isSprinting: 0
+  sprintPressed: 0
 --- !u!114 &7478806533832175603
 MonoBehaviour:
   m_ObjectHideFlags: 0
