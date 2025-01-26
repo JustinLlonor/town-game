@@ -1,3 +1,4 @@
+using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,7 +6,7 @@ using UnityEngine;
 //using Photon.Realtime;
 //using WebSocketSharp;
 
-public class PlayerInfoView : MonoBehaviour//PunCallbacks
+public class PlayerInfoView : NetworkBehaviour
 {
     public Gradient healthGradient = new Gradient();
     public string[] healthTextGradient = new string[] { };
@@ -13,8 +14,8 @@ public class PlayerInfoView : MonoBehaviour//PunCallbacks
     public string[] sanityTextGradient = new string[] { };
     public PlayerStats stats;
     public float recievedHP = 100f;
-    //public PhotonView view;
     Interactable vi;
+    [HideInInspector] public NetworkObject no;
     int previousIndex = -1;
     bool updatedNick = false;
 
@@ -26,12 +27,12 @@ public class PlayerInfoView : MonoBehaviour//PunCallbacks
     private void Start()
     {
         //if (!view.IsMine) return;
-        //if (view.IsMine)
-        //{
-        //    transform.GetComponent<BoxCollider>().enabled = false;
-        //}
+        if (no.HasInputAuthority)
+        {
+            transform.GetComponent<BoxCollider>().enabled = false;
+        }
     }
-        
+   
     private void Update()
     {
         if (vi == null) return;
@@ -39,7 +40,6 @@ public class PlayerInfoView : MonoBehaviour//PunCallbacks
         UpdateHP(Mathf.Clamp01(recievedHP / stats.maxHP));
     }
 
-    //[PunRPC]
     public void SetNickname(string newName)
     {
         vi.hovers[0].lore = newName;

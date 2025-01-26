@@ -1,8 +1,8 @@
 using Fusion;
 using Fusion.Addons.Physics;
 using Fusion.Sockets;
+using Steamworks;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -11,6 +11,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     public NetworkRunner nRunner;
     [Header("Input")]
+    public int waitingRoomIndex = 1;
     public Vector2 moveDirection;
     public float orientation;
     public float camOrientation;
@@ -26,15 +27,17 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         pSim.ClientPhysicsSimulation = ClientPhysicsSimulation.SimulateAlways;
         nRunner.ProvideInput = true;
 
+        SteamInviteAccepter sia = FindObjectOfType<SteamInviteAccepter>();
+        if (sia != null) sia.DisableInvites();
+
         // Create the NetworkSceneInfo from the current scene
         var scene = SceneRef.FromIndex(sceneIndex);
         var sceneInfo = new NetworkSceneInfo();
         if (scene.IsValid)
         {
-            sceneInfo.AddSceneRef(scene, LoadSceneMode.Additive);
+            sceneInfo.AddSceneRef(scene, LoadSceneMode.Single);
         }
 
-        Debug.Log("Starting Game");
         // Start or join (depends on gamemode) a session with a specific name
         await nRunner.StartGame(new StartGameArgs()
         {
@@ -69,14 +72,18 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         input.Set(data);
     }
 
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+    {
+        if (nRunner.LocalPlayer == player) SteamMatchmaking.LeaveLobby((CSteamID)SessionData.steamIdLobby); // Leaves steam lobby
+    }
+
+    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
     public void OnConnectedToServer(NetworkRunner runner) { }
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { }
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
-    public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }

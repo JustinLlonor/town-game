@@ -2,13 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Steamworks;
+using Fusion;
 //using Photon.Pun;
 //using WebSocketSharp;
 
 public class SteamInviteAccepter : MonoBehaviour
 {
+    RunnerManager rm;
     protected Callback<LobbyEnter_t> LobbyEntered;
     protected Callback<GameLobbyJoinRequested_t> AcceptedInvite;
+
+    private void Awake()
+    {
+        rm = FindObjectOfType<RunnerManager>();
+    }
 
     private void OnEnable()
     {
@@ -19,7 +26,7 @@ public class SteamInviteAccepter : MonoBehaviour
         }
     }
 
-    private void OnDisable()
+    public void DisableInvites()
     {
         if (SteamManager.Initialized)
         {
@@ -28,12 +35,16 @@ public class SteamInviteAccepter : MonoBehaviour
         }
     }
 
+    private void OnDisable()
+    {
+        DisableInvites();
+    }
+
     private void OnLobbyEntered(LobbyEnter_t callback)
     {
         string roomName = (string)SteamMatchmaking.GetLobbyData((CSteamID)callback.m_ulSteamIDLobby, "roomname");
-        //if (roomName.IsNullOrEmpty()) return;
         Debug.LogError("Accepting invite to room: " + roomName);
-        //PhotonNetwork.JoinRoom(roomName);
+        rm.StartGame(GameMode.Client, roomName, 1);
     }
 
     private void OnAcceptedInvite(GameLobbyJoinRequested_t callback)

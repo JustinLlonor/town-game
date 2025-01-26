@@ -583,6 +583,7 @@ MonoBehaviour:
   - {fileID: 5552705410368871873}
   - {fileID: 6160271850420175375}
   - {fileID: 873785079005984450}
+  - {fileID: 991788123578228062}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &2442258754578231911
 MonoBehaviour:
@@ -3072,7 +3073,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canInteract: 0
   hovers:
-  - lore: Name (Missing!)
+  - lore: Nickname
     interactKey: 0
     color: {r: 1, g: 1, b: 1, a: 0}
     delay: 0
@@ -3185,6 +3186,7 @@ MonoBehaviour:
   - Deranged
   stats: {fileID: 5552705410368871873}
   recievedHP: 100
+  no: {fileID: 2540704478665164047}
 --- !u!1 &6153972788918099714
 GameObject:
   m_ObjectHideFlags: 0

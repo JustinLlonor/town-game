@@ -16,7 +16,6 @@ public class LobbyManager : MonoBehaviour//PunCallbacks
     public TextMeshProUGUI createText;
     public TextMeshProUGUI joinText;
     public TMP_InputField nicknameText;
-    public int waitingRoomIndex = 1;
     string previousNick;
     private RunnerManager runnerManager;
 
@@ -61,7 +60,7 @@ public class LobbyManager : MonoBehaviour//PunCallbacks
         }
         //PhotonNetwork.CreateRoom(createText.text, ro);
         if (SteamManager.Initialized) SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePrivate, 15);
-        runnerManager.StartGame(GameMode.Host, createText.text, waitingRoomIndex);
+        runnerManager.StartGame(GameMode.Host, createText.text, runnerManager.waitingRoomIndex);
     }
 
     public void JoinPress()
@@ -70,7 +69,7 @@ public class LobbyManager : MonoBehaviour//PunCallbacks
         //Debug.Log("Joining");
         //Debug.Log(PhotonNetwork.IsConnected);
         //PhotonNetwork.JoinRoom(joinText.text);
-        runnerManager.StartGame(GameMode.Client, joinText.text, waitingRoomIndex);
+        runnerManager.StartGame(GameMode.Client, joinText.text, runnerManager.waitingRoomIndex);
     }
 
     //public override void OnConnectedToMaster()
