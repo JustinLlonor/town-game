@@ -581,6 +581,7 @@ MonoBehaviour:
   - {fileID: 2442258754578231911}
   - {fileID: 5552705410368871873}
   - {fileID: 6160271850420175375}
+  - {fileID: 873785079005984450}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &2442258754578231911
 MonoBehaviour:
@@ -696,7 +697,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHP: 100
-  HP: 100
+  _HP: 100
   HPRegenSpeed: 0
   maxNutrition: 100
   nutrition: 100
@@ -709,7 +710,8 @@ MonoBehaviour:
   _staminaCooldown: 0
   staminaRegenCooldown: 0
   canRegenStamina: 1
-  corpsePrefab: {fileID: 1324774699613132895, guid: 7fed3915b4c981048bf3b085ed791f3c, type: 3}
+  corpsePrefab:
+    RawGuidValue: 00000000000000000000000000000000
   myRig: {fileID: 9118308081295399195}
   hurtLayer: Hurt
   hurtWeight: 0.6

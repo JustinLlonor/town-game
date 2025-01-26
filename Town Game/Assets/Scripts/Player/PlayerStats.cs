@@ -27,7 +27,7 @@ public class PlayerStats : NetworkBehaviour
     public float staminaRegenCooldown = .5f;
     public bool canRegenStamina = true;
     [Header("Death")]
-    public GameObject corpsePrefab;
+    public NetworkPrefabRef corpsePrefab;
     public Transform myRig;
     [Header("Hurt")]
     public string hurtLayer = "Hurt";
@@ -162,7 +162,6 @@ public class PlayerStats : NetworkBehaviour
         }
     }
 
-    // HP
     void RegenHP()
     {
         HP += HPRegenSpeed * Runner.DeltaTime;
@@ -213,36 +212,46 @@ public class PlayerStats : NetworkBehaviour
         if (hWeight < 0.001f) hWeight = 0f;
     }
 
-    //public void Kill()
-    //{
-    //    OnDeath?.Invoke();
-    //    GameObject corpse = PhotonNetwork.Instantiate(corpsePrefab.name, transform.position, transform.rotation);
-    //    PhotonView corpseView = corpse.GetComponent<PhotonView>();
-    //    pe.ApplyEvidence(corpse);
-    //    Ragdoller ragdoller = corpse.GetComponent<Ragdoller>();
-    //    ragdoller.SetPositionsToTarget(myRig);
-    //    FindObjectOfType<CameraBobbing>().isBobbing = false;
-    //
-    //    // Set corpse nickname
-    //    Corpse co = corpse.GetComponent<Corpse>();
-    //    co.SetVelocity(gameObject.GetComponent<Rigidbody>().velocity);
-    //    co.SetCorpseData(view.Owner);
-    //    corpseView.RPC("SetCorpseData", RpcTarget.OthersBuffered, view.Owner);
+    public void Kill()
+    {
+        if (HasInputAuthority) ClientDeath();
+        if (!HasStateAuthority) return;
+
+        Rigidbody rb = GetComponent<Rigidbody>();
+        NetworkObject corpse = Runner.Spawn(corpsePrefab, rb.position, rb.rotation, null, (runner, o) =>
+        {
+            o.GetComponent<Corpse>().Init(pe, rb.velocity);
+        });
+        // To initialize: evidence, bone positions, velocity, clothing
+        //GameObject corpse = PhotonNetwork.Instantiate(corpsePrefab.name, transform.position, transform.rotation);
+        //PhotonView corpseView = corpse.GetComponent<PhotonView>();
+        Ragdoller ragdoller = corpse.GetComponent<Ragdoller>();
+        ragdoller.SetPositionsToTarget(myRig);
+    
+        // Set corpse nickname
+        //co.SetCorpseData(view.Owner);
+        //corpseView.RPC("SetCorpseData", RpcTarget.OthersBuffered, view.Owner);
 
         // Sets corpse clothing to this player's clothing
-    //    PlayerClothing cpc = corpse.GetComponent<PlayerClothing>();
-    //    PlayerClothing pc = gameObject.GetComponent<PlayerClothing>();
-    //    foreach (PlayerClothing.Attire attire in pc.attires)
-    //    {
-    //        if (attire.clothing == null) continue;
-    //        cpc.SetClothing(attire.clothing.name, cpc.isMale);
-    //        corpseView.RPC("SetClothing", RpcTarget.OthersBuffered, attire.clothing.name, cpc.isMale);
-    //    }
-    //    PhotonNetwork.Destroy(gameObject);
-    //    return;
+        PlayerClothing cpc = corpse.GetComponent<PlayerClothing>();
+        PlayerClothing pc = gameObject.GetComponent<PlayerClothing>();
+        foreach (PlayerClothing.Attire attire in pc.attires)
+        {
+            if (attire.clothing == null) continue;
+            cpc.SetClothing(attire.clothing.name, cpc.isMale);
+            //corpseView.RPC("SetClothing", RpcTarget.OthersBuffered, attire.clothing.name, cpc.isMale);
+        }
+        //PhotonNetwork.Destroy(gameObject);
+        return;
 
         //Destroy player
-    //}
+    }
+
+    public void ClientDeath()
+    {
+        OnDeath?.Invoke();
+        FindObjectOfType<CameraBobbing>().isBobbing = false;
+    }
 
     // Stamina
     void RegenStamina()

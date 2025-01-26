@@ -1,19 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//using Photon.Pun;
+using Fusion;
 
-public class Corpse : MonoBehaviour//PunCallbacks
+public class Corpse : NetworkBehaviour//PunCallbacks
 {
     public string nickname;
     public bool isCultist;
     public List<Evidence> evidence;
+    public Rigidbody rootRb;
 
     UIManager ui;
 
     private void Awake()
     {
         ui = FindObjectOfType<UIManager>();
+    }
+
+    public void Init(PlayerEvidence playerEvidence, Vector3 velocity)
+    {
+        rootRb.velocity = velocity;
+        //playerEvidence.ApplyEvidence(gameObject);
     }
 
     //[PunRPC]

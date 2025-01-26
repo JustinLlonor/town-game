@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using JetBrains.Annotations;
 using Unity.VisualScripting;
+using Fusion;
 
-public class PlayerClothing : MonoBehaviour
+public class PlayerClothing : NetworkBehaviour
 {
     public bool isMale;
     public bool isCorpse = false;
@@ -26,7 +27,16 @@ public class PlayerClothing : MonoBehaviour
         RandomizeClothing();
     }
 
-    //[PunRPC]
+    public override void Spawned()
+    {
+        
+    }
+
+    public void Init()
+    {
+
+    }
+
     public void SetClothing(string clothingName, bool male)
     {
         isMale = male;
