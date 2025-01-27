@@ -7,7 +7,6 @@ using UnityEngine;
 using WebSocketSharp;
 using Steamworks;
 using Fusion;
-using UnityEngine.SceneManagement;
 
 public class LobbyManager : MonoBehaviour//PunCallbacks
 {

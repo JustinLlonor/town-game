@@ -5,10 +5,11 @@ using Fusion;
 
 public class Corpse : NetworkBehaviour//PunCallbacks
 {
-    public string nickname;
-    public bool isCultist;
+    public string nickname { get; set; }
+    public bool isCultist { get; set; }
     public List<Evidence> evidence;
     public Rigidbody rootRb;
+    //[Networked, Capacity(0)] public NetworkLinkedList<Evidence> evidences { get; }
 
     UIManager ui;
 
@@ -21,7 +22,7 @@ public class Corpse : NetworkBehaviour//PunCallbacks
     {
         rootRb.velocity = velocity;
         GetComponent<PlayerClothing>().isMale = isMale;
-        //playerEvidence.ApplyEvidence(gameObject);
+        playerEvidence.ApplyEvidence(gameObject);
     }
 
     public void AddEvidence(string[] icons, string[] descriptions, float time)
@@ -38,8 +39,9 @@ public class Corpse : NetworkBehaviour//PunCallbacks
     //    pc.isMale = (bool)player.CustomProperties["isMale"];
     //}
 
-    public void InspectCorpse()
+    public void InspectCorpse() // Make corpses ask for information from the server, and make locations interest
     {
+        return;
         ui.OpenCorpse(evidence, nickname, isCultist);
     }
 
