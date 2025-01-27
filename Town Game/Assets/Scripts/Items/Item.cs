@@ -5,16 +5,17 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "New Item", menuName = "Items/Item")]
 public class Item : ScriptableObject
 {
+    [Header("Info")]
     public Texture2D icon;
     public string description = "";
     public bool large = false; // large if cannot be stored in inventory
-    public Mesh mesh;
+    public Mesh mesh; // Mesh of the item
     public Texture2D texture;
     public string[] equipSounds = new string[] { "Equip1", "Equip2", "Equip3" };
     public bool leaveFingerprints = true;
     [Header("Usage")]
-    public string useMethod;
-    public string secondaryUseMethod;
+    public string useMethod; // Make the use methods able to gain information from the player, as well as
+    public string secondaryUseMethod; // access some sort of animation system for the client/character
     [Header("Client Animation")]
     public string holdPose = "ArmHoldNormal_f";
     public string gripPose;
