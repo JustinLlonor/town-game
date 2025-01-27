@@ -998,10 +998,10 @@ MonoBehaviour:
   m_OnEndEdit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1877625311}
         m_TargetAssemblyTypeName: LobbyManager, Assembly-CSharp
         m_MethodName: OnChangedNickname
-        m_Mode: 0
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -1114,10 +1114,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nRunner: {fileID: 0}
+  waitingRoomIndex: 1
   moveDirection: {x: 0, y: 0}
   orientation: 0
   camOrientation: 0
   jump: 0
+  crouch: 0
+  sprint: 0
 --- !u!4 &1669553461
 Transform:
   m_ObjectHideFlags: 0
@@ -1167,7 +1170,6 @@ MonoBehaviour:
   createText: {fileID: 5365595862647129498}
   joinText: {fileID: 5840643864407156676}
   nicknameText: {fileID: 1500584213}
-  waitingRoomIndex: 1
 --- !u!4 &1877625312
 Transform:
   m_ObjectHideFlags: 0

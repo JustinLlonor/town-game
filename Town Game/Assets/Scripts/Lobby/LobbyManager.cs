@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 //using Photon.Pun;
 //using Photon.Realtime;
-//using WebSocketSharp;
+using WebSocketSharp;
 using Steamworks;
 using Fusion;
 using UnityEngine.SceneManagement;
@@ -35,9 +35,10 @@ public class LobbyManager : MonoBehaviour//PunCallbacks
 
     public void OnChangedNickname(string newNick)
     {
+        newNick = nicknameText.text;
         bool nickValid = true;
         if (newNick.Length > 32) nickValid = false;
-        //if (newNick.IsNullOrEmpty()) nickValid = false;
+        if (newNick.IsNullOrEmpty()) nickValid = false;
         if (!nickValid)
         {
             nicknameText.text = previousNick;
@@ -49,7 +50,7 @@ public class LobbyManager : MonoBehaviour//PunCallbacks
 
     public void CreatePress()
     {
-        //if (nicknameText.text.IsNullOrEmpty()) return;
+        if (nicknameText.text.IsNullOrEmpty()) return;
         //RoomOptions ro = new RoomOptions();
         //ro.MaxPlayers = 15;
         //ro.CleanupCacheOnLeave = false;
@@ -65,10 +66,8 @@ public class LobbyManager : MonoBehaviour//PunCallbacks
 
     public void JoinPress()
     {
-        //if (nicknameText.text.IsNullOrEmpty()) return;
-        //Debug.Log("Joining");
-        //Debug.Log(PhotonNetwork.IsConnected);
-        //PhotonNetwork.JoinRoom(joinText.text);
+        if (nicknameText.text.IsNullOrEmpty()) return;
+        Debug.Log("Joining");
         runnerManager.StartGame(GameMode.Client, joinText.text, runnerManager.waitingRoomIndex);
     }
 

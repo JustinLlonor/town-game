@@ -2,6 +2,7 @@ using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using WebSocketSharp;
 //using Photon.Pun;
 //using Photon.Realtime;
 //using WebSocketSharp;
@@ -12,7 +13,8 @@ public class PlayerInfoView : NetworkBehaviour
     public string[] healthTextGradient = new string[] { };
     public Gradient sanityGradient = new Gradient();
     public string[] sanityTextGradient = new string[] { };
-    public PlayerStats stats;
+    [HideInInspector] public PlayerStats stats;
+    [HideInInspector] public Player player;
     public float recievedHP = 100f;
     Interactable vi;
     [HideInInspector] public NetworkObject no;
@@ -49,12 +51,11 @@ public class PlayerInfoView : NetworkBehaviour
     void UpdateNickname()
     {
         if (updatedNick) return;
-        //if (view.Owner == null) return;
-        //if (!((string)view.Owner.CustomProperties["name"]).IsNullOrEmpty())
-        //{
-        //    view.RPC("SetNickname", RpcTarget.OthersBuffered, (string)view.Owner.CustomProperties["name"]);
-        //    updatedNick = true;
-        //}
+        if (!player.nickname.IsNullOrEmpty())
+        {
+            SetNickname(player.nickname);
+            updatedNick = true;
+        }
     }
 
     void UpdateHP(float eval)

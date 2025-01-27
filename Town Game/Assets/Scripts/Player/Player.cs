@@ -7,6 +7,7 @@ using UnityEngine.Timeline;
 
 public class Player : NetworkBehaviour
 {
+    [Networked] public string nickname { get; set; } = "";
     public delegate void PlayerEvent();
     public PlayerEvent Init;
     public int simulationTickDistance = 2;
@@ -35,7 +36,14 @@ public class Player : NetworkBehaviour
 
     public override void Spawned()
     {
+        if (HasInputAuthority) RPC_SendNickname(SessionData.nickname);
         Init?.Invoke();
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
+    public void RPC_SendNickname(string name)
+    {
+        nickname = name;
     }
 
     private void Update()
