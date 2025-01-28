@@ -242,6 +242,7 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
     private void OnJump()
     {
         runnerManager.jump = true; // Set the jump button to true to be networked
+        Debug.Log(runnerManager.jump);
     }
 
     public void Jump()

@@ -13,7 +13,8 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
 {
     [Header("Hotbar")]
     public int equippedSlot; // To be synced, along with item show functions
-    public List<string> hotbar = new List<string>(); // To be synced
+    public int hotbarLength = 4;
+    [Networked, Capacity(4)]public NetworkLinkedList<string> hotbar { get; } // To be synced
     public ItemData[] itemData; // To be synced
     public GameObject hotbarSlot;
     public RectTransform hotbarUI;
@@ -37,6 +38,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     AttackManager attackManager;
     //PhotonView view;
     ObjectManager itemManager;
+    RunnerManager runnerManager;
     MeshFilter sFilter;
     MeshRenderer sRenderer;
     Transform mainCam;
@@ -46,10 +48,13 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
 
     private void Awake()
     {
-        itemData = new ItemData[hotbar.Count];
-        for (int i = 0; i < itemData.Length; i++) itemData[i] = null;
+        Init();
+    }
+
+    public void Init()
+    {
+        runnerManager = FindObjectOfType<RunnerManager>();
         camTransform = Camera.main.transform.parent;
-        //view = gameObject.GetComponent<PhotonView>();
         itemManager = FindObjectOfType<ObjectManager>();
         sFilter = sItem.GetComponent<MeshFilter>();
         sRenderer = sItem.GetComponent<MeshRenderer>();
@@ -57,13 +62,6 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         rb = gameObject.GetComponent<Rigidbody>();
         mainCam = Camera.main.transform;
         fps = FindObjectOfType<FirstPerson>();
-    }
-
-    private void Start()
-    {
-        SetupHotbarUI();
-        EquipItem(0);
-        UpdateHotbarUI();
     }
 
     private void Update()
@@ -82,6 +80,30 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         //if (!view.IsMine) return;
     }
 
+    public override void Spawned()
+    {
+        Init();
+        for (int i = 0; i < hotbarLength; i++)
+        {
+            hotbar.Add("");
+        }
+        itemData = new ItemData[hotbar.Count];
+        for (int i = 0; i < itemData.Length; i++) itemData[i] = null;
+        if (!HasInputAuthority) return;
+        SetupHotbarUI();
+        EquipItem(0);
+        UpdateHotbarUI();
+    }
+
+    void SetupHotbarUI()
+    {
+        for (int i = 0; i < hotbarLength; i++)
+        {
+            Instantiate(hotbarSlot, hotbarUI);
+        }
+        hotbarUI.anchoredPosition -= new Vector2((hotbar.Count - 1) * 50f, 0f); //For centering
+    }
+
     private void OnDropItem()
     {
         DropItem(equippedSlot);
@@ -93,20 +115,12 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     /// <param name="previous"></param>
     private void OnUnequip(int previous)
     {
+        if (hotbar.Count == 0) return;
         if (hotbar[previous].IsNullOrEmpty()) return;
         if (itemManager.itemSearch[hotbar[previous]] as Weapon)
         {
             attackManager.ResetAttack();
         }
-    }
-
-    void SetupHotbarUI()
-    {
-        for (int i = 0; i < hotbar.Count; i++)
-        {
-            Instantiate(hotbarSlot, hotbarUI);
-        }
-        hotbarUI.anchoredPosition -= new Vector2((hotbar.Count - 1) * 50f, 0f); //For centering
     }
 
     void UpdateHotbarUI()
@@ -146,6 +160,8 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         {
             if (equippedItem.large) return;
         }
+        runnerManager.hotbarKey = slot;
+        return;
         EquipItem(slot-1);
         UpdateHotbarUI();
 
@@ -276,7 +292,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         if (!hotbar[slot].IsNullOrEmpty()) return -1;
         if (itemManager.itemSearch.ContainsKey(itemName))
         {
-            hotbar[slot] = itemName;
+            hotbar.Set(slot, itemName);
             if (equipItem) EquipItem(slot, slot == equippedSlot);
             if (!equipItem) EquipItem(equippedSlot, slot == equippedSlot);
         }
@@ -298,7 +314,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
             {
                 if (hotbar[i] == itemName)
                 {
-                    hotbar[i] = "";
+                    hotbar.Set(i, "");
                     EquipItem(equippedSlot, i == equippedSlot);
                     break;
                 }
@@ -308,7 +324,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         {
             if (hotbar[slot] == itemName)
             {
-                hotbar[slot] = "";
+                hotbar.Set(slot, "");
                 EquipItem(equippedSlot, slot == equippedSlot);
             }
         }
