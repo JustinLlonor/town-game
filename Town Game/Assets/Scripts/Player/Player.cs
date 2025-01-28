@@ -87,6 +87,7 @@ public class Player : NetworkBehaviour
                 camDirectionX = data.camDirectionX;
                 direction = data.direction;
             }
+            // Player movement
             if (data.buttons.IsSet(NetworkInputData.Buttons.Jump))
             {
                 pm.Jump();
@@ -100,6 +101,7 @@ public class Player : NetworkBehaviour
                 pm.ExitCrouch();
             }
             pm.sprintPressed = data.buttons.IsSet(NetworkInputData.Buttons.Sprint);
+            // Player inventory
         }
         Simulate();
     }

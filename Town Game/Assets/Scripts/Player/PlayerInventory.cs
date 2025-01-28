@@ -12,9 +12,9 @@ using UnityEngine.InputSystem;
 public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
 {
     [Header("Hotbar")]
-    public int equippedSlot;
-    public List<string> hotbar = new List<string>();
-    public ItemData[] itemData;
+    public int equippedSlot; // To be synced, along with item show functions
+    public List<string> hotbar = new List<string>(); // To be synced
+    public ItemData[] itemData; // To be synced
     public GameObject hotbarSlot;
     public RectTransform hotbarUI;
     public GameObject largeUI;
@@ -30,8 +30,6 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     public float movementMultiplier = 2f;
     public float pickupCooldown = .5f;
     public GameObject itemPrefab;
-    [Header("Keybinds")]
-    public KeyCode dropKey;
 
     [HideInInspector] public GameObject itemComponentObject; // The GameObject that is a child of the physical item that contains item behaviours.
     FirstPerson fps;
