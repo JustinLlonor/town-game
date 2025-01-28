@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//using WebSocketSharp;
+using WebSocketSharp;
 using UnityEngine.EventSystems;
 
 public class ItemUse : MonoBehaviour
@@ -26,6 +26,7 @@ public class ItemUse : MonoBehaviour
 
     private void Update()
     {
+        // Update to new input system later
         //if (!view.IsMine) return;
         if (!cm.isLocked) return;
         if (Input.GetKey(useKey))
@@ -40,8 +41,7 @@ public class ItemUse : MonoBehaviour
 
     void UseItem()
     {
-        return; // Change later
-        //if (inventory.hotbar[inventory.equippedSlot].IsNullOrEmpty()) return;
+        if (inventory.hotbar[inventory.equippedSlot].IsNullOrEmpty()) return;
         Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot]];
         if (item as Weapon)
         {
@@ -49,26 +49,17 @@ public class ItemUse : MonoBehaviour
             attackManager.Attack(weapon);
             return;
         }
-        //if (inventory.hotbar[inventory.equippedSlot].IsNullOrEmpty()) return;
-        //if (!item.useMethod.IsNullOrEmpty())
-        //{
-        //    Invoke(item.useMethod, 0f);
-        //}
+        if (item == null) return; // If item doesn't exist
+
+        inventory.itemComponentObject.SendMessage("OnPrimaryUse", SendMessageOptions.DontRequireReceiver); // Sends the message OnPrimaryUse to every component in the item component holder
     }
 
     void UseSecondary()
     {
-        //if (inventory.hotbar[inventory.equippedSlot].IsNullOrEmpty()) return;
+        if (inventory.hotbar[inventory.equippedSlot].IsNullOrEmpty()) return;
         Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot]];
         if (item == null) return;
-        //if (!item.secondaryUseMethod.IsNullOrEmpty())
-        //{
-        //    Invoke(item.secondaryUseMethod, 0f);
-        //}
-    }
 
-    void Empty()
-    {
-        Debug.Log("Empty"); 
+        inventory.itemComponentObject.SendMessage("OnSecondaryUse", SendMessageOptions.DontRequireReceiver);
     }
 }

@@ -67,6 +67,7 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
     public Transform standPos;
     public Transform crouchPos;
     public Transform orientation;
+    public Transform itemComponentHolder;
 
     public MovementEvent OnLeap;
 
@@ -309,6 +310,7 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
             isSprinting = false;
         }
         crouchMinus = crouchMultiplier;
+        itemComponentHolder.position = crouchPos.position;
         if (HasInputAuthority && !Runner.IsResimulation) StartCamLerp(cameraPosition, crouchPos);
     }
 
@@ -322,6 +324,7 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         if (!isCrouching) return;
         if (!CanUncrouch()) return;
         crouchMinus = 1f;
+        itemComponentHolder.position = standPos.position;
         if (HasInputAuthority && !Runner.IsResimulation) StartCamLerp(cameraPosition, standPos);
         isCrouching = false;
     }

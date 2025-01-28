@@ -487,6 +487,37 @@ Transform:
   - {fileID: 6501996020310103523}
   m_Father: {fileID: 6706510609064349016}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1733608181469062427
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3732753293932338788}
+  m_Layer: 6
+  m_Name: Item Component Holder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3732753293932338788
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1733608181469062427}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.637, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5522855053688399310}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1787190705143953567
 GameObject:
   m_ObjectHideFlags: 0
@@ -582,6 +613,7 @@ MonoBehaviour:
   - {fileID: 9069154022521576282}
   - {fileID: 2442258754578231911}
   - {fileID: 5552705410368871873}
+  - {fileID: 1106844264840172896}
   - {fileID: 6160271850420175375}
   - {fileID: 7478806533832175603}
   - {fileID: 873785079005984450}
@@ -761,11 +793,13 @@ MonoBehaviour:
   camTransform: {fileID: 0}
   dragMax: 10
   animator: {fileID: 5001893267009733704}
+  itemComponentHolder: {fileID: 0}
   dropVelocity: 3
   movementMultiplier: 2
   pickupCooldown: 0.5
   itemPrefab: {fileID: 4422009458430310206, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
   dropKey: 103
+  itemComponentObject: {fileID: 0}
 --- !u!114 &2378964989146487730
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -906,6 +940,7 @@ MonoBehaviour:
   standPos: {fileID: 6575205651289647044}
   crouchPos: {fileID: 884615722293357098}
   orientation: {fileID: 7162067020350182232}
+  itemComponentHolder: {fileID: 3732753293932338788}
   horizontalMovement: 0
   verticalMovement: 0
   _isMoving: 0
@@ -3461,6 +3496,7 @@ Transform:
   - {fileID: 8806967224018203518}
   - {fileID: 6575205651289647044}
   - {fileID: 884615722293357098}
+  - {fileID: 3732753293932338788}
   m_Father: {fileID: 1317372394872903684}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7182566175449430168

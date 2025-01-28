@@ -14,8 +14,10 @@ public class Weapon : Item
     [Tooltip("How long before the player can attack again")]
     public float attackCooldown = .44f;
     public Shake shake;
+    [Header("Sounds")]
     public string[] attackSounds = new string[] { };
     public string[] damageSounds = new string[] { };
+    [Header("Evidence")]
     public string[] evidenceDescriptions = new string[] { };
     public string[] evidenceIcons = new string[] { };
 //    public float headMultiplier = 1.2f;

@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 //using Photon.Pun;
-//using WebSocketSharp;
+using WebSocketSharp;
 using UnityEngine.UI;
+using Fusion;
 //using Photon.Realtime;
 
-public class PlayerInventory : MonoBehaviour//PunCallbacks, IPunObservable
+// Sync player inventory stuff
+public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
 {
     [Header("Hotbar")]
     public int equippedSlot;
@@ -19,8 +21,9 @@ public class PlayerInventory : MonoBehaviour//PunCallbacks, IPunObservable
     public Transform sItem; // Server item
     public Transform camTransform;
     public float dragMax = 5f;
-    [Header("Item Animations")]
+    [Header("Item References")]
     public Animator animator;
+    public Transform itemComponentHolder;
     [Header("Item Dropping")]
     public float dropVelocity = .5f;
     public float movementMultiplier = 2f;
@@ -29,6 +32,7 @@ public class PlayerInventory : MonoBehaviour//PunCallbacks, IPunObservable
     [Header("Keybinds")]
     public KeyCode dropKey;
 
+    [HideInInspector] public GameObject itemComponentObject; // The GameObject that is a child of the physical item that contains item behaviours.
     FirstPerson fps;
     Item equippedItem = null;
     AttackManager attackManager;
@@ -103,8 +107,7 @@ public class PlayerInventory : MonoBehaviour//PunCallbacks, IPunObservable
     /// <param name="previous"></param>
     private void OnUnequip(int previous)
     {
-        return;
-        //if (hotbar[previous].IsNullOrEmpty()) return;
+        if (hotbar[previous].IsNullOrEmpty()) return;
         if (itemManager.itemSearch[hotbar[previous]] as Weapon)
         {
             attackManager.ResetAttack();
@@ -117,44 +120,44 @@ public class PlayerInventory : MonoBehaviour//PunCallbacks, IPunObservable
         {
             Instantiate(hotbarSlot, hotbarUI);
         }
-        //hotbarUI.anchoredPosition -= new Vector2((hotbar.Count - 1) * 50f, 0f); //For centering
+        hotbarUI.anchoredPosition -= new Vector2((hotbar.Count - 1) * 50f, 0f); //For centering
     }
 
     void UpdateHotbarUI()
     {
     //    //if (!view.IsMine) return;
-    //    for (int i = 0; i < hotbar.Count; i++)
-    //    {
-    //        RawImage panel = hotbarUI.GetChild(i).GetChild(0).GetComponent<RawImage>();
-    //        RawImage icon = hotbarUI.GetChild(i).GetChild(0).GetChild(0).GetComponent<RawImage>();
-    //        //Sets icons
-    //        if (hotbar[i].IsNullOrEmpty())
-    //        {
-    //            icon.enabled = false;
-    //        } 
-    //        else
-    //        {
-    //            icon.enabled = true;
-    //            icon.texture = itemManager.itemSearch[hotbar[i]].icon;
-    //        }
-    //        //Sets icon colors
-    //        if (equippedSlot == i)
-    //        {
-    //            panel.color = new Color(1f, 1f, 1f, .37f);
-    //        }
-    //        else
-    //        {
-    //            panel.color = new Color(0f, 0f, 0f, .37f); ;
-    //        }
-    //    }
+        for (int i = 0; i < hotbar.Count; i++)
+        {
+            RawImage panel = hotbarUI.GetChild(i).GetChild(0).GetComponent<RawImage>(); // WHAT THE FUCK
+            RawImage icon = hotbarUI.GetChild(i).GetChild(0).GetChild(0).GetComponent<RawImage>();
+            //Sets icons
+            if (hotbar[i].IsNullOrEmpty())
+            {
+                icon.enabled = false;
+            } 
+            else
+            {
+                icon.enabled = true;
+                icon.texture = itemManager.itemSearch[hotbar[i]].icon;
+            }
+            //Sets icon colors
+            if (equippedSlot == i)
+            {
+                panel.color = new Color(1f, 1f, 1f, .37f);
+            }
+            else
+            {
+                panel.color = new Color(0f, 0f, 0f, .37f); ;
+            }
+        }
     }
 
     void HotbarControls()
     {
-        //if (!hotbar[equippedSlot].IsNullOrEmpty())
-        //{
-        //    if (equippedItem.large) return;
-        //}
+        if (!hotbar[equippedSlot].IsNullOrEmpty())
+        {
+            if (equippedItem.large) return;
+        }
         for(int i = 0; i < hotbarInput.Length; i++)
         {
             if (Input.GetKeyDown(hotbarInput[i]))
@@ -168,21 +171,34 @@ public class PlayerInventory : MonoBehaviour//PunCallbacks, IPunObservable
         }
     }
 
+    /**
+     - Sync HideItem and ShowItem across network
+     - Make this function only callable on fixedupdatenetwork, itemcomponent object should sync across client and server
+    **/
+
     public void EquipItem(int slot, bool selfEquip = false)
     {
         //if (!view.IsMine) return;
         CrosshairManager.instance.RemoveCrosshair(1);
         largeUI.SetActive(false);
-        if (equippedSlot == slot && !selfEquip) return;
+        if (equippedSlot == slot && !selfEquip) return; // If the player equips the same slot they are holding
+
+        if (itemComponentObject != null) Destroy(itemComponentObject);
+        itemComponentObject = null;
+
         equippedSlot = slot;
-        //if (hotbar[equippedSlot].IsNullOrEmpty())
-        //{
-        //    equippedItem = null;
-        //    HideItem();
+        if (hotbar[equippedSlot].IsNullOrEmpty()) // If the slot is empty, hide the item and return
+        {
+            equippedItem = null;
+            HideItem();
         //    view.RPC("HideItem", RpcTarget.OthersBuffered);
-        //    return;
-        //}
+            return;
+        }
+
         equippedItem = itemManager.itemSearch[hotbar[equippedSlot]];
+        itemComponentObject = Instantiate(equippedItem.itemComponentHolder, itemComponentHolder);
+        itemComponentObject.SendMessage("OnReceiveMetadata", itemData[equippedSlot].metadata, SendMessageOptions.DontRequireReceiver); // Gives metadata information to any listeners
+
         if (equippedItem as Weapon)
         {
             Weapon weapon = (Weapon)equippedItem;
@@ -194,7 +210,7 @@ public class PlayerInventory : MonoBehaviour//PunCallbacks, IPunObservable
         //view.RPC("ShowItem", RpcTarget.OthersBuffered, hotbar[equippedSlot]);
     }
 
-    //[PunRPC]
+    // Shows the item on both client and server side
     public void ShowItem(string itemName)
     {
         Item equippedItem = itemManager.itemSearch[itemName];
@@ -216,7 +232,7 @@ public class PlayerInventory : MonoBehaviour//PunCallbacks, IPunObservable
         return; 
     }
 
-    //[PunRPC]
+    // Hides the item by disabling renderers
     public void HideItem()
     {
         sFilter.mesh = null;
@@ -225,6 +241,7 @@ public class PlayerInventory : MonoBehaviour//PunCallbacks, IPunObservable
         fps.HideClientItem();
     }
 
+    // Resets animations for the character
     void ResetEquipLayers()
     {
         foreach (int layer in equipLayers)
@@ -238,22 +255,22 @@ public class PlayerInventory : MonoBehaviour//PunCallbacks, IPunObservable
     {
         for (int i = 0; i < hotbar.Count; i++)
         {
-            //if (hotbar[i].IsNullOrEmpty())
-            //{
-            //    return false;
-            //}
+            if (hotbar[i].IsNullOrEmpty())
+            {
+                return false;
+            }
         }
         return true;
     }
-    public bool IsInventoryFull(out int emptySlot)
+    public bool IsInventoryFull(out int emptySlot) // Outputs the nearest empty slot
     {
         for (int i = 0; i < hotbar.Count; i++)
         {
-            //if (hotbar[i].IsNullOrEmpty())
-            //{
-            //    emptySlot = i;
-            //    return false;
-            //}
+            if (hotbar[i].IsNullOrEmpty())
+            {
+                emptySlot = i;
+                return false;
+            }
         }
         emptySlot = -1;
         return true;
@@ -265,28 +282,28 @@ public class PlayerInventory : MonoBehaviour//PunCallbacks, IPunObservable
     /// <param name="itemName">Name of item</param>
     /// <param name="slot">Slot to put item in, automatically finds a slot by default</param>
     //[PunRPC]
-    //public int GiveItem(string itemName, bool equipItem = false, int slot = -1)
-    //{
-    //    int emptySlot;
-    //    if (IsInventoryFull(out emptySlot))
-    //    {
-    //        Debug.LogError("Inventory is full!");
-    //        return -1;
-    //    }
-    //    if (slot == -1)
-    //    {
-    //        slot = emptySlot;
-    //    }
-    //    if (!hotbar[slot].IsNullOrEmpty()) return -1;
-    //    if (itemManager.itemSearch.ContainsKey(itemName))
-    //    {
-    //        hotbar[slot] = itemName;
-    //        if (equipItem) EquipItem(slot, slot == equippedSlot);
-    //        if (!equipItem) EquipItem(equippedSlot, slot == equippedSlot);
-    //    }
-    //    UpdateHotbarUI();
-    //    return slot;
-    //}
+    public int GiveItem(string itemName, bool equipItem = false, int slot = -1)
+    {
+        int emptySlot;
+        if (IsInventoryFull(out emptySlot))
+        {
+            Debug.LogError("Inventory is full!");
+            return -1;
+        }
+        if (slot == -1)
+        {
+            slot = emptySlot;
+        }
+        if (!hotbar[slot].IsNullOrEmpty()) return -1;
+        if (itemManager.itemSearch.ContainsKey(itemName))
+        {
+            hotbar[slot] = itemName;
+            if (equipItem) EquipItem(slot, slot == equippedSlot);
+            if (!equipItem) EquipItem(equippedSlot, slot == equippedSlot);
+        }
+        UpdateHotbarUI();
+        return slot;
+    }
 
     /// <summary>
     /// Removes an item from this player.
@@ -341,26 +358,26 @@ public class PlayerInventory : MonoBehaviour//PunCallbacks, IPunObservable
 
     void AddFingerprint(int itemIndex)
     {
-        //if (!itemData[itemIndex].fingerprints.Contains(view.Owner)) itemData[itemIndex].fingerprints.Add(view.Owner);
+        //if (!itemData[itemIndex].fingerprints.Contains(view.Owner)) itemData[itemIndex].fingerprints.Add(view.Owner); // Photon syncing
     }
 
-    //void TransferItemData(int itemIndex, PhotonView itemView)
-    //{
-    //    ItemData data = itemData[itemIndex];
-    //    foreach (Player player in data.fingerprints)
-    //    {
-    //        itemView.RPC("AddFingerprint", RpcTarget.AllBuffered, player);
-    //    }
-    //    foreach (KeyValuePair<string, string> pair in data.metadata)
-    //    {
-    //        itemView.RPC("AddMetadata", RpcTarget.AllBuffered, pair.Key, pair.Value);
-    //    }
-    //}
+    void TransferItemData(int itemIndex)//, PhotonView itemView)
+    {
+        ItemData data = itemData[itemIndex];
+        foreach (PlayerRef player in data.fingerprints)
+        {
+            //itemView.RPC("AddFingerprint", RpcTarget.AllBuffered, player); // Photon syncing
+        }
+        foreach (KeyValuePair<string, string> pair in data.metadata)
+        {
+            //itemView.RPC("AddMetadata", RpcTarget.AllBuffered, pair.Key, pair.Value);
+        }
+    }
 
     public void CollectItemData(ItemData data, int itemIndex)
     {
         itemData[itemIndex] = new ItemData();
         itemData[itemIndex].metadata = data.metadata;
-        //itemData[itemIndex].fingerprints = data.fingerprints;
+        itemData[itemIndex].fingerprints = data.fingerprints;
     }
 }
