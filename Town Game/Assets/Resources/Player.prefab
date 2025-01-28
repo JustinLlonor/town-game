@@ -696,6 +696,7 @@ MonoBehaviour:
   - {fileID: 6160271850420175375}
   - {fileID: 7478806533832175603}
   - {fileID: 873785079005984450}
+  - {fileID: 8314741821198590847}
   - {fileID: 991788123578228062}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &2442258754578231911
@@ -781,11 +782,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   equippedSlot: -1
-  hotbar:
-  - 
-  - 
-  - 
-  - 
+  hotbarLength: 4
+  _hotbar: []
   itemData: []
   hotbarSlot: {fileID: 1340724474612461429, guid: dfc5d85edf9e2cc47bc5329f7e3e244d, type: 3}
   hotbarUI: {fileID: 0}
@@ -799,7 +797,6 @@ MonoBehaviour:
   movementMultiplier: 2
   pickupCooldown: 0.5
   itemPrefab: {fileID: 4422009458430310206, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
-  dropKey: 103
   itemComponentObject: {fileID: 0}
 --- !u!114 &2378964989146487730
 MonoBehaviour:
@@ -1957,6 +1954,7 @@ GameObject:
   - component: {fileID: 1342524613149204641}
   - component: {fileID: 6727572804747496107}
   - component: {fileID: 5001893267009733704}
+  - component: {fileID: 8314741821198590847}
   - component: {fileID: 5527739715085672161}
   - component: {fileID: 5120924170084903890}
   - component: {fileID: 2837109604865662369}
@@ -2027,6 +2025,24 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &8314741821198590847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3806856976935638070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 506319458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Animator: {fileID: 5001893267009733704}
+  ApplyTiming: 2
+  SyncSettings: 79
+  StateHashes: 000000002b1a167c79406955303b67ca2d3ca08d6bd5a32d398fdc04ecd9d2c9df6af7fe20e23b685928a8ce49b654caecf2b375f28077c557c4907a28a981077af3fe2e72d1b3d968408933d9baf9f35bf5b576958341e2b91ea9d140eebb93eacfd2c8f376460bed42fb02624ba7a25713f29bd81aae3ba8a7ceb9d7d96ab513bc2f4dc01206a90f6451a579a98cf624abbf67cd41bdb49373045fa4ae5c1881e63690851d2dab
+  TriggerHashes: 00000000
+  TotalWords: 10
 --- !u!114 &5527739715085672161
 MonoBehaviour:
   m_ObjectHideFlags: 0
