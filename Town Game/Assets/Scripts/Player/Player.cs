@@ -12,6 +12,7 @@ public class Player : NetworkBehaviour
     public PlayerEvent Init;
     public int simulationTickDistance = 2;
     [HideInInspector] public PlayerMovement pm;
+    [HideInInspector] public PlayerInventory pi;
     Transform playerGFX;
     Transform cameraPosition;
     PlayerManager playerManager;

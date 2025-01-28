@@ -5,6 +5,7 @@ using UnityEngine;
 using WebSocketSharp;
 using UnityEngine.UI;
 using Fusion;
+using UnityEngine.InputSystem;
 //using Photon.Realtime;
 
 // Sync player inventory stuff
@@ -42,18 +43,6 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     MeshRenderer sRenderer;
     Transform mainCam;
     Rigidbody rb;
-    KeyCode[] hotbarInput =
-    {
-        KeyCode.Alpha1,
-        KeyCode.Alpha2,
-        KeyCode.Alpha3,
-        KeyCode.Alpha4,
-        KeyCode.Alpha5,
-        KeyCode.Alpha6,
-        KeyCode.Alpha7,
-        KeyCode.Alpha8,
-        KeyCode.Alpha9,
-    };
     List<int> equipLayers = new List<int>();
     int previousSlot;
 
@@ -87,7 +76,6 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
             OnUnequip(previousSlot);
             previousSlot = equippedSlot;
         }
-        HotbarControls();
         if (equippedItem != null) largeUI.SetActive(equippedItem.large);
     }
 
@@ -152,30 +140,23 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         }
     }
 
-    void HotbarControls()
+    private void OnEquipItem(InputValue iv)
     {
+        int slot = (int)iv.Get<float>();
+        if (slot == 0) return;
         if (!hotbar[equippedSlot].IsNullOrEmpty())
         {
             if (equippedItem.large) return;
         }
-        for(int i = 0; i < hotbarInput.Length; i++)
-        {
-            if (Input.GetKeyDown(hotbarInput[i]))
-            {
-                if (i <  hotbar.Count)
-                {
-                    EquipItem(i);
-                }
-                UpdateHotbarUI();
-            }
-        }
+        EquipItem(slot-1);
+        UpdateHotbarUI();
+
     }
 
     /**
      - Sync HideItem and ShowItem across network
      - Make this function only callable on fixedupdatenetwork, itemcomponent object should sync across client and server
     **/
-
     public void EquipItem(int slot, bool selfEquip = false)
     {
         //if (!view.IsMine) return;
