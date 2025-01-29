@@ -1,9 +1,7 @@
 using Fusion;
 using Fusion.Addons.Physics;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Timeline;
+using WebSocketSharp;
 
 public class Player : NetworkBehaviour
 {
@@ -102,8 +100,21 @@ public class Player : NetworkBehaviour
             }
             pm.sprintPressed = data.buttons.IsSet(NetworkInputData.Buttons.Sprint);
             // Player inventory
+            if (data.hotbarKey != 0)
+            {
+                PlayerInventory(data.hotbarKey - 1);
+            }
         }
         Simulate();
+    }
+
+    private void PlayerInventory(int slot)
+    {
+        if (!pi.hotbar[pi.equippedSlot].IsNullOrEmpty())
+        {
+            // if (pi.equippedItem.large) return; Do later, if the equipped item is large then return
+        }
+        pi.EquipItem(slot - 1);
     }
 
     private void Simulate()

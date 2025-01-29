@@ -289,6 +289,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95bd1018383b0e8429881c3562310534, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _steamID: 
 --- !u!114 &386717492
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2595,7 +2596,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2142610577585994373, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3831975536681494021, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
       propertyPath: m_IsActive
@@ -3665,6 +3666,10 @@ PrefabInstance:
       propertyPath: largeUI
       value: 
       objectReference: {fileID: 361995279573289457}
+    - target: {fileID: 5674810268018765361, guid: 510253d1d4f227543af658125b506bb6, type: 3}
+      propertyPath: SortKey
+      value: 2925720350
+      objectReference: {fileID: 0}
     - target: {fileID: 5709288198271284562, guid: 510253d1d4f227543af658125b506bb6, type: 3}
       propertyPath: sceneViewId
       value: 6

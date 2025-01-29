@@ -11,8 +11,8 @@ using UnityEngine.InputSystem;
 // Sync player inventory stuff
 public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
 {
+    [Networked] public int equippedSlot { get; set; } // To be synced, along with item show functions
     [Header("Hotbar")]
-    public int equippedSlot; // To be synced, along with item show functions
     public int hotbarLength = 4;
     [Networked, Capacity(4)]public NetworkLinkedList<string> hotbar { get; } // To be synced
     public ItemData[] itemData; // To be synced
@@ -34,7 +34,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
 
     [HideInInspector] public GameObject itemComponentObject; // The GameObject that is a child of the physical item that contains item behaviours.
     FirstPerson fps;
-    Item equippedItem = null;
+    public Item equippedItem = null;
     AttackManager attackManager;
     //PhotonView view;
     ObjectManager itemManager;
@@ -45,6 +45,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     Rigidbody rb;
     List<int> equipLayers = new List<int>();
     int previousSlot;
+    bool uiSetup = false;
 
     private void Awake()
     {
@@ -67,13 +68,11 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     private void Update()
     {
         //if (!view.IsMine) return;
-        if (previousSlot != equippedSlot)
-        {
-            OnUnequip(previousSlot);
-            previousSlot = equippedSlot;
-        }
+        Previous();
         if (equippedItem != null) largeUI.SetActive(equippedItem.large);
     }
+
+
 
     private void LateUpdate()
     {
@@ -88,11 +87,25 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
             hotbar.Add("");
         }
         itemData = new ItemData[hotbar.Count];
-        for (int i = 0; i < itemData.Length; i++) itemData[i] = null;
+        //for (int i = 0; i < itemData.Length; i++) itemData[i] = null; item data stuff doesn't matter until an item enters that slot
         if (!HasInputAuthority) return;
+    }
+
+    public void Setup()
+    {
+        uiSetup = true;
         SetupHotbarUI();
         EquipItem(0);
         UpdateHotbarUI();
+    }
+
+    public void Previous()
+    {
+        if (previousSlot != equippedSlot)
+        {
+            //OnUnequip(previousSlot);
+            previousSlot = equippedSlot;
+        }
     }
 
     void SetupHotbarUI()
@@ -113,7 +126,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     /// Called whenever an item is unequipped
     /// </summary>
     /// <param name="previous"></param>
-    private void OnUnequip(int previous)
+    private void OnUnequip(int previous) // To be set up
     {
         if (hotbar.Count == 0) return;
         if (hotbar[previous].IsNullOrEmpty()) return;
@@ -125,6 +138,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
 
     void UpdateHotbarUI()
     {
+        if (!uiSetup) return;
     //    //if (!view.IsMine) return;
         for (int i = 0; i < hotbar.Count; i++)
         {
@@ -156,15 +170,10 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     {
         int slot = (int)iv.Get<float>();
         if (slot == 0) return;
-        if (!hotbar[equippedSlot].IsNullOrEmpty())
-        {
-            if (equippedItem.large) return;
-        }
         runnerManager.hotbarKey = slot;
-        return;
-        EquipItem(slot-1);
-        UpdateHotbarUI();
-
+        Debug.Log(slot);
+        //EquipItem(slot-1);
+        //UpdateHotbarUI();
     }
 
     /**
@@ -174,10 +183,12 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     public void EquipItem(int slot, bool selfEquip = false)
     {
         //if (!view.IsMine) return;
-        CrosshairManager.instance.RemoveCrosshair(1);
-        largeUI.SetActive(false);
         if (equippedSlot == slot && !selfEquip) return; // If the player equips the same slot they are holding
-
+        if (HasInputAuthority)
+        {
+            CrosshairManager.instance.RemoveCrosshair(1);
+            largeUI.SetActive(false);
+        }
         if (itemComponentObject != null) Destroy(itemComponentObject);
         itemComponentObject = null;
 
@@ -185,8 +196,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         if (hotbar[equippedSlot].IsNullOrEmpty()) // If the slot is empty, hide the item and return
         {
             equippedItem = null;
-            HideItem();
-        //    view.RPC("HideItem", RpcTarget.OthersBuffered);
+            HideItem(); // Sync with change detector
             return;
         }
 
@@ -196,13 +206,12 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
 
         if (equippedItem as Weapon)
         {
-            Weapon weapon = (Weapon)equippedItem;
-            attackManager.SetAttackCooldown(weapon.attackCooldown);
-            CrosshairManager.instance.AddCrosshair(1, 1);
+            //Weapon weapon = (Weapon)equippedItem;
+            //attackManager.SetAttackCooldown(weapon.attackCooldown);
+            //CrosshairManager.instance.AddCrosshair(1, 1);
         }
 
-        ShowItem(hotbar[equippedSlot]);
-        //view.RPC("ShowItem", RpcTarget.OthersBuffered, hotbar[equippedSlot]);
+        ShowItem(hotbar[equippedSlot]); // Sync with change detector
     }
 
     // Shows the item on both client and server side
@@ -347,7 +356,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         //ItemPhys itemPhys = itemObj.GetComponent<ItemPhys>();
         //itemPhys.interactTimer = pickupCooldown;
 
-        itemData[itemIndex] = null;
+        //itemData[itemIndex] = null;
         RemoveItem(hotbar[equippedSlot], equippedSlot);
     }
 

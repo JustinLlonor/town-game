@@ -527,7 +527,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1317372394872903684}
-  - component: {fileID: 3091803339169035289}
+  - component: {fileID: 7285387551892225928}
   - component: {fileID: 9069154022521576282}
   - component: {fileID: 2540704478665164047}
   - component: {fileID: 2442258754578231911}
@@ -577,7 +577,7 @@ Transform:
   - {fileID: 6748732434187779059}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3091803339169035289
+--- !u!114 &7285387551892225928
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -601,55 +601,7 @@ MonoBehaviour:
   m_ControlsChangedEvent:
     m_PersistentCalls:
       m_Calls: []
-  m_ActionEvents:
-  - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6160271850420175375}
-        m_TargetAssemblyTypeName: PlayerMovement, Assembly-CSharp
-        m_MethodName: Jump
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-    m_ActionId: 0b719ec9-f2a6-49a4-a6a6-9541eb36544c
-    m_ActionName: BaseGameplay/Jump[/Keyboard/space]
-  - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 3091803339169035289}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-    m_ActionId: 5609079e-b899-4dfc-abca-10c6cdeb8fbe
-    m_ActionName: BaseGameplay/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]
-  - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6160271850420175375}
-        m_TargetAssemblyTypeName: PlayerMovement, Assembly-CSharp
-        m_MethodName: Sprint
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-    m_ActionId: e4fc99fc-bcb9-4ec8-8b00-9d9b781924f7
-    m_ActionName: BaseGameplay/Sprint[/Keyboard/shift]
+  m_ActionEvents: []
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: BaseGameplay
@@ -781,7 +733,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bad30909cbd7727458a11ec97d7047de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  equippedSlot: -1
+  _equippedSlot: 0
   hotbarLength: 4
   _hotbar: []
   itemData: []
@@ -810,8 +762,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 558a8c529795101459a8233010c58d84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useKey: 323
-  secondaryUseKey: 324
   animator: {fileID: 5001893267009733704}
   inventory: {fileID: 1106844264840172896}
   attackManager: {fileID: 7351151026128905701}

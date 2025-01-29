@@ -6,10 +6,6 @@ using UnityEngine.EventSystems;
 
 public class ItemUse : MonoBehaviour
 {
-    [Header("Keybinds")]
-    public KeyCode useKey;
-    public KeyCode secondaryUseKey;
-
     [HideInInspector] public Animator animator;
     [HideInInspector] public PlayerInventory inventory;
     [HideInInspector] public AttackManager attackManager;
@@ -29,16 +25,21 @@ public class ItemUse : MonoBehaviour
         // Update to new input system later
         //if (!view.IsMine) return;
         if (!cm.isLocked) return;
-        if (Input.GetKey(useKey))
-        {
-            UseItem();
-        }
-        if (Input.GetKey(secondaryUseKey))
-        {
-            UseSecondary();
-        }
+        if (Input.GetKeyDown(KeyCode.Mouse0)) UseItem();
+        if (Input.GetKeyDown(KeyCode.Mouse1)) UseSecondary(); // Likely the old input system is getting mouse input, could possibly interrupt new input system
     }
 
+    
+    private void OnPrimaryItem()
+    {
+        UseItem();
+    }
+
+    private void OnSecondaryItem()
+    {
+        UseSecondary();
+    }
+    
     void UseItem()
     {
         if (inventory.hotbar[inventory.equippedSlot].IsNullOrEmpty()) return;

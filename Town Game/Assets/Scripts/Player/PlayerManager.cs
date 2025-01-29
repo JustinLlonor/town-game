@@ -79,6 +79,7 @@ public class PlayerManager : MonoBehaviour//PunCallbacks
         playerInventory.camTransform = camTransform;
         playerInventory.hotbarUI = hotbar;
         playerInventory.largeUI = largeUI;
+        playerInventory.Setup();
 
         currentPlayer = player;
     }

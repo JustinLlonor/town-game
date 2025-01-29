@@ -5,6 +5,7 @@ using UnityEngine;
 using Steamworks;
 using System;
 using Fusion;
+using WebSocketSharp;
 
 public class SteamLobbyManager : MonoBehaviour
 {
@@ -68,12 +69,10 @@ public class SteamLobbyManager : MonoBehaviour
     {
         sm = FindObjectOfType<ServerManager>();
         runner = FindObjectOfType<NetworkRunner>();
+        if (!SteamManager.Initialized) return;
         ulong steamID = Convert.ToUInt64(sm.steamID);
-        if (SteamManager.Initialized)
-        {
-            Debug.Log("Joining Steam lobby: " + steamID);
-            SteamMatchmaking.JoinLobby((CSteamID)steamID);
-        }
+        Debug.Log("Joining Steam lobby: " + steamID);
+        SteamMatchmaking.JoinLobby((CSteamID)steamID);
     }
 
     private void Update()
