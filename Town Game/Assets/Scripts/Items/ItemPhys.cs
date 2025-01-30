@@ -1,5 +1,6 @@
 //using Photon.Pun;
 //using Photon.Realtime;
+using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -74,7 +75,7 @@ public class ItemPhys : MonoBehaviour
     {
         if (pickedUp) return;
         PlayerInventory inventory = playerManager.currentPlayer.GetComponent<PlayerInventory>();
-        string eName = inventory.hotbar[inventory.equippedSlot];
+        string eName = inventory.hotbar[inventory.equippedSlot].ToString();
         //if (!eName.IsNullOrEmpty())
         //{
         //    Item item = om.itemSearch[inventory.hotbar[inventory.equippedSlot]];
@@ -124,7 +125,7 @@ public class ItemPhys : MonoBehaviour
     }
 
     //[PunRPC]
-    public void AddMetadata(int key, int value)
+    public void AddMetadata(NetworkString<_4> key, int value)
     {
         itemData.metadata.Add(key, value);
     }

@@ -6,12 +6,14 @@ using Fusion;
 [System.Serializable]
 public struct ItemData : INetworkStruct
 {
-    [Networked, Capacity(10)] public NetworkDictionary<int, int> metadata { get; }
+    [Networked, Capacity(10)] public NetworkDictionary<NetworkString<_4>, int> metadata => default;
     [Networked, Capacity(20)] public NetworkLinkedList<PlayerRef> fingerprints { get; }
 
-    public ItemData(NetworkDictionary<int, int> metadata, NetworkLinkedList<PlayerRef> fingerprints)
+    /**
+    public ItemData(NetworkDictionary<NetworkString<_4>, int> metadata, NetworkLinkedList<PlayerRef> fingerprints)
     {
         this.metadata = metadata;
         this.fingerprints = fingerprints;
     }
+    **/
 }

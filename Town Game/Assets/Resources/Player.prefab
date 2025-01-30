@@ -744,12 +744,13 @@ MonoBehaviour:
   camTransform: {fileID: 0}
   dragMax: 10
   animator: {fileID: 5001893267009733704}
-  itemComponentHolder: {fileID: 0}
+  itemComponentHolder: {fileID: 3732753293932338788}
   dropVelocity: 3
   movementMultiplier: 2
   pickupCooldown: 0.5
   itemPrefab: {fileID: 4422009458430310206, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
   itemComponentObject: {fileID: 0}
+  equippedItem: {fileID: 0}
 --- !u!114 &2378964989146487730
 MonoBehaviour:
   m_ObjectHideFlags: 0

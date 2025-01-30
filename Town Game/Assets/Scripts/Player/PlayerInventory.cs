@@ -14,7 +14,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     [Networked] public int equippedSlot { get; set; } // To be synced, along with item show functions
     [Header("Hotbar")]
     public int hotbarLength = 4;
-    [Networked, Capacity(4)]public NetworkLinkedList<string> hotbar { get; } // To be synced
+    [Networked, Capacity(4)]public NetworkLinkedList<NetworkString<_32>> hotbar { get; } // To be synced
     public ItemData[] itemData; // To be synced
     public GameObject hotbarSlot;
     public RectTransform hotbarUI;
@@ -128,8 +128,8 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     private void OnUnequip(int previous) // To be set up
     {
         if (hotbar.Count == 0) return;
-        if (hotbar[previous].IsNullOrEmpty()) return;
-        if (itemManager.itemSearch[hotbar[previous]] as Weapon)
+        if (hotbar[previous].ToString().IsNullOrEmpty()) return;
+        if (itemManager.itemSearch[hotbar[previous].ToString()] as Weapon)
         {
             attackManager.ResetAttack();
         }
@@ -144,14 +144,14 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
             RawImage panel = hotbarUI.GetChild(i).GetChild(0).GetComponent<RawImage>(); // WHAT THE FUCK
             RawImage icon = hotbarUI.GetChild(i).GetChild(0).GetChild(0).GetComponent<RawImage>();
             //Sets icons
-            if (hotbar[i].IsNullOrEmpty())
+            if (hotbar[i].ToString().IsNullOrEmpty())
             {
                 icon.enabled = false;
             } 
             else
             {
                 icon.enabled = true;
-                icon.texture = itemManager.itemSearch[hotbar[i]].icon;
+                icon.texture = itemManager.itemSearch[hotbar[i].ToString()].icon;
             }
             //Sets icon colors
             if (equippedSlot == i)
@@ -170,9 +170,6 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         int slot = (int)iv.Get<float>();
         if (slot == 0) return;
         runnerManager.hotbarKey = slot;
-        Debug.Log("hey");
-        //EquipItem(slot-1);
-        //UpdateHotbarUI();
     }
 
     /**
@@ -193,14 +190,14 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
 
         equippedSlot = slot;
 
-        if (hotbar[equippedSlot].IsNullOrEmpty()) // If the slot is empty, hide the item and return
+        if (hotbar[equippedSlot].ToString().IsNullOrEmpty()) // If the slot is empty, hide the item and return
         {
             equippedItem = null;
             HideItem(); // Sync with change detector
             return;
         }
 
-        equippedItem = itemManager.itemSearch[hotbar[equippedSlot]];
+        equippedItem = itemManager.itemSearch[hotbar[equippedSlot].ToString()];
         itemComponentObject = Instantiate(equippedItem.itemComponentHolder, itemComponentHolder);
         itemComponentObject.SendMessage("OnReceiveMetadata", itemData[equippedSlot].metadata, SendMessageOptions.DontRequireReceiver); // Gives metadata information to any listeners
 
@@ -211,7 +208,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
             //CrosshairManager.instance.AddCrosshair(1, 1);
         }
 
-        ShowItem(hotbar[equippedSlot]); // Sync with change detector
+        ShowItem(hotbar[equippedSlot].ToString()); // Sync with change detector
     }
 
     // Shows the item on both client and server side
@@ -259,7 +256,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     {
         for (int i = 0; i < hotbar.Count; i++)
         {
-            if (hotbar[i].IsNullOrEmpty())
+            if (hotbar[i].ToString().IsNullOrEmpty())
             {
                 return false;
             }
@@ -270,7 +267,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     {
         for (int i = 0; i < hotbar.Count; i++)
         {
-            if (hotbar[i].IsNullOrEmpty())
+            if (hotbar[i].ToString().IsNullOrEmpty())
             {
                 emptySlot = i;
                 return false;
@@ -298,7 +295,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         {
             slot = emptySlot;
         }
-        if (!hotbar[slot].IsNullOrEmpty()) return -1;
+        if (!hotbar[slot].ToString().IsNullOrEmpty()) return -1;
         if (itemManager.itemSearch.ContainsKey(itemName))
         {
             hotbar.Set(slot, itemName);
@@ -342,7 +339,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
 
     public void DropItem(int itemIndex)
     {
-        Item item = itemManager.itemSearch[hotbar[itemIndex]];
+        Item item = itemManager.itemSearch[hotbar[itemIndex].ToString()];
         if (item == null) return;
         //if (hotbar[equippedSlot].IsNullOrEmpty()) return;
         //GameObject itemObj = PhotonNetwork.Instantiate(itemPrefab.name, mainCam.position, mainCam.rotation);
@@ -357,7 +354,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         //itemPhys.interactTimer = pickupCooldown;
 
         //itemData[itemIndex] = null;
-        RemoveItem(hotbar[equippedSlot], equippedSlot);
+        RemoveItem(hotbar[equippedSlot].ToString(), equippedSlot);
     }
 
     void AddFingerprint(int itemIndex)
@@ -372,7 +369,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         {
             //itemView.RPC("AddFingerprint", RpcTarget.AllBuffered, player); // Photon syncing
         }
-        foreach (KeyValuePair<int, int> pair in data.metadata)
+        foreach (KeyValuePair<NetworkString<_4>, int> pair in data.metadata)
         {
             //itemView.RPC("AddMetadata", RpcTarget.AllBuffered, pair.Key, pair.Value);
         }
@@ -383,7 +380,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         itemData[itemIndex] = new ItemData();
         itemData[itemIndex].metadata.Clear();
         itemData[itemIndex].fingerprints.Clear();
-        foreach (KeyValuePair<int, int> pair in data.metadata)
+        foreach (KeyValuePair<NetworkString<_4>, int> pair in data.metadata)
         {
             itemData[itemIndex].metadata.Add(pair.Key, pair.Value);
         }

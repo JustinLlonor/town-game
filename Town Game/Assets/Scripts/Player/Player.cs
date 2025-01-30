@@ -102,7 +102,6 @@ public class Player : NetworkBehaviour
             // Player inventory
             if (!(data.hotbarKey <= 0))
             {
-                Debug.Log(data.hotbarKey);
                 PlayerInventory(data.hotbarKey);
             }
         }
@@ -111,7 +110,7 @@ public class Player : NetworkBehaviour
 
     private void PlayerInventory(int slot)
     {
-        if (!pi.hotbar[pi.equippedSlot].IsNullOrEmpty())
+        if (!pi.hotbar[pi.equippedSlot].ToString().IsNullOrEmpty())
         {
             // if (pi.equippedItem.large) return; Do later, if the equipped item is large then return
         }

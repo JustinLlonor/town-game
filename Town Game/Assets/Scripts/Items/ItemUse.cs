@@ -42,8 +42,8 @@ public class ItemUse : MonoBehaviour
     
     void UseItem()
     {
-        if (inventory.hotbar[inventory.equippedSlot].IsNullOrEmpty()) return;
-        Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot]];
+        if (inventory.hotbar[inventory.equippedSlot].ToString().IsNullOrEmpty()) return;
+        Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
         if (item as Weapon)
         {
             Weapon weapon = (Weapon)item;
@@ -57,8 +57,8 @@ public class ItemUse : MonoBehaviour
 
     void UseSecondary()
     {
-        if (inventory.hotbar[inventory.equippedSlot].IsNullOrEmpty()) return;
-        Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot]];
+        if (inventory.hotbar[inventory.equippedSlot].ToString().IsNullOrEmpty()) return;
+        Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
         if (item == null) return;
 
         inventory.itemComponentObject.SendMessage("OnSecondaryUse", SendMessageOptions.DontRequireReceiver);
