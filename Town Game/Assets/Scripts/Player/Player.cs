@@ -100,9 +100,10 @@ public class Player : NetworkBehaviour
             }
             pm.sprintPressed = data.buttons.IsSet(NetworkInputData.Buttons.Sprint);
             // Player inventory
-            if (data.hotbarKey != 0)
+            if (!(data.hotbarKey <= 0))
             {
-                PlayerInventory(data.hotbarKey - 1);
+                Debug.Log(data.hotbarKey);
+                PlayerInventory(data.hotbarKey);
             }
         }
         Simulate();
@@ -115,6 +116,7 @@ public class Player : NetworkBehaviour
             // if (pi.equippedItem.large) return; Do later, if the equipped item is large then return
         }
         pi.EquipItem(slot - 1);
+        if (HasInputAuthority) pi.UpdateHotbarUI();
     }
 
     private void Simulate()

@@ -124,7 +124,7 @@ public class ItemPhys : MonoBehaviour
     }
 
     //[PunRPC]
-    public void AddMetadata(string key, string value)
+    public void AddMetadata(int key, int value)
     {
         itemData.metadata.Add(key, value);
     }

@@ -95,7 +95,6 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     {
         uiSetup = true;
         SetupHotbarUI();
-        EquipItem(0);
         UpdateHotbarUI();
     }
 
@@ -136,7 +135,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         }
     }
 
-    void UpdateHotbarUI()
+    public void UpdateHotbarUI()
     {
         if (!uiSetup) return;
     //    //if (!view.IsMine) return;
@@ -171,7 +170,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         int slot = (int)iv.Get<float>();
         if (slot == 0) return;
         runnerManager.hotbarKey = slot;
-        Debug.Log(slot);
+        Debug.Log("hey");
         //EquipItem(slot-1);
         //UpdateHotbarUI();
     }
@@ -187,12 +186,13 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         if (HasInputAuthority)
         {
             CrosshairManager.instance.RemoveCrosshair(1);
-            largeUI.SetActive(false);
+            if (largeUI != null) largeUI.SetActive(false);
         }
         if (itemComponentObject != null) Destroy(itemComponentObject);
         itemComponentObject = null;
 
         equippedSlot = slot;
+
         if (hotbar[equippedSlot].IsNullOrEmpty()) // If the slot is empty, hide the item and return
         {
             equippedItem = null;
@@ -372,7 +372,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         {
             //itemView.RPC("AddFingerprint", RpcTarget.AllBuffered, player); // Photon syncing
         }
-        foreach (KeyValuePair<string, string> pair in data.metadata)
+        foreach (KeyValuePair<int, int> pair in data.metadata)
         {
             //itemView.RPC("AddMetadata", RpcTarget.AllBuffered, pair.Key, pair.Value);
         }
@@ -381,7 +381,16 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     public void CollectItemData(ItemData data, int itemIndex)
     {
         itemData[itemIndex] = new ItemData();
-        itemData[itemIndex].metadata = data.metadata;
-        itemData[itemIndex].fingerprints = data.fingerprints;
+        itemData[itemIndex].metadata.Clear();
+        itemData[itemIndex].fingerprints.Clear();
+        foreach (KeyValuePair<int, int> pair in data.metadata)
+        {
+            itemData[itemIndex].metadata.Add(pair.Key, pair.Value);
+        }
+
+        foreach (PlayerRef player in data.fingerprints)
+        {
+            itemData[itemIndex].fingerprints.Add(player);
+        }
     }
 }

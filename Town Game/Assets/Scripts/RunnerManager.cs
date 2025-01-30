@@ -70,6 +70,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         data.buttons.Set(NetworkInputData.Buttons.Crouch, crouch);
         data.buttons.Set(NetworkInputData.Buttons.Sprint, sprint);
         data.hotbarKey = hotbarKey;
+        hotbarKey = 0;
 
         input.Set(data);
     }

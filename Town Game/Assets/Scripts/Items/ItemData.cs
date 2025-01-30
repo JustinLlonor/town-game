@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using Fusion;
 
 [System.Serializable]
-public struct ItemData
+public struct ItemData : INetworkStruct
 {
-    public NetworkDictionary<string, string> metadata;
-    public List<PlayerRef> fingerprints;
+    [Networked, Capacity(10)] public NetworkDictionary<int, int> metadata { get; }
+    [Networked, Capacity(20)] public NetworkLinkedList<PlayerRef> fingerprints { get; }
 
-    public ItemData(NetworkDictionary<string, string> metadata, List<PlayerRef> fingerprints)
+    public ItemData(NetworkDictionary<int, int> metadata, NetworkLinkedList<PlayerRef> fingerprints)
     {
         this.metadata = metadata;
         this.fingerprints = fingerprints;
