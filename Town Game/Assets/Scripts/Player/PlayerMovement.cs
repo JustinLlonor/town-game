@@ -164,14 +164,15 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
 
     public override void Render()
     {
-        if (jumpCount > lastJump)
+        if (jumpCount > lastJump) // Sees if the jump count has changed, then sets lastJump to the jump count
         {
             if (!isCrouching)
             {
+                Debug.Log("Jump animaiton");
                 animator.Play("Jump");
                 if (!HasInputAuthority) SoundManager.instance.Play3D("Jump", groundCheck.position);
             }
-            jumpCount = lastJump;
+            lastJump = jumpCount;
         }
 
         foreach (var change in changeDetector.DetectChanges(this))
@@ -252,7 +253,7 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         //if (!(jumpTimer <= 0f)) return;
         if (!stats.ConsumeStamina(jumpStaminaConsumption)) return;
         if (!Runner.IsResimulation && HasInputAuthority) ClientJump();
-        if (!HasInputAuthority) jumpCount++;
+        if (Runner.IsServer) jumpCount++;
         if (isCrouching) rb.AddForce(Vector3.up * jumpHeight * crouchJumpMultiplier, ForceMode.Impulse);
         if (!isCrouching)
         {

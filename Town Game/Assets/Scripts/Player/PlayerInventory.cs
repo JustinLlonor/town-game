@@ -6,6 +6,7 @@ using WebSocketSharp;
 using UnityEngine.UI;
 using Fusion;
 using UnityEngine.InputSystem;
+using static Fusion.NetworkBehaviour;
 //using Photon.Realtime;
 
 // Sync player inventory stuff
@@ -47,6 +48,8 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     int previousSlot;
     bool uiSetup = false;
 
+    ChangeDetector changeDetector;
+
     private void Awake()
     {
         Init();
@@ -67,8 +70,8 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
 
     private void Update()
     {
-        //if (!view.IsMine) return;
         Previous();
+        if (!HasInputAuthority) return;
         if (equippedItem != null) largeUI.SetActive(equippedItem.large);
     }
 
@@ -81,14 +84,28 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
 
     public override void Spawned()
     {
+        changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
         Init();
-        for (int i = 0; i < hotbarLength; i++)
+        if (Runner.IsServer)
         {
-            hotbar.Add("");
+            for (int i = 0; i < hotbarLength; i++) hotbar.Add("");
         }
         itemData = new ItemData[hotbar.Count];
         //for (int i = 0; i < itemData.Length; i++) itemData[i] = null; item data stuff doesn't matter until an item enters that slot
         if (!HasInputAuthority) return;
+    }
+
+    public override void Render()
+    {
+        foreach (var change in changeDetector.DetectChanges(this))
+        {
+            switch (change)
+            {
+                case nameof(equippedSlot):
+                    // Hide and show items on proxies
+                    break;
+            }
+        }
     }
 
     public void Setup()
@@ -178,8 +195,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     **/
     public void EquipItem(int slot, bool selfEquip = false)
     {
-        //if (!view.IsMine) return;
-        if (equippedSlot == slot && !selfEquip) return; // If the player equips the same slot they are holding
+        if (equippedSlot == slot && !selfEquip) return; // If the player equips the same slot they are holding?
         if (HasInputAuthority)
         {
             CrosshairManager.instance.RemoveCrosshair(1);
@@ -226,11 +242,10 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
             animator.SetLayerWeight(layer, 1f);
             equipLayers.Add(layer);
         }
-        // Client side
-        //if (!view.IsMine) return;
-        fps.ShowClientItem(equippedItem);
 
-        return; 
+        // Client side
+        if (!HasInputAuthority) return;
+        fps.ShowClientItem(equippedItem);
     }
 
     // Hides the item by disabling renderers
@@ -238,7 +253,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     {
         sFilter.mesh = null;
         ResetEquipLayers();
-        //if (!view.IsMine) return;
+        if (!HasInputAuthority) return;
         fps.HideClientItem();
     }
 
