@@ -14,10 +14,12 @@ public class Player : NetworkBehaviour
     Transform playerGFX;
     Transform cameraPosition;
     PlayerManager playerManager;
+    RunnerManager rm;
     // To sync the inputs on all other clients
     [Networked] public float camDirection { get; set; }
     [Networked] float camDirectionX { get; set; }
     [Networked] Vector2 direction { get; set; }
+    bool nicknameSet = false;
 
     private void Awake()
     {
@@ -35,14 +37,20 @@ public class Player : NetworkBehaviour
 
     public override void Spawned()
     {
-        if (HasInputAuthority) RPC_SendNickname(SessionData.nickname);
+        rm = FindObjectOfType<RunnerManager>();
         Init?.Invoke();
+        if (!HasInputAuthority) return;
+        RPC_SendNickname(SessionData.nickname);
+        UIManager.instance.OnUIOpen += MenuOpen;
+        UIManager.instance.OnUIClose += MenuClose;
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
     public void RPC_SendNickname(string name)
     {
+        if (nicknameSet) return;
         nickname = name;
+        nicknameSet = true;
     }
 
     private void Update()
@@ -51,20 +59,16 @@ public class Player : NetworkBehaviour
         {
             Prediction();
         }
+    }
 
-        if (!HasInputAuthority) return;
-        /**
-        if (timer <= 0f)
-        {
-            Debug.LogError(simCount);
-            timer = 1f;
-            simCount = 0;
-        } 
-        else
-        {
-            timer -= Time.deltaTime;
-        }
-        **/
+    void MenuOpen()
+    {
+        rm.menu = true;
+    }
+
+    void MenuClose()
+    {
+        rm.menu = false;
     }
 
     public override void FixedUpdateNetwork()

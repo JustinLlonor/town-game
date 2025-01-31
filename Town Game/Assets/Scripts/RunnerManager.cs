@@ -18,6 +18,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
     public bool jump = false;
     public bool crouch = false;
     public bool sprint = false;
+    public bool menu = false;
     public int hotbarKey = 1;
 
     public async void StartGame(GameMode mode, string name, int sceneIndex)
@@ -71,6 +72,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         data.buttons.Set(NetworkInputData.Buttons.Sprint, sprint);
         data.hotbarKey = hotbarKey;
         hotbarKey = 0;
+        data.menu = menu;
 
         input.Set(data);
     }

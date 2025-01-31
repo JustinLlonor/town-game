@@ -317,7 +317,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
             if (equipItem) EquipItem(slot, slot == equippedSlot);
             if (!equipItem) EquipItem(equippedSlot, slot == equippedSlot);
         }
-        UpdateHotbarUI();
+        if (HasInputAuthority) UpdateHotbarUI();
         return slot;
     }
 

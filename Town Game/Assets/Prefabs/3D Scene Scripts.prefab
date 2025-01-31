@@ -44,6 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95bd1018383b0e8429881c3562310534, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _steamID: 
 --- !u!1 &2381419112232006619
 GameObject:
   m_ObjectHideFlags: 0
@@ -575,6 +576,10 @@ PrefabInstance:
       value: 256
       objectReference: {fileID: 0}
     - target: {fileID: 3342184779573511502, guid: 668a749bb83c86446922dfb5701650ab, type: 3}
+      propertyPath: m_Actions
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3342184779573511502, guid: 668a749bb83c86446922dfb5701650ab, type: 3}
       propertyPath: m_DefaultActionMap
       value: Interaction
       objectReference: {fileID: 0}
@@ -598,7 +603,8 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5579229852761029680, guid: 668a749bb83c86446922dfb5701650ab, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

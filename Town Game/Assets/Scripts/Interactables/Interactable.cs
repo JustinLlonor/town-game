@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
+using Fusion;
 
 public class Interactable : MonoBehaviour
 {

@@ -4,15 +4,15 @@ using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//using WebSocketSharp;
+using WebSocketSharp;
 
-public class ItemPhys : MonoBehaviour
+public class ItemPhys : NetworkBehaviour
 {
-    public string itemName;
+    [Networked] public string itemName { get; set; }
+    [Networked] public ItemData itemData { get; set; } = new ItemData();
     public float interactTimer = .5f;
     public Color inspectionColor;
-    public ItemData itemData = new ItemData();
-    bool pickedUp = false;
+    public bool pickedUp = false;
 
     PlayerManager playerManager;
     //PhotonView view;
@@ -20,6 +20,8 @@ public class ItemPhys : MonoBehaviour
     InteractableFinder finder;
     Interactable interactable;
     Item item;
+
+    ChangeDetector changeDetector;
 
     private void Awake()
     {
@@ -49,6 +51,25 @@ public class ItemPhys : MonoBehaviour
         }
     }
 
+    public override void Spawned()
+    {
+        changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
+    }
+
+    public override void Render()
+    {
+        foreach (var change in changeDetector.DetectChanges(this))
+        {
+            switch (change)
+            {
+                case (nameof(itemName)):
+                    RenderItem();
+                    break;
+            }
+                
+        }
+    }
+
     public void InspectItem()
     {
         interactable.hovers[1].interactKey = Interactable.InteractKey.None;
@@ -67,7 +88,7 @@ public class ItemPhys : MonoBehaviour
         //{
         //    fingerprintText = "There seem to be many different smudges and scratches on the object.";
         //}
-        StartCoroutine(RollText(2, fingerprintText));
+        //StartCoroutine(RollText(2, fingerprintText));
 
     }
 
@@ -76,24 +97,23 @@ public class ItemPhys : MonoBehaviour
         if (pickedUp) return;
         PlayerInventory inventory = playerManager.currentPlayer.GetComponent<PlayerInventory>();
         string eName = inventory.hotbar[inventory.equippedSlot].ToString();
-        //if (!eName.IsNullOrEmpty())
-        //{
-        //    Item item = om.itemSearch[inventory.hotbar[inventory.equippedSlot]];
-        //    if (item.large)
-        //    {
-        //        finder.iValid = false;
-        //        return;
-        //    }
-        //}
-        //if (inventory.IsInventoryFull()) return;
-        //int givenSlot = inventory.GiveItem(itemName, true);
-        //if (givenSlot == -1) return;
-        //inventory.CollectItemData(itemData, givenSlot);
+        if (!eName.IsNullOrEmpty())
+        {
+            Item item = om.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
+            if (item.large)
+            {
+                finder.iValid = false;
+                return;
+            }
+        }
+        int givenSlot = inventory.GiveItem(itemName, true);
+        if (givenSlot == -1) return; // If inventory is full, return
+        inventory.CollectItemData(itemData, givenSlot);
         //view.TransferOwnership(PhotonNetwork.LocalPlayer);
         //view.RPC("RemoveItem", view.Owner);
-        //pickedUp = true;
-        //gameObject.GetComponent<MeshRenderer>().enabled = false;
-        //gameObject.GetComponent<Interactable>().canInteract = false;
+        pickedUp = true;
+        gameObject.GetComponent<MeshRenderer>().enabled = false;
+        gameObject.GetComponent<Interactable>().canInteract = false;
     }
 
     //[PunRPC]
@@ -107,6 +127,10 @@ public class ItemPhys : MonoBehaviour
     {
         gameObject.GetComponent<Interactable>().hovers[0].lore = "Pick up";
         item = FindObjectOfType<ObjectManager>().itemSearch[itemName];
+    }
+
+    public void RenderItem()
+    {
         gameObject.GetComponent<MeshFilter>().mesh = item.mesh;
         gameObject.GetComponent<MeshRenderer>().material.SetTexture("_MainTex", item.texture);
         gameObject.GetComponent<MeshCollider>().sharedMesh = item.mesh;

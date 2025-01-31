@@ -4,8 +4,9 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Fusion;
 
-public class InteractableFinder : MonoBehaviour
+public class InteractableFinder : NetworkBehaviour
 {
     [Header("Masks")]
     public LayerMask interactableMask;
@@ -19,24 +20,37 @@ public class InteractableFinder : MonoBehaviour
 
     [HideInInspector] public bool iValid = true;
     [HideInInspector] public Interactable currentInteraction;
+    [HideInInspector] public Player player;
+    [HideInInspector] public Transform trackedTransform;
+    [HideInInspector] public Rigidbody rb;
     GameObject currentInteractable = null;
     float timer = 0f;
-    bool currentPressed = false;
+    [Networked] float serverTimer { get; set; } // Interaction timer on the server
+    [Networked] int interactPressed { get; set; } // Interaction key that is pressed
+    [Networked] bool currentPressed { get; set; } = false; // If the thing is currently pressed
     List<int> trackedIndexes = new List<int>();
+    Vector3 forwardDirection;
+    bool menuData = false;
 
-    private void Start()
+    public override void Spawned()
     {
-        UIManager.instance.OnUIOpen += ResetInteractions;
+        if (IsProxy) Destroy(this);
+        if (HasInputAuthority) UIManager.instance.OnUIOpen += ResetInteractions;
+        iui = FindObjectOfType<InteractableUI>();
     }
 
-    private void Update()
+    public override void FixedUpdateNetwork()
     {
-        if (!UIManager.instance.uiOpened) CastRay();
-    }
-
-    private void FixedUpdate()
-    {
-        UpdateTracking();
+        if (GetInput(out NetworkInputData data))
+        {
+            menuData = data.menu;
+            forwardDirection = Quaternion.Euler(data.camDirectionX, data.camDirection, 0f) * Vector3.forward; // orientation/camDirection is mouse x
+            if (!Runner.IsResimulation)
+            {
+                if (!menuData) CastRay(); // If the menu isn't open for the player, cast a ray
+                UpdateTracking();
+            }
+        }
     }
 
     private void OnInteract1(InputValue iv)
@@ -74,27 +88,31 @@ public class InteractableFinder : MonoBehaviour
 
     void CastRay()
     {
+        Vector3 trackedPosition = new Vector3(rb.position.x, trackedTransform.position.y, rb.position.z);
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.forward, out hit, range, (int)interactableMask))
+        if (Physics.Raycast(trackedPosition, forwardDirection, out hit, range, (int)interactableMask)) // Raycast interactable
         {
             RaycastHit eHit;
-            if (Physics.Raycast(transform.position, transform.forward, out eHit, range, (int)environmentMask))
+            if (Physics.Raycast(trackedPosition, forwardDirection, out eHit, range, (int)environmentMask))
             {
-                if (eHit.distance < hit.distance)
+                if (eHit.distance < hit.distance) // Raycast environment, if the environment blocks the interactable, reset interactions and stop
                 {
                     ResetInteractions();
                     return;
                 }
             }
-            if (hit.collider.gameObject != currentInteractable)
+            if (hit.collider.gameObject != currentInteractable) // Executes if we are looking at an interactable
             {
-                if (!hit.collider.gameObject.GetComponent<Interactable>().canInteract) return;
-                if (currentInteraction != null) currentInteraction.UnglowMaterials();
+                if (!hit.collider.gameObject.GetComponent<Interactable>().canInteract) return; // Can't interact, return
+                if (currentInteraction != null && HasInputAuthority) currentInteraction.UnglowMaterials(); // Stop making the materials glow
                 currentInteractable = hit.collider.gameObject;
                 currentInteraction = currentInteractable.GetComponent<Interactable>();
                 DisplayInteraction(currentInteraction);
-                CrosshairManager.instance.AddCrosshair(0, 0);
-                currentInteraction.GlowMaterials();
+                if (HasInputAuthority)
+                {
+                    CrosshairManager.instance.AddCrosshair(0, 0);
+                    currentInteraction.GlowMaterials();
+                }
                 return;
             }
             return;
@@ -104,12 +122,15 @@ public class InteractableFinder : MonoBehaviour
 
     public void ResetInteractions()
     {
-        if (currentInteraction != null) currentInteraction.UnglowMaterials();
+        if (currentInteraction != null && HasInputAuthority) currentInteraction.UnglowMaterials();
+        serverTimer = 0f;
         currentInteractable = null;
         currentInteraction = null;
+
+        if (!HasInputAuthority) return; // Client interaction reset
         StopAllCoroutines();
-        timer = 0f;
-        iui.StopHighlight();
+        timer = 0f; // Client timer
+        iui.StopHighlight(); // UI
         iui.ClearInteractions();
         trackedIndexes.Clear();
         CrosshairManager.instance.RemoveCrosshair(0);
@@ -162,9 +183,14 @@ public class InteractableFinder : MonoBehaviour
         timer = 0f;
         iui.StopHighlight();
     }
-
+    
+    /// <summary>
+    /// Displays the interaction text on the UI
+    /// </summary>
+    /// <param name="inter"></param>
     void DisplayInteraction(Interactable inter)
     {
+        if (!HasInputAuthority) return;
         // Sets to lore of interaction
         Interactable.Hover[] hovers = inter.hovers;
         iui.ClearInteractions();
@@ -191,8 +217,12 @@ public class InteractableFinder : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Updates the lore for the interactable
+    /// </summary>
     void UpdateTracking()
     {
+        if (!HasInputAuthority) return;
         if (currentInteraction == null || trackedIndexes.Count == 0) return;
         Interactable.Hover[] hovers = currentInteraction.hovers;
         foreach (int i in trackedIndexes)

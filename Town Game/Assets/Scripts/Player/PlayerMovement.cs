@@ -99,6 +99,8 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
     Vector3 moveDirection;
     Vector3 slopeDirection;
     Vector3 groundCheckOffset;
+    Vector3 standOffset;
+    Vector3 crouchOffset;
     IEnumerator currentCamLerp;
 
     // Client Feedback
@@ -111,6 +113,8 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
     private void Awake()
     {
         groundCheckOffset = groundCheck.localPosition;
+        standOffset = standPos.localPosition;
+        crouchOffset = crouchPos.localPosition;
         no = gameObject.GetComponent<NetworkObject>();
         //view = gameObject.GetComponent<PhotonView>();
         playerManager = FindObjectOfType<PlayerManager>();
@@ -312,7 +316,7 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         }
         crouchMinus = crouchMultiplier;
         itemComponentHolder.position = crouchPos.position;
-        if (HasInputAuthority && !Runner.IsResimulation) StartCamLerp(cameraPosition, crouchPos);
+        if (!Runner.IsResimulation) StartCamLerp(cameraPosition, crouchOffset);
     }
 
     public void ExitCrouch()
@@ -326,11 +330,11 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         if (!CanUncrouch()) return;
         crouchMinus = 1f;
         itemComponentHolder.position = standPos.position;
-        if (HasInputAuthority && !Runner.IsResimulation) StartCamLerp(cameraPosition, standPos);
+        if (!Runner.IsResimulation) StartCamLerp(cameraPosition, standOffset);
         isCrouching = false;
     }
 
-    void StartCamLerp(Transform from, Transform to)
+    void StartCamLerp(Transform from, Vector3 to)
     {
         if (currentCamLerp != null)
         {
@@ -340,9 +344,16 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         StartCoroutine(currentCamLerp);
     }
 
-    IEnumerator LerpCamPos(Transform from, Transform to)
+    /// <summary>
+    /// Takes a transform and lerps it to a local player position
+    /// </summary>
+    /// <param name="from"></param>
+    /// <param name="to"></param>
+    /// <returns></returns>
+    IEnumerator LerpCamPos(Transform from, Vector3 to)
     {
         Transform newFrom = Instantiate(from.gameObject, from.parent).transform;
+        Vector3 toPosition = rb.position + to;
         StartCoroutine(LifeTimer(newFrom.gameObject));
         float lerpTime = 0f;
         float lerpMax = crouchTime;
@@ -351,11 +362,11 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
             yield return null;
             float lerpPercent = lerpTime / lerpMax;
             lerpPercent = crouchCurve.Evaluate(lerpPercent);
-            Vector3 newPos = Vector3.Lerp(newFrom.position, to.position, lerpPercent);
+            Vector3 newPos = Vector3.Lerp(newFrom.position, toPosition, lerpPercent);
             cameraPosition.position = newPos;
             lerpTime += Time.deltaTime;
         }
-        cameraPosition.position = to.position;
+        cameraPosition.position = toPosition;
     }
 
     IEnumerator LifeTimer(GameObject obj)

@@ -16,4 +16,5 @@ public struct NetworkInputData : INetworkInput
     public float camDirectionX;
     public Vector2Compressed direction;
     public int hotbarKey;
+    public NetworkBool menu;
 }

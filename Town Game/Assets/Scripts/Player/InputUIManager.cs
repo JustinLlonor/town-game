@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Fusion;
 
 // For disabling and enabling input
 public class InputUIManager : MonoBehaviour
@@ -9,9 +10,15 @@ public class InputUIManager : MonoBehaviour
     public bool disableOnUI = true;
     PlayerInput playerInput;
     CameraManager cameraManager;
+    NetworkObject no;
 
     private void Awake()
     {
+        no = GetComponentInParent<NetworkObject>();
+        if (no != null)
+        {
+            if (!no.HasInputAuthority) Destroy(this);
+        }
         playerInput = gameObject.GetComponent<PlayerInput>();
         cameraManager = FindObjectOfType<CameraManager>();
         cameraManager.OnSwitchCameraMode += OnCameraChangedMode;
@@ -19,10 +26,6 @@ public class InputUIManager : MonoBehaviour
 
     private void Start()
     {
-        //if (gameObject.GetComponent<PhotonView>() != null)
-        //{
-        //    if (!gameObject.GetComponent<PhotonView>().IsMine) return;
-        //}
         UIManager.instance.OnUIOpen += DisableInputs;
         UIManager.instance.OnUIClose += EnableInputs;
     }
