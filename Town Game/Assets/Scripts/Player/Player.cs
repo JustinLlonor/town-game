@@ -114,14 +114,13 @@ public class Player : NetworkBehaviour
 
     void CrouchSet(bool crouchPressed)
     {
+        if (!crouchPressed) pm.ExitCrouch();
         if (crouchPressed == previousCrouchSet) return; // If they don't need to change, return
         previousCrouchSet = crouchPressed;
         if (crouchPressed)
         {
             pm.EnterCrouch();
-            return;
         }
-        pm.ExitCrouch();
     }
 
     private void PlayerInventory(int slot)

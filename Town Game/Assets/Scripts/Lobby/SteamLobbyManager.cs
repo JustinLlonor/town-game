@@ -69,10 +69,6 @@ public class SteamLobbyManager : MonoBehaviour
     {
         sm = FindObjectOfType<ServerManager>();
         runner = FindObjectOfType<NetworkRunner>();
-        if (!SteamManager.Initialized) return;
-        ulong steamID = Convert.ToUInt64(sm.steamID);
-        Debug.Log("Joining Steam lobby: " + steamID);
-        SteamMatchmaking.JoinLobby((CSteamID)steamID);
     }
 
     private void Update()

@@ -957,7 +957,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   _isCrouching: 0
-  playerRadius: 0.19
+  playerRadius: 0.21
   uncrouchCastUpper: {fileID: 477552824089262698}
   uncrouchCastLower: {fileID: 106252941851045372}
   standingColliders:
@@ -967,7 +967,7 @@ MonoBehaviour:
   - {fileID: 847193838002151960}
   - {fileID: 5432845057157182992}
   stepHeight: 0.3
-  stepSmooth: 20
+  stepSmooth: 30
   stepDistance: 0.1
   stepRayLower: {fileID: 6757060838315044995}
   stepRayUpper: {fileID: 6393881673779276614}
