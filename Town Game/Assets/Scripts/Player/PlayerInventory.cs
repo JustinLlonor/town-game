@@ -13,6 +13,8 @@ using static Fusion.NetworkBehaviour;
 public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
 {
     [Networked] public int equippedSlot { get; set; } // To be synced, along with item show functions
+    [Networked] bool reequipTick { get; set; }
+    bool previousReequip;
     [Header("Hotbar")]
     public int hotbarLength = 4;
     [Networked, Capacity(4)]public NetworkLinkedList<NetworkString<_32>> hotbar { get; } // To be synced
@@ -102,7 +104,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
             switch (change)
             {
                 case nameof(equippedSlot):
-                    // Hide and show items on proxies
+                    
                     break;
             }
         }
@@ -119,8 +121,16 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     {
         if (previousSlot != equippedSlot)
         {
-            //OnUnequip(previousSlot);
             previousSlot = equippedSlot;
+        }
+        if (previousReequip != reequipTick)
+        {
+            if (HasInputAuthority)
+            {
+                EquipItem(equippedSlot, true);
+                UpdateHotbarUI();
+            }
+            previousReequip = reequipTick;
         }
     }
 
@@ -297,18 +307,16 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     /// </summary>
     /// <param name="itemName">Name of item</param>
     /// <param name="slot">Slot to put item in, automatically finds a slot by default</param>
-    //[PunRPC]
     public int GiveItem(string itemName, bool equipItem = false, int slot = -1)
     {
         int emptySlot;
         if (IsInventoryFull(out emptySlot))
         {
-            Debug.LogError("Inventory is full!");
             return -1;
         }
         if (slot == -1)
         {
-            slot = emptySlot;
+            slot = emptySlot; // Given slot
         }
         if (!hotbar[slot].ToString().IsNullOrEmpty()) return -1;
         if (itemManager.itemSearch.ContainsKey(itemName))
@@ -316,6 +324,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
             hotbar.Set(slot, itemName);
             if (equipItem) EquipItem(slot, slot == equippedSlot);
             if (!equipItem) EquipItem(equippedSlot, slot == equippedSlot);
+            if (Runner.IsServer) reequipTick = !reequipTick;
         }
         if (HasInputAuthority) UpdateHotbarUI();
         return slot;

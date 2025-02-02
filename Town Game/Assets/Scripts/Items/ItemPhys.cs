@@ -3,16 +3,18 @@
 using Fusion;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using WebSocketSharp;
 
 public class ItemPhys : NetworkBehaviour
 {
-    [Networked] public string itemName { get; set; }
+    [Networked] public NetworkString<_32> itemName { get; set; }
     [Networked] public ItemData itemData { get; set; } = new ItemData();
     public float interactTimer = .5f;
     public Color inspectionColor;
-    public bool pickedUp = false;
+    [Networked] public bool pickedUp { get; set; }
+    [Networked] public PlayerRef pickedPlayer { get; set; }
 
     PlayerManager playerManager;
     //PhotonView view;
@@ -26,7 +28,7 @@ public class ItemPhys : NetworkBehaviour
     private void Awake()
     {
         finder = FindObjectOfType<InteractableFinder>();
-        //playerManager = FindObjectOfType<PlayerManager>();
+        playerManager = FindObjectOfType<PlayerManager>();
         //view = gameObject.GetComponent<PhotonView>();
         om = FindObjectOfType<ObjectManager>();
         interactable = gameObject.GetComponent<Interactable>();
@@ -68,6 +70,11 @@ public class ItemPhys : NetworkBehaviour
             }
                 
         }
+
+        if (HasInputAuthority)
+        {
+            interactable.canInteract = !pickedUp;
+        }
     }
 
     public void InspectItem()
@@ -107,12 +114,14 @@ public class ItemPhys : NetworkBehaviour
                 return;
             }
         }
-        int givenSlot = inventory.GiveItem(itemName, true);
+        int givenSlot = inventory.GiveItem(itemName.ToString(), true);
         if (givenSlot == -1) return; // If inventory is full, return
         inventory.CollectItemData(itemData, givenSlot);
         pickedUp = true;
+        pickedPlayer = player;
         gameObject.GetComponent<MeshRenderer>().enabled = false;
         gameObject.GetComponent<Interactable>().canInteract = false;
+        if (HasStateAuthority) Runner.Despawn(Object);
     }
 
     //[PunRPC]
@@ -125,13 +134,12 @@ public class ItemPhys : NetworkBehaviour
     public void CreateItem()
     {
         gameObject.GetComponent<Interactable>().hovers[0].lore = "Pick up";
-        item = FindObjectOfType<ObjectManager>().itemSearch[itemName];
+        item = FindObjectOfType<ObjectManager>().itemSearch[itemName.ToString()];
     }
 
     public void RenderItem()
     {
         if (item == null) return;
-        Debug.Log("Rendering");
         gameObject.GetComponent<MeshFilter>().mesh = item.mesh;
         gameObject.GetComponent<MeshRenderer>().material.SetTexture("_MainTex", item.texture);
         gameObject.GetComponent<MeshCollider>().sharedMesh = item.mesh;

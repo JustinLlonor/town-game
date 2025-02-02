@@ -274,6 +274,14 @@ public class InteractableFinder : NetworkBehaviour
             {
                 localTimer += Time.deltaTime;
                 iui.SetHighlight(interaction, localTimer / h.delay);
+                if (localTimer >= h.delay)
+                {
+                    if (!clientActed)
+                    {
+                        h.networkSettings.clientAction.Invoke();
+                        clientActed = true; // Client actions
+                    }
+                }
             }
             else
             {
