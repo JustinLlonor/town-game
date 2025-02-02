@@ -172,7 +172,6 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         {
             if (!isCrouching)
             {
-                Debug.Log("Jump animaiton");
                 animator.Play("Jump");
                 if (!HasInputAuthority) SoundManager.instance.Play3D("Jump", groundCheck.position);
             }
@@ -315,8 +314,7 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
             isSprinting = false;
         }
         crouchMinus = crouchMultiplier;
-        itemComponentHolder.position = crouchPos.position;
-        if (!Runner.IsResimulation) StartCamLerp(cameraPosition, crouchOffset);
+        if (!Runner.IsResimulation) StartCamLerp(cameraPosition, crouchPos, crouchOffset);
     }
 
     public void ExitCrouch()
@@ -329,31 +327,29 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         if (!isCrouching) return;
         if (!CanUncrouch()) return;
         crouchMinus = 1f;
-        itemComponentHolder.position = standPos.position;
-        if (!Runner.IsResimulation) StartCamLerp(cameraPosition, standOffset);
+        if (!Runner.IsResimulation) StartCamLerp(cameraPosition, standPos, standOffset);
         isCrouching = false;
     }
 
-    void StartCamLerp(Transform from, Vector3 to)
+    void StartCamLerp(Transform from, Transform to, Vector3 toRb)
     {
         if (currentCamLerp != null)
         {
             StopCoroutine(currentCamLerp);
         }
-        currentCamLerp = LerpCamPos(from, to);
+        currentCamLerp = LerpCamPos(from, to, toRb);
         StartCoroutine(currentCamLerp);
     }
 
     /// <summary>
-    /// Takes a transform and lerps it to a local player position
+    /// Takes a transform and lerps it to a local player position, toRb is the networked rigidbody position
     /// </summary>
     /// <param name="from"></param>
     /// <param name="to"></param>
     /// <returns></returns>
-    IEnumerator LerpCamPos(Transform from, Vector3 to)
+    IEnumerator LerpCamPos(Transform from, Transform to, Vector3 toRb)
     {
         Transform newFrom = Instantiate(from.gameObject, from.parent).transform;
-        Vector3 toPosition = rb.position + to;
         StartCoroutine(LifeTimer(newFrom.gameObject));
         float lerpTime = 0f;
         float lerpMax = crouchTime;
@@ -362,11 +358,14 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
             yield return null;
             float lerpPercent = lerpTime / lerpMax;
             lerpPercent = crouchCurve.Evaluate(lerpPercent);
-            Vector3 newPos = Vector3.Lerp(newFrom.position, toPosition, lerpPercent);
+            Vector3 newPos = Vector3.Lerp(newFrom.position, to.position, lerpPercent); // Transform position and rb position are different
+            Vector3 newPosHolder = Vector3.Lerp(newFrom.position, rb.position + toRb, lerpPercent);
             cameraPosition.position = newPos;
+            itemComponentHolder.position = newPosHolder;
             lerpTime += Time.deltaTime;
         }
-        cameraPosition.position = toPosition;
+        cameraPosition.position = to.position;
+        itemComponentHolder.position = rb.position + toRb;
     }
 
     IEnumerator LifeTimer(GameObject obj)

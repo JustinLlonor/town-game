@@ -17,4 +17,7 @@ public struct NetworkInputData : INetworkInput
     public Vector2Compressed direction;
     public int hotbarKey;
     public NetworkBool menu;
+
+    public NetworkBool interactPressed;
+    public int interaction;
 }

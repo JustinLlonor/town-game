@@ -11,6 +11,7 @@ public class Player : NetworkBehaviour
     public int simulationTickDistance = 2;
     [HideInInspector] public PlayerMovement pm;
     [HideInInspector] public PlayerInventory pi;
+    public InteractableFinder inf;
     Transform playerGFX;
     Transform cameraPosition;
     PlayerManager playerManager;
@@ -108,6 +109,11 @@ public class Player : NetworkBehaviour
             {
                 PlayerInventory(data.hotbarKey);
             }
+            // Interactable Finder
+            inf.menuData = data.menu;
+            inf.forwardDirection = Quaternion.Euler(data.camDirectionX, data.camDirection, 0f) * Vector3.forward; // orientation/camDirection is mouse x
+            inf.currentKey = (Interactable.InteractKey)data.interaction;
+            inf.currentPressed = data.interactPressed;
         }
         Simulate();
     }

@@ -20,11 +20,19 @@ public class Interactable : MonoBehaviour
     {
         public string lore;
         public InteractKey interactKey;
+        public UnityEvent action;
         public Color color = Color.white;
         public float delay;
-        public UnityEvent action;
         public bool trackLore = false;
         public bool trackColor = false;
+        public NetworkSettings networkSettings;
+
+        [Serializable]
+        public class NetworkSettings
+        {
+            public bool networked = false;
+            public UnityEvent clientAction;
+        }
     }
 
     private void OnDestroy()

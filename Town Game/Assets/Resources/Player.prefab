@@ -172,7 +172,7 @@ GameObject:
   - component: {fileID: 5159080065833086584}
   - component: {fileID: 6452414919005105157}
   m_Layer: 6
-  m_Name: Camera Position
+  m_Name: Item Component Holder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -190,7 +190,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 1.637, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 4465183557156050638}
   m_Father: {fileID: 5522855053688399310}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6307447400546101972
@@ -252,6 +253,7 @@ MonoBehaviour:
   player: {fileID: 9069154022521576282}
   trackedTransform: {fileID: 8806967224018203518}
   rb: {fileID: 2546787659200004203}
+  _timerRunning: 0
 --- !u!114 &5159080065833086584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -585,7 +587,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3732753293932338788}
   m_Layer: 6
-  m_Name: Item Component Holder
+  m_Name: Camera Position
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -711,6 +713,7 @@ MonoBehaviour:
   simulationTickDistance: 2
   pm: {fileID: 6160271850420175375}
   pi: {fileID: 1106844264840172896}
+  inf: {fileID: 8489816749943817623}
   _camDirection: 0
 --- !u!114 &2540704478665164047
 MonoBehaviour:
@@ -737,8 +740,8 @@ MonoBehaviour:
   - {fileID: 7478806533832175603}
   - {fileID: 873785079005984450}
   - {fileID: 8314741821198590847}
-  - {fileID: 991788123578228062}
   - {fileID: 8489816749943817623}
+  - {fileID: 991788123578228062}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &2442258754578231911
 MonoBehaviour:
@@ -974,11 +977,11 @@ MonoBehaviour:
   aniSpeedFactor: 1.6
   headAim: {fileID: 854407532444519849}
   graphics: {fileID: 1342524613149204641}
-  cameraPosition: {fileID: 8806967224018203518}
+  cameraPosition: {fileID: 3732753293932338788}
   standPos: {fileID: 6575205651289647044}
   crouchPos: {fileID: 884615722293357098}
   orientation: {fileID: 7162067020350182232}
-  itemComponentHolder: {fileID: 3732753293932338788}
+  itemComponentHolder: {fileID: 8806967224018203518}
   horizontalMovement: 0
   verticalMovement: 0
   _isMoving: 0
@@ -2525,7 +2528,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4465183557156050638}
   - {fileID: 3627863261363966554}
   m_Father: {fileID: 6067828109587796757}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3125,12 +3127,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6144801191825045227}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0.00047994728, y: -0.000000119209204, z: -5.7214497e-11, w: 0.99999994}
+  m_LocalPosition: {x: 0, y: -0.5276536, z: 0.0071543828}
+  m_LocalScale: {x: 100, y: 100.00002, z: 100.00002}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 3369263236979518758}
+  m_Father: {fileID: 8806967224018203518}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &4049416290977594736
 BoxCollider:
@@ -3151,8 +3153,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.003627437, y: 0.008331908, z: 0.0020808089}
-  m_Center: {x: 0.000019258112, y: 0.00090811314, z: 0.000039152408}
+  m_Size: {x: 0.003, y: 0.004005205, z: 0.0020808089}
+  m_Center: {x: 0.000019258112, y: 0.004558505, z: 0.000039152343}
 --- !u!114 &5858100474516846259
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3169,31 +3171,40 @@ MonoBehaviour:
   hovers:
   - lore: Nickname
     interactKey: 0
+    action:
+      m_PersistentCalls:
+        m_Calls: []
     color: {r: 1, g: 1, b: 1, a: 0}
     delay: 0
-    action:
-      m_PersistentCalls:
-        m_Calls: []
     trackLore: 0
     trackColor: 0
+    networkSettings:
+      networked: 0
+      playOnClient: 0
   - lore: Healthy
     interactKey: 0
+    action:
+      m_PersistentCalls:
+        m_Calls: []
     color: {r: 0.30865914, g: 1, b: 0.28773582, a: 0}
     delay: 0
-    action:
-      m_PersistentCalls:
-        m_Calls: []
     trackLore: 1
     trackColor: 1
+    networkSettings:
+      networked: 0
+      playOnClient: 0
   - lore: Sane
     interactKey: 0
-    color: {r: 0.29045033, g: 0.37188497, b: 0.5754717, a: 1}
-    delay: 0
     action:
       m_PersistentCalls:
         m_Calls: []
+    color: {r: 0.29045033, g: 0.37188497, b: 0.5754717, a: 1}
+    delay: 0
     trackLore: 1
     trackColor: 1
+    networkSettings:
+      networked: 0
+      playOnClient: 0
   glow: 0
   renderers: []
   glowAmount: 1
@@ -3550,10 +3561,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 3732753293932338788}
   - {fileID: 8806967224018203518}
   - {fileID: 6575205651289647044}
   - {fileID: 884615722293357098}
-  - {fileID: 3732753293932338788}
   m_Father: {fileID: 1317372394872903684}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7182566175449430168

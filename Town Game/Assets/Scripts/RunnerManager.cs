@@ -20,6 +20,8 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
     public bool sprint = false;
     public bool menu = false;
     public int hotbarKey = 1;
+    public bool interactionPressed = false;
+    public int interactionKey = 0;
 
     public async void StartGame(GameMode mode, string name, int sceneIndex)
     {
@@ -63,6 +65,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         var data = new NetworkInputData();
 
+        // Movement
         data.direction = moveDirection;
         data.camDirection = orientation;
         data.camDirectionX = camOrientation;
@@ -70,9 +73,14 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         jump = false;
         data.buttons.Set(NetworkInputData.Buttons.Crouch, crouch);
         data.buttons.Set(NetworkInputData.Buttons.Sprint, sprint);
+        // Hotbar
         data.hotbarKey = hotbarKey;
         hotbarKey = 0;
+        // Menu
         data.menu = menu;
+        // Interactables
+        data.interactPressed = interactionPressed;
+        data.interaction = interactionKey;
 
         input.Set(data);
     }

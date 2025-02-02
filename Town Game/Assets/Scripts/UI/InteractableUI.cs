@@ -91,6 +91,13 @@ public class InteractableUI : MonoBehaviour
         StopAllCoroutines();
     }
 
+    public void SetHighlight(Transform interaction, float percent)
+    {
+        if (interacted != interaction) interacted = interaction;
+        RectTransform img = (RectTransform)interaction.GetChild(0);
+        img.sizeDelta = new Vector2(img.sizeDelta.x, percent * fillHeight);
+    }
+
     IEnumerator HighlightAnimation(Transform interaction, float interactionTime)
     {
         float timer = 0f;
