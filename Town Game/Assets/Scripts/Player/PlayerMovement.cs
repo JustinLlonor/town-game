@@ -50,8 +50,8 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
     public Transform stepRayUpper;
 
     [Header("Fall")]
-    public float fallDamageMultiplier = 1f;
-    public float mercyDistance = 3f;
+    public float fallDamageMultiplier = 3f;
+    public float mercyDistance = 5f;
     public Shake softFall;
     public Shake hardFall;
 
@@ -498,9 +498,9 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
                 if (isCrouching)
                 {
                     if (!CanUncrouch()) return;
+                    ExitCrouch();
                 }
                 stats.staminaRegenCooldown = sprintStaminaRegenCooldown;
-                ExitCrouch();
                 isSprinting = true;
             }
             else

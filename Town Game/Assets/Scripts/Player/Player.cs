@@ -21,6 +21,7 @@ public class Player : NetworkBehaviour
     [Networked] float camDirectionX { get; set; }
     [Networked] Vector2 direction { get; set; }
     bool nicknameSet = false;
+    bool previousCrouchSet = false;
 
     private void Awake()
     {
@@ -95,14 +96,7 @@ public class Player : NetworkBehaviour
             {
                 pm.Jump();
             }
-            if (data.buttons.IsSet(NetworkInputData.Buttons.Crouch))
-            {
-                pm.EnterCrouch();
-            }
-            else
-            {
-                pm.ExitCrouch();
-            }
+            CrouchSet(data.buttons.IsSet(NetworkInputData.Buttons.Crouch)); // Crouching stuff, executes functions on first press
             pm.sprintPressed = data.buttons.IsSet(NetworkInputData.Buttons.Sprint);
             // Player inventory
             if (!(data.hotbarKey <= 0))
@@ -116,6 +110,18 @@ public class Player : NetworkBehaviour
             inf.currentPressed = data.interactPressed;
         }
         Simulate();
+    }
+
+    void CrouchSet(bool crouchPressed)
+    {
+        if (crouchPressed == previousCrouchSet) return; // If they don't need to change, return
+        previousCrouchSet = crouchPressed;
+        if (crouchPressed)
+        {
+            pm.EnterCrouch();
+            return;
+        }
+        pm.ExitCrouch();
     }
 
     private void PlayerInventory(int slot)
