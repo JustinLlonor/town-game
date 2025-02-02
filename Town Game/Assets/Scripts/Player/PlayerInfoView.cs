@@ -31,7 +31,7 @@ public class PlayerInfoView : NetworkBehaviour
         //if (!view.IsMine) return;
         if (no.HasInputAuthority)
         {
-            transform.GetComponent<BoxCollider>().enabled = false;
+            transform.GetComponent<Collider>().enabled = false;
         }
     }
    

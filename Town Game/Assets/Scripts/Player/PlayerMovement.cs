@@ -164,6 +164,10 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         airSpeed = speed;
         jumpCount = lastJump;
         changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
+        if (IsProxy)
+        {
+            ProxyCrouchLerp();
+        }
     }
 
     public override void Render()
@@ -184,6 +188,7 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
             {
                 case nameof(isCrouching):
                     ChangeCrouchHitboxes(isCrouching);
+                    ProxyCrouchLerp(); // Changes the stat position for proxies
                     break;
             }
         }
@@ -383,6 +388,19 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
     {
         SetColliders(crouchingColliders, enabled);
         SetColliders(standingColliders, !enabled);
+    }
+
+    void ProxyCrouchLerp()
+    {
+        if (!IsProxy) return;
+        if (isCrouching)
+        {
+            StartCamLerp(cameraPosition, crouchPos, crouchOffset);
+        } 
+        else
+        {
+            StartCamLerp(cameraPosition, standPos, standOffset);
+        }
     }
 
     void SetColliders(Collider[] colliders, bool isActive)

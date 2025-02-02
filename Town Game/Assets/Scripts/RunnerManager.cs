@@ -23,6 +23,8 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
     public bool interactionPressed = false;
     public int interactionKey = 0;
 
+    PlayerManager pm;
+
     public async void StartGame(GameMode mode, string name, int sceneIndex)
     {
         // Create the Fusion runner and let it know that we will be providing user input
@@ -52,12 +54,12 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         });
     }
 
-    // Finds the player manager and spawns the player
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
         if (runner.IsServer)
         {
-            FindObjectOfType<PlayerManager>().SpawnPlayer(runner, player);
+            pm = FindObjectOfType<PlayerManager>();
+            pm.SpawnPlayer(runner, player); // Adds a new player when a player joins
         }
     }
 
@@ -88,6 +90,15 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
         if (nRunner.LocalPlayer == player) SteamMatchmaking.LeaveLobby((CSteamID)SessionData.steamIdLobby); // Leaves steam lobby
+        if (runner.IsServer)
+        {
+            pm.RemovePlayer(player); // annihalates the palyer
+        }
+    }
+
+    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
+    {
+
     }
 
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
@@ -95,7 +106,6 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
     public void OnConnectedToServer(NetworkRunner runner) { }
-    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { }
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }

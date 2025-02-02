@@ -135,6 +135,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 3112396975348243436}
+  - {fileID: 4393661128077201535}
   ForceRemoteRenderTimeframe: 0
 --- !u!1 &9196370192044856765
 GameObject:
@@ -460,6 +461,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7795883315039441122, guid: 00b86e8be9c97a24e98cfbdeab7f72cf, type: 3}
   m_PrefabInstance: {fileID: 6663416099428915247}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4393661128077201535 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6953661347052619856, guid: 00b86e8be9c97a24e98cfbdeab7f72cf, type: 3}
+  m_PrefabInstance: {fileID: 6663416099428915247}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38b8182a1f2d2a2438ddfbdb8a89e85f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &8582622432131805566
 PrefabInstance:
   m_ObjectHideFlags: 0

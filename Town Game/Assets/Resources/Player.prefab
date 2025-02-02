@@ -254,6 +254,10 @@ MonoBehaviour:
   trackedTransform: {fileID: 8806967224018203518}
   rb: {fileID: 2546787659200004203}
   _timerRunning: 0
+  currentPressed: 0
+  currentKey: 0
+  forwardDirection: {x: 0, y: 0, z: 0}
+  menuData: 0
 --- !u!114 &5159080065833086584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -636,7 +640,6 @@ GameObject:
   - component: {fileID: 4000725801890306170}
   - component: {fileID: 3145977071549816313}
   - component: {fileID: 4262745249595203894}
-  - component: {fileID: 4613987656612589359}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -1229,18 +1232,6 @@ MonoBehaviour:
   roomMask:
     serializedVersion: 2
     m_Bits: 16384
---- !u!114 &4613987656612589359
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1787190705143953567}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a8a1e8986c0e8443a1ac52cc6f4f05d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &2255715054737852972
 GameObject:
   m_ObjectHideFlags: 0
@@ -3109,7 +3100,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4465183557156050638}
-  - component: {fileID: 4049416290977594736}
+  - component: {fileID: 4753551060298632716}
   - component: {fileID: 5858100474516846259}
   - component: {fileID: 991788123578228062}
   m_Layer: 12
@@ -3128,14 +3119,14 @@ Transform:
   m_GameObject: {fileID: 6144801191825045227}
   serializedVersion: 2
   m_LocalRotation: {x: 0.00047994728, y: -0.000000119209204, z: -5.7214497e-11, w: 0.99999994}
-  m_LocalPosition: {x: 0, y: -0.5276536, z: 0.0071543828}
+  m_LocalPosition: {x: 0, y: -0.5276536, z: 0}
   m_LocalScale: {x: 100, y: 100.00002, z: 100.00002}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8806967224018203518}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &4049416290977594736
-BoxCollider:
+--- !u!136 &4753551060298632716
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -3152,9 +3143,11 @@ BoxCollider:
   m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.003, y: 0.004005205, z: 0.0020808089}
-  m_Center: {x: 0.000019258112, y: 0.004558505, z: 0.000039152343}
+  serializedVersion: 2
+  m_Radius: 0.0013
+  m_Height: 0.004877663
+  m_Direction: 1
+  m_Center: {x: -3.410221e-20, y: 0.0046254103, z: -2.8237113e-13}
 --- !u!114 &5858100474516846259
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3180,7 +3173,9 @@ MonoBehaviour:
     trackColor: 0
     networkSettings:
       networked: 0
-      playOnClient: 0
+      clientAction:
+        m_PersistentCalls:
+          m_Calls: []
   - lore: Healthy
     interactKey: 0
     action:
@@ -3192,7 +3187,9 @@ MonoBehaviour:
     trackColor: 1
     networkSettings:
       networked: 0
-      playOnClient: 0
+      clientAction:
+        m_PersistentCalls:
+          m_Calls: []
   - lore: Sane
     interactKey: 0
     action:
@@ -3204,7 +3201,9 @@ MonoBehaviour:
     trackColor: 1
     networkSettings:
       networked: 0
-      playOnClient: 0
+      clientAction:
+        m_PersistentCalls:
+          m_Calls: []
   glow: 0
   renderers: []
   glowAmount: 1

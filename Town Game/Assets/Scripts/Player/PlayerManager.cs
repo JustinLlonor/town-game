@@ -1,12 +1,15 @@
-//using Photon.Pun;
-//using Photon.Realtime;
 using Fusion;
+using Fusion.Sockets;
+using Steamworks;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerManager : MonoBehaviour//PunCallbacks
+public class PlayerManager : NetworkBehaviour
 {
+    [Networked, Capacity(20)] public NetworkDictionary<PlayerRef, NetworkObject> playerObjects => default;
+    
     public GameObject currentPlayer;
     public NetworkPrefabRef playerPrefab;
     public Transform spawn;
@@ -34,6 +37,11 @@ public class PlayerManager : MonoBehaviour//PunCallbacks
     {
         public float speed = 3f;    
         public bool canJump = true;
+    }
+
+    void Awake()
+    {
+        
     }
 
     private void Start()
@@ -86,8 +94,15 @@ public class PlayerManager : MonoBehaviour//PunCallbacks
 
     public void SpawnPlayer(NetworkRunner runner, PlayerRef player)
     {
-        runner.Spawn(playerPrefab, spawn.position, Quaternion.identity, player);
+        NetworkObject playerObject = runner.Spawn(playerPrefab, spawn.position, Quaternion.identity, player);
+        playerObjects.Add(player, playerObject);
         // Add OnInstantiate later
+    }
+
+    public void RemovePlayer(PlayerRef player)
+    {
+        Runner.Despawn(playerObjects[player]);
+        playerObjects.Remove(player);
     }
 
     //[PunRPC]
