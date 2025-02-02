@@ -2734,8 +2734,6 @@ MonoBehaviour:
   hovers:
   - lore: Inspect Corpse
     interactKey: 1
-    color: {r: 1, g: 1, b: 1, a: 1}
-    delay: 0.5
     action:
       m_PersistentCalls:
         m_Calls:
@@ -2751,8 +2749,19 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+    actions:
+    - actionObject: {fileID: 1324774699613132895}
+      methodName: InspectCorpse
+      passPlayerRef: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+    delay: 0.5
     trackLore: 1
     trackColor: 1
+    networkSettings:
+      networked: 0
+      clientAction:
+        m_PersistentCalls:
+          m_Calls: []
   glow: 1
   renderers:
   - {fileID: 8751506138060936789}

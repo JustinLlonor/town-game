@@ -211,21 +211,7 @@ MonoBehaviour:
   hovers:
   - lore: Say Message
     interactKey: 1
-    action:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 124851463}
-          m_TargetAssemblyTypeName: InteractTest, Assembly-CSharp
-          m_MethodName: Interaction
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
+    actions: []
     color: {r: 1, g: 1, b: 1, a: 0}
     delay: 0
     trackLore: 0
@@ -237,21 +223,7 @@ MonoBehaviour:
           m_Calls: []
   - lore: Say Message
     interactKey: 2
-    action:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 124851463}
-          m_TargetAssemblyTypeName: InteractTest, Assembly-CSharp
-          m_MethodName: Interaction
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
+    actions: []
     color: {r: 1, g: 1, b: 1, a: 0}
     delay: 1
     trackLore: 0
@@ -740,6 +712,96 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!1001 &909422909
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 878983568128443568, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: _itemName
+      value: Fire Axe
+      objectReference: {fileID: 0}
+    - target: {fileID: 2385170970280949644, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: Flags
+      value: 262145
+      objectReference: {fileID: 0}
+    - target: {fileID: 2385170970280949644, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: SortKey
+      value: 1130865147
+      objectReference: {fileID: 0}
+    - target: {fileID: 2385170970280949644, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: NetworkedBehaviours.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4266447201804198896, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.20995474
+      objectReference: {fileID: 0}
+    - target: {fileID: 4266447201804198896, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4266447201804198896, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -2.3608434
+      objectReference: {fileID: 0}
+    - target: {fileID: 4266447201804198896, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4266447201804198896, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4266447201804198896, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4266447201804198896, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4266447201804198896, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4266447201804198896, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4266447201804198896, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4422009458430310206, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: m_Name
+      value: Item
+      objectReference: {fileID: 0}
+    - target: {fileID: 5799700709153586727, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: hovers.Array.data[0].actions.methodName
+      value: PickUpItem
+      objectReference: {fileID: 0}
+    - target: {fileID: 5799700709153586727, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: hovers.Array.data[0].actions.actionObject
+      value: 
+      objectReference: {fileID: 909422910}
+    - target: {fileID: 5799700709153586727, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: hovers.Array.data[0].actions.passPlayerRef
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+--- !u!1 &909422910 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4422009458430310206, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+  m_PrefabInstance: {fileID: 909422909}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &958127720
 GameObject:
   m_ObjectHideFlags: 0
@@ -6251,3 +6313,4 @@ SceneRoots:
   - {fileID: 85949327}
   - {fileID: 1125089343}
   - {fileID: 124851462}
+  - {fileID: 909422909}

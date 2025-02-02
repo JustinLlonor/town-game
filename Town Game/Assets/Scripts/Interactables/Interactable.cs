@@ -20,7 +20,7 @@ public class Interactable : MonoBehaviour
     {
         public string lore;
         public InteractKey interactKey;
-        public UnityEvent action;
+        public Action[] actions;
         public Color color = Color.white;
         public float delay;
         public bool trackLore = false;
@@ -35,6 +35,32 @@ public class Interactable : MonoBehaviour
         }
     }
 
+    public enum InteractKey
+    {
+        None = 0,
+        Interact1 = 1,
+        Interact2 = 2,
+        Interact3 = 3,
+    }
+
+    [Serializable]
+    public struct Action
+    {
+        public GameObject actionObject;
+        public string methodName;
+        public bool passPlayerRef;
+
+        public void Invoke(PlayerRef player = default)
+        {
+            if (passPlayerRef)
+            {
+                actionObject.SendMessage(methodName, player);
+                return;
+            }
+            actionObject.SendMessage(methodName);
+        }
+    }
+
     private void OnDestroy()
     {
         InteractableFinder ifi = FindObjectOfType<InteractableFinder>();
@@ -46,13 +72,6 @@ public class Interactable : MonoBehaviour
         }
     }
 
-    public enum InteractKey
-    {
-        None = 0,
-        Interact1 = 1,
-        Interact2 = 2,
-        Interact3 = 3,
-    }
 
     public void GlowMaterials()
     {

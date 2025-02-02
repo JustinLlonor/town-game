@@ -9,8 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4266447201804198896}
-  - component: {fileID: 5799700709153586727}
+  - component: {fileID: 2385170970280949644}
   - component: {fileID: 878983568128443568}
+  - component: {fileID: 5799700709153586727}
   - component: {fileID: 6346319758511634961}
   - component: {fileID: 3440494748875919613}
   - component: {fileID: 1425072880965935143}
@@ -37,6 +38,46 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2385170970280949644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4422009458430310206}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 2637675323
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 878983568128443568}
+  ForceRemoteRenderTimeframe: 0
+--- !u!114 &878983568128443568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4422009458430310206}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b7186cc53a7aec41ab3eb0f7dfad27c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _itemName: 
+  _itemData:
+    _fingerprints:
+      Data: 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+    _metadata:
+      Data: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  interactTimer: 0
+  inspectionColor: {r: 0.7735849, g: 0.7735849, b: 0.7735849, a: 1}
+  pickedUp: 0
 --- !u!114 &5799700709153586727
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -53,8 +94,6 @@ MonoBehaviour:
   hovers:
   - lore: Pick up
     interactKey: 1
-    color: {r: 1, g: 1, b: 1, a: 1}
-    delay: 0.25
     action:
       m_PersistentCalls:
         m_Calls:
@@ -70,12 +109,21 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-    trackLore: 0
-    trackColor: 0
-  - lore: Inspect
-    interactKey: 2
+    actions:
+    - actionObject: {fileID: 4422009458430310206}
+      methodName: PickUpItem
+      passPlayerRef: 1
     color: {r: 1, g: 1, b: 1, a: 1}
     delay: 0.25
+    trackLore: 0
+    trackColor: 0
+    networkSettings:
+      networked: 1
+      clientAction:
+        m_PersistentCalls:
+          m_Calls: []
+  - lore: Inspect
+    interactKey: 2
     action:
       m_PersistentCalls:
         m_Calls:
@@ -91,36 +139,38 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+    actions:
+    - actionObject: {fileID: 4422009458430310206}
+      methodName: InspectItem
+      passPlayerRef: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+    delay: 0.25
     trackLore: 1
     trackColor: 1
+    networkSettings:
+      networked: 0
+      clientAction:
+        m_PersistentCalls:
+          m_Calls: []
   - lore: 
     interactKey: 0
-    color: {r: 0.77254903, g: 0.77254903, b: 0.77254903, a: 1}
-    delay: 0.1
     action:
       m_PersistentCalls:
         m_Calls: []
+    actions: []
+    color: {r: 0.77254903, g: 0.77254903, b: 0.77254903, a: 1}
+    delay: 0.1
     trackLore: 1
     trackColor: 0
+    networkSettings:
+      networked: 0
+      clientAction:
+        m_PersistentCalls:
+          m_Calls: []
   glow: 1
   renderers:
   - {fileID: 3440494748875919613}
   glowAmount: 1
---- !u!114 &878983568128443568
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4422009458430310206}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1b7186cc53a7aec41ab3eb0f7dfad27c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  itemName: 
-  interactTimer: 0
-  inspectionColor: {r: 0.7735849, g: 0.7735849, b: 0.7735849, a: 1}
 --- !u!33 &6346319758511634961
 MeshFilter:
   m_ObjectHideFlags: 0

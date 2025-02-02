@@ -69,9 +69,18 @@ public class InteractableFinder : NetworkBehaviour
             if (currentInteraction.hovers.Length <= heldInteractable) return;
             if (serverTimer.Expired(Runner))
             {
-                if (Runner.IsServer) currentInteraction.hovers[heldInteractable].action.Invoke();
+                if (Runner.IsServer) InvokeActions(currentInteraction.hovers[heldInteractable].actions, Object.InputAuthority);
                 ResetInteractions();
             }
+        }
+    }
+
+    void InvokeActions(Interactable.Action[] actions, PlayerRef player)
+    {
+        Debug.Log(player);
+        foreach (Interactable.Action action in actions)
+        {
+            action.Invoke(player);
         }
     }
 
@@ -186,7 +195,7 @@ public class InteractableFinder : NetworkBehaviour
                     {
                         if (h.delay == 0f) // If the delay is 0, immediately execute the action and return
                         {
-                            h.action.Invoke();
+                            InvokeActions(h.actions, Object.InputAuthority);
                             ResetInteractions();
                             return;
                         }
@@ -212,7 +221,7 @@ public class InteractableFinder : NetworkBehaviour
     {
         if (hover.delay == 0f)
         {
-            hover.action.Invoke();
+            InvokeActions(hover.actions, Object.InputAuthority);
             return;
         }
         iui.StartHighlight(iui.transform.GetChild(i), hover.delay);
@@ -293,7 +302,7 @@ public class InteractableFinder : NetworkBehaviour
             timer += Time.deltaTime;
             if (timer > length)
             {
-                h.action.Invoke();
+                InvokeActions(h.actions, Object.InputAuthority);
                 if (!iValid)
                 {
                     iValid = true;

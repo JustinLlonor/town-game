@@ -34,9 +34,7 @@ public class ItemPhys : NetworkBehaviour
 
     private void Start()
     {
-        CreateItem();
-        //view.RPC("CreateItem", RpcTarget.Others);
-        //view.TransferOwnership(0);
+        
     }
     
     private void Update()
@@ -54,6 +52,8 @@ public class ItemPhys : NetworkBehaviour
     public override void Spawned()
     {
         changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
+        CreateItem();
+        RenderItem();
     }
 
     public override void Render()
@@ -92,10 +92,11 @@ public class ItemPhys : NetworkBehaviour
 
     }
 
-    public void PickUpItem()
+    public void PickUpItem(PlayerRef player)
     {
         if (pickedUp) return;
-        PlayerInventory inventory = playerManager.currentPlayer.GetComponent<PlayerInventory>();
+        PlayerInventory inventory = playerManager.playerObjects[player].GetComponent<PlayerInventory>();
+        if (inventory == null) return;
         string eName = inventory.hotbar[inventory.equippedSlot].ToString();
         if (!eName.IsNullOrEmpty())
         {
@@ -109,8 +110,6 @@ public class ItemPhys : NetworkBehaviour
         int givenSlot = inventory.GiveItem(itemName, true);
         if (givenSlot == -1) return; // If inventory is full, return
         inventory.CollectItemData(itemData, givenSlot);
-        //view.TransferOwnership(PhotonNetwork.LocalPlayer);
-        //view.RPC("RemoveItem", view.Owner);
         pickedUp = true;
         gameObject.GetComponent<MeshRenderer>().enabled = false;
         gameObject.GetComponent<Interactable>().canInteract = false;
@@ -131,6 +130,8 @@ public class ItemPhys : NetworkBehaviour
 
     public void RenderItem()
     {
+        if (item == null) return;
+        Debug.Log("Rendering");
         gameObject.GetComponent<MeshFilter>().mesh = item.mesh;
         gameObject.GetComponent<MeshRenderer>().material.SetTexture("_MainTex", item.texture);
         gameObject.GetComponent<MeshCollider>().sharedMesh = item.mesh;
