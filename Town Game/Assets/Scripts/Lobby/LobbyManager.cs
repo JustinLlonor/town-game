@@ -70,6 +70,11 @@ public class LobbyManager : MonoBehaviour//PunCallbacks
         runnerManager.StartGame(GameMode.Client, joinText.text, runnerManager.waitingRoomIndex);
     }
 
+    public void TestPress()
+    {
+        runnerManager.StartGame(GameMode.Single, joinText.text, runnerManager.waitingRoomIndex);
+    }
+
     //public override void OnConnectedToMaster()
     //{
         //Debug.Log("Connected to " + PhotonNetwork.CloudRegion + "!");

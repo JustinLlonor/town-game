@@ -77,7 +77,6 @@ public class InteractableFinder : NetworkBehaviour
 
     void InvokeActions(Interactable.Action[] actions, PlayerRef player)
     {
-        Debug.Log(player);
         foreach (Interactable.Action action in actions)
         {
             action.Invoke(player);

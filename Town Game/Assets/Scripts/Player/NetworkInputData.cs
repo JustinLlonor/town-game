@@ -8,7 +8,8 @@ public struct NetworkInputData : INetworkInput
     {
         Jump = 0,
         Crouch = 1,
-        Sprint = 2
+        Sprint = 2,
+        Drop = 3
     }
 
     public NetworkButtons buttons;
@@ -16,8 +17,8 @@ public struct NetworkInputData : INetworkInput
     public float camDirectionX;
     public Vector2Compressed direction;
     public int hotbarKey;
-    public NetworkBool menu;
 
+    public NetworkBool menu;
     public NetworkBool interactPressed;
     public int interaction;
 }

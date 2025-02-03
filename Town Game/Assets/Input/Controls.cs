@@ -65,12 +65,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": ""Drop Item"",
-                    ""type"": ""Button"",
+                    ""type"": ""Value"",
                     ""id"": ""50b94010-a554-4285-80fe-6c43b0871039"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": false
+                    ""initialStateCheck"": true
                 },
                 {
                     ""name"": ""Equip Item"",

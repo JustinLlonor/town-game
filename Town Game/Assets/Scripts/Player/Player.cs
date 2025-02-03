@@ -8,17 +8,17 @@ public class Player : NetworkBehaviour
     [Networked] public string nickname { get; set; } = "";
     public delegate void PlayerEvent();
     public PlayerEvent Init;
-    public int simulationTickDistance = 2;
     [HideInInspector] public PlayerMovement pm;
     [HideInInspector] public PlayerInventory pi;
-    public InteractableFinder inf;
+    [HideInInspector] public PlayerDropManager dropManager;
+    [HideInInspector] public InteractableFinder inf;
     Transform playerGFX;
     Transform cameraPosition;
     PlayerManager playerManager;
     RunnerManager rm;
     // To sync the inputs on all other clients
     [Networked] public float camDirection { get; set; }
-    [Networked] float camDirectionX { get; set; }
+    [Networked] public float camDirectionX { get; set; }
     [Networked] Vector2 direction { get; set; }
     bool nicknameSet = false;
     bool previousCrouchSet = false;
@@ -45,32 +45,6 @@ public class Player : NetworkBehaviour
         RPC_SendNickname(SessionData.nickname);
         UIManager.instance.OnUIOpen += MenuOpen;
         UIManager.instance.OnUIClose += MenuClose;
-    }
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
-    public void RPC_SendNickname(string name)
-    {
-        if (nicknameSet) return;
-        nickname = name;
-        nicknameSet = true;
-    }
-
-    private void Update()
-    {
-        if (IsProxy)
-        {
-            Prediction();
-        }
-    }
-
-    void MenuOpen()
-    {
-        rm.menu = true;
-    }
-
-    void MenuClose()
-    {
-        rm.menu = false;
     }
 
     public override void FixedUpdateNetwork()
@@ -108,8 +82,36 @@ public class Player : NetworkBehaviour
             inf.forwardDirection = Quaternion.Euler(data.camDirectionX, data.camDirection, 0f) * Vector3.forward; // orientation/camDirection is mouse x
             inf.currentKey = (Interactable.InteractKey)data.interaction;
             inf.currentPressed = data.interactPressed;
+            // Dropping
+            dropManager.dropPressed = data.buttons.IsSet(NetworkInputData.Buttons.Drop);
         }
         Simulate();
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
+    public void RPC_SendNickname(string name)
+    {
+        if (nicknameSet) return;
+        nickname = name;
+        nicknameSet = true;
+    }
+
+    private void Update()
+    {
+        if (IsProxy)
+        {
+            Prediction();
+        }
+    }
+
+    void MenuOpen()
+    {
+        rm.menu = true;
+    }
+
+    void MenuClose()
+    {
+        rm.menu = false;
     }
 
     void CrouchSet(bool crouchPressed)

@@ -640,6 +640,7 @@ GameObject:
   - component: {fileID: 4000725801890306170}
   - component: {fileID: 3145977071549816313}
   - component: {fileID: 4262745249595203894}
+  - component: {fileID: 8777106030094182887}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -668,6 +669,7 @@ Transform:
   - {fileID: 854407532444519849}
   - {fileID: 2587516000765255706}
   - {fileID: 6748732434187779059}
+  - {fileID: 6286999851831770165}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7285387551892225928
@@ -713,11 +715,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _nickname: 
-  simulationTickDistance: 2
   pm: {fileID: 6160271850420175375}
   pi: {fileID: 1106844264840172896}
+  dropManager: {fileID: 8777106030094182887}
   inf: {fileID: 8489816749943817623}
   _camDirection: 0
+  _camDirectionX: 0
 --- !u!114 &2540704478665164047
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -742,6 +745,7 @@ MonoBehaviour:
   - {fileID: 6160271850420175375}
   - {fileID: 7478806533832175603}
   - {fileID: 873785079005984450}
+  - {fileID: 8777106030094182887}
   - {fileID: 8314741821198590847}
   - {fileID: 8489816749943817623}
   - {fileID: 991788123578228062}
@@ -1232,6 +1236,33 @@ MonoBehaviour:
   roomMask:
     serializedVersion: 2
     m_Bits: 16384
+--- !u!114 &8777106030094182887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1787190705143953567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7830818c8a8c24f459e08b5a598ed959, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inventory: {fileID: 1106844264840172896}
+  dropPressed: 0
+  player: {fileID: 9069154022521576282}
+  dropDistance: 4
+  surfaceTolerance: 0.9238795
+  environmentMask:
+    serializedVersion: 2
+    m_Bits: 128
+  groundDistance: 0.1
+  physItem:
+    RawGuidValue: ed8544e501428ac408be6a749e03b2d4
+  itemDrop: {fileID: 6286999851831770165}
+  camTransform: {fileID: 8806967224018203518}
+  canPlace: {fileID: 2100000, guid: b51cc5a231301754c859aebb437eb17a, type: 2}
+  cantPlace: {fileID: 2100000, guid: 095279de25b14c94c8efcd5a31092d33, type: 2}
 --- !u!1 &2255715054737852972
 GameObject:
   m_ObjectHideFlags: 0
@@ -3091,6 +3122,111 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5660957984162474693}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5860515733100161275
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6286999851831770165}
+  - component: {fileID: 3753809783535363540}
+  - component: {fileID: 4878957026744110904}
+  - component: {fileID: 3765929299129543333}
+  m_Layer: 0
+  m_Name: Item Drop
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6286999851831770165
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5860515733100161275}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.5, y: -0.5, z: -0.5, w: 0.5}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1317372394872903684}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: -90}
+--- !u!33 &3753809783535363540
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5860515733100161275}
+  m_Mesh: {fileID: -7354185949920861747, guid: 67afa0fb94df67d4cbc3dfe48bf0f83e, type: 3}
+--- !u!23 &4878957026744110904
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5860515733100161275}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: b51cc5a231301754c859aebb437eb17a, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &3765929299129543333
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5860515733100161275}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 3, y: 3, z: 3}
+  m_Center: {x: 0, y: 0.34030235, z: -0.03938014}
 --- !u!1 &6144801191825045227
 GameObject:
   m_ObjectHideFlags: 0
@@ -3164,9 +3300,7 @@ MonoBehaviour:
   hovers:
   - lore: Nickname
     interactKey: 0
-    action:
-      m_PersistentCalls:
-        m_Calls: []
+    actions: []
     color: {r: 1, g: 1, b: 1, a: 0}
     delay: 0
     trackLore: 0
@@ -3178,9 +3312,7 @@ MonoBehaviour:
           m_Calls: []
   - lore: Healthy
     interactKey: 0
-    action:
-      m_PersistentCalls:
-        m_Calls: []
+    actions: []
     color: {r: 0.30865914, g: 1, b: 0.28773582, a: 0}
     delay: 0
     trackLore: 1
@@ -3192,9 +3324,7 @@ MonoBehaviour:
           m_Calls: []
   - lore: Sane
     interactKey: 0
-    action:
-      m_PersistentCalls:
-        m_Calls: []
+    actions: []
     color: {r: 0.29045033, g: 0.37188497, b: 0.5754717, a: 1}
     delay: 0
     trackLore: 1

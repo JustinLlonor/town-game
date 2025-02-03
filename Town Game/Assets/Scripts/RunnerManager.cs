@@ -22,6 +22,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
     public int hotbarKey = 1;
     public bool interactionPressed = false;
     public int interactionKey = 0;
+    public bool dropPressed = false;
 
     PlayerManager pm;
 
@@ -75,6 +76,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         jump = false;
         data.buttons.Set(NetworkInputData.Buttons.Crouch, crouch);
         data.buttons.Set(NetworkInputData.Buttons.Sprint, sprint);
+        data.buttons.Set(NetworkInputData.Buttons.Drop, dropPressed);
         // Hotbar
         data.hotbarKey = hotbarKey;
         hotbarKey = 0;
@@ -83,6 +85,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         // Interactables
         data.interactPressed = interactionPressed;
         data.interaction = interactionKey;
+
 
         input.Set(data);
     }

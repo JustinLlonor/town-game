@@ -143,11 +143,6 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         hotbarUI.anchoredPosition -= new Vector2((hotbar.Count - 1) * 50f, 0f); //For centering
     }
 
-    private void OnDropItem()
-    {
-        DropItem(equippedSlot);
-    }
-
     /// <summary>
     /// Called whenever an item is unequipped
     /// </summary>
@@ -363,22 +358,22 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
 
     public void DropItem(int itemIndex)
     {
-        Item item = itemManager.itemSearch[hotbar[itemIndex].ToString()];
-        if (item == null) return;
+        //Item item = itemManager.itemSearch[hotbar[itemIndex].ToString()];
+        //if (item == null) return;
         //if (hotbar[equippedSlot].IsNullOrEmpty()) return;
         //GameObject itemObj = PhotonNetwork.Instantiate(itemPrefab.name, mainCam.position, mainCam.rotation);
         //itemObj.GetComponent<Interactable>().canInteract = false;
-        Vector3 velocityAdd = Vector3.ClampMagnitude(rb.velocity / movementMultiplier, 3f);
+        //Vector3 velocityAdd = Vector3.ClampMagnitude(rb.velocity / movementMultiplier, 3f);
         //itemObj.GetComponent<Rigidbody>().velocity = mainCam.forward * dropVelocity + velocityAdd;
         //PhotonView itemView = itemObj.GetComponent<PhotonView>();
         //itemView.RPC("SetName", RpcTarget.All, item.name);
-        AddFingerprint(itemIndex);
+        //AddFingerprint(itemIndex);
         //TransferItemData(itemIndex, itemView);
         //ItemPhys itemPhys = itemObj.GetComponent<ItemPhys>();
         //itemPhys.interactTimer = pickupCooldown;
 
         //itemData[itemIndex] = null;
-        RemoveItem(hotbar[equippedSlot].ToString(), equippedSlot);
+        //RemoveItem(hotbar[equippedSlot].ToString(), equippedSlot);
     }
 
     void AddFingerprint(int itemIndex)

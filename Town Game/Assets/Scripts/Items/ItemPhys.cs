@@ -142,7 +142,15 @@ public class ItemPhys : NetworkBehaviour
         if (item == null) return;
         gameObject.GetComponent<MeshFilter>().mesh = item.mesh;
         gameObject.GetComponent<MeshRenderer>().material.SetTexture("_MainTex", item.texture);
-        gameObject.GetComponent<MeshCollider>().sharedMesh = item.mesh;
+        SetColliderBounds();
+    }
+
+    void SetColliderBounds()
+    {
+        Bounds meshBounds = gameObject.GetComponent<MeshRenderer>().localBounds;
+        BoxCollider itemCollider = gameObject.GetComponent<BoxCollider>();
+        itemCollider.center = meshBounds.center;
+        itemCollider.size = meshBounds.size;
     }
 
     //[PunRPC]
