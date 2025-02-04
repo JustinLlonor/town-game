@@ -23,6 +23,7 @@ public class PlayerManager : NetworkBehaviour
     public GameObject largeUI;
     public CleanupMaster cm;
     public FirstPerson fps;
+    public Transform dropGizmo;
 
     // Delegate for when the player gets spawned
     public InstantiatePlayer OnInstantiatePlayer;

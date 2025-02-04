@@ -12,7 +12,7 @@ public class PlayerDropManager : NetworkBehaviour
     bool previousPressed = false;
     [Header("Drop Settings")]
     public float dropDistance = 4f;
-    public float surfaceTolerance = 0.923879533f;
+    public float colliderTolerance = .05f;
     public LayerMask environmentMask;
     public float groundDistance = 0.01f;
     [Header("References")]
@@ -29,6 +29,7 @@ public class PlayerDropManager : NetworkBehaviour
     public override void Spawned()
     {
         rm = FindObjectOfType<RunnerManager>();
+        itemDrop = FindObjectOfType<PlayerManager>().dropGizmo;
         itemRenderer = itemDrop.GetComponent<MeshRenderer>();
         itemFilter = itemDrop.GetComponent<MeshFilter>();
     }
@@ -100,6 +101,11 @@ public class PlayerDropManager : NetworkBehaviour
             Vector3 falseDirection = Quaternion.Euler(player.camDirectionX, player.camDirection, 0f) * Vector3.forward;
             ChangeDropPosition(Quaternion.Euler(player.camDirectionX - 90f, player.camDirection, 0f) * Vector3.forward, -falseDirection, camTransform.position + falseDirection * dropDistance, currentItem);
         }
+    }
+
+    bool CheckPlaceable() // Checks if can place inside a certain area, collider tolerance allows how much of the item can be placed in that area
+    {
+        return false;
     }
 
     void ChangeDropPosition(Vector3 direction, Vector3 up, Vector3 point, Item currentItem)
