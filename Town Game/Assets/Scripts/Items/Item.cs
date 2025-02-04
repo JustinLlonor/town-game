@@ -8,6 +8,7 @@ public class Item : ScriptableObject
     [Header("Info")]
     public Texture2D icon;
     public string description = "";
+    public Vector3 placedRotation = Vector3.zero;
     public GameObject itemComponentHolder;
     public bool large = false; // large if cannot be stored in inventory
     public Mesh mesh; // Mesh of the item

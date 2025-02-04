@@ -84,43 +84,72 @@ public class PlayerDropManager : NetworkBehaviour
         itemRenderer.material = cantPlace;
     }
 
-    void CheckCanPlace() // Jesus Christ
+    void CheckCanPlace()
     {
         Item currentItem = GetCurrentItem();
         if (currentItem == null) return;
-        Bounds itemBounds = currentItem.mesh.bounds;
         Vector3 direction = Quaternion.Euler(player.camDirectionX, player.camDirection, 0f) * Vector3.forward;
-        Quaternion orientation = Quaternion.Euler(0f, -90f + player.camDirection, -90f);
         RaycastHit hit;
         if (Physics.Raycast(camTransform.position, direction, out hit, dropDistance, (int)environmentMask))
         {
-            Vector3 normalDirection = hit.normal;
-            Vector3 newPoint = hit.point + Vector3.up * (itemBounds.extents.x) * (1 + groundDistance);
-            Vector3 visualPosition = new Vector3(direction.x, 0f, direction.z).normalized;
-            visualPosition = newPoint - visualPosition * itemBounds.extents.y;
-            //newRotation *= orientation;
-            itemDrop.position = visualPosition;
-            itemDrop.rotation = orientation;
-            if (!Physics.CheckBox(newPoint, itemBounds.size/2f, orientation, (int)environmentMask))
-            {
-                if (Vector3.Dot(normalDirection, Vector3.up) >= surfaceTolerance)
-                {
-                    SetMaterial(true);
-                    return;
-                }
-            } else
-            {
-                SetMaterial(false);
-            }
-        } else
+            ChangeDropPosition(direction, hit.normal, hit.point, currentItem);
+        } 
+        else
         {
             SetMaterial(false);
-            Vector3 newPoint = hit.point + Vector3.up * (itemBounds.extents.x) * (1 + groundDistance);
-            Vector3 visualPosition = new Vector3(direction.x, 0f, direction.z).normalized;
-            visualPosition = newPoint - visualPosition * itemBounds.extents.y; // what the fuc is going on 
-            itemDrop.position = visualPosition;
-            itemDrop.rotation = orientation;
+            Vector3 falseDirection = Quaternion.Euler(player.camDirectionX, player.camDirection, 0f) * Vector3.forward;
+            ChangeDropPosition(Quaternion.Euler(player.camDirectionX - 90f, player.camDirection, 0f) * Vector3.forward, -falseDirection, camTransform.position + falseDirection * dropDistance, currentItem);
         }
+    }
+
+    void ChangeDropPosition(Vector3 direction, Vector3 up, Vector3 point, Item currentItem)
+    {
+        Bounds itemBounds = currentItem.mesh.bounds;
+        Vector3 forward = Vector3.ProjectOnPlane(direction, up);
+        Quaternion orientation = Quaternion.LookRotation(forward, up) * Quaternion.Euler(currentItem.placedRotation); // Sets orientation on the normal
+        float boundsY = GetBoundsYPosition(itemBounds.min, itemBounds.max, itemBounds.center, currentItem.placedRotation);
+        Vector3 yCenter = RotatePointAroundPivot(new Vector3(0f, itemBounds.center.y, 0f), Vector3.zero, currentItem.placedRotation);
+        Vector3 visualPosition = point + up * (boundsY - yCenter.y);
+        float boundsX = GetBoundsYPosition(itemBounds.min, itemBounds.max, itemBounds.center, currentItem.placedRotation + new Vector3(0f, 0f, 90f));
+        visualPosition -= forward.normalized * (boundsX);
+        itemDrop.position = visualPosition;
+        itemDrop.rotation = orientation;
+    }
+
+    /// <summary>
+    /// Gets the y extent of a rotated bounding box
+    /// </summary>
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    /// <param name="rotation"></param>
+    /// <returns></returns>
+    float GetBoundsYPosition(Vector3 min, Vector3 max, Vector3 center, Vector3 rotation) // what the fuc
+    {
+        Vector3[] points = new Vector3[8];
+        points[0] = min;
+        points[1] = max;
+        points[2] = new Vector3(max.x, min.y, min.z);
+        points[3] = new Vector3(min.x, min.y, max.z);
+        points[4] = new Vector3(min.x, max.y, min.z);
+        points[5] = new Vector3(min.x, max.y, max.z);
+        points[6] = new Vector3(max.x, max.y, min.z);
+        points[7] = new Vector3(max.x, min.y, max.z);
+        float lowestPoint = Mathf.Infinity;
+        foreach (Vector3 point in points)
+        {
+            Vector3 newPoint = RotatePointAroundPivot(point, center, rotation);
+            if (newPoint.y < lowestPoint)
+            {
+                lowestPoint = newPoint.y;
+            }
+        }
+
+        return center.y - lowestPoint;
+    }
+
+    Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Vector3 angles)
+    {
+        return Quaternion.Euler(angles) * (point - pivot) + pivot;
     }
 
     Item GetCurrentItem()
