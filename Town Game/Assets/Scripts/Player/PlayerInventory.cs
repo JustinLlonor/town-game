@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using Fusion;
 using UnityEngine.InputSystem;
 using static Fusion.NetworkBehaviour;
+using Unity.VisualScripting;
 //using Photon.Realtime;
 
 // Sync player inventory stuff
@@ -17,8 +18,8 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     bool previousReequip;
     [Header("Hotbar")]
     public int hotbarLength = 4;
-    [Networked, Capacity(4)]public NetworkLinkedList<NetworkString<_32>> hotbar { get; } // To be synced
-    public ItemData[] itemData; // To be synced
+    [Networked, Capacity(4)]public NetworkLinkedList<NetworkString<_32>> hotbar { get; }
+    [Networked, Capacity(4)]public NetworkLinkedList<ItemData> itemData { get; }// Item metadata
     public GameObject hotbarSlot;
     public RectTransform hotbarUI;
     public GameObject largeUI;
@@ -90,9 +91,12 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         Init();
         if (Runner.IsServer)
         {
-            for (int i = 0; i < hotbarLength; i++) hotbar.Add("");
+            for (int i = 0; i < hotbarLength; i++)
+            {
+                hotbar.Add("");
+                itemData.Add(new ItemData());
+            }
         }
-        itemData = new ItemData[hotbar.Count];
         //for (int i = 0; i < itemData.Length; i++) itemData[i] = null; item data stuff doesn't matter until an item enters that slot
         if (!HasInputAuthority) return;
     }
@@ -353,7 +357,22 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
                 EquipItem(equippedSlot, slot == equippedSlot);
             }
         }
-        UpdateHotbarUI();
+
+        if (HasInputAuthority) UpdateHotbarUI();
+    }
+
+    /// <summary>
+    /// Removes an item at a specified slot
+    /// </summary>
+    /// <param name="slot">Slot index</param>
+    public void RemoveItem(int slot)
+    {
+        if (hotbar[slot].ToString().IsNullOrEmpty()) return;
+        hotbar.Set(slot, "");
+        EquipItem(equippedSlot, slot == equippedSlot);
+        if (Runner.IsServer) reequipTick = !reequipTick;
+
+        if (HasInputAuthority) UpdateHotbarUI();
     }
 
     public void DropItem(int itemIndex)
@@ -381,32 +400,8 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         //if (!itemData[itemIndex].fingerprints.Contains(view.Owner)) itemData[itemIndex].fingerprints.Add(view.Owner); // Photon syncing
     }
 
-    void TransferItemData(int itemIndex)//, PhotonView itemView)
-    {
-        ItemData data = itemData[itemIndex];
-        foreach (PlayerRef player in data.fingerprints)
-        {
-            //itemView.RPC("AddFingerprint", RpcTarget.AllBuffered, player); // Photon syncing
-        }
-        foreach (KeyValuePair<NetworkString<_4>, int> pair in data.metadata)
-        {
-            //itemView.RPC("AddMetadata", RpcTarget.AllBuffered, pair.Key, pair.Value);
-        }
-    }
-
     public void CollectItemData(ItemData data, int itemIndex)
     {
-        itemData[itemIndex] = new ItemData();
-        itemData[itemIndex].metadata.Clear();
-        itemData[itemIndex].fingerprints.Clear();
-        foreach (KeyValuePair<NetworkString<_4>, int> pair in data.metadata)
-        {
-            itemData[itemIndex].metadata.Add(pair.Key, pair.Value);
-        }
-
-        foreach (PlayerRef player in data.fingerprints)
-        {
-            itemData[itemIndex].fingerprints.Add(player);
-        }
+        itemData.Set(itemIndex, new ItemData(data.metadata, data.fingerprints));
     }
 }

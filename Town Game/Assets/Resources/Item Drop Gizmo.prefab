@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 7617892085331182185}
   - component: {fileID: 7646246313509876689}
   - component: {fileID: 1190346282088832145}
-  - component: {fileID: 7623737277386966312}
   - component: {fileID: 2609762704049723254}
   - component: {fileID: 328698379074422835}
   m_Layer: 0
@@ -126,26 +125,8 @@ MonoBehaviour:
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: 7623737277386966312}
   - {fileID: 2609762704049723254}
   ForceRemoteRenderTimeframe: 0
---- !u!114 &7623737277386966312
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5419155114515952582}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _stateAuthorityChangeErrorCorrectionDelta: 0.15
-  SyncScale: 0
-  SyncParent: 0
-  _autoAOIOverride: 1
-  DisableSharedModeInterpolation: 0
 --- !u!114 &2609762704049723254
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -167,6 +148,7 @@ MonoBehaviour:
   canPlace: {fileID: 2100000, guid: b51cc5a231301754c859aebb437eb17a, type: 2}
   cantPlace: {fileID: 2100000, guid: 095279de25b14c94c8efcd5a31092d33, type: 2}
   bCollider: {fileID: 7646246313509876689}
+  checkForCollisions: 0
 --- !u!54 &328698379074422835
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -33,11 +33,6 @@ public class ItemPhys : NetworkBehaviour
         om = FindObjectOfType<ObjectManager>();
         interactable = gameObject.GetComponent<Interactable>();
     }
-
-    private void Start()
-    {
-        
-    }
     
     private void Update()
     {
@@ -54,8 +49,11 @@ public class ItemPhys : NetworkBehaviour
     public override void Spawned()
     {
         changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
-        CreateItem();
-        RenderItem();
+        if (!itemName.ToString().IsNullOrEmpty())
+        {
+            CreateItem();
+            RenderItem();
+        }
     }
 
     public override void Render()
@@ -65,6 +63,7 @@ public class ItemPhys : NetworkBehaviour
             switch (change)
             {
                 case (nameof(itemName)):
+                    CreateItem();
                     RenderItem();
                     break;
             }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
 using UnityEngine.InputSystem;
+using WebSocketSharp;
 
 public class PlayerDropManager : NetworkBehaviour
 {
@@ -12,9 +13,8 @@ public class PlayerDropManager : NetworkBehaviour
     bool previousPressed = false;
     [Header("Drop Settings")]
     public float dropDistance = 4f;
-    public float colliderTolerance = .05f;
     public LayerMask environmentMask;
-    public float groundDistance = 0.01f;
+    public float surfaceTolerance = 0.95f;
     [Header("References")]
     public NetworkPrefabRef physItem;
     public NetworkPrefabRef itemGizmo;
@@ -23,6 +23,7 @@ public class PlayerDropManager : NetworkBehaviour
     public Material cantPlace;
     public ItemGizmo gizmo;
     bool isPlacing = false;
+    bool isPlace = false;
     RunnerManager rm;
 
     public override void Spawned()
@@ -74,12 +75,34 @@ public class PlayerDropManager : NetworkBehaviour
 
     void VerifyPlacement() // Places the item if the item placement is valid
     {
-        if (gizmo.CheckPlaceable())
+        if (gizmo.CheckPlaceable() && isPlace)
         {
-            // Place the item
+            PlaceItem();
             return;
         }
         // Play an error sfx
+    }
+
+    void PlaceItem()
+    {
+        Item item = GetCurrentItem();
+        if (item == null) return;
+        if (inventory.hotbar[inventory.equippedSlot].ToString().IsNullOrEmpty()) return;
+        if (!Runner.IsServer && HasInputAuthority) inventory.RemoveItem(inventory.equippedSlot);
+        if (!Runner.IsServer) return;
+        NetworkObject itemObj = Runner.Spawn(physItem, gizmo.transform.position, gizmo.transform.rotation);
+        ItemPhys pItem = itemObj.GetComponent<ItemPhys>();
+        pItem.itemName = item.name;
+        pItem.gameObject.name = item.name;
+        TransferItemData(inventory.itemData[inventory.equippedSlot], pItem);
+
+        inventory.RemoveItem(inventory.equippedSlot);
+        //RemoveItem(hotbar[equippedSlot].ToString(), equippedSlot);
+    }
+
+    void TransferItemData(ItemData data, ItemPhys physItem)
+    {
+        physItem.itemData = new ItemData(data.metadata, data.fingerprints);
     }
 
     void UpdateGizmo()
@@ -91,11 +114,19 @@ public class PlayerDropManager : NetworkBehaviour
         if (Physics.Raycast(camTransform.position, direction, out hit, dropDistance, (int)environmentMask))
         {
             ChangeDropPosition(direction, hit.normal, hit.point, currentItem);
+            if (Vector3.Dot(hit.normal, Vector3.up) < surfaceTolerance) // If the dot product is not close enough to Vector3.up invalidate the placement
+            {
+                isPlace = false;
+                gizmo.SetMaterial(false);
+                return;
+            }
+            isPlace = true;
             gizmo.checkForCollisions = true;
             gizmo.SetMaterial(gizmo.CheckPlaceable());
         } 
         else
         {
+            isPlace = false;
             gizmo.checkForCollisions = false;
             gizmo.SetMaterial(false);
             Vector3 falseDirection = Quaternion.Euler(player.camDirectionX, player.camDirection, 0f) * Vector3.forward;
