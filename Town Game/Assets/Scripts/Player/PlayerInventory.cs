@@ -35,6 +35,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     public float movementMultiplier = 2f;
     public float pickupCooldown = .5f;
     public GameObject itemPrefab;
+    public InventoryEvent OnSwitchSlot;
 
     [HideInInspector] public GameObject itemComponentObject; // The GameObject that is a child of the physical item that contains item behaviours.
     FirstPerson fps;
@@ -51,6 +52,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     int previousSlot;
     bool uiSetup = false;
 
+    public delegate void InventoryEvent();
     ChangeDetector changeDetector;
 
     private void Awake()
@@ -204,6 +206,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     **/
     public void EquipItem(int slot, bool selfEquip = false)
     {
+        if (equippedSlot != slot) OnSwitchSlot?.Invoke();
         if (equippedSlot == slot && !selfEquip) return; // If the player equips the same slot they are holding?
         if (HasInputAuthority)
         {

@@ -30,6 +30,7 @@ public class PlayerDropManager : NetworkBehaviour
     {
         if (Runner.IsServer) Runner.Spawn(itemGizmo, Vector3.zero, Quaternion.identity, Object.InputAuthority);
         rm = FindObjectOfType<RunnerManager>();
+        inventory.OnSwitchSlot += CancelDrop;
     }
 
     public override void FixedUpdateNetwork()
@@ -68,7 +69,14 @@ public class PlayerDropManager : NetworkBehaviour
 
     void OnDropRelease()
     {
+        if (!isPlacing) return;
         VerifyPlacement();
+        CancelDrop();
+    }
+
+    void CancelDrop()
+    {
+        Debug.Log("Cancelling");
         gizmo.SetRenderer(false);
         isPlacing = false;
     }
