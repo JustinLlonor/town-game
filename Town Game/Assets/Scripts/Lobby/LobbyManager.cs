@@ -29,7 +29,7 @@ public class LobbyManager : MonoBehaviour//PunCallbacks
         if (SteamManager.Initialized) defaultNick = SteamFriends.GetPersonaName();
         SessionData.nickname = defaultNick;
         previousNick = SessionData.nickname;
-        runnerManager = FindObjectOfType<RunnerManager>();
+        runnerManager = FindFirstObjectByType<RunnerManager>();
     }
 
     public void OnChangedNickname(string newNick)

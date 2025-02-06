@@ -9,7 +9,7 @@ public class MeetingStarter : MonoBehaviour
 
     private void Awake()
     {
-        mm = FindObjectOfType<MeetingManager>();
+        mm = FindFirstObjectByType<MeetingManager>();
     }
 
     public void InitiateMeeting()

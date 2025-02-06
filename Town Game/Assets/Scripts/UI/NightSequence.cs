@@ -17,10 +17,10 @@ public class NightSequence : MonoBehaviour
 
     private void Awake()
     {
-        gm = FindObjectOfType<GameManager>();
-        bs = FindObjectOfType<BlackScreen>();
-        pm = FindObjectOfType<PlayerManager>();
-        rm = FindObjectOfType<RoomManager>();
+        gm = FindFirstObjectByType<GameManager>();
+        bs = FindFirstObjectByType<BlackScreen>();
+        pm = FindFirstObjectByType<PlayerManager>();
+        rm = FindFirstObjectByType<RoomManager>();
 
         //gm.OnNightSkip += NightStuff;
         gm.OnDayStart += DayStuff;

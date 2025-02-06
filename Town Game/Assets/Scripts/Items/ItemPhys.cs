@@ -27,10 +27,10 @@ public class ItemPhys : NetworkBehaviour
 
     private void Awake()
     {
-        finder = FindObjectOfType<InteractableFinder>();
-        playerManager = FindObjectOfType<PlayerManager>();
+        finder = FindFirstObjectByType<InteractableFinder>();
+        playerManager = FindFirstObjectByType<PlayerManager>();
         //view = gameObject.GetComponent<PhotonView>();
-        om = FindObjectOfType<ObjectManager>();
+        om = FindFirstObjectByType<ObjectManager>();
         interactable = gameObject.GetComponent<Interactable>();
     }
     
@@ -133,7 +133,7 @@ public class ItemPhys : NetworkBehaviour
     public void CreateItem()
     {
         gameObject.GetComponent<Interactable>().hovers[0].lore = "Pick up";
-        item = FindObjectOfType<ObjectManager>().itemSearch[itemName.ToString()];
+        item = FindFirstObjectByType<ObjectManager>().itemSearch[itemName.ToString()];
     }
 
     public void RenderItem()

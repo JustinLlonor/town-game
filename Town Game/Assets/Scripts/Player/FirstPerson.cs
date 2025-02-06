@@ -19,12 +19,12 @@ public class FirstPerson : MonoBehaviour
 
     private void Awake()
     {
-        PlayerManager pm = FindObjectOfType<PlayerManager>();
+        PlayerManager pm = FindFirstObjectByType<PlayerManager>();
         if (pm != null) pm.OnInstantiatePlayer += AssignPlayerReferences;
         animator = gameObject.GetComponent<Animator>();
         itemFilter = itemTransform.GetComponent<MeshFilter>();
         itemRenderer = itemTransform.GetComponent<MeshRenderer>();
-        cameraManager = FindObjectOfType<CameraManager>();
+        cameraManager = FindFirstObjectByType<CameraManager>();
         cameraManager.OnSwitchCameraMode += OnCameraModeChange;
     }
 

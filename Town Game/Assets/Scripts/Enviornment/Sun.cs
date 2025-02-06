@@ -21,7 +21,7 @@ public class Sun : MonoBehaviour
 
     private void Awake()
     {
-        gm = FindObjectOfType<GameManager>();
+        gm = FindFirstObjectByType<GameManager>();
         sunTransform = lightSource.transform;
     }
 

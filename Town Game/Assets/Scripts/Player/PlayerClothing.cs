@@ -24,8 +24,8 @@ public class PlayerClothing : NetworkBehaviour
 
     public override void Spawned()
     {
-        fps = FindObjectOfType<FirstPerson>();
-        om = FindObjectOfType<ObjectManager>();
+        fps = FindFirstObjectByType<FirstPerson>();
+        om = FindFirstObjectByType<ObjectManager>();
         changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
 ;        if (isCorpse) return;
         if (!HasStateAuthority) return;

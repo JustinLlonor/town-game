@@ -13,7 +13,7 @@ public class FootstepPlayer : MonoBehaviour
     private void Awake()
     {
         //view = transform.parent.GetComponent<PhotonView>();
-        sm = FindObjectOfType<SoundManager>();
+        sm = FindFirstObjectByType<SoundManager>();
     }
 
     public void PlayFootstep()

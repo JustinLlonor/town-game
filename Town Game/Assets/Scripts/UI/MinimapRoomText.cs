@@ -13,7 +13,7 @@ public class MinimapRoomText : MonoBehaviour
     {
         text = gameObject.GetComponent<TextMeshProUGUI>();
         animator = gameObject.GetComponent<Animator>();
-        PlayerManager pm = FindObjectOfType<PlayerManager>();
+        PlayerManager pm = FindFirstObjectByType<PlayerManager>();
         pm.OnInstantiatePlayer += AddReferences;
         if (trackedPM != null) trackedPM.OnEnterRoom += PlayRoomText;
     }

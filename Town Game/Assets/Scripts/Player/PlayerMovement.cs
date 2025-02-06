@@ -117,14 +117,14 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         crouchOffset = crouchPos.localPosition;
         no = gameObject.GetComponent<NetworkObject>();
         //view = gameObject.GetComponent<PhotonView>();
-        playerManager = FindObjectOfType<PlayerManager>();
+        playerManager = FindFirstObjectByType<PlayerManager>();
         playerInput = gameObject.GetComponent<PlayerInput>();
         rb = gameObject.GetComponent<Rigidbody>();
         //if (!view.IsMine) Destroy(playerInput);
         //if (!view.IsMine) return;
         gameObject.GetComponent<Player>().Init += Init;
         stats = gameObject.GetComponent<PlayerStats>();
-        runnerManager = FindObjectOfType<RunnerManager>();
+        runnerManager = FindFirstObjectByType<RunnerManager>();
         stepRayUpper.localPosition = new Vector3(stepRayUpper.localPosition.x, stepHeight, stepRayUpper.localPosition.z);
         unCastDistance = uncrouchCastUpper.position.y - uncrouchCastLower.position.y;
         rb.freezeRotation = true;

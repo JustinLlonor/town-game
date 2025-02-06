@@ -21,8 +21,8 @@ public class TabSchedule : MonoBehaviour
 
     private void Awake()
     {
-        sm = FindObjectOfType<ScheduleManager>();
-        gm = FindObjectOfType<GameManager>();
+        sm = FindFirstObjectByType<ScheduleManager>();
+        gm = FindFirstObjectByType<GameManager>();
     }
 
     private void Start()

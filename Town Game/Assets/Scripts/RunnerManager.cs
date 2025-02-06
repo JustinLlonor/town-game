@@ -34,7 +34,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         pSim.ClientPhysicsSimulation = ClientPhysicsSimulation.SimulateAlways;
         nRunner.ProvideInput = true;
 
-        SteamInviteAccepter sia = FindObjectOfType<SteamInviteAccepter>();
+        SteamInviteAccepter sia = FindFirstObjectByType<SteamInviteAccepter>();
         if (sia != null) sia.DisableInvites();
 
         // Create the NetworkSceneInfo from the current scene
@@ -59,7 +59,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (runner.IsServer)
         {
-            pm = FindObjectOfType<PlayerManager>();
+            pm = FindFirstObjectByType<PlayerManager>();
             pm.SpawnPlayer(runner, player); // Adds a new player when a player joins
         }
     }

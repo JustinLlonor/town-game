@@ -33,8 +33,8 @@ public class TasksUI : MonoBehaviour
 
     private void Awake()
     {
-        sm = FindObjectOfType<ScheduleManager>();
-        pm = FindObjectOfType<PlayerManager>();
+        sm = FindFirstObjectByType<ScheduleManager>();
+        pm = FindFirstObjectByType<PlayerManager>();
         pm.OnInstantiatePlayer += GetPlayerReferences;
         //sm.OnBlockChange += PeriodChange;
     }

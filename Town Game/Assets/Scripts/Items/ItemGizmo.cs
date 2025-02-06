@@ -37,7 +37,7 @@ public class ItemGizmo : NetworkBehaviour
 
     IEnumerator AssignCoroutine()
     {
-        PlayerManager playerManager = FindObjectOfType<PlayerManager>();
+        PlayerManager playerManager = FindFirstObjectByType<PlayerManager>();
         while (!playerManager.playerObjects.ContainsKey(Object.InputAuthority)) // While the player manager doesn't contain the key of input authority we wait
         {
             yield return null;

@@ -64,7 +64,7 @@ public class PlayerStats : NetworkBehaviour
         //view = gameObject.GetComponent<PhotonView>();
         pe = gameObject.GetComponent<PlayerEvidence>();
         //if (!view.IsMine) return;
-        shake = FindObjectOfType<CameraShake>();
+        shake = FindFirstObjectByType<CameraShake>();
         //if (FindObjectOfType<GameManager>() != null)AddAffector(hungerAffecter);
     }
 
@@ -251,7 +251,7 @@ public class PlayerStats : NetworkBehaviour
 
     public void ClientDeath()
     {
-        CameraBobbing cb = FindObjectOfType<CameraBobbing>();
+        CameraBobbing cb = FindFirstObjectByType<CameraBobbing>();
         cb.isBobbing = false;
         cb.isSprinting = false;
         OnDeath?.Invoke();

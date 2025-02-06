@@ -22,7 +22,7 @@ public class PlayerStatsUI : MonoBehaviour
 
     private void Awake()
     {
-        FindObjectOfType<PlayerManager>().OnInstantiatePlayer += AssignPlayerReferences;
+        FindFirstObjectByType<PlayerManager>().OnInstantiatePlayer += AssignPlayerReferences;
         barMax = healthTransform.localScale.y;
         staminaBarMax = staminaTransform.localScale.y;
     }

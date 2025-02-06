@@ -13,7 +13,7 @@ public class Observable : MonoBehaviour
 
     private void Awake()
     {
-        cm = FindObjectOfType<CameraManager>();
+        cm = FindFirstObjectByType<CameraManager>();
     }
 
     private void Update()

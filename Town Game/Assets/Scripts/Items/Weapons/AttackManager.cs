@@ -26,8 +26,8 @@ public class AttackManager : MonoBehaviour
 
     private void Awake()
     {
-        cShake = FindObjectOfType<CameraShake>();
-        fps = FindObjectOfType<FirstPerson>();
+        cShake = FindFirstObjectByType<CameraShake>();
+        fps = FindFirstObjectByType<FirstPerson>();
         camTransform = Camera.main.transform;
         //if (!view.IsMine) return;
         foreach(Collider collider in colliders)

@@ -62,15 +62,15 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
 
     public void Init()
     {
-        runnerManager = FindObjectOfType<RunnerManager>();
+        runnerManager = FindFirstObjectByType<RunnerManager>();
         camTransform = Camera.main.transform.parent;
-        itemManager = FindObjectOfType<ObjectManager>();
+        itemManager = FindFirstObjectByType<ObjectManager>();
         sFilter = sItem.GetComponent<MeshFilter>();
         sRenderer = sItem.GetComponent<MeshRenderer>();
         attackManager = gameObject.GetComponent<AttackManager>();
         rb = gameObject.GetComponent<Rigidbody>();
         mainCam = Camera.main.transform;
-        fps = FindObjectOfType<FirstPerson>();
+        fps = FindFirstObjectByType<FirstPerson>();
     }
 
     private void Update()

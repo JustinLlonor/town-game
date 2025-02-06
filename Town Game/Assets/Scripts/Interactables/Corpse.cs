@@ -15,7 +15,7 @@ public class Corpse : NetworkBehaviour//PunCallbacks
 
     private void Awake()
     {
-        ui = FindObjectOfType<UIManager>();
+        ui = FindFirstObjectByType<UIManager>();
     }
 
     public void Init(PlayerEvidence playerEvidence, Vector3 velocity, bool isMale)

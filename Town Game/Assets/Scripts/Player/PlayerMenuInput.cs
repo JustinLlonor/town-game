@@ -6,7 +6,7 @@ public class PlayerMenuInput : MonoBehaviour
 {
     private void OnPlayerMenu()
     {
-        UIManager um = FindObjectOfType<UIManager>();
+        UIManager um = FindFirstObjectByType<UIManager>();
         if (um == null) return;
         um.OpenPlayerMenu();
     }

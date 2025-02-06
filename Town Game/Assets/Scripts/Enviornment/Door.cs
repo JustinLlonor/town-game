@@ -25,7 +25,7 @@ public class Door : MonoBehaviour
 
     private void Awake()
     {
-        gm = FindObjectOfType<GameManager>();
+        gm = FindFirstObjectByType<GameManager>();
         //view = transform.GetComponent<PhotonView>();
         originalAngle = doorTransform.localEulerAngles.y;
         // Sets all other colliders to the open collider

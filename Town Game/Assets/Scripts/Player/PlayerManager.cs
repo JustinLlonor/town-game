@@ -46,7 +46,7 @@ public class PlayerManager : NetworkBehaviour
 
     private void Start()
     {
-        networkRunner = FindObjectOfType<NetworkRunner>();
+        networkRunner = FindFirstObjectByType<NetworkRunner>();
         //if (!PhotonNetwork.IsConnected) return;
         //if (PhotonNetwork.CurrentRoom == null) return;
         //GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawn.position, spawn.rotation);
@@ -114,7 +114,7 @@ public class PlayerManager : NetworkBehaviour
 
         Rigidbody rb = currentPlayer.GetComponent<Rigidbody>();
         PlayerMovement pm = currentPlayer.GetComponent<PlayerMovement>();
-        CameraMovement cm = FindObjectOfType<CameraMovement>();
+        CameraMovement cm = FindFirstObjectByType<CameraMovement>();
         currentPlayer.transform.position = location;
         currentPlayer.transform.rotation = rotation;
         pm.cameraPosition.eulerAngles = new Vector3 (0, rotation.eulerAngles.y, 0);

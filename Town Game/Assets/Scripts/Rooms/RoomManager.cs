@@ -23,8 +23,8 @@ public class RoomManager : MonoBehaviour
 
     private void Awake()
     {
-        gm = FindObjectOfType<GameManager>();
-        cm = FindObjectOfType<CameraManager>();
+        gm = FindFirstObjectByType<GameManager>();
+        cm = FindFirstObjectByType<CameraManager>();
         foreach (Transform child in transform)
         {
             MapRoom.RoomType type = child.GetComponent<MapRoom>().roomType;

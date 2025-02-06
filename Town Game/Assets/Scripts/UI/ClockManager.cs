@@ -18,8 +18,8 @@ public class ClockManager : MonoBehaviour
 
     private void Awake()
     {
-        gm = FindObjectOfType<GameManager>();
-        sm = FindObjectOfType<ScheduleManager>();
+        gm = FindFirstObjectByType<GameManager>();
+        sm = FindFirstObjectByType<ScheduleManager>();
     }
 
     private void Start()

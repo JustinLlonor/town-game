@@ -25,7 +25,7 @@ public class Player : NetworkBehaviour
 
     private void Awake()
     {
-        playerManager = FindObjectOfType<PlayerManager>();
+        playerManager = FindFirstObjectByType<PlayerManager>();
         playerGFX = pm.graphics;
         cameraPosition = pm.cameraPosition;
     }
@@ -39,7 +39,7 @@ public class Player : NetworkBehaviour
 
     public override void Spawned()
     {
-        rm = FindObjectOfType<RunnerManager>();
+        rm = FindFirstObjectByType<RunnerManager>();
         Init?.Invoke();
         if (!HasInputAuthority) return;
         RPC_SendNickname(SessionData.nickname);

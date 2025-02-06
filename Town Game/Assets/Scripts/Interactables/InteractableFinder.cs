@@ -42,8 +42,8 @@ public class InteractableFinder : NetworkBehaviour
     {
         if (IsProxy) Destroy(this);
         if (HasInputAuthority) UIManager.instance.OnUIOpen += ResetInteractions;
-        iui = FindObjectOfType<InteractableUI>();
-        rm = FindObjectOfType<RunnerManager>();
+        iui = FindFirstObjectByType<InteractableUI>();
+        rm = FindFirstObjectByType<RunnerManager>();
     }
 
     public override void FixedUpdateNetwork()

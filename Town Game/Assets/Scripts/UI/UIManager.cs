@@ -24,15 +24,15 @@ public class UIManager : MonoBehaviour
     private void Awake()
     {
         instance = this;
-        cm = FindObjectOfType<CursorManager>();
-        iFinder = FindObjectOfType<InteractableFinder>();
+        cm = FindFirstObjectByType<CursorManager>();
+        iFinder = FindFirstObjectByType<InteractableFinder>();
         OnUIClose += CloseCorpse;
         OnUIClose += CloseTabMenu;
         OnUIClose += SetOpenFalse;
         OnUIOpen += SetOpenTrue;
         OnUIOpen += cm.Unlock;
-        PlayerManager pm = FindObjectOfType<PlayerManager>();
-        FindObjectOfType<CameraManager>().OnSwitchCameraMode += OnCameraChangeMode;
+        PlayerManager pm = FindFirstObjectByType<PlayerManager>();
+        FindFirstObjectByType<CameraManager>().OnSwitchCameraMode += OnCameraChangeMode;
     }
 
     private void OnExit()

@@ -93,11 +93,11 @@ public class GameManager : MonoBehaviour//PunCallbacks, IPunObservable
         rv = gameObject.GetComponent<RoleRevealer>();
         //view = transform.GetComponent<PhotonView>();
         OnRevealRoles += rv.RevealRole;
-        rm = FindObjectOfType<RoomManager>();
+        rm = FindFirstObjectByType<RoomManager>();
         //pm = FindObjectOfType<PlayerManager>();
-        sm = FindObjectOfType<ScheduleManager>();
+        sm = FindFirstObjectByType<ScheduleManager>();
         gt = gameObject.GetComponent<GameTimer>();
-        cm = FindObjectOfType<CameraManager>();
+        cm = FindFirstObjectByType<CameraManager>();
     }
 
     private void Start()

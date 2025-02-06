@@ -67,8 +67,8 @@ public class SteamLobbyManager : MonoBehaviour
 
     private void Start()
     {
-        sm = FindObjectOfType<ServerManager>();
-        runner = FindObjectOfType<NetworkRunner>();
+        sm = FindFirstObjectByType<ServerManager>();
+        runner = FindFirstObjectByType<NetworkRunner>();
     }
 
     private void Update()

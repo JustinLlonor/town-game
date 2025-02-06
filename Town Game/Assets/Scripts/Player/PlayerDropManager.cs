@@ -29,7 +29,7 @@ public class PlayerDropManager : NetworkBehaviour
     public override void Spawned()
     {
         if (Runner.IsServer) Runner.Spawn(itemGizmo, Vector3.zero, Quaternion.identity, Object.InputAuthority);
-        rm = FindObjectOfType<RunnerManager>();
+        rm = FindFirstObjectByType<RunnerManager>();
         inventory.OnSwitchSlot += CancelDrop;
     }
 

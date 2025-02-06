@@ -20,7 +20,7 @@ public class InputUIManager : MonoBehaviour
             if (!no.HasInputAuthority) Destroy(this);
         }
         playerInput = gameObject.GetComponent<PlayerInput>();
-        cameraManager = FindObjectOfType<CameraManager>();
+        cameraManager = FindFirstObjectByType<CameraManager>();
         cameraManager.OnSwitchCameraMode += OnCameraChangedMode;
     }
 

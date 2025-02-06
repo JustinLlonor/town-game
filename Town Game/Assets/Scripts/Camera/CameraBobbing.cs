@@ -31,7 +31,7 @@ public class CameraBobbing : MonoBehaviour
     {
         currentLength = walkLength;
         currentAmplitude = wAmplitude;
-        FindObjectOfType<PlayerManager>().OnInstantiatePlayer += SetupReferences;
+        FindFirstObjectByType<PlayerManager>().OnInstantiatePlayer += SetupReferences;
     }
 
     void SetupReferences(GameObject player)

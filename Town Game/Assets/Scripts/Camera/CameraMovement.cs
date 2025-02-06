@@ -25,11 +25,11 @@ public class CameraMovement : MonoBehaviour
     private void Awake()
     {
         cameraManager = FindAnyObjectByType<CameraManager>();
-        cursorManager = FindObjectOfType<CursorManager>();
-        runnerManager = FindObjectOfType<RunnerManager>();
-        FindObjectOfType<PlayerManager>().OnInstantiatePlayer += AssignReferences;
+        cursorManager = FindFirstObjectByType<CursorManager>();
+        runnerManager = FindFirstObjectByType<RunnerManager>();
+        FindFirstObjectByType<PlayerManager>().OnInstantiatePlayer += AssignReferences;
         cameraManager.OnSwitchCameraMode += OnCameraModeChange;
-        GameManager gm = FindObjectOfType<GameManager>();
+        GameManager gm = FindFirstObjectByType<GameManager>();
         if (gm == null)
         {
             canMove = true;

@@ -23,8 +23,8 @@ public class CorpseUI : MonoBehaviour
 
     private void Awake()
     {
-        cm = FindObjectOfType<CursorManager>();
-        om = FindObjectOfType<ObjectManager>();
+        cm = FindFirstObjectByType<CursorManager>();
+        om = FindFirstObjectByType<ObjectManager>();
     }
 
     public void CreateEvidenceList(List<Evidence> evidence, int depth)

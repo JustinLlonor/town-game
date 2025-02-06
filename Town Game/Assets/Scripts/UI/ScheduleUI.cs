@@ -45,8 +45,8 @@ public class ScheduleUI : MonoBehaviour
 
     private void Awake()
     {
-        sm = FindObjectOfType<ScheduleManager>();
-        gm = FindObjectOfType<GameManager>();
+        sm = FindFirstObjectByType<ScheduleManager>();
+        gm = FindFirstObjectByType<GameManager>();
         sm.OnUpdateGlobalEvents += AddBookmarks;
     }
 

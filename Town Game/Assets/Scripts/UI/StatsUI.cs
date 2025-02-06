@@ -39,7 +39,7 @@ public class StatsUI : MonoBehaviour
 
     private void Awake()
     {
-        PlayerManager pm = FindObjectOfType<PlayerManager>();
+        PlayerManager pm = FindFirstObjectByType<PlayerManager>();
         pm.OnInstantiatePlayer += AssignPlayerReferences;
     }
 

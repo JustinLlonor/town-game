@@ -14,7 +14,7 @@ public class SteamInviteAccepter : MonoBehaviour
 
     private void Awake()
     {
-        rm = FindObjectOfType<RunnerManager>();
+        rm = FindFirstObjectByType<RunnerManager>();
     }
 
     private void OnEnable()

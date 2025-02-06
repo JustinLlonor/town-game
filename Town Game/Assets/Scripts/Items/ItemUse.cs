@@ -15,9 +15,9 @@ public class ItemUse : MonoBehaviour
 
     private void Awake()
     {
-        cm = FindObjectOfType<CursorManager>();
+        cm = FindFirstObjectByType<CursorManager>();
         //view = gameObject.GetComponent<PhotonView>();
-        itemManager = FindObjectOfType<ObjectManager>();
+        itemManager = FindFirstObjectByType<ObjectManager>();
     }
 
     private void Update()
