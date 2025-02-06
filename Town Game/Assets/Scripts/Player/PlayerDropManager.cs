@@ -17,25 +17,23 @@ public class PlayerDropManager : NetworkBehaviour
     public float groundDistance = 0.01f;
     [Header("References")]
     public NetworkPrefabRef physItem;
-    public Transform itemDrop;
+    public NetworkPrefabRef itemGizmo;
     public Transform camTransform;
     public Material canPlace;
     public Material cantPlace;
+    public ItemGizmo gizmo;
     bool isPlacing = false;
     RunnerManager rm;
-    MeshRenderer itemRenderer;
-    MeshFilter itemFilter;
 
     public override void Spawned()
     {
+        if (Runner.IsServer) Runner.Spawn(itemGizmo, Vector3.zero, Quaternion.identity, Object.InputAuthority);
         rm = FindObjectOfType<RunnerManager>();
-        itemDrop = FindObjectOfType<PlayerManager>().dropGizmo;
-        itemRenderer = itemDrop.GetComponent<MeshRenderer>();
-        itemFilter = itemDrop.GetComponent<MeshFilter>();
     }
 
     public override void FixedUpdateNetwork()
     {
+        if (gizmo == null) return;
         // Change detector
         if (previousPressed != dropPressed)
         {
@@ -51,7 +49,7 @@ public class PlayerDropManager : NetworkBehaviour
         }
         if (isPlacing)
         {
-            CheckCanPlace();
+            UpdateGizmo();
         }
     }
 
@@ -62,30 +60,29 @@ public class PlayerDropManager : NetworkBehaviour
         // if we are not holding an item, return
         if (currentItem == null) return;
         // Enable mesh renderer
-        itemRenderer.enabled = true;
-        itemFilter.mesh = currentItem.mesh;
+        gizmo.SetRenderer(true, currentItem.mesh);
+        gizmo.SetColliderBounds(currentItem.mesh.bounds.center, currentItem.mesh.bounds.size);
         isPlacing = true;
-        itemDrop.GetComponent<BoxCollider>().center = currentItem.mesh.bounds.center;
-        itemDrop.GetComponent<BoxCollider>().size = currentItem.mesh.bounds.size;
     }
 
     void OnDropRelease()
     {
-        itemRenderer.enabled = false;
+        VerifyPlacement();
+        gizmo.SetRenderer(false);
         isPlacing = false;
     }
 
-    void SetMaterial(bool allowedPlace)
+    void VerifyPlacement() // Places the item if the item placement is valid
     {
-        if (allowedPlace)
+        if (gizmo.CheckPlaceable())
         {
-            itemRenderer.material = canPlace;
+            // Place the item
             return;
         }
-        itemRenderer.material = cantPlace;
+        // Play an error sfx
     }
 
-    void CheckCanPlace()
+    void UpdateGizmo()
     {
         Item currentItem = GetCurrentItem();
         if (currentItem == null) return;
@@ -94,18 +91,16 @@ public class PlayerDropManager : NetworkBehaviour
         if (Physics.Raycast(camTransform.position, direction, out hit, dropDistance, (int)environmentMask))
         {
             ChangeDropPosition(direction, hit.normal, hit.point, currentItem);
+            gizmo.checkForCollisions = true;
+            gizmo.SetMaterial(gizmo.CheckPlaceable());
         } 
         else
         {
-            SetMaterial(false);
+            gizmo.checkForCollisions = false;
+            gizmo.SetMaterial(false);
             Vector3 falseDirection = Quaternion.Euler(player.camDirectionX, player.camDirection, 0f) * Vector3.forward;
             ChangeDropPosition(Quaternion.Euler(player.camDirectionX - 90f, player.camDirection, 0f) * Vector3.forward, -falseDirection, camTransform.position + falseDirection * dropDistance, currentItem);
         }
-    }
-
-    bool CheckPlaceable() // Checks if can place inside a certain area, collider tolerance allows how much of the item can be placed in that area
-    {
-        return false;
     }
 
     void ChangeDropPosition(Vector3 direction, Vector3 up, Vector3 point, Item currentItem)
@@ -118,8 +113,7 @@ public class PlayerDropManager : NetworkBehaviour
         Vector3 visualPosition = point + up * (boundsY - yCenter.y);
         float boundsX = GetBoundsYPosition(itemBounds.min, itemBounds.max, itemBounds.center, currentItem.placedRotation + new Vector3(0f, 0f, 90f));
         visualPosition -= forward.normalized * (boundsX);
-        itemDrop.position = visualPosition;
-        itemDrop.rotation = orientation;
+        gizmo.ChangePosition(visualPosition, orientation);
     }
 
     /// <summary>

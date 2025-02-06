@@ -1251,13 +1251,15 @@ MonoBehaviour:
   dropPressed: 0
   player: {fileID: 9069154022521576282}
   dropDistance: 4
-  surfaceTolerance: 0.9238795
+  colliderTolerance: 0.05
   environmentMask:
     serializedVersion: 2
     m_Bits: 128
   groundDistance: 0.1
   physItem:
     RawGuidValue: ed8544e501428ac408be6a749e03b2d4
+  itemGizmo:
+    RawGuidValue: f7ee5bdcbcb56334cafa539d73522876
   itemDrop: {fileID: 0}
   camTransform: {fileID: 8806967224018203518}
   canPlace: {fileID: 2100000, guid: b51cc5a231301754c859aebb437eb17a, type: 2}

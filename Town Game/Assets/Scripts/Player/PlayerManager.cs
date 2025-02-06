@@ -23,7 +23,6 @@ public class PlayerManager : NetworkBehaviour
     public GameObject largeUI;
     public CleanupMaster cm;
     public FirstPerson fps;
-    public Transform dropGizmo;
 
     // Delegate for when the player gets spawned
     public InstantiatePlayer OnInstantiatePlayer;
@@ -102,7 +101,9 @@ public class PlayerManager : NetworkBehaviour
 
     public void RemovePlayer(PlayerRef player)
     {
-        Runner.Despawn(playerObjects[player]);
+        NetworkObject obj = playerObjects[player];
+        Runner.Despawn(obj.GetComponent<PlayerDropManager>().gizmo.GetComponent<NetworkObject>()); // Removes the item gizmo
+        Runner.Despawn(obj);
         playerObjects.Remove(player);
     }
 
