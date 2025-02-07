@@ -33,9 +33,18 @@ public class PlayerDropManager : NetworkBehaviour
         inventory.OnSwitchSlot += CancelDrop;
     }
 
+    private void Update()
+    {
+        if (isPlacing && HasInputAuthority)
+        {
+            UpdateGizmo();
+        }
+    }
+
     public override void FixedUpdateNetwork()
     {
         if (gizmo == null) return;
+        if (Runner.IsResimulation) return;
         // Change detector
         if (previousPressed != dropPressed)
         {
@@ -49,7 +58,7 @@ public class PlayerDropManager : NetworkBehaviour
                 OnDropRelease();
             }
         }
-        if (isPlacing)
+        if (Runner.IsServer && !HasInputAuthority)
         {
             UpdateGizmo();
         }
@@ -62,7 +71,7 @@ public class PlayerDropManager : NetworkBehaviour
         // if we are not holding an item, return
         if (currentItem == null) return;
         // Enable mesh renderer
-        gizmo.SetRenderer(true, currentItem.mesh);
+        if (HasInputAuthority) gizmo.SetRenderer(true, currentItem.mesh);
         gizmo.SetColliderBounds(currentItem.mesh.bounds.center, currentItem.mesh.bounds.size);
         isPlacing = true;
     }
@@ -76,7 +85,6 @@ public class PlayerDropManager : NetworkBehaviour
 
     void CancelDrop()
     {
-        Debug.Log("Cancelling");
         gizmo.SetRenderer(false);
         isPlacing = false;
     }
@@ -117,7 +125,18 @@ public class PlayerDropManager : NetworkBehaviour
     {
         Item currentItem = GetCurrentItem();
         if (currentItem == null) return;
-        Vector3 direction = Quaternion.Euler(player.camDirectionX, player.camDirection, 0f) * Vector3.forward;
+        float camX;
+        float camY;
+        if (!Runner.IsServer)
+        {
+            camX = rm.camOrientation;
+            camY = rm.orientation;
+        } else
+        {
+            camX = player.camDirectionX;
+            camY = player.camDirection;
+        }
+        Vector3 direction = Quaternion.Euler(camX, camY, 0f) * Vector3.forward;
         RaycastHit hit;
         if (Physics.Raycast(camTransform.position, direction, out hit, dropDistance, (int)environmentMask))
         {
@@ -137,8 +156,8 @@ public class PlayerDropManager : NetworkBehaviour
             isPlace = false;
             gizmo.checkForCollisions = false;
             gizmo.SetMaterial(false);
-            Vector3 falseDirection = Quaternion.Euler(player.camDirectionX, player.camDirection, 0f) * Vector3.forward;
-            ChangeDropPosition(Quaternion.Euler(player.camDirectionX - 90f, player.camDirection, 0f) * Vector3.forward, -falseDirection, camTransform.position + falseDirection * dropDistance, currentItem);
+            Vector3 falseDirection = Quaternion.Euler(camX, camY, 0f) * Vector3.forward;
+            ChangeDropPosition(Quaternion.Euler(camX - 90f, camY, 0f) * Vector3.forward, -falseDirection, camTransform.position + falseDirection * dropDistance, currentItem);
         }
     }
 
