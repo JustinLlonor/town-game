@@ -15,7 +15,7 @@ public class SteamLobbyManager : MonoBehaviour
     protected Callback<LobbyEnter_t> LobbyEntered;
     protected Callback<GameLobbyJoinRequested_t> LobbyRequested;
 
-    private new void OnEnable()
+    private void OnEnable()
     {
         if (SteamManager.Initialized)
         {
@@ -26,7 +26,7 @@ public class SteamLobbyManager : MonoBehaviour
         }
     }
 
-    private new void OnDisable()
+    private void OnDisable()
     {
         if (SteamManager.Initialized)
         {

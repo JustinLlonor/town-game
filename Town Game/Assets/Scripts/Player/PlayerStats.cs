@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//using Photon.Pun;
 using System.Linq;
 using Fusion;
 using UnityEngine.SceneManagement;
@@ -71,10 +70,12 @@ public class PlayerStats : NetworkBehaviour
     private void Update()
     {
         FixDmg(); //Dmg animation
+        /**
         if (Input.GetKeyDown(KeyCode.K))
         {
             Kill();
         }
+        **/
         //if (!view.IsMine) return;
         //CheckAffecters();
     }

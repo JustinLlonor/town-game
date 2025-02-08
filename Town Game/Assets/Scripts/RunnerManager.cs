@@ -11,7 +11,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     public NetworkRunner nRunner;
     [Header("Input")]
-    public int waitingRoomIndex = 1;
+    public int testRoomIndex = 1;
     public Vector2 moveDirection;
     public float orientation;
     public float camOrientation;

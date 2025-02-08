@@ -16,11 +16,9 @@ public class Observable : MonoBehaviour
         cm = FindFirstObjectByType<CameraManager>();
     }
 
-    private void Update()
-    {
-
-    }
-
+    /// <summary>
+    /// Starts the observation for this observable
+    /// </summary>
     public void StartObservation()
     {
         if (isObserving) return;
@@ -29,10 +27,13 @@ public class Observable : MonoBehaviour
         cm.trackedObservableTransform = observeCameraTransform;
         cm.observableGive = give;
         cm.StartModeTransition(transitionDuration, CameraManager.CameraMode.Observe);
-        WaitTransition();
+        WaitTransition(); // Make player stuff here, network player states like isMoving
         isObserving = true;
     }
-        
+    
+    /// <summary>
+    /// Stops the observation for this observable
+    /// </summary>
     public void ExitObservation()
     {
         if (!isObserving) return;
