@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
+    public Camera mainCamera;
     public CameraMode mode;
     public Transform trackedFPSTransform;
     public Transform trackedCinematicTransform;

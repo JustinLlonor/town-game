@@ -112,6 +112,7 @@ public class FirstPerson : MonoBehaviour
 
     public void Disable()
     {
+        animator.SetBool("isRunning", false);
         visible = false;
         armsRenderer.enabled = false;
     }

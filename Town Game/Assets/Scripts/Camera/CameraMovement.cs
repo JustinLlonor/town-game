@@ -6,10 +6,15 @@ using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
+    public LayerMask subInteractableMask;
     public float mouseSensitivity = 1f;
     public Transform player;
     public Transform orientation;
     public Transform headAim;
+    public Transform observableCursor;
+    public CameraBehaviourBase cameraState;
+    private PlayerCameraMovement pCamState = new PlayerCameraMovement();
+    private ObservableCameraMovement oCamState = new ObservableCameraMovement();
 
     Transform fpsTransform;
     NetworkRigidbody3D playerRb;
@@ -41,7 +46,6 @@ public class CameraMovement : MonoBehaviour
 
     private void Update()
     {
-        if (player == null) return;
         CameraLook();
     }
 
@@ -53,20 +57,24 @@ public class CameraMovement : MonoBehaviour
     
     void CameraLook()
     {
-        if (cameraManager.isTransitioning) return;
-        if (!canMove) return;
-        if (!cursorManager.isLocked) return;
+        cameraState.CameraLook(this, cameraManager, runnerManager);
+    }
+
+    public bool CursorLocked()
+    {
+        return cursorManager.isLocked;
+    }
+
+    public Vector2 GetMouseMovement()
+    {
         float mouseX = Input.GetAxisRaw("Mouse X") * mouseSensitivity;
         float mouseY = Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
-        xRotation -= mouseY;
-        xRotation = Mathf.Clamp(xRotation, -90, 90);
-        yRotation += mouseX;
-        transform.eulerAngles = new Vector3(xRotation, yRotation, 0f);
-        orientation.eulerAngles = new Vector3(0, yRotation, 0);
-        player.rotation = orientation.rotation;
-        headAim.position = transform.position + transform.forward;
-        runnerManager.orientation = yRotation;
-        runnerManager.camOrientation = xRotation;
+        return new Vector2(mouseX, mouseY);
+    }
+
+    public Vector3 GetMousePosition()
+    {
+        return Input.mousePosition;
     }
 
     void AssignReferences(GameObject player)
@@ -77,6 +85,7 @@ public class CameraMovement : MonoBehaviour
         this.player = mv.graphics;
         orientation = mv.orientation;
         headAim = mv.headAim;
+        cameraState = pCamState;
 
         yRotation = player.transform.eulerAngles.y;
     }
@@ -84,7 +93,19 @@ public class CameraMovement : MonoBehaviour
     void OnCameraModeChange(CameraManager.CameraMode mode)
     {
         if (!settable && mode == CameraManager.CameraMode.FirstPerson) return;
-        canMove = (mode == CameraManager.CameraMode.FirstPerson);
+        canMove = (mode == CameraManager.CameraMode.FirstPerson); // Sets the canMove to true if it is first person
+        if (mode == CameraManager.CameraMode.FirstPerson)
+        {
+            Cursor.visible = true;
+            cursorManager.Lock();
+            cameraState = pCamState;
+        }
+        if (mode == CameraManager.CameraMode.Observe)
+        {
+            Cursor.visible = false;
+            cursorManager.Unlock();
+            cameraState = oCamState;
+        }
         if (mode == CameraManager.CameraMode.Cinematic)
         {
             headAim.position = transform.position;

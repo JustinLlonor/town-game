@@ -37,6 +37,7 @@ public class UIManager : MonoBehaviour
 
     private void OnExit()
     {
+        if (!uiOpened) return;
         OnUIClose.Invoke();
         cm.Lock();
     }
