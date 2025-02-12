@@ -9,7 +9,7 @@ public class CameraManager : MonoBehaviour
     public Transform trackedFPSTransform;
     public Transform trackedCinematicTransform;
     public Transform trackedObservableTransform;
-    public float observableGive;
+    [SerializeField] private Observable currentObservable;
 
     public SwitchCameraMode OnSwitchCameraMode;
     public delegate void SwitchCameraMode(CameraMode mode);
@@ -22,6 +22,8 @@ public class CameraManager : MonoBehaviour
         Cinematic = 1,
         Observe = 2
     }
+
+    public Observable GetCurrentObservable() { return currentObservable; }
 
     public void ChangeCameraMode(CameraMode newMode)
     {

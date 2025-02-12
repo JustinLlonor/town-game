@@ -8,7 +8,14 @@ public class ObservableCameraMovement : CameraBehaviourBase
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, 3f, cam.subInteractableMask))
         {
-            
+            Observable currentObservable = cameraManager.GetCurrentObservable();
+            if (currentObservable != null)
+            {
+                if (currentObservable is ItemObservable)
+                {
+                    ((ItemObservable)currentObservable).ReceiveInteractable(hit.transform.gameObject);
+                }
+            }
         }
     }
 }

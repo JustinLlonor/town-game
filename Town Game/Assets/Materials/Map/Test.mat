@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Char_A1
+  m_Name: Test
   m_Shader: {fileID: -6465566751694194690, guid: c83dd207f1241c34089d863437d408df, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -48,7 +48,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: e8238c84be7f8b64190ff84a5d240d21, type: 3}
+        m_Texture: {fileID: 2800000, guid: 2f3ac63c8db1c18478190b70b9087090, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTexture:
@@ -103,7 +103,7 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _LightingSteps: 2
+    - _LightingSteps: 3
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1

@@ -25,7 +25,6 @@ public class Observable : MonoBehaviour
         if (transitioning) return;
         if (cm.mode != CameraManager.CameraMode.FirstPerson) return;
         cm.trackedObservableTransform = observeCameraTransform;
-        cm.observableGive = give;
         cm.StartModeTransition(transitionDuration, CameraManager.CameraMode.Observe);
         WaitTransition(); // Make player stuff here, network player states like isMoving
         isObserving = true;
