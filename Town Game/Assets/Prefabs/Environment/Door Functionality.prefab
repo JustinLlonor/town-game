@@ -25,13 +25,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 536605266173448584}
-  serializedVersion: 2
   m_LocalRotation: {x: -2.0372681e-10, y: 2.910383e-11, z: 7.34488e-11, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 782857837459217864}
+  m_RootOrder: -2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &2652529519615077259
 BoxCollider:
@@ -70,31 +70,40 @@ MonoBehaviour:
   hovers:
   - lore: Curfew
     interactKey: 0
+    actions: []
     color: {r: 0.6886792, g: 0.6886792, b: 0.6886792, a: 1}
     delay: 0
-    action:
-      m_PersistentCalls:
-        m_Calls: []
     trackLore: 0
     trackColor: 0
+    networkSettings:
+      networked: 0
+      clientAction:
+        m_PersistentCalls:
+          m_Calls: []
   - lore: 
     interactKey: 0
+    actions: []
     color: {r: 0.6886792, g: 0.6886792, b: 0.6886792, a: 1}
     delay: 0
-    action:
-      m_PersistentCalls:
-        m_Calls: []
     trackLore: 0
     trackColor: 0
+    networkSettings:
+      networked: 0
+      clientAction:
+        m_PersistentCalls:
+          m_Calls: []
   - lore: 
     interactKey: 0
+    actions: []
     color: {r: 0.6886792, g: 0.6886792, b: 0.6886792, a: 1}
     delay: 0
-    action:
-      m_PersistentCalls:
-        m_Calls: []
     trackLore: 0
     trackColor: 0
+    networkSettings:
+      networked: 0
+      clientAction:
+        m_PersistentCalls:
+          m_Calls: []
   glow: 0
   renderers: []
   glowAmount: 1
@@ -123,13 +132,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3020144408493259837}
-  serializedVersion: 2
   m_LocalRotation: {x: -2.0372681e-10, y: 2.910383e-11, z: 7.34488e-11, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 782857837459217864}
+  m_RootOrder: -2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &854186398638495186
 BoxCollider:
@@ -168,25 +177,16 @@ MonoBehaviour:
   hovers:
   - lore: Open door
     interactKey: 1
+    actions: []
     color: {r: 1, g: 1, b: 1, a: 1}
     delay: 0.25
-    action:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 4461534919709972855}
-          m_TargetAssemblyTypeName: Door, Assembly-CSharp
-          m_MethodName: OpenDoorRPC
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
     trackLore: 0
     trackColor: 0
+    networkSettings:
+      networked: 0
+      clientAction:
+        m_PersistentCalls:
+          m_Calls: []
   glow: 0
   renderers: []
   glowAmount: 1
@@ -215,13 +215,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3681341374686129164}
-  serializedVersion: 2
   m_LocalRotation: {x: -2.0372681e-10, y: 2.910383e-11, z: 7.34488e-11, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 782857837459217864}
+  m_RootOrder: -2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &4620629840814321496
 BoxCollider:
@@ -260,25 +260,16 @@ MonoBehaviour:
   hovers:
   - lore: Close door
     interactKey: 1
+    actions: []
     color: {r: 1, g: 1, b: 1, a: 1}
     delay: 0
-    action:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 4461534919709972855}
-          m_TargetAssemblyTypeName: Door, Assembly-CSharp
-          m_MethodName: CloseDoorRPC
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
     trackLore: 0
     trackColor: 0
+    networkSettings:
+      networked: 0
+      clientAction:
+        m_PersistentCalls:
+          m_Calls: []
   glow: 0
   renderers: []
   glowAmount: 1
@@ -291,7 +282,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 782857837459217864}
-  - component: {fileID: 1415845095361435099}
   - component: {fileID: 4461534919709972855}
   m_Layer: 7
   m_Name: Door Functionality
@@ -307,7 +297,6 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4922160400263079796}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -317,29 +306,8 @@ Transform:
   - {fileID: 4529896349630448523}
   - {fileID: 3594986151960951651}
   m_Father: {fileID: 0}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1415845095361435099
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4922160400263079796}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents: []
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!114 &4461534919709972855
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -386,5 +354,3 @@ MonoBehaviour:
   interClose: {fileID: 3681341374686129164}
   interLocked: {fileID: 536605266173448584}
   doorOpened: 0
-  doorLocked: 0
-  testDoor: 0

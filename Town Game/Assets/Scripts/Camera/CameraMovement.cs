@@ -57,6 +57,7 @@ public class CameraMovement : MonoBehaviour
     
     void CameraLook()
     {
+        if (cameraState == null) return;
         cameraState.CameraLook(this, cameraManager, runnerManager);
     }
 
@@ -102,7 +103,7 @@ public class CameraMovement : MonoBehaviour
         }
         if (mode == CameraManager.CameraMode.Observe)
         {
-            Cursor.visible = false;
+            //Cursor.visible = false;
             cursorManager.Unlock();
             cameraState = oCamState;
         }

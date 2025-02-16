@@ -60,14 +60,14 @@ public class LobbyManager : MonoBehaviour//PunCallbacks
         }
         //PhotonNetwork.CreateRoom(createText.text, ro);
         if (SteamManager.Initialized) SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePrivate, 15);
-        runnerManager.StartGame(GameMode.Host, createText.text, runnerManager.testRoomIndex);
+        runnerManager.StartGame(GameMode.Host, createText.text, runnerManager.waitingRoomIndex);
     }
 
     public void JoinPress()
     {
         if (nicknameText.text.IsNullOrEmpty()) return;
         Debug.Log("Joining");
-        runnerManager.StartGame(GameMode.Client, joinText.text, runnerManager.testRoomIndex);
+        runnerManager.StartGame(GameMode.Client, joinText.text, runnerManager.waitingRoomIndex);
     }
 
     public void TestPress()

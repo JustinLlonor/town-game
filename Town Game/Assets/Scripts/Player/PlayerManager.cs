@@ -64,6 +64,7 @@ public class PlayerManager : NetworkBehaviour
 
     private void Update()
     {
+        if (networkRunner == null) return;
         if (!networkRunner.IsServer)
         {
             if (Physics.simulationMode == SimulationMode.Script)
