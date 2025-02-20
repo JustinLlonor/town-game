@@ -69,14 +69,20 @@ public class InteractableFinder : NetworkBehaviour
             if (currentInteraction.hovers.Length <= heldInteractable) return;
             if (serverTimer.Expired(Runner))
             {
-                if (Runner.IsServer) InvokeActions(currentInteraction.hovers[heldInteractable].actions, Object.InputAuthority);
+                Interactable.Hover hover = currentInteraction.hovers[heldInteractable];
+                if (Runner.IsServer) InvokeActions(hover.actions, Object.InputAuthority);
                 ResetInteractions();
+                if (HasInputAuthority)
+                {
+                    hover.networkSettings.clientAction.Invoke();
+                }
             }
         }
     }
 
     void InvokeActions(Interactable.Action[] actions, PlayerRef player)
     {
+        bool isServer = rm.nRunner.IsServer;
         foreach (Interactable.Action action in actions)
         {
             action.Invoke(player);
@@ -190,22 +196,21 @@ public class InteractableFinder : NetworkBehaviour
                 }
                 if (h.networkSettings.networked)
                 {
-                    if (Runner.IsServer)
+                    if (Runner.IsServer) // If server
                     {
                         if (h.delay == 0f) // If the delay is 0, immediately execute the action and return
                         {
                             InvokeActions(h.actions, Object.InputAuthority);
                             ResetInteractions();
-                            return;
                         }
-                        if (!timerRunning)
+                        else if (!timerRunning)
                         {
                             heldInteractable = i;
                             timerRunning = true;
                             serverTimer = TickTimer.CreateFromSeconds(Runner, h.delay);
                         }
                     }
-                    if (HasInputAuthority)
+                    if (HasInputAuthority) // If client
                     {
                         ServerInteractionKey(h, iui.transform.GetChild(i)); // Calls server interaction key from client
                     }
@@ -265,7 +270,6 @@ public class InteractableFinder : NetworkBehaviour
     IEnumerator StartServerTimer(Transform interaction, Interactable.Hover h) // For the client
     {
         float localTimer = 0f;
-        bool clientActed = false;
         while (currentPressed)
         {
             yield return null;
@@ -273,24 +277,11 @@ public class InteractableFinder : NetworkBehaviour
             {
                 localTimer += Time.deltaTime;
                 iui.SetHighlight(interaction, localTimer / h.delay);
-                if (localTimer >= h.delay)
-                {
-                    if (!clientActed)
-                    {
-                        h.networkSettings.clientAction.Invoke();
-                        clientActed = true; // Client actions
-                    }
-                }
             }
             else
             {
                 if (serverTimer.Expired(Runner))
                 {
-                    if (!clientActed)
-                    {
-                        h.networkSettings.clientAction.Invoke();
-                        clientActed = true; // Client actions
-                    }
                     iui.SetHighlight(interaction, 1f);
                     continue;
                 }

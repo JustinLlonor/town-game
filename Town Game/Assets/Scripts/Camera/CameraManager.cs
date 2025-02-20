@@ -24,6 +24,11 @@ public class CameraManager : MonoBehaviour
         Observe = 2
     }
 
+    public void SetCurrentObservable(Observable observable)
+    {
+        currentObservable = observable;
+    }
+
     public Observable GetCurrentObservable() { return currentObservable; }
 
     public void ChangeCameraMode(CameraMode newMode)
@@ -44,6 +49,9 @@ public class CameraManager : MonoBehaviour
                 transform.position = trackedObservableTransform.position;
                 transform.rotation = trackedObservableTransform.rotation;
             }
+        } else
+        {
+            currentObservable = null;
         }
         OnSwitchCameraMode?.Invoke(mode);
     }

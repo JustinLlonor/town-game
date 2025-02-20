@@ -12,7 +12,7 @@ public class TestScript : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.O))
         {
-            GetComponent<Observable>().ExitObservation();
+            GetComponent<Observable>().ExitObservation(true);
         }
     }
 }
