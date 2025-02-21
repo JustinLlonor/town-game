@@ -64,6 +64,7 @@ public class Observable : NetworkBehaviour
         cm.StartModeTransition(transitionDuration, CameraManager.CameraMode.Observe);
         cm.SetCurrentObservable(this);
         StartObservationEvent();
+        FindFirstObjectByType<PlayerManager>().playerObjects[Runner.LocalPlayer].GetComponent<Player>().inf.SetCanInteract(false);
         WaitTransition(); // Make player stuff here, network player states like isMoving
         isObserving = true;
     }
@@ -76,6 +77,7 @@ public class Observable : NetworkBehaviour
         if (!isObserving) return;
         if (transitioning && checkTransition) return;
         cm.StartFPSTransition(transitionDuration);
+        FindFirstObjectByType<PlayerManager>().playerObjects[Runner.LocalPlayer].GetComponent<Player>().inf.SetCanInteract(true);
         WaitTransition();
         isObserving = false;
     }
@@ -87,6 +89,9 @@ public class Observable : NetworkBehaviour
     public void StartObservationNetwork(PlayerRef player)
     {
         if (CheckObservationTaken(player)) return;
+        PlayerManager playerManager = FindFirstObjectByType<PlayerManager>();
+        playerManager.playerObjects[player].GetComponent<Player>().inf.SetCanInteract(false);
+        playerManager.playerObservables.Add(player, this);
         currentPlayer = player;
     }
 
@@ -96,6 +101,9 @@ public class Observable : NetworkBehaviour
     public void ExitObservationNetwork(PlayerRef player)
     {
         if (currentPlayer != player) return;
+        PlayerManager playerManager = FindFirstObjectByType<PlayerManager>();
+        playerManager.playerObjects[player].GetComponent<Player>().inf.SetCanInteract(true);
+        playerManager.playerObservables.Remove(player);
         currentPlayer = PlayerRef.None;
     }
 

@@ -17,6 +17,8 @@ public class InteractableFinder : NetworkBehaviour
     public InteractableUI iui;
     [Header("Keys")]
     public InputActionReference[] interactActions;
+    [Networked] public bool canInteract { get; set; } = true;
+    bool previousCanInteract = true;
 
     [HideInInspector] public bool iValid = true;
     public Interactable currentInteraction;
@@ -51,17 +53,32 @@ public class InteractableFinder : NetworkBehaviour
         inputManager.onInteract3 += OnInteract3;
     }
 
-    private void Awake()
+    public void SetCanInteract(bool interactability)
     {
-        
+        canInteract = interactability;
+    }
+
+    private void Update()
+    {
+        if (canInteract != previousCanInteract)
+        {
+            previousCanInteract = canInteract;
+            if (!canInteract)
+            {
+                ResetInteractions();
+            }
+        }
     }
 
     public override void FixedUpdateNetwork()
     {
         if (!Runner.IsResimulation)
         {
-            if (!menuData) CastRay(); // If the menu isn't open for the player, cast a ray
-            UpdateTracking(); // Tracked hovers for the client
+            if (canInteract)
+            {
+                if (!menuData && canInteract) CastRay(); // If the menu isn't open for the player, and we can interact, cast a ray
+                UpdateTracking(); // Tracked hovers for the client
+            }
             if (currentPressed != previousPressed)
             {
                 previousPressed = currentPressed;

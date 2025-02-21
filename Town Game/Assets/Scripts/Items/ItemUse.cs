@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using WebSocketSharp;
 using UnityEngine.EventSystems;
+using Fusion;
 
-public class ItemUse : MonoBehaviour
+public class ItemUse : NetworkBehaviour
 {
     [HideInInspector] public Animator animator;
     [HideInInspector] public PlayerInventory inventory;
@@ -18,9 +19,6 @@ public class ItemUse : MonoBehaviour
         cm = FindFirstObjectByType<CursorManager>();
         //view = gameObject.GetComponent<PhotonView>();
         itemManager = FindFirstObjectByType<ObjectManager>();
-        InputManager inputManager = FindFirstObjectByType<InputManager>();
-        inputManager.onPrimaryFire += OnPrimaryItem;
-        inputManager.onSecondaryFire += OnSecondaryItem;
     }
 
     private void Update()
@@ -28,8 +26,14 @@ public class ItemUse : MonoBehaviour
         // Update to new input system later
         //if (!view.IsMine) return;
         if (!cm.isLocked) return;
-        if (Input.GetKeyDown(KeyCode.Mouse0)) UseItem();
-        if (Input.GetKeyDown(KeyCode.Mouse1)) UseSecondary(); // Likely the old input system is getting mouse input, could possibly interrupt new input system, FIX THIS
+    }
+
+    public override void Spawned()
+    {
+        if (!HasInputAuthority) return;
+        InputManager inputManager = FindFirstObjectByType<InputManager>();
+        inputManager.onPrimaryFire += OnPrimaryItem;
+        inputManager.onSecondaryFire += OnSecondaryItem;
     }
 
     private void OnPrimaryItem()

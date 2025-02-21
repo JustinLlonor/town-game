@@ -10,9 +10,9 @@ using UnityEngine.SceneManagement;
 public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     public NetworkRunner nRunner;
-    [Header("Input")]
     public int waitingRoomIndex = 1;
     public int testRoomIndex = 3;
+    [Header("Input")]
     public Vector2 moveDirection;
     public float orientation;
     public float camOrientation;
@@ -24,6 +24,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
     public bool interactionPressed = false;
     public int interactionKey = 0;
     public bool dropPressed = false;
+    public bool exitObservePressed = false;
 
     PlayerManager pm;
 
@@ -86,7 +87,8 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         // Interactables
         data.interactPressed = interactionPressed;
         data.interaction = interactionKey;
-
+        data.buttons.Set(NetworkInputData.Buttons.ExitObserve, exitObservePressed);
+        exitObservePressed = false;
 
         input.Set(data);
     }

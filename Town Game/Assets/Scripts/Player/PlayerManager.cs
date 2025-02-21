@@ -9,6 +9,7 @@ using UnityEngine;
 public class PlayerManager : NetworkBehaviour
 {
     [Networked, Capacity(20)] public NetworkDictionary<PlayerRef, NetworkObject> playerObjects => default;
+    public Dictionary<PlayerRef, Observable> playerObservables = new Dictionary<PlayerRef, Observable>();
     
     public GameObject currentPlayer;
     public NetworkPrefabRef playerPrefab;

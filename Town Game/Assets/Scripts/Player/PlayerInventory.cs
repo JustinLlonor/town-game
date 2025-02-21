@@ -83,8 +83,6 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         if (equippedItem != null) largeUI.SetActive(equippedItem.large);
     }
 
-
-
     private void LateUpdate()
     {
         //if (!view.IsMine) return;
@@ -103,7 +101,6 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
             }
         }
         //for (int i = 0; i < itemData.Length; i++) itemData[i] = null; item data stuff doesn't matter until an item enters that slot
-        if (!HasInputAuthority) return;
     }
 
     public override void Render()

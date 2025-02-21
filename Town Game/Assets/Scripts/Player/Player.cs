@@ -45,6 +45,8 @@ public class Player : NetworkBehaviour
         RPC_SendNickname(SessionData.nickname);
         UIManager.instance.OnUIOpen += MenuOpen;
         UIManager.instance.OnUIClose += MenuClose;
+        InputManager inputManager = FindFirstObjectByType<InputManager>();
+        inputManager.onExitObserve += OnExitObservable;
     }
 
     public override void FixedUpdateNetwork()
@@ -84,6 +86,11 @@ public class Player : NetworkBehaviour
             inf.currentPressed = data.interactPressed;
             // Dropping
             dropManager.dropPressed = data.buttons.IsSet(NetworkInputData.Buttons.Drop);
+            // Observables
+            if (data.buttons.IsSet(NetworkInputData.Buttons.ExitObserve))
+            {
+                ExitObserve();
+            }
         }
         Simulate();
     }
@@ -112,6 +119,28 @@ public class Player : NetworkBehaviour
     void MenuClose()
     {
         rm.menu = false;
+    }
+
+    private void OnExitObservable()
+    {
+        rm.exitObservePressed = true;
+    }
+
+    private void ExitObserve()
+    {
+        if (Runner.IsServer)
+        {
+            PlayerRef thisPlayer = Object.InputAuthority;
+            if (playerManager.playerObservables.ContainsKey(thisPlayer))
+            {
+                playerManager.playerObservables[thisPlayer].ExitObservationNetwork(thisPlayer);
+            }
+        }
+        if (HasInputAuthority)
+        {
+            CameraManager cameraManager = FindFirstObjectByType<CameraManager>();
+            cameraManager.GetCurrentObservable().ExitObservation();
+        }
     }
 
     void CrouchSet(bool crouchPressed)
@@ -152,4 +181,5 @@ public class Player : NetworkBehaviour
         cameraPosition.rotation = Quaternion.Euler(camDirectionX, camDirection, 0f);
         pm.SetDirection(direction);
     }
+
 }

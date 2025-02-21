@@ -111,6 +111,7 @@ public class InputManager : MonoBehaviour
     public InputValueEvent onInteract3;
     // Observable
     public InputEvent onPrimaryObserve;
+    public InputEvent onExitObserve;
     // UI
     public InputEvent onExit;
     // ClosedUI
@@ -131,5 +132,5 @@ public class InputManager : MonoBehaviour
     private void OnPrimaryObserve() { onPrimaryObserve?.Invoke(); }
     private void OnExit() { onExit?.Invoke(); }
     private void OnPlayerMenu() { onPlayerMenu?.Invoke(); }
-
+    private void OnExitObserve() { onExitObserve?.Invoke(); }
 }

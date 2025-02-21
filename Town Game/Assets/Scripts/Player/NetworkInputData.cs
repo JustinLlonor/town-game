@@ -9,7 +9,8 @@ public struct NetworkInputData : INetworkInput
         Jump = 0,
         Crouch = 1,
         Sprint = 2,
-        Drop = 3
+        Drop = 3,
+        ExitObserve = 4
     }
 
     public NetworkButtons buttons;
