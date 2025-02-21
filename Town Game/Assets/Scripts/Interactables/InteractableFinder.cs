@@ -44,6 +44,16 @@ public class InteractableFinder : NetworkBehaviour
         if (HasInputAuthority) UIManager.instance.OnUIOpen += ResetInteractions;
         iui = FindFirstObjectByType<InteractableUI>();
         rm = FindFirstObjectByType<RunnerManager>();
+        if (!HasInputAuthority) return;
+        InputManager inputManager = FindFirstObjectByType<InputManager>();
+        inputManager.onInteract1 += OnInteract1;
+        inputManager.onInteract2 += OnInteract2;
+        inputManager.onInteract3 += OnInteract3;
+    }
+
+    private void Awake()
+    {
+        
     }
 
     public override void FixedUpdateNetwork()

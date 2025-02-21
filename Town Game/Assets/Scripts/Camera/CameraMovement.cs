@@ -3,6 +3,7 @@ using Fusion.Addons.Physics;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class CameraMovement : MonoBehaviour
 {
@@ -26,6 +27,7 @@ public class CameraMovement : MonoBehaviour
     [HideInInspector] public float yRotation = 0f;
     public bool canMove = true;
     bool settable = true;
+    Vector2 cameraDelta;
 
     private void Awake()
     {
@@ -35,6 +37,8 @@ public class CameraMovement : MonoBehaviour
         FindFirstObjectByType<PlayerManager>().OnInstantiatePlayer += AssignReferences;
         cameraManager.OnSwitchCameraMode += OnCameraModeChange;
         GameManager gm = FindFirstObjectByType<GameManager>();
+        InputManager inputManager = FindFirstObjectByType<InputManager>();
+        inputManager.onCamera += GetCameraDelta;
         if (gm == null)
         {
             canMove = true;
@@ -47,6 +51,11 @@ public class CameraMovement : MonoBehaviour
     private void Update()
     {
         CameraLook();
+    }
+
+    void GetCameraDelta(InputValue iv)
+    {
+        cameraDelta = iv.Get<Vector2>() / 40f;
     }
 
     void EnableCanMove()
@@ -68,8 +77,8 @@ public class CameraMovement : MonoBehaviour
 
     public Vector2 GetMouseMovement()
     {
-        float mouseX = Input.GetAxisRaw("Mouse X") * mouseSensitivity;
-        float mouseY = Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
+        float mouseX = cameraDelta.x * mouseSensitivity;
+        float mouseY = cameraDelta.y * mouseSensitivity;
         return new Vector2(mouseX, mouseY);
     }
 

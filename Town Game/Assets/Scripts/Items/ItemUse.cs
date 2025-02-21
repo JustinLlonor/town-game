@@ -18,6 +18,9 @@ public class ItemUse : MonoBehaviour
         cm = FindFirstObjectByType<CursorManager>();
         //view = gameObject.GetComponent<PhotonView>();
         itemManager = FindFirstObjectByType<ObjectManager>();
+        InputManager inputManager = FindFirstObjectByType<InputManager>();
+        inputManager.onPrimaryFire += OnPrimaryItem;
+        inputManager.onSecondaryFire += OnSecondaryItem;
     }
 
     private void Update()
@@ -26,10 +29,9 @@ public class ItemUse : MonoBehaviour
         //if (!view.IsMine) return;
         if (!cm.isLocked) return;
         if (Input.GetKeyDown(KeyCode.Mouse0)) UseItem();
-        if (Input.GetKeyDown(KeyCode.Mouse1)) UseSecondary(); // Likely the old input system is getting mouse input, could possibly interrupt new input system
+        if (Input.GetKeyDown(KeyCode.Mouse1)) UseSecondary(); // Likely the old input system is getting mouse input, could possibly interrupt new input system, FIX THIS
     }
 
-    
     private void OnPrimaryItem()
     {
         UseItem();

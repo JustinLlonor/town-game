@@ -45,6 +45,165 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _steamID: 
+--- !u!1 &363963279311297204
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4160039781275148989}
+  - component: {fileID: 7079801951623922194}
+  - component: {fileID: 4791146062468208012}
+  - component: {fileID: 5281006052331039976}
+  m_Layer: 0
+  m_Name: Input Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4160039781275148989
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 363963279311297204}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8927670568152924241}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7079801951623922194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 363963279311297204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: 6f2a2a3d5b1cccd4e88046785cd2ce93, type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents:
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 2568e392-c895-4593-ac3d-d4dcce40581e
+    m_ActionName: 'BaseGameplay/Jump[/Keyboard/space]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: e4812b0a-4811-433b-ae1c-efac752ca689
+    m_ActionName: 'BaseGameplay/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 5ecd9586-de83-42c3-b8ac-600ef13b621a
+    m_ActionName: 'BaseGameplay/Sprint[/Keyboard/shift]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: afac82ce-4652-4828-9b82-d477f08c97f1
+    m_ActionName: 'BaseGameplay/Crouch[/Keyboard/leftCtrl]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 13aa3ae3-942f-4916-a899-cab110403427
+    m_ActionName: 'BaseGameplay/Drop Item[/Keyboard/g]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 21d2956b-df0e-4765-84ae-e4b5f16d2bea
+    m_ActionName: 'BaseGameplay/Equip Item[/Keyboard/1,/Keyboard/2,/Keyboard/3,/Keyboard/4]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 82e6b616-5383-4f18-a59c-87c709b6eb2c
+    m_ActionName: BaseGameplay/Primary Item
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 1e8efdc8-2ef6-4bb5-8c1a-a80e512109d3
+    m_ActionName: BaseGameplay/Secondary Item
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: a1525880-b527-411d-bb67-113cea1b28de
+    m_ActionName: 'BaseGameplay/Camera[/Mouse/delta]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 3a10c83d-feb3-481f-9885-e33856884bb0
+    m_ActionName: 'Interaction/Interact 1[/Keyboard/e]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 63aff58c-9a94-4c7a-a2bf-b7752a8c7f1a
+    m_ActionName: 'Interaction/Interact 2[/Keyboard/q]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 22898674-1789-43cd-9d33-29fd7c498b92
+    m_ActionName: 'Interaction/Interact 3[/Keyboard/c]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 3a14f764-d453-435c-a843-dbc2f082846f
+    m_ActionName: 'Interaction/PlayerMenu[/Keyboard/tab]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 829af145-6f3d-4adb-8515-7504754198d9
+    m_ActionName: 'UI/Exit[/Keyboard/escape]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 203fbe19-ab72-46ae-a07b-ea584bb6d520
+    m_ActionName: Observable/New action
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: BaseGameplay
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
+--- !u!114 &4791146062468208012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 363963279311297204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c2fd60d41de9324f95579468e5561ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentMaps: []
+  baseGameplayMaps:
+  - BaseGameplay
+  - Interaction
+  - ClosedUI
+  observableMaps:
+  - Observable
+  - ClosedUI
+  uiMaps:
+  - UI
+  input: {fileID: 7079801951623922194}
+--- !u!114 &5281006052331039976
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 363963279311297204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f5cf3b6093861d4ca71e7ca2c067354, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2381419112232006619
 GameObject:
   m_ObjectHideFlags: 0
@@ -115,6 +274,7 @@ Transform:
   - {fileID: 8967740034207964387}
   - {fileID: 6392004144748257209}
   - {fileID: 745082805845088640}
+  - {fileID: 4160039781275148989}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

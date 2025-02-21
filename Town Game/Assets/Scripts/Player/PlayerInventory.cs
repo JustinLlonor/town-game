@@ -58,6 +58,9 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     private void Awake()
     {
         Init();
+        if (!HasInputAuthority) return;
+        InputManager inputManager = FindFirstObjectByType<InputManager>();
+        inputManager.onEquipItem += OnEquipItem;
     }
 
     public void Init()

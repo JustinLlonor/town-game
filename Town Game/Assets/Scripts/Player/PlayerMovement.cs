@@ -116,12 +116,9 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         standOffset = standPos.localPosition;
         crouchOffset = crouchPos.localPosition;
         no = gameObject.GetComponent<NetworkObject>();
-        //view = gameObject.GetComponent<PhotonView>();
         playerManager = FindFirstObjectByType<PlayerManager>();
         playerInput = gameObject.GetComponent<PlayerInput>();
         rb = gameObject.GetComponent<Rigidbody>();
-        //if (!view.IsMine) Destroy(playerInput);
-        //if (!view.IsMine) return;
         gameObject.GetComponent<Player>().Init += Init;
         stats = gameObject.GetComponent<PlayerStats>();
         runnerManager = FindFirstObjectByType<RunnerManager>();
@@ -147,6 +144,11 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         bobbing = playerManager.camBobbing;
         shake = playerManager.camShake;
         playerManager.camTransform.GetComponent<CameraManager>().SetTrackedFPSTransform(cameraPosition);
+        InputManager inputManager = FindFirstObjectByType<InputManager>();
+        inputManager.onMove += OnMove;
+        inputManager.onSprint += OnSprint;
+        inputManager.onCrouch += OnCrouch;
+        inputManager.onJump += OnJump;
     }
 
     private void Update()
@@ -253,6 +255,24 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         runnerManager.jump = true; // Set the jump button to true to be networked
     }
 
+    private void OnMove(InputValue iv)
+    {
+        if (!canMove) return;
+        Vector2 mv = iv.Get<Vector2>();
+        runnerManager.moveDirection = mv;
+    }
+
+    private void OnCrouch(InputValue iv)
+    {
+        if (iv.Get<float>() == 1f)
+        {
+            if (!canMove) return;
+            runnerManager.crouch = true;
+            return;
+        }
+        runnerManager.crouch = false;
+    }
+
     public void Jump()
     {
         if (!canMove) return;
@@ -289,24 +309,6 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
     public void JumpAnimation()
     {
         animator.Play("Jump");
-    }
-
-    private void OnMove(InputValue iv)
-    {
-        if (!canMove) return;
-        Vector2 mv = iv.Get<Vector2>();
-        runnerManager.moveDirection = mv;
-    }
-
-    private void OnCrouch(InputValue iv)
-    {
-        if (iv.Get<float>() == 1f)
-        {
-            if (!canMove) return;
-            runnerManager.crouch = true;
-            return;
-        }
-        runnerManager.crouch = false;
     }
 
     public void EnterCrouch()

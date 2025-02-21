@@ -31,6 +31,9 @@ public class PlayerDropManager : NetworkBehaviour
         if (Runner.IsServer) Runner.Spawn(itemGizmo, Vector3.zero, Quaternion.identity, Object.InputAuthority);
         rm = FindFirstObjectByType<RunnerManager>();
         inventory.OnSwitchSlot += CancelDrop;
+        if (!HasInputAuthority) return;
+        InputManager inputManager = FindFirstObjectByType<InputManager>();
+        inputManager.onDropItem += OnDropItem;
     }
 
     private void Update()
