@@ -1,14 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//using Photon.Pun;
 using WebSocketSharp;
 using UnityEngine.UI;
 using Fusion;
 using UnityEngine.InputSystem;
-using static Fusion.NetworkBehaviour;
-using Unity.VisualScripting;
-//using Photon.Realtime;
 
 // Sync player inventory stuff
 public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
@@ -58,9 +54,6 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     private void Awake()
     {
         Init();
-        if (!HasInputAuthority) return;
-        InputManager inputManager = FindFirstObjectByType<InputManager>();
-        inputManager.onEquipItem += OnEquipItem;
     }
 
     public void Init()
@@ -100,6 +93,10 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
                 itemData.Add(new ItemData());
             }
         }
+
+        if (!HasInputAuthority) return;
+        InputManager inputManager = FindFirstObjectByType<InputManager>();
+        inputManager.onEquipItem += OnEquipItem;
         //for (int i = 0; i < itemData.Length; i++) itemData[i] = null; item data stuff doesn't matter until an item enters that slot
     }
 

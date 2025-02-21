@@ -14,6 +14,7 @@ public class CameraMovement : MonoBehaviour
     public Transform headAim;
     public Transform observableCursor;
     public CameraBehaviourBase cameraState;
+    public float primaryDown = 0f;
     private PlayerCameraMovement pCamState = new PlayerCameraMovement();
     private ObservableCameraMovement oCamState = new ObservableCameraMovement();
 
@@ -39,6 +40,7 @@ public class CameraMovement : MonoBehaviour
         GameManager gm = FindFirstObjectByType<GameManager>();
         InputManager inputManager = FindFirstObjectByType<InputManager>();
         inputManager.onCamera += GetCameraDelta;
+        inputManager.onPrimaryObserve += GetObservablePrimary;
         if (gm == null)
         {
             canMove = true;
@@ -55,7 +57,12 @@ public class CameraMovement : MonoBehaviour
 
     void GetCameraDelta(InputValue iv)
     {
-        cameraDelta = iv.Get<Vector2>() / 40f;
+        cameraDelta = iv.Get<Vector2>() / 30f;
+    }
+
+    void GetObservablePrimary(InputValue iv)
+    {
+        primaryDown = iv.Get<float>();
     }
 
     void EnableCanMove()

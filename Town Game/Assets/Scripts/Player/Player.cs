@@ -22,6 +22,7 @@ public class Player : NetworkBehaviour
     [Networked] Vector2 direction { get; set; }
     bool nicknameSet = false;
     bool previousCrouchSet = false;
+    int lastSI = -1;
 
     private void Awake()
     {
@@ -91,8 +92,28 @@ public class Player : NetworkBehaviour
             {
                 ExitObserve();
             }
+            if (data.subInteractableIndex != -1)
+            {
+                IncreaseSIAtIndex(data.subInteractableIndex);
+            }
+            else
+            {
+                if (lastSI == -1)
+                {
+
+                }
+            }
         }
         Simulate();
+    }
+
+    private void IncreaseSIAtIndex(int index)
+    {
+        if (!playerManager.playerObservables.ContainsKey(Object.InputAuthority)) return;
+        if (!(playerManager.playerObservables[Object.InputAuthority] is ItemObservable)) return;
+        ItemObservable io = (ItemObservable)playerManager.playerObservables[Object.InputAuthority];
+
+        io.IncreaseSIProgress(Runner.DeltaTime, index);
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]

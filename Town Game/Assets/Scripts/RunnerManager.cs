@@ -25,6 +25,10 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
     public int interactionKey = 0;
     public bool dropPressed = false;
     public bool exitObservePressed = false;
+    public int siPressed = -1;
+    [HideInInspector] public bool heldOnSI = false;
+    [HideInInspector] public bool isHoldSI;
+    public bool firstFrame = true;
 
     PlayerManager pm;
 
@@ -89,6 +93,37 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         data.interaction = interactionKey;
         data.buttons.Set(NetworkInputData.Buttons.ExitObserve, exitObservePressed);
         exitObservePressed = false;
+        if (siPressed != -1)
+        {
+            if (isHoldSI)
+            {
+                firstFrame = false;
+                if (heldOnSI)
+                {
+                    data.subInteractableIndex = siPressed;
+                } else
+                {
+                    data.subInteractableIndex = -1;
+                }
+            }
+            else
+            {
+                if (firstFrame && heldOnSI)
+                {
+                    data.subInteractableIndex = siPressed;
+                    Debug.Log("Set first frame");
+                    firstFrame = false;
+                }
+                else
+                {
+                    data.subInteractableIndex = -1;
+                }
+            }
+        } else
+        {
+            firstFrame = true;
+            data.subInteractableIndex = -1;
+        }
 
         input.Set(data);
     }

@@ -2,21 +2,28 @@ using UnityEngine;
 
 public class ObservableCameraMovement : CameraBehaviourBase
 {
+    bool firstFrame = true;
     public override void CameraLook(CameraMovement cam, CameraManager cameraManager, RunnerManager runnerManager)
     {
-        if (!Input.GetMouseButton(0)) return;
+        Observable currentObservable = cameraManager.GetCurrentObservable();
+        if (currentObservable == null) return;
+        if (!(currentObservable is ItemObservable)) return;
+        if (cam.primaryDown == 0f)
+        {
+            ((ItemObservable)currentObservable).ResetInteractable();
+            firstFrame = true;
+            return;
+        }
         Ray ray = cameraManager.mainCamera.ScreenPointToRay(cam.GetMousePosition());
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, 3f, cam.subInteractableMask))
         {
-            Observable currentObservable = cameraManager.GetCurrentObservable();
-            if (currentObservable != null)
-            {
-                if (currentObservable is ItemObservable)
-                {
-                    ((ItemObservable)currentObservable).ReceiveInteractable(hit.transform.gameObject);
-                }
-            }
+            ((ItemObservable)currentObservable).ReceiveInteractable(hit.transform.gameObject, firstFrame);
+        } 
+        else
+        {
+            ((ItemObservable)currentObservable).ResetInteractable();
         }
+        firstFrame = false;
     }
 }

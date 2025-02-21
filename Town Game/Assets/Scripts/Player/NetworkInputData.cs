@@ -22,4 +22,6 @@ public struct NetworkInputData : INetworkInput
     public NetworkBool menu;
     public NetworkBool interactPressed;
     public int interaction;
+
+    public int subInteractableIndex; // -1 means not pressed
 }

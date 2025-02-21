@@ -340,12 +340,12 @@
             "actions": [
                 {
                     "name": "Primary Observe",
-                    "type": "Button",
+                    "type": "Value",
                     "id": "203fbe19-ab72-46ae-a07b-ea584bb6d520",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "Axis",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Exit Observe",

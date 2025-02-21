@@ -135,7 +135,6 @@ GameObject:
   - component: {fileID: 90547264}
   - component: {fileID: 90547263}
   - component: {fileID: 90547262}
-  - component: {fileID: 90547261}
   m_Layer: 12
   m_Name: Cube
   m_TagString: Untagged
@@ -231,18 +230,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &90547261
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 90547255}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 793fa5257247bef4a91251831b23ed22, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &90547262
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -258,7 +245,18 @@ MonoBehaviour:
   observeCameraTransform: {fileID: 328866711}
   transitionDuration: 0.5
   networked: 1
-  siObjects: []
+  siObjects:
+  - {fileID: 1521158749}
+  - {fileID: 365740225}
+  siStats:
+  - enabled: 1
+    hold: 1
+    holdRate: 0.2
+    cooldown: 0
+  - enabled: 1
+    hold: 0
+    holdRate: 0
+    cooldown: 0
   _siProgress: []
   _currentSI: 0
 --- !u!114 &90547263
