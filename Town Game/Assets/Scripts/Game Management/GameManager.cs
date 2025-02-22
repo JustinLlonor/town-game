@@ -1,15 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//using Photon.Pun;
-//using Photon.Realtime;
+using Fusion;
 using System.Linq;
 using TMPro;
 using Steamworks;
 using System;
-//using WebSocketSharp;
+using WebSocketSharp;
 
-public class GameManager : MonoBehaviour//PunCallbacks, IPunObservable
+public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
 {
     //public Vector2Int testTime;, not part
     public GlobalEvent testevent;

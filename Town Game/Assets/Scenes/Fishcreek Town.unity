@@ -4360,7 +4360,7 @@ GameObject:
   - component: {fileID: 893103986}
   - component: {fileID: 893103985}
   - component: {fileID: 893103984}
-  m_Layer: 15
+  m_Layer: 7
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4458,6 +4458,30 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7672904466477095405, guid: e4182a93f6f36da49902806272b5e851, type: 3}
   m_PrefabInstance: {fileID: 3149838951044529036}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &899381374 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5211516756420375758, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+  m_PrefabInstance: {fileID: 110649284601070364}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &899381376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 899381374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 2124293625
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 110649284601070366}
+  ForceRemoteRenderTimeframe: 0
 --- !u!1 &930193182
 GameObject:
   m_ObjectHideFlags: 0
@@ -4904,7 +4928,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1122534626}
   - component: {fileID: 1122534627}
-  - component: {fileID: 1122534628}
   m_Layer: 0
   m_Name: Room Holder
   m_TagString: Untagged
@@ -4960,18 +4983,6 @@ MonoBehaviour:
   buildingTransitionSpeed: 10
   ownedRooms: []
   currentBuilding: 0
---- !u!114 &1122534628
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1122534625}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1181082080
 GameObject:
   m_ObjectHideFlags: 0
@@ -9215,10 +9226,16 @@ PrefabInstance:
       propertyPath: sceneViewId
       value: 8
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3042919538494657000, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+    - {fileID: 8939135918072450520, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+    - {fileID: 2033373573955012660, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5211516756420375758, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 899381376}
   m_SourcePrefab: {fileID: 100100000, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
 --- !u!114 &110649284601070365 stripped
 MonoBehaviour:
@@ -9229,6 +9246,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 93e80c0d6411fac47aa6a89115cce7e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &110649284601070366 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1676236008550905741, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+  m_PrefabInstance: {fileID: 110649284601070364}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9f9def4262e76f4f8c1781626b806f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &361995279573289457 stripped
@@ -9860,6 +9888,10 @@ PrefabInstance:
       propertyPath: largeUI
       value: 
       objectReference: {fileID: 361995279573289457}
+    - target: {fileID: 4393661128077201535, guid: 510253d1d4f227543af658125b506bb6, type: 3}
+      propertyPath: spawnPlayersOnStart
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5674810268018765361, guid: 510253d1d4f227543af658125b506bb6, type: 3}
       propertyPath: SortKey
       value: 2414271228

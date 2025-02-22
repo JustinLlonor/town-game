@@ -8,6 +8,7 @@ using UnityEngine;
 
 public class PlayerManager : NetworkBehaviour
 {
+    public bool spawnPlayersOnStart = false;
     [Networked, Capacity(20)] public NetworkDictionary<PlayerRef, NetworkObject> playerObjects => default;
     public Dictionary<PlayerRef, Observable> playerObservables = new Dictionary<PlayerRef, Observable>();
     
@@ -40,14 +41,8 @@ public class PlayerManager : NetworkBehaviour
         public bool canJump = true;
     }
 
-    void Awake()
-    {
-        
-    }
-
     private void Start()
     {
-        networkRunner = FindFirstObjectByType<NetworkRunner>();
         //if (!PhotonNetwork.IsConnected) return;
         //if (PhotonNetwork.CurrentRoom == null) return;
         //GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawn.position, spawn.rotation);
@@ -61,6 +56,18 @@ public class PlayerManager : NetworkBehaviour
         //playerMovement.canJump = playerSettings.canJump;
 
         //currentPlayer = player;
+    }
+
+    public override void Spawned()
+    {
+        networkRunner = FindFirstObjectByType<NetworkRunner>();
+        if (spawnPlayersOnStart && networkRunner.IsServer)
+        {
+            foreach (PlayerRef player in networkRunner.ActivePlayers)
+            {
+                SpawnPlayer(networkRunner, player);
+            }
+        }
     }
 
     private void Update()

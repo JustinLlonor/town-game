@@ -1,5 +1,6 @@
 using Fusion;
 using Fusion.Addons.Physics;
+using Steamworks;
 using UnityEngine;
 using WebSocketSharp;
 
@@ -44,7 +45,8 @@ public class Player : NetworkBehaviour
         rm = FindFirstObjectByType<RunnerManager>();
         Init?.Invoke();
         if (!HasInputAuthority) return;
-        RPC_SendNickname(SessionData.nickname);
+        if (SteamManager.Initialized) RPC_SendNickname(SteamFriends.GetPersonaName());
+        else RPC_SendNickname(Object.InputAuthority.PlayerId.ToString());
         UIManager.instance.OnUIOpen += MenuOpen;
         UIManager.instance.OnUIClose += MenuClose;
         InputManager inputManager = FindFirstObjectByType<InputManager>();
@@ -118,6 +120,7 @@ public class Player : NetworkBehaviour
         io.IncreaseSIProgress(Runner.DeltaTime, index);
     }
 
+    // An RPC sent from the player to the server to set the nickname
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
     public void RPC_SendNickname(string name)
     {
