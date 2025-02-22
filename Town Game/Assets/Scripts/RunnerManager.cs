@@ -111,7 +111,6 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
                 if (firstFrame && heldOnSI)
                 {
                     data.subInteractableIndex = siPressed;
-                    Debug.Log("Set first frame");
                     firstFrame = false;
                 }
                 else

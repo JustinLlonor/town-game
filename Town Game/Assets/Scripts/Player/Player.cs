@@ -16,13 +16,13 @@ public class Player : NetworkBehaviour
     Transform cameraPosition;
     PlayerManager playerManager;
     RunnerManager rm;
+    CameraManager cm;
     // To sync the inputs on all other clients
     [Networked] public float camDirection { get; set; }
     [Networked] public float camDirectionX { get; set; }
     [Networked] Vector2 direction { get; set; }
     bool nicknameSet = false;
     bool previousCrouchSet = false;
-    int lastSI = -1;
 
     private void Awake()
     {
@@ -40,6 +40,7 @@ public class Player : NetworkBehaviour
 
     public override void Spawned()
     {
+        cm = FindFirstObjectByType<CameraManager>();
         rm = FindFirstObjectByType<RunnerManager>();
         Init?.Invoke();
         if (!HasInputAuthority) return;
@@ -92,26 +93,27 @@ public class Player : NetworkBehaviour
             {
                 ExitObserve();
             }
-            if (data.subInteractableIndex != -1)
+            if (data.subInteractableIndex != -1 && !Runner.IsResimulation)
             {
                 IncreaseSIAtIndex(data.subInteractableIndex);
-            }
-            else
-            {
-                if (lastSI == -1)
-                {
-
-                }
-            }
+            } 
         }
         Simulate();
     }
 
     private void IncreaseSIAtIndex(int index)
     {
-        if (!playerManager.playerObservables.ContainsKey(Object.InputAuthority)) return;
-        if (!(playerManager.playerObservables[Object.InputAuthority] is ItemObservable)) return;
-        ItemObservable io = (ItemObservable)playerManager.playerObservables[Object.InputAuthority];
+        ItemObservable io = null;
+        if (HasStateAuthority)
+        {
+            if (!playerManager.playerObservables.ContainsKey(Object.InputAuthority)) return;
+            if (!(playerManager.playerObservables[Object.InputAuthority] is ItemObservable)) return;
+            io = (ItemObservable)playerManager.playerObservables[Object.InputAuthority];
+        }
+        if (HasInputAuthority)
+        {
+            io = (ItemObservable)cm.GetCurrentObservable();
+        }
 
         io.IncreaseSIProgress(Runner.DeltaTime, index);
     }

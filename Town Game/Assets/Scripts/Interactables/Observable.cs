@@ -92,6 +92,7 @@ public class Observable : NetworkBehaviour
         PlayerManager playerManager = FindFirstObjectByType<PlayerManager>();
         playerManager.playerObjects[player].GetComponent<Player>().inf.SetCanInteract(false);
         playerManager.playerObservables.Add(player, this);
+        Object.AssignInputAuthority(player);
         currentPlayer = player;
     }
 
@@ -104,6 +105,7 @@ public class Observable : NetworkBehaviour
         PlayerManager playerManager = FindFirstObjectByType<PlayerManager>();
         playerManager.playerObjects[player].GetComponent<Player>().inf.SetCanInteract(true);
         playerManager.playerObservables.Remove(player);
+        Object.AssignInputAuthority(PlayerRef.None);
         currentPlayer = PlayerRef.None;
     }
 
