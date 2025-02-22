@@ -1366,7 +1366,7 @@ Transform:
   - {fileID: 1228468015}
   - {fileID: 1396315221}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &466027946
 PrefabInstance:
@@ -4216,7 +4216,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7010651056177408524, guid: cb50ca930099a6040ba0260e3c6dbe39, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 105.49265
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7010651056177408524, guid: cb50ca930099a6040ba0260e3c6dbe39, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -6025,7 +6025,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!224 &1413672852 stripped
 RectTransform:
@@ -6738,7 +6738,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1618606373
 GameObject:
@@ -7404,13 +7404,49 @@ PrefabInstance:
       propertyPath: itemName
       value: Fire Axe
       objectReference: {fileID: 0}
+    - target: {fileID: 878983568128443568, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: _itemName._length
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 878983568128443568, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: '_itemName._data.Data.Array.data[0]'
+      value: 70
+      objectReference: {fileID: 0}
+    - target: {fileID: 878983568128443568, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: '_itemName._data.Data.Array.data[1]'
+      value: 105
+      objectReference: {fileID: 0}
+    - target: {fileID: 878983568128443568, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: '_itemName._data.Data.Array.data[2]'
+      value: 114
+      objectReference: {fileID: 0}
+    - target: {fileID: 878983568128443568, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: '_itemName._data.Data.Array.data[3]'
+      value: 101
+      objectReference: {fileID: 0}
+    - target: {fileID: 878983568128443568, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: '_itemName._data.Data.Array.data[4]'
+      value: 32
+      objectReference: {fileID: 0}
+    - target: {fileID: 878983568128443568, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: '_itemName._data.Data.Array.data[5]'
+      value: 65
+      objectReference: {fileID: 0}
+    - target: {fileID: 878983568128443568, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: '_itemName._data.Data.Array.data[6]'
+      value: 120
+      objectReference: {fileID: 0}
+    - target: {fileID: 878983568128443568, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: '_itemName._data.Data.Array.data[7]'
+      value: 101
+      objectReference: {fileID: 0}
     - target: {fileID: 2385170970280949644, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
       propertyPath: SortKey
       value: 124525293
       objectReference: {fileID: 0}
     - target: {fileID: 4266447201804198896, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
       propertyPath: m_RootOrder
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4266447201804198896, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -9088,7 +9124,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 466519801941495353, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: m_RootOrder
-      value: 4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 466519801941495353, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: m_LocalPosition.x
@@ -9958,7 +9994,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8927670568152924241, guid: 510253d1d4f227543af658125b506bb6, type: 3}
       propertyPath: m_RootOrder
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8927670568152924241, guid: 510253d1d4f227543af658125b506bb6, type: 3}
       propertyPath: m_LocalPosition.x

@@ -11,6 +11,7 @@ public class PlayerManager : NetworkBehaviour
     public bool spawnPlayersOnStart = false;
     [Networked, Capacity(20)] public NetworkDictionary<PlayerRef, NetworkObject> playerObjects => default;
     public Dictionary<PlayerRef, Observable> playerObservables = new Dictionary<PlayerRef, Observable>();
+    public Dictionary<PlayerRef, PlayerProperties> playerProperties;
     
     public GameObject currentPlayer;
     public NetworkPrefabRef playerPrefab;
@@ -39,6 +40,32 @@ public class PlayerManager : NetworkBehaviour
     {
         public float speed = 3f;    
         public bool canJump = true;
+    }
+
+    public struct PlayerProperties
+    {
+        public string nickname;
+        public bool isCultist;
+        public int room;
+        public int currency;
+
+        public PlayerProperties(string nickname, bool isCultist, int room, int currency)
+        {
+            this.nickname = nickname;
+            this.isCultist = isCultist;
+            this.room = room;
+            this.currency = currency;
+        }
+
+        public void SetRoom(int newRoom)
+        {
+            room = newRoom;
+        }
+
+        public void SetCurrency(int newCurrency)
+        {
+            currency = newCurrency;
+        }
     }
 
     private void Start()
@@ -105,6 +132,7 @@ public class PlayerManager : NetworkBehaviour
     {
         NetworkObject playerObject = runner.Spawn(playerPrefab, spawn.position, Quaternion.identity, player);
         playerObjects.Add(player, playerObject);
+        playerProperties.Add(player, new PlayerProperties());
         // Add OnInstantiate later
     }
 
@@ -124,7 +152,6 @@ public class PlayerManager : NetworkBehaviour
         }
     }
 
-    //[PunRPC]
     public void Teleport(Vector3 location, Quaternion rotation)
     {
         if (currentPlayer == null) return;

@@ -101,12 +101,67 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
 
     private void Start()
     {
-        //if (PhotonNetwork.IsMasterClient)
+        StartGame();
+    }
+
+    // Calls all the game start functions
+    void StartGame()
+    {
+        if (!Runner.IsServer) return;
+        AssignRooms();
+        SetCurrency();
+    }
+
+    // Assigns rooms to different players, sohuld only be called on state authority
+    void AssignRooms()
+    {
+       int playerCount = Runner.ActivePlayers.Count();
+       if (Runner.ActivePlayers.Count() > rm.playerRooms.Count)
+        {
+            Debug.LogError("Not enough rooms!");
+            // Stop game function here
+            return;
+        }
+
+        int[] roomAssignment = new int[playerCount];
+
+        for (int i = 0; i < roomAssignment.Length; i++) roomAssignment[i] = -1;
+
+        for (int i = 0; i < roomAssignment.Length; i++)
+        {
+            int randomRoom = UnityEngine.Random.Range(0, rm.playerRooms.Count);
+            while (roomAssignment.Contains(randomRoom))
+            {
+                randomRoom = UnityEngine.Random.Range(0, rm.playerRooms.Count);
+            }
+            roomAssignment[i] = randomRoom;
+        }
+        
+        for (int i = 0; i < roomAssignment.Length; i++)
+        {
+            PlayerRef rPlayer = new List<PlayerRef>(Runner.ActivePlayers)[i];
+            pm.playerProperties[rPlayer].SetRoom(roomAssignment[i]);
+        //    ExitGames.Client.Photon.Hashtable pProperties = PhotonNetwork.PlayerList[i].CustomProperties;
+        //    pProperties["room"] = roomAssignment[i];
+        //    PhotonNetwork.PlayerList[i].SetCustomProperties(pProperties);
+        }
+    }
+
+    void InitiatePositions() // Initiates the positions for every player in the lobby, gets removed on death
+    {
+        //foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
         //{
-        //    AssignRooms();
-        //    InitiatePositions();
-        //    SetCurrency();
+        //    view.RPC("CreatePositionToken", RpcTarget.AllBuffered, player.CustomProperties["name"], (int)Position.Habitant);
         //}
+    }
+
+    void SetCurrency()
+    {
+        // Sets  the currency to the start currency for every player in the lobby
+        foreach (PlayerRef player in  Runner.ActivePlayers)
+        {
+            pm.playerProperties[player].SetCurrency(startCurrency);
+        }
     }
 
     private void Update()
@@ -259,57 +314,8 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         //    chosenBuildings.Add(player, "house"); // Adds the player's home as the default building
         //}
     }
- 
-    void AssignRooms()
-    {
-        //if (PhotonNetwork.PlayerList.Length > rm.playerRooms.Count)
-        //{
-        //    Debug.LogError("Not enough rooms!");
-            // Stop game function here
-        //    return;
-        //}
 
-        //int[] roomAssignment = new int[PhotonNetwork.PlayerList.Length];
-
-        //for (int i = 0; i < roomAssignment.Length; i++) roomAssignment[i] = -1;
-
-        //for (int i = 0; i < roomAssignment.Length; i++)
-        //{
-        //    int randomRoom = UnityEngine.Random.Range(0, rm.playerRooms.Count);
-        //    while (roomAssignment.Contains(randomRoom))
-        //    {
-        //        randomRoom = UnityEngine.Random.Range(0, rm.playerRooms.Count);
-        //    }
-        //    roomAssignment[i] = randomRoom;
-        //}
-        
-        //for (int i = 0; i < roomAssignment.Length; i++)
-        //{
-        //    ExitGames.Client.Photon.Hashtable pProperties = PhotonNetwork.PlayerList[i].CustomProperties;
-        //    pProperties["room"] = roomAssignment[i];
-        //    PhotonNetwork.PlayerList[i].SetCustomProperties(pProperties);
-        //}
-    }
-
-    // Initiates the positions for every player in the lobby, gets removed on death
-    void InitiatePositions()
-    {
-        //foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
-        //{
-        //    view.RPC("CreatePositionToken", RpcTarget.AllBuffered, player.CustomProperties["name"], (int)Position.Habitant);
-        //}
-    }
-
-    void SetCurrency()
-    {
-        //foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
-        //{
-        //    ExitGames.Client.Photon.Hashtable properties = player.CustomProperties;
-        //    properties["money"] = 100;
-        //    player.SetCustomProperties(properties);
-        //}
-    }
-
+    // Old code for position creation, ignore
     //[PunRPC]
     public void CreatePositionToken(string player, int position)
     {
