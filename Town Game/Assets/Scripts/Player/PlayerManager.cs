@@ -107,6 +107,14 @@ public class PlayerManager : NetworkBehaviour
         Runner.Despawn(obj.GetComponent<PlayerDropManager>().gizmo.GetComponent<NetworkObject>()); // Removes the item gizmo
         Runner.Despawn(obj);
         playerObjects.Remove(player);
+        // Removes the player from observable dictionary if they are observing something
+        if (playerObservables.ContainsKey(player))
+        {
+            playerObjects[player].GetComponent<Player>().inf.SetCanInteract(true);
+            playerObservables.Remove(player);
+            Object.AssignInputAuthority(PlayerRef.None);
+            playerObservables[player].currentPlayer = PlayerRef.None;
+        }
     }
 
     //[PunRPC]
