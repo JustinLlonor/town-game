@@ -66,7 +66,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         if (runner.IsServer)
         {
             pm = FindFirstObjectByType<PlayerManager>();
-            pm.SpawnPlayer(runner, player); // Adds a new player when a player joins
+            if (pm.spawnPlayersOnJoin) pm.SpawnPlayer(runner, player); // Adds a new player when a player joins
         }
     }
 

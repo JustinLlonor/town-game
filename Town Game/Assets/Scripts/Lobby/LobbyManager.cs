@@ -43,6 +43,7 @@ public class LobbyManager : MonoBehaviour//PunCallbacks
 
     public void TestPress()
     {
+        SessionData.isTesting = true;
         runnerManager.StartGame(GameMode.Single, joinText.text, runnerManager.testRoomIndex);
     }
 }

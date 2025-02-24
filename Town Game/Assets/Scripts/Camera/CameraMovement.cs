@@ -15,6 +15,7 @@ public class CameraMovement : MonoBehaviour
     public Transform observableCursor;
     public CameraBehaviourBase cameraState;
     public float primaryDown = 0f;
+    public ZTilt zTilt;
     private PlayerCameraMovement pCamState = new PlayerCameraMovement();
     private ObservableCameraMovement oCamState = new ObservableCameraMovement();
 

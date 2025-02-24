@@ -26,8 +26,8 @@ public class RoleRevealer : MonoBehaviour
         cm = FindFirstObjectByType<CameraManager>();
         bs = FindFirstObjectByType<BlackScreen>();
         rtxt = FindFirstObjectByType<RoleText>();;
+        FindObjectOfType<PlayerManager>().OnInstantiatePlayer += GetReferences;
         //if (PhotonNetwork.CurrentRoom != null) bs.ShowCover();
-        //FindObjectOfType<PlayerManager>().OnInstantiatePlayer += GetReferences;
     }
     
     private void Update()
@@ -46,6 +46,7 @@ public class RoleRevealer : MonoBehaviour
 
     public void RevealRole(bool isCultist)
     {
+        Debug.Log("RR Start");
         OnGetRole?.Invoke(isCultist);
         StartCoroutine(StartReveal(isCultist));
     }

@@ -20,6 +20,7 @@ public class PlayerInfoView : NetworkBehaviour
     [HideInInspector] public NetworkObject no;
     int previousIndex = -1;
     bool updatedNick = false;
+    bool init = false;
 
     private void Awake()
     {
@@ -34,7 +35,12 @@ public class PlayerInfoView : NetworkBehaviour
             transform.GetComponent<Collider>().enabled = false;
         }
     }
-   
+
+    public override void Spawned()
+    {
+        init = true;
+    }
+
     private void Update()
     {
         if (vi == null) return;
@@ -50,6 +56,7 @@ public class PlayerInfoView : NetworkBehaviour
 
     void UpdateNickname()
     {
+        if (!init) return;
         if (updatedNick) return;
         if (!player.nickname.IsNullOrEmpty())
         {

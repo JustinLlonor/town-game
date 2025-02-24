@@ -437,6 +437,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Voice",
+            "id": "5551bae3-6dcc-40c2-ab9c-4126fbfd53b1",
+            "actions": [
+                {
+                    "name": "Activate",
+                    "type": "Value",
+                    "id": "fc805eeb-9d14-4ff3-b8ec-39187df97257",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "75f9c93d-856b-45e2-92c6-322ae9dec056",
+                    "path": "<Keyboard>/v",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Activate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []

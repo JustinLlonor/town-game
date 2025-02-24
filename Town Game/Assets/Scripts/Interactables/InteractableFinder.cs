@@ -39,11 +39,13 @@ public class InteractableFinder : NetworkBehaviour
     List<int> trackedIndexes = new List<int>();
     [HideInInspector] public Vector3 forwardDirection;
     [HideInInspector] public bool menuData = false;
+    bool init = false;
 
     public override void Spawned()
     {
         if (IsProxy) Destroy(this);
         if (HasInputAuthority) UIManager.instance.OnUIOpen += ResetInteractions;
+        init = true;
         iui = FindFirstObjectByType<InteractableUI>();
         rm = FindFirstObjectByType<RunnerManager>();
         if (!HasInputAuthority) return;
@@ -60,6 +62,7 @@ public class InteractableFinder : NetworkBehaviour
 
     private void Update()
     {
+        if (!init) return;
         if (canInteract != previousCanInteract)
         {
             previousCanInteract = canInteract;

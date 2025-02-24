@@ -8,10 +8,11 @@ using UnityEngine;
 
 public class PlayerManager : NetworkBehaviour
 {
-    public bool spawnPlayersOnStart = false;
+    public bool spawnPlayersOnJoin = true;
     [Networked, Capacity(20)] public NetworkDictionary<PlayerRef, NetworkObject> playerObjects => default;
     public Dictionary<PlayerRef, Observable> playerObservables = new Dictionary<PlayerRef, Observable>();
-    public Dictionary<PlayerRef, PlayerProperties> playerProperties;
+    public Dictionary<PlayerRef, PlayerProperties> playerProperties = new Dictionary<PlayerRef, PlayerProperties>();
+    public PlayerProperties currentPlayerProperties = new PlayerProperties("", false, 0, 0);
     
     public GameObject currentPlayer;
     public NetworkPrefabRef playerPrefab;
@@ -42,7 +43,7 @@ public class PlayerManager : NetworkBehaviour
         public bool canJump = true;
     }
 
-    public struct PlayerProperties
+    public class PlayerProperties
     {
         public string nickname;
         public bool isCultist;
@@ -57,9 +58,14 @@ public class PlayerManager : NetworkBehaviour
             this.currency = currency;
         }
 
+        public void SetIsCultist(bool newIsCultist)
+        {
+            isCultist = newIsCultist;
+        }
+
         public void SetRoom(int newRoom)
         {
-            room = newRoom;
+            this.room = newRoom;
         }
 
         public void SetCurrency(int newCurrency)
@@ -88,13 +94,6 @@ public class PlayerManager : NetworkBehaviour
     public override void Spawned()
     {
         networkRunner = FindFirstObjectByType<NetworkRunner>();
-        if (spawnPlayersOnStart && networkRunner.IsServer)
-        {
-            foreach (PlayerRef player in networkRunner.ActivePlayers)
-            {
-                SpawnPlayer(networkRunner, player);
-            }
-        }
     }
 
     private void Update()
@@ -132,8 +131,13 @@ public class PlayerManager : NetworkBehaviour
     {
         NetworkObject playerObject = runner.Spawn(playerPrefab, spawn.position, Quaternion.identity, player);
         playerObjects.Add(player, playerObject);
-        playerProperties.Add(player, new PlayerProperties());
         // Add OnInstantiate later
+    }
+
+    public void SpawnPlayerAtTransform(NetworkRunner runner, PlayerRef player, Transform transform)
+    {
+        NetworkObject playerObject = runner.Spawn(playerPrefab, transform.position, Quaternion.identity, player);
+        playerObjects.Add(player, playerObject);
     }
 
     public void RemovePlayer(PlayerRef player)
@@ -152,19 +156,25 @@ public class PlayerManager : NetworkBehaviour
         }
     }
 
-    public void Teleport(Vector3 location, Quaternion rotation)
+    /// <summary>
+    /// Teleports the specified player to the location with the rotation
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="location"></param>
+    /// <param name="rotation"></param>
+    public void Teleport(PlayerRef player, Vector3 location, Quaternion rotation)
     {
-        if (currentPlayer == null) return;
-
-        Rigidbody rb = currentPlayer.GetComponent<Rigidbody>();
-        PlayerMovement pm = currentPlayer.GetComponent<PlayerMovement>();
+        if (!Runner.IsServer) return;
+        GameObject tpPlayer = playerObjects.Get(player).gameObject;
+        Rigidbody rb = tpPlayer.GetComponent<Rigidbody>();
+        PlayerMovement pm = tpPlayer.GetComponent<PlayerMovement>();
         CameraMovement cm = FindFirstObjectByType<CameraMovement>();
-        currentPlayer.transform.position = location;
-        currentPlayer.transform.rotation = rotation;
-        pm.cameraPosition.eulerAngles = new Vector3 (0, rotation.eulerAngles.y, 0);
-        rb.velocity = Vector3.zero;
         rb.position = location;
         rb.rotation = rotation;
+        tpPlayer.transform.position = location;
+        tpPlayer.transform.rotation = rotation;
+        pm.cameraPosition.eulerAngles = new Vector3 (0, rotation.eulerAngles.y, 0);
+        rb.velocity = Vector3.zero;
         cm.yRotation = rotation.eulerAngles.y;
         cm.xRotation = rotation.eulerAngles.x;
         OnTeleportPlayer?.Invoke();

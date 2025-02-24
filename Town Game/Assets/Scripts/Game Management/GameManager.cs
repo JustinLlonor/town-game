@@ -7,6 +7,7 @@ using TMPro;
 using Steamworks;
 using System;
 using WebSocketSharp;
+using static PlayerManager;
 
 public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
 {
@@ -16,8 +17,8 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     public int gamePhase = 0;
     [Header("Game Variables")]
     //public Player campLeader;
-    //public Player[] cultists = new Player[] { };
-    //public Player[] alivePlayers = new Player[] { }; // doesn't update with alive players yet
+    public PlayerRef[] cultists = new PlayerRef[] { };
+    public PlayerRef[] alivePlayers = new PlayerRef[] { }; // doesn't update with alive players yet
     public Dictionary<string, Position> playerPositions = new Dictionary<string, Position>();
     //public Dictionary<Player, string> chosenBuildings = new Dictionary<Player, string>();
     public float gameTime = 0f;
@@ -60,6 +61,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     public GameEvent OnTimeResume;
     public delegate void GameEvent();
     public delegate void RevealRoles(bool isCultist);
+    bool init = false;
 
     public enum Position
     {
@@ -93,23 +95,19 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         //view = transform.GetComponent<PhotonView>();
         OnRevealRoles += rv.RevealRole;
         rm = FindFirstObjectByType<RoomManager>();
-        //pm = FindObjectOfType<PlayerManager>();
+        pm = FindFirstObjectByType<PlayerManager>();
         sm = FindFirstObjectByType<ScheduleManager>();
         gt = gameObject.GetComponent<GameTimer>();
         cm = FindFirstObjectByType<CameraManager>();
+        if (!SessionData.isTesting)
+        {
+            FindFirstObjectByType<BlackScreen>().ShowCover();
+        }
     }
 
-    private void Start()
+    public override void Spawned()
     {
-        StartGame();
-    }
-
-    // Calls all the game start functions
-    void StartGame()
-    {
-        if (!Runner.IsServer) return;
-        AssignRooms();
-        SetCurrency();
+        init = true;
     }
 
     // Assigns rooms to different players, sohuld only be called on state authority
@@ -141,9 +139,6 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         {
             PlayerRef rPlayer = new List<PlayerRef>(Runner.ActivePlayers)[i];
             pm.playerProperties[rPlayer].SetRoom(roomAssignment[i]);
-        //    ExitGames.Client.Photon.Hashtable pProperties = PhotonNetwork.PlayerList[i].CustomProperties;
-        //    pProperties["room"] = roomAssignment[i];
-        //    PhotonNetwork.PlayerList[i].SetCustomProperties(pProperties);
         }
     }
 
@@ -166,9 +161,10 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
 
     private void Update()
     {
+        if (!init) return;
         CheckDay();
         UpdateGameTime();
-        //if (!PhotonNetwork.IsMasterClient) return;
+        if (!Runner.IsServer) return;
         //if (Input.GetKeyDown(KeyCode.Backspace)) SetTime(testTime.x, testTime.y);
         if (Input.GetKeyDown(KeyCode.Backspace))
         {
@@ -209,8 +205,27 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
 
     void Phase0()
     {
-        AssignRoles();
+        CreatePlayerProperties();
+        AssignRooms(); // Sets the room properties of each player
+        SetCurrency(); // Sets the default currency of each player
+        SpawnPositions(); // Spawns each player
+        AssignRoles(); // Assigns the roles of each player (and reveals)
         SetTime(startTime.x, startTime.y);
+    }
+
+    void CreatePlayerProperties()
+    {
+        foreach (PlayerRef player in Runner.ActivePlayers)
+        {
+            pm.playerProperties.Add(player, new PlayerProperties("", false, -1, 0));
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_SendRole([RpcTarget] PlayerRef player, bool isCultist)
+    {
+        pm.currentPlayerProperties.SetIsCultist(isCultist);
+        OnRevealRoles?.Invoke(isCultist);
     }
 
     void CheckDayStart()
@@ -340,63 +355,62 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
 
     void AssignRoles()
     {
-        //List<Player> players = new List<Player>();
+        List<PlayerRef> players = new List<PlayerRef>();
         // Sets isCultist to false for every player, adds to playerlist
-        //foreach (Player player in PhotonNetwork.PlayerList)
-        //{
-        //    AssignRole(player, false);
-        //    players.Add(player);
-        //}
-        //alivePlayers = players.ToArray();
+        foreach (PlayerRef player in Runner.ActivePlayers)
+        {
+            AssignRole(player, false);
+            players.Add(player);
+        }
+        alivePlayers = players.ToArray();
 
         // Sets cultistNumber to the amount of cultists in the game
         int cultistNumber = 0;
         int i = 0;
-        //while (i < PhotonNetwork.PlayerList.Length)
-        //{
-        //    if (cultistAssignment[i] == true) cultistNumber++;
-        //    i++;
-        //}
+        while (i < Runner.ActivePlayers.Count())
+        {
+            if (cultistAssignment[i] == true) cultistNumber++;
+            i++;
+        }
         //Debug.Log("Cultist number " + cultistNumber);
 
         // Creates a list of the current cultists
-        //List<Player> assignedCultists = PhotonNetwork.PlayerList.ToList();
-        //Debug.Log("Player list count: " + assignedCultists.Count);
-        //while (assignedCultists.Count > cultistNumber)
-        //{
-        //    int removalIndex = UnityEngine.Random.Range(0, assignedCultists.Count);
-        //    Debug.Log("Removing at " + removalIndex);
-        //    assignedCultists.RemoveAt(removalIndex);
-        //}
+        List<PlayerRef> assignedCultists = new List<PlayerRef>(Runner.ActivePlayers);
+        Debug.Log("Player list count: " + assignedCultists.Count);
+        while (assignedCultists.Count > cultistNumber)
+        {
+            int removalIndex = UnityEngine.Random.Range(0, assignedCultists.Count);
+            Debug.Log("Removing at " + removalIndex);
+            assignedCultists.RemoveAt(removalIndex);
+        }
 
         // Sets isCultist to true for every cultist
-        //foreach (Player cultist in assignedCultists)
-        //{
-        //    AssignRole(cultist, true);
-        //}
+        foreach (PlayerRef cultist in assignedCultists)
+        {
+            AssignRole(cultist, true);
+        }
 
-        // Reveals roles
-        //foreach (Player player in PhotonNetwork.PlayerList)
-        //{
-        //    view.RPC("RevealRole", player);
-        //}
+        cultists = assignedCultists.ToArray();
 
-        //cultists = assignedCultists.ToArray();
+        foreach (PlayerRef player in Runner.ActivePlayers)
+        {
+            RPC_SendRole(player, pm.playerProperties[player].isCultist);
+        }
     }
 
-    void AssignRole()//Player player, bool isCultist)
+    void AssignRole(PlayerRef player, bool isCultist)
     {
-    //    ExitGames.Client.Photon.Hashtable playerProperties = player.CustomProperties;
-    //    playerProperties["isCultist"] = isCultist;
-    //    player.SetCustomProperties(playerProperties);
+        pm.playerProperties[player].SetIsCultist(isCultist);
     }
 
-    //[PunRPC]
-    public void RevealRole()
+    public void SpawnPositions()
     {
         // Invokes reveal roles delegate for the role reveal sequence
-        //Transform roomT = rm.playerRooms[(int)PhotonNetwork.LocalPlayer.CustomProperties["room"]].spawnTransform;
-        //pm.Teleport(roomT.position, roomT.rotation);
+        foreach (PlayerRef player in Runner.ActivePlayers)
+        {
+            Transform roomT = rm.playerRooms[pm.playerProperties[player].room].spawnTransform;
+            pm.SpawnPlayerAtTransform(Runner, player, roomT);
+        }
         //OnRevealRoles?.Invoke((bool)PhotonNetwork.LocalPlayer.CustomProperties["isCultist"]);
     }
 

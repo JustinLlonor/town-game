@@ -19,5 +19,6 @@ public class PlayerCameraMovement : CameraBehaviourBase
         cam.headAim.position = cam.transform.position + cam.transform.forward;
         runnerManager.orientation = cam.yRotation;
         runnerManager.camOrientation = cam.xRotation;
+        cam.zTilt.ReceiveCM(mouseMv);
     }
 }
