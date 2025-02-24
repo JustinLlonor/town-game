@@ -10,6 +10,7 @@ using UnityEngine.SceneManagement;
 public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     public NetworkRunner nRunner;
+    public int mainMenuIndex = 0;
     public int waitingRoomIndex = 1;
     public int testRoomIndex = 3;
     [Header("Input")]
@@ -138,7 +139,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
     {
-
+        SceneManager.LoadScene(mainMenuIndex);
     }
 
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }

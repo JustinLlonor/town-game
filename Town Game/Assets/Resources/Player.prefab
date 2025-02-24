@@ -215,6 +215,7 @@ MonoBehaviour:
   - {fileID: -5521037850191274806, guid: d1a46caebc7ff67479477b2b749f204b, type: 3}
   - {fileID: 724544186050314342, guid: d1a46caebc7ff67479477b2b749f204b, type: 3}
   - {fileID: -5860677679832714288, guid: d1a46caebc7ff67479477b2b749f204b, type: 3}
+  _canInteract: 1
   iValid: 1
   currentInteraction: {fileID: 0}
   player: {fileID: 9069154022521576282}
@@ -1048,6 +1049,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _isMale: 0
+  _skinTone: 0
+  skinTones:
+  - {fileID: 2100000, guid: ef526697ae326fa4995303c6d58932f7, type: 2}
+  - {fileID: 2100000, guid: e1258ddff029bcd469c2eb0bcafdfe11, type: 2}
+  - {fileID: 2100000, guid: c86683c1742598949a65b19ea1d1a5b0, type: 2}
   isCorpse: 0
   attires:
   - bodyPart: 0

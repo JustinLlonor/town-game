@@ -60,7 +60,7 @@ public class InteractableFinder : NetworkBehaviour
         canInteract = interactability;
     }
 
-    private void Update()
+    public override void Render()
     {
         if (!init) return;
         if (canInteract != previousCanInteract)

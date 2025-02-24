@@ -9,6 +9,7 @@ public class FirstPerson : MonoBehaviour
     public PlayerMovement trackedMV;
     public Transform itemTransform;
     public SkinnedMeshRenderer armsRenderer;
+    public SkinnedMeshRenderer handsRenderer;
     MeshFilter itemFilter;
     MeshRenderer itemRenderer;
     Animator animator;
@@ -98,6 +99,12 @@ public class FirstPerson : MonoBehaviour
     public void ChangeArmMesh(Mesh mesh)
     {
         armsRenderer.sharedMesh = mesh;
+    }
+
+    public void ChangeArmMaterials(Material material)
+    {
+        armsRenderer.material = material;
+        handsRenderer.material = material;
     }
 
     void OnCameraModeChange(CameraManager.CameraMode mode)

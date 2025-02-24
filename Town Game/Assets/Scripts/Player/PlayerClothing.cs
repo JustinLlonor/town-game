@@ -12,6 +12,8 @@ public class PlayerClothing : NetworkBehaviour
     public Attire[] attires;
     [Networked, Capacity(5)] public NetworkArray<int> nAttires { get; } = MakeInitializer(new int[5]); // Change this number as you add more clothes
     public RandomizedClothing[] randomizedClothing;
+    [Networked] public int skinTone { get; set; }
+    public Material[] skinTones;
     ObjectManager om;
     ChangeDetector changeDetector;
     FirstPerson fps;
@@ -31,6 +33,7 @@ public class PlayerClothing : NetworkBehaviour
         if (!HasStateAuthority) return;
         RandomizeGender();
         RandomizeClothing();
+        RandomizeSkinColor();
     }
 
     public override void Render()
@@ -41,6 +44,10 @@ public class PlayerClothing : NetworkBehaviour
             {
                 case nameof(nAttires): // goofy ahh code
                     RenderAllClothing();
+                    break;
+                case nameof(skinTone):
+                    SetAllAttireMaterials(skinTones[skinTone]);
+                    if (HasInputAuthority) fps.ChangeArmMaterials(skinTones[skinTone]);
                     break;
             }
         }
@@ -131,6 +138,12 @@ public class PlayerClothing : NetworkBehaviour
         }
     }
 
+    public void RandomizeSkinColor()
+    {
+        int randomColor = UnityEngine.Random.Range((int)0, (int)skinTones.Length);
+        SetSkinColor(randomColor);
+    }
+
     void RenderClothing(Attire attire)
     {
         if (attire.clothing == null) return;
@@ -156,6 +169,19 @@ public class PlayerClothing : NetworkBehaviour
             }
             ((SkinnedMeshRenderer)attire.renderer).sharedMesh = attire.clothing.femaleModel;
             return;
+        }
+    }
+
+    public void SetSkinColor(int skinColorIndex)
+    {
+        skinTone = skinColorIndex;
+    }
+
+    public void SetAllAttireMaterials(Material material)
+    {
+        foreach (Attire attire in attires)
+        {
+            attire.renderer.material = material;
         }
     }
 
