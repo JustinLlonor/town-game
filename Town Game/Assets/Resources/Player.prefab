@@ -1049,11 +1049,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _isMale: 0
-  _skinTone: 0
-  skinTones:
-  - {fileID: 2100000, guid: ef526697ae326fa4995303c6d58932f7, type: 2}
-  - {fileID: 2100000, guid: e1258ddff029bcd469c2eb0bcafdfe11, type: 2}
-  - {fileID: 2100000, guid: c86683c1742598949a65b19ea1d1a5b0, type: 2}
   isCorpse: 0
   attires:
   - bodyPart: 0
@@ -1076,7 +1071,11 @@ MonoBehaviour:
     renderer: {fileID: 7586582529506314482}
     clothing: {fileID: 0}
     hiddenParts: 
-  _nAttires: 0000000000000000000000000000000000000000
+  - bodyPart: 2
+    renderer: {fileID: 5395435907658582406}
+    clothing: {fileID: 0}
+    hiddenParts: 
+  _nAttires: 000000000000000000000000000000000000000000000000
   randomizedClothing:
   - clothings:
     - {fileID: 11400000, guid: bc71a214499ce35498253c0637e60fd3, type: 2}
@@ -1109,6 +1108,11 @@ MonoBehaviour:
   - clothings:
     - {fileID: 11400000, guid: d3922b8ed0318a541956cb0d56437bd3, type: 2}
     nullChance: 0
+  _skinTone: 0
+  skinTones:
+  - {fileID: 2100000, guid: ef526697ae326fa4995303c6d58932f7, type: 2}
+  - {fileID: 2100000, guid: e1258ddff029bcd469c2eb0bcafdfe11, type: 2}
+  - {fileID: 2100000, guid: c86683c1742598949a65b19ea1d1a5b0, type: 2}
 --- !u!114 &4000725801890306170
 MonoBehaviour:
   m_ObjectHideFlags: 0

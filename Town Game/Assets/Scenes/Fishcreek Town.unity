@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.14712596, g: 0.17876688, b: 0.11010601, a: 1}
+  m_IndirectSpecularColor: {r: 0.14712575, g: 0.17876674, b: 0.11010596, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1569,11 +1569,6 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 7672904466477095405, guid: e4182a93f6f36da49902806272b5e851, type: 3}
   m_PrefabInstance: {fileID: 524385197}
-  m_PrefabAsset: {fileID: 0}
---- !u!20 &584956733 stripped
-Camera:
-  m_CorrespondingSourceObject: {fileID: 4730499524169653944, guid: 510253d1d4f227543af658125b506bb6, type: 3}
-  m_PrefabInstance: {fileID: 4651078421021443356}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &585955852
 GameObject:
@@ -4350,7 +4345,7 @@ GameObject:
   - component: {fileID: 1396315220}
   - component: {fileID: 1396315219}
   - component: {fileID: 1396315218}
-  m_Layer: 7
+  m_Layer: 15
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7230,7 +7225,7 @@ PrefabInstance:
     - target: {fileID: 7676982022842817193, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
       propertyPath: uiFront
       value: 
-      objectReference: {fileID: 584956733}
+      objectReference: {fileID: 0}
     - target: {fileID: 7975865857500244657, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
       propertyPath: m_Name
       value: Interact Text
@@ -7489,6 +7484,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 359856739840586900, guid: 510253d1d4f227543af658125b506bb6, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -110.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 359856739840586900, guid: 510253d1d4f227543af658125b506bb6, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -39.2
+      objectReference: {fileID: 0}
     - target: {fileID: 745082805845088640, guid: 510253d1d4f227543af658125b506bb6, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0
@@ -7517,6 +7520,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.y
       value: 90
       objectReference: {fileID: 0}
+    - target: {fileID: 924202023757738992, guid: 510253d1d4f227543af658125b506bb6, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1195583651662735641, guid: 510253d1d4f227543af658125b506bb6, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -7528,6 +7535,10 @@ PrefabInstance:
     - target: {fileID: 3102990639695460404, guid: 510253d1d4f227543af658125b506bb6, type: 3}
       propertyPath: m_Name
       value: 3D Scene Scripts
+      objectReference: {fileID: 0}
+    - target: {fileID: 3648693726865100316, guid: 510253d1d4f227543af658125b506bb6, type: 3}
+      propertyPath: m_CameraType
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4393661128077201535, guid: 510253d1d4f227543af658125b506bb6, type: 3}
       propertyPath: hotbar
@@ -7553,10 +7564,22 @@ PrefabInstance:
       propertyPath: sceneViewId
       value: 26
       objectReference: {fileID: 0}
+    - target: {fileID: 5796150539774158859, guid: 510253d1d4f227543af658125b506bb6, type: 3}
+      propertyPath: SortKey
+      value: 914708853
+      objectReference: {fileID: 0}
     - target: {fileID: 6343291171063278774, guid: 510253d1d4f227543af658125b506bb6, type: 3}
       propertyPath: iui
       value: 
       objectReference: {fileID: 622337005}
+    - target: {fileID: 6663378448941250897, guid: 510253d1d4f227543af658125b506bb6, type: 3}
+      propertyPath: hotbar
+      value: 
+      objectReference: {fileID: 6172742886535201663}
+    - target: {fileID: 6663378448941250897, guid: 510253d1d4f227543af658125b506bb6, type: 3}
+      propertyPath: spawnPlayersOnJoin
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6829310027673692852, guid: 510253d1d4f227543af658125b506bb6, type: 3}
       propertyPath: m_LocalPosition.x
       value: -3.415
