@@ -130,7 +130,7 @@ MonoBehaviour:
   wAmplitude: 0.03
   sAmplitude: 0.05
   cAmplitude: 0.04
-  zTilt: 25
+  zTilt: 210
   resetSpeed: 5
   transitionSpeed: 5
   isBobbing: 0
@@ -671,9 +671,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0941ba3d65fbaa74c833cdb4501ade68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cb: {fileID: 5936565786900437778}
   maxDeg: 10
-  camXMultiplier: 0.5
-  lerpSpeed: 10
+  camXMultiplier: 1.4
+  stepSpeed: 20
 --- !u!1001 &5748298751459455394
 PrefabInstance:
   m_ObjectHideFlags: 0

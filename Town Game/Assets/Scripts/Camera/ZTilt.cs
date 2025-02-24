@@ -5,22 +5,29 @@ using UnityEngine;
 
 public class ZTilt : MonoBehaviour
 {
+    public CameraBobbing cb;
     public float maxDeg = 10f;
     public float camXMultiplier = 2.5f;
-    public float lerpSpeed = 10f;
+    public float stepSpeed = 5f;
     float desiredZ = 0f;
-    Vector2 cm = new Vector2();
+    float cmX = 0f;
+    int tFrame = 30;
+
+    private void Start()
+    {
+        Application.targetFrameRate = 30;
+    }
 
     public void ReceiveCM(Vector2 cameraMovement)
     {
-        cm.x = cameraMovement.x;
-        cm.y = cameraMovement.y;
+        cmX = cameraMovement.x;
     }
 
     private void Update()
     {
-        desiredZ = Mathf.Clamp(cm.x * camXMultiplier, -maxDeg, maxDeg);
-        float newZ = Mathf.LerpAngle(transform.eulerAngles.z, desiredZ, Time.deltaTime * lerpSpeed);
+        if (!cb.isCrouching) desiredZ = Mathf.Clamp((cmX * camXMultiplier) / (Time.deltaTime * 90f), -maxDeg, maxDeg); // Consistent with all mouse speeds
+        else desiredZ = 0f;
+        float newZ = Mathf.MoveTowardsAngle(transform.eulerAngles.z, desiredZ, Time.deltaTime * stepSpeed);
         transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, newZ);
     }
 }
