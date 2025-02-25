@@ -33,6 +33,11 @@ public struct ScheduleBlock
         this.interestGroups = interestGroups;
     }
 
+    /// <summary>
+    /// Checks if a schedule block is equal to another schedule block. Only checks the period name, room, length, and time, but not the assignedPlayers and interest groups.
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
     public override bool Equals(object obj)
     {
         if (!(obj is ScheduleBlock)) return false;
@@ -58,6 +63,23 @@ public struct ScheduleBlock
             if (group < 0) return false;
         }
         return true;
+    }
+
+    /// <summary>
+    /// Gets the equivalent block in the specified schedule
+    /// </summary>
+    /// <param name="schedule"></param>
+    /// <returns></returns>
+    public ScheduleBlock GetEquivalentBlockInSchedule(List<ScheduleBlock> schedule)
+    {
+        foreach (ScheduleBlock scheduleBlock in schedule)
+        {
+            if (this.Equals(scheduleBlock))
+            {
+                return scheduleBlock;
+            }
+        }
+        return ScheduleBlock.None;
     }
 
     public static ScheduleBlock None

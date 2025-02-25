@@ -83,39 +83,52 @@ public class ScheduleManager : NetworkBehaviour
     {
         ScheduleBlock newBlock = new ScheduleBlock(periodName, room, length, time, assignedPlayers, interestGroups);
         masterSchedule.Add(newBlock);
-        SendBlockData(newBlock);
+        SendAddBlockData(newBlock);
         return newBlock;
     }
 
     /// <summary>
-    /// Removes a schedule block from the master schedule
+    /// Removes a schedule block from the master schedule. If the schedule block is in the future, the removal is cancelled.
     /// </summary>
     /// <param name="block"></param>
     public void RemoveBlock(ScheduleBlock block)
     {
-        if (masterSchedule.Contains(block)) masterSchedule.Remove(block);
+        int blockIndex = masterSchedule.IndexOf(block);
+        if (blockIndex == -1) return;
+        SendRemoveBlockData(block);
+        masterSchedule.RemoveAt(blockIndex);
         // Add code for removing on clients later
-    }
-
-    public void UpdatePlayerScheduleBlocK()
-    {
-
     }
 
     /// <summary>
     /// Sends the specified block to all holders of an interest group
     /// </summary>
     /// <param name="block"></param>
-    void SendBlockData(ScheduleBlock block)
+    void SendAddBlockData(ScheduleBlock block)
     {
+        // Send the schedule block to individual players
         foreach (KeyValuePair<PlayerRef, PlayerManager.PlayerProperties> player in playerManager.playerProperties)
         {
-            // Update individaul player local schedules
             if (block.assignedPlayers.Contains(player.Key)) // Iterates over every player who is assigned to this block
             {
                 RPC_SendScheduleBlock(player.Key, block.periodName, block.room, block.time, block.length, block.assignedPlayers.ToArray(), block.interestGroups.ToArray());
             }
         }
+        // Send the schedule block to groups who can see it (interestGroup)
+        SendProxyBlock(block);
+    }
+
+    void SendRemoveBlockData(ScheduleBlock block)
+    {
+        foreach (KeyValuePair<PlayerRef, PlayerManager.PlayerProperties> player in playerManager.playerProperties)
+        {
+            if (block.assignedPlayers.Contains(player.Key)) // Iterates over every player who is assigned to this block
+            {
+                RPC_RemoveScheduleBlock(player.Key, block.periodName, block.room, block.time, block.length);
+            }
+        }
+        // Send the schedule block to groups who can see it (interestGroup)
+        SendProxyRemove(block);
     }
 
     /// <summary>
@@ -134,17 +147,37 @@ public class ScheduleManager : NetworkBehaviour
 
         OnUpdateSchedule?.Invoke();
     }
+    /// <summary>
+    /// Removes the specified equivalent schedule block on the player's local schedule
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="periodName"></param>
+    /// <param name="room"></param>
+    /// <param name="time"></param>
+    /// <param name="length"></param>
 
-    void SendProxyBlock(ScheduleBlock block, PlayerRef playerAssigned)
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_RemoveScheduleBlock([RpcTarget] PlayerRef player, string periodName, string room, float time, float length)
+    {
+        ScheduleBlock removedBlock = new ScheduleBlock(periodName, room, length, time);
+        ScheduleBlock localRemoved = removedBlock.GetEquivalentBlockInSchedule(localSchedule);
+        if (!localRemoved.Equals(ScheduleBlock.None))
+        {
+            localSchedule.Remove(localRemoved);
+        }
+    }
+
+    // Sends the proxy block to interest groups
+    void SendProxyBlock(ScheduleBlock block)
     {
         if (block.interestGroups == null)
         {
-            SendProxyBlockToAll(block, playerAssigned);
+            SendProxyBlockToAll(block);
             return;
         }
         if (block.interestGroups.Count == 0)
         {
-            SendProxyBlockToAll(block, playerAssigned);
+            SendProxyBlockToAll(block);
             return;
         }
         // Sends the proxy to all interest groups
@@ -158,16 +191,17 @@ public class ScheduleManager : NetworkBehaviour
                 if (sentPlayers.Contains(player)) continue; // To prevent double sending
                 sentPlayers.Add(player);
                 // Sends to all players in the interest group the individual assigned player's schedule block
-                RPC_SendProxyScheduleBlock(player, playerAssigned, block.periodName, block.room, block.time, block.length);
+                RPC_SendProxyBlock(player, block.periodName, block.room, block.time, block.length, block.assignedPlayers.ToArray(), block.interestGroups.ToArray());
             }
         }
     }
 
-    void SendProxyBlockToAll(ScheduleBlock block, PlayerRef playerAssigned)
+    // For when a block is visible to all players
+    void SendProxyBlockToAll(ScheduleBlock block)
     {
         foreach (PlayerRef player in Runner.ActivePlayers)
         {
-            RPC_SendProxyScheduleBlock(player, playerAssigned, block.periodName, block.room, block.time, block.length);
+            RPC_SendProxyBlock(player, block.periodName, block.room, block.time, block.length, block.assignedPlayers.ToArray(), block.interestGroups.ToArray());
         }
     }
 
@@ -180,9 +214,78 @@ public class ScheduleManager : NetworkBehaviour
     /// <param name="time"></param>
     /// <param name="length"></param>
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
-    public void RPC_SendProxyScheduleBlock([RpcTarget] PlayerRef player, PlayerRef proxyPlayer, string periodName, string room, float time, float length)
+    public void RPC_SendProxyBlock([RpcTarget] PlayerRef player, string periodName, string room, float time, float length, PlayerRef[] assignedPlayers, int[] interestGroups)
     {
+        ScheduleBlock sentBlock = new ScheduleBlock(periodName, room, length, time, assignedPlayers.ToList(), interestGroups.ToList());
+        foreach (PlayerRef proxy in assignedPlayers) // Updates all proxy schedules on this client
+        {
+            AddProxyBlock(proxy, sentBlock);
+        }
+    }
 
+    void SendProxyRemove(ScheduleBlock block)
+    {
+        if (block.interestGroups == null)
+        {
+            RemoveProxyBlockFromAll(block);
+            return;
+        }
+        if (block.interestGroups.Count == 0)
+        {
+            RemoveProxyBlockFromAll(block);
+            return;
+        }
+        // Sends the proxy to all interest groups
+        List<PlayerRef> sentPlayers = new List<PlayerRef>();
+        foreach (int group in block.interestGroups)
+        {
+            // Gets all players in the group and iterates
+            List<PlayerRef> players = playerManager.GetPlayersInGroup(group);
+            foreach (PlayerRef player in players)
+            {
+                if (sentPlayers.Contains(player)) continue; // To prevent double sending
+                sentPlayers.Add(player);
+                // Sends to all players in the interest group the individual assigned player's schedule block
+                RPC_SendProxyBlock(player, block.periodName, block.room, block.time, block.length, block.assignedPlayers.ToArray(), block.interestGroups.ToArray());
+            }
+        }
+    }
+
+    void RemoveProxyBlockFromAll(ScheduleBlock block)
+    {
+        foreach (PlayerRef player in Runner.ActivePlayers)
+        {
+            RPC_RemoveProxyBlock(player, block.periodName, block.room, block.time, block.length, block.assignedPlayers.ToArray(), block.interestGroups.ToArray());
+        }
+    }
+
+    /// <summary>
+    /// Removes the proxy block for the proxies from the assigned players. Pass in a subset of assigned players when reassigning a schedule block   
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="periodName"></param>
+    /// <param name="room"></param>
+    /// <param name="time"></param>
+    /// <param name="length"></param>
+    /// <param name="assignedPlayers"></param>
+    /// <param name="interestGroups"></param>
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_RemoveProxyBlock([RpcTarget] PlayerRef player, string periodName, string room, float time, float length, PlayerRef[] assignedPlayers, int[] interestGroups)
+    {
+        ScheduleBlock checkedBlock = new ScheduleBlock(periodName, room, length, time, assignedPlayers.ToList(), interestGroups.ToList());
+        foreach (PlayerRef proxy in assignedPlayers)
+        {
+            ScheduleBlock foundBlock = checkedBlock.GetEquivalentBlockInSchedule(playerSchedules[proxy]);
+            if (!foundBlock.Equals(ScheduleBlock.None))
+            {
+                playerSchedules[proxy].Remove(foundBlock);
+            }
+        }
+    }
+
+    public void AddProxyBlock(PlayerRef player, ScheduleBlock proxyBlock)
+    {
+        proxySchedules[player].Add(proxyBlock);
     }
 
     // Below is reference code (may be deprecated)
