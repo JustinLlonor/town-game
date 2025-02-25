@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 //using Photon.Pun;
 using System.Linq;
+using Fusion;
 
-public class ScheduleManager : MonoBehaviour
+public class ScheduleManager : NetworkBehaviour
 {
     // Dictionary for the schedules of each player
-    //public Dictionary<Photon.Realtime.Player, List<ScheduleBlock>> playerSchedules = new Dictionary<Photon.Realtime.Player, List<ScheduleBlock>>();
+    public Dictionary<PlayerRef, List<ScheduleBlock>> playerSchedules => default;
     // this client's schedule
-    public List<ScheduleBlock> schedule;
+    public List<ScheduleBlock> localSchedule;
     public List<ScheduleBlock> immutableBlocks = new List<ScheduleBlock>();
     [HideInInspector] public List<ScheduleBlock> orderedBlocks = new List<ScheduleBlock>();
     //PhotonView view;
-    [HideInInspector] public ScheduleBlock currentBlock = null;
-    ScheduleBlock previousBlock = null;
+    [HideInInspector] public ScheduleBlock currentBlock = ScheduleBlock.None;
+    ScheduleBlock previousBlock = ScheduleBlock.None;
     
     // This room's global events
     public List<GlobalEvent> globalEvents = new List<GlobalEvent>();
@@ -24,6 +25,7 @@ public class ScheduleManager : MonoBehaviour
     public ScheduleEvent OnUpdateSchedule;
     public ScheduleEvent OnUpdateGlobalEvents;
     public BlockChange OnBlockChange;
+
     public delegate void ScheduleEvent();
     /// <summary>
     /// Called when a schedule block ends and another begins
@@ -52,48 +54,43 @@ public class ScheduleManager : MonoBehaviour
     }
 
     //[PunRPC]
-    //public void AddSchedulePlayer(Photon.Realtime.Player player)
-    //{
-    //    playerSchedules.Add(player, new List<ScheduleBlock>());
-    //}
+    public void AddSchedulePlayer(PlayerRef player)
+    {
+        playerSchedules.Add(player, new List<ScheduleBlock>());
+    }
 
     //[PunRPC]
-    //public void AddScheduleBlock(Photon.Realtime.Player player, string periodName, string room, float time, float length)
-    //{
-    //    if (PeriodOverlaps(time, time + length, player))
-    //    {
-    //        Debug.LogError("Period overlaps, schedule block was not added");
-    //        return;
-    //    }
-    //    playerSchedules[player].Add(new ScheduleBlock(periodName, room, length, time));
+    public void AddScheduleBlock(PlayerRef player, string periodName, string room, float time, float length)
+    {
+        playerSchedules[player].Add(new ScheduleBlock(periodName, room, length, time));
 
-    //    if (player == PhotonNetwork.LocalPlayer) schedule.Add(new ScheduleBlock(periodName, room, length, time));
-    //    OnUpdateSchedule?.Invoke();
-    //}
+        if (player == Runner.LocalPlayer) localSchedule.Add(new ScheduleBlock(periodName, room, length, time));
+        OnUpdateSchedule?.Invoke();
+    }
 
     //[PunRPC]
-    //public void RemoveScheduleBlock(Photon.Realtime.Player player, float time)
-    //{
-    //    int i = 0;
-    //    foreach (ScheduleBlock block in new List<ScheduleBlock>(playerSchedules[player])) // Removes from dictionary
-    //    {
-    //        if (block.time == time)
-    //        {
-    //            playerSchedules[player].RemoveAt(i);
-    //            break;
-    //        }
-    //        i++;
-    //    }
+    public void RemoveScheduleBlock(PlayerRef player, float time)
+    {
+        int i = 0;
+        foreach (ScheduleBlock block in new List<ScheduleBlock>(playerSchedules[player])) // Removes from dictionary
+        {
+            if (block.time == time)
+            {
+                playerSchedules[player].RemoveAt(i);
+                break;
+            }
+            i++;
+        }
 
         // Removes locally
-    //    if (player == PhotonNetwork.LocalPlayer) schedule.RemoveAt(i);
-    //    OnUpdateSchedule?.Invoke();
-    //}
+        if (player == Runner.LocalPlayer) localSchedule.RemoveAt(i);
+        OnUpdateSchedule?.Invoke();
+    }
 
     //[PunRPC]
     public void ClearSchedule()
     {
-        schedule.Clear();
+        localSchedule.Clear();
 
         OnUpdateSchedule?.Invoke();
     }
@@ -110,24 +107,24 @@ public class ScheduleManager : MonoBehaviour
         OnUpdateGlobalEvents?.Invoke();
     }
 
-    public bool PeriodOverlaps(float startTime, float endTime)//, Photon.Realtime.Player player)
+    public bool PeriodOverlaps(float startTime, float endTime, PlayerRef player)
     {
         bool output = false;
-        //foreach (ScheduleBlock block in playerSchedules[player])
-        //{
-        //    if (block.time > startTime && block.time < endTime)
-        //    {
-        //        output = true; break;
-        //    }
-        //    if (block.time + block.length > startTime && block.time + block.length < endTime)
-        //    {
-        //        output = true; break;
-        //    }
-        //    if (block.time < startTime && block.time + block.length > endTime)
-        //    {
-        //        output = true; break;
-        //    }
-        //}
+        foreach (ScheduleBlock block in playerSchedules[player])
+        {
+            if (block.time > startTime && block.time < endTime)
+            {
+                output = true; break;
+            }
+            if (block.time + block.length > startTime && block.time + block.length < endTime)
+            {
+                output = true; break;
+            }
+            if (block.time < startTime && block.time + block.length > endTime)
+            {
+                output = true; break;
+            }
+        }
         foreach (ScheduleBlock block in immutableBlocks)
         {
             if (block.time > startTime && block.time < endTime)
@@ -156,14 +153,14 @@ public class ScheduleManager : MonoBehaviour
             orderedBlocks.RemoveAt(0);
             if (orderedBlocks.Count == 0)
             {
-                currentBlock = null;
+                currentBlock = ScheduleBlock.None;
                 CheckPreviousBlock();
                 return;
             }
         }
         if (gm.currentPeriod < orderedBlocks[0].time) // if the current time is behind the next period
         {
-            currentBlock = null;
+            currentBlock = ScheduleBlock.None;
         }
         else if (!orderedBlocks[0].Equals(currentBlock))
         {
@@ -175,7 +172,7 @@ public class ScheduleManager : MonoBehaviour
 
     void CheckPreviousBlock()
     {
-        if (previousBlock != currentBlock)
+        if (!previousBlock.Equals(currentBlock))
         {
             OnBlockChange?.Invoke(previousBlock, currentBlock);
             previousBlock = currentBlock;
@@ -184,8 +181,8 @@ public class ScheduleManager : MonoBehaviour
 
     void ResetBlockCheck()
     {
-        currentBlock = null;
-        previousBlock = null;
+        currentBlock = ScheduleBlock.None;
+        previousBlock = ScheduleBlock.None;
     }
 
     void UpdateOrderedBlocks()
@@ -199,7 +196,7 @@ public class ScheduleManager : MonoBehaviour
             newOrdered.Add(new ScheduleBlock(block.periodName, block.room, block.length, block.time + (gm.currentDay * 24)));
         }
 
-        foreach (ScheduleBlock block in schedule)
+        foreach (ScheduleBlock block in localSchedule)
         {
             if (block.time < minRange || block.time > maxRange) continue;
             newOrdered.Add(new ScheduleBlock(block.periodName, block.room, block.length, block.time));

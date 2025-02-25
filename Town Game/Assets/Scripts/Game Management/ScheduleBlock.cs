@@ -1,5 +1,7 @@
+using Fusion;
+
 [System.Serializable]
-public class ScheduleBlock
+public struct ScheduleBlock : INetworkStruct
 {
     // The name of the activity
     public string periodName;
@@ -20,9 +22,8 @@ public class ScheduleBlock
 
     public override bool Equals(object obj)
     {
-        ScheduleBlock block = obj as ScheduleBlock;
-
-        if (block == null) return false;
+        if (!(obj is ScheduleBlock)) return false;
+        ScheduleBlock block = (ScheduleBlock)obj;
 
         if (periodName != block.periodName) return false;
         if (room != block.room) return false;
@@ -30,5 +31,14 @@ public class ScheduleBlock
         if (time != block.time) return false;
 
         return true;
+    }
+
+    public static ScheduleBlock None
+    {
+        get
+        {
+            ScheduleBlock result = new ScheduleBlock(null, null, -1f, -1f);
+            return result;
+        }
     }
 }

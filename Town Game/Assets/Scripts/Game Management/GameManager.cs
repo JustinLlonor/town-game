@@ -16,15 +16,15 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     // gamePhase 0 = initialize game/assign roles 1 = main game 2 = results screen, not part
     public int gamePhase = 0;
     [Header("Game Variables")]
-    //public Player campLeader;
+    public PlayerRef leader;
     public PlayerRef[] cultists = new PlayerRef[] { };
     public PlayerRef[] alivePlayers = new PlayerRef[] { }; // doesn't update with alive players yet
     public Dictionary<string, Position> playerPositions = new Dictionary<string, Position>();
     //public Dictionary<Player, string> chosenBuildings = new Dictionary<Player, string>();
-    public float gameTime = 0f;
+    [Networked] public float gameTime { get; set; } = 0f;
     public float currentPeriod;
     public int currentDay = 0;
-    public bool timeStopped = false;
+    [Networked] public bool timeStopped { get; set; } = false;
     int previousDay = -1;
     [Header("Game Settings")]
     // When an index of this is true, a cultist is added when the players playing is equal to that number.
@@ -41,12 +41,10 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     [Header("Constants")]
     public string[] days;
     public string[] positions;
-    //PhotonView view;
     RoleRevealer rv;
     RoomManager rm;
     PlayerManager pm;
     ScheduleManager sm;
-    CameraManager cm;
     bool skippedNight = false;
     bool startedDay = false;
     GameTimer gt;
@@ -92,13 +90,12 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     private void Awake()
     {
         rv = gameObject.GetComponent<RoleRevealer>();
-        //view = transform.GetComponent<PhotonView>();
         OnRevealRoles += rv.RevealRole;
         rm = FindFirstObjectByType<RoomManager>();
         pm = FindFirstObjectByType<PlayerManager>();
         sm = FindFirstObjectByType<ScheduleManager>();
         gt = gameObject.GetComponent<GameTimer>();
-        cm = FindFirstObjectByType<CameraManager>();
+        //cm = FindFirstObjectByType<CameraManager>();
         if (!SessionData.isTesting)
         {
             FindFirstObjectByType<BlackScreen>().ShowCover();
@@ -140,14 +137,6 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
             PlayerRef rPlayer = new List<PlayerRef>(Runner.ActivePlayers)[i];
             pm.playerProperties[rPlayer].SetRoom(roomAssignment[i]);
         }
-    }
-
-    void InitiatePositions() // Initiates the positions for every player in the lobby, gets removed on death
-    {
-        //foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
-        //{
-        //    view.RPC("CreatePositionToken", RpcTarget.AllBuffered, player.CustomProperties["name"], (int)Position.Habitant);
-        //}
     }
 
     void SetCurrency()
@@ -256,11 +245,11 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     void NightSkip()
     {
         skippedNight = true;
-        //view.RPC("NightSkipSequence", RpcTarget.All);
+        RPC_NightSkipSequence();
     }
 
-    //[PunRPC]
-    public void NightSkipSequence()
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_NightSkipSequence()
     {
         OnNightSkipStart?.Invoke();
         gt.StartTimer(buildingChooseTimer + 1f);
@@ -416,10 +405,10 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
 
     void UpdateGameTime()
     {
-        if (timeStopped) return;
-        gameTime += Time.deltaTime * timeSpeed;
         currentDay = Mathf.FloorToInt((gameTime + hourLength) / (hourLength * 24f));
         currentPeriod = gameTime / hourLength;
+        if (timeStopped) return;
+        gameTime += Time.deltaTime * timeSpeed;
     }
 
     /// <summary>
@@ -471,7 +460,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
 
     public void StopTime()
     {
-        //if (!PhotonNetwork.IsMasterClient) return;
+        if (!Runner.IsServer) return;
         if (timeStopped) return;
         timeStopped = true;
         OnTimeStop?.Invoke();
@@ -479,7 +468,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
 
     public void ResumeTime()
     {
-        //if (!PhotonNetwork.IsMasterClient) return;
+        if (!Runner.IsServer) return;
         if (!timeStopped) return;
         timeStopped = false;
         OnTimeResume?.Invoke();

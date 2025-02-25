@@ -55,7 +55,7 @@ public class TasksUI : MonoBehaviour
     void PeriodChange(ScheduleBlock from, ScheduleBlock to)
     {
         // If free time, clear tasks
-        if (to == null)
+        if (to.Equals(ScheduleBlock.None))
         {
             ClearTrackedTasks();
             HideUI();
@@ -82,7 +82,7 @@ public class TasksUI : MonoBehaviour
     // Gets task holder of the room and calls get tasks
     void GetRoomTasks(MapRoom room)
     {
-        if (sm.currentBlock == null) return;
+        if (sm.currentBlock.Equals(ScheduleBlock.None)) return;
         if (sm.currentBlock.room != room.roomName) return;
         if (room.taskHolder == null)
         {

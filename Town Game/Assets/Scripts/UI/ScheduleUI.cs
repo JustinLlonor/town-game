@@ -131,7 +131,7 @@ public class ScheduleUI : MonoBehaviour
         }
 
         // Add mutable blocks
-        foreach (ScheduleBlock block in sm.schedule)
+        foreach (ScheduleBlock block in sm.localSchedule)
         {
             if (BlockPassed(block)) continue;
             if (block.time < minRange || block.time > maxRange) continue;
@@ -217,7 +217,7 @@ public class ScheduleUI : MonoBehaviour
         float timeStart;
         float timeEnd;
         // Empty periods
-        if (to == null)
+        if (to.Equals(ScheduleBlock.None))
         {
             int afterIndex = sm.orderedBlocks.IndexOf(from) + 1;
             if (afterIndex > sm.orderedBlocks.Count - 1) return;
