@@ -2,7 +2,7 @@ using Fusion;
 using System.Collections.Generic;
 
 [System.Serializable]
-public struct ScheduleBlock : INetworkStruct
+public struct ScheduleBlock
 {
     // The name of the activity
     public string periodName;
