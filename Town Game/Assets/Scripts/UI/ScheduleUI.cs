@@ -47,7 +47,6 @@ public class ScheduleUI : MonoBehaviour
     {
         sm = FindFirstObjectByType<ScheduleManager>();
         gm = FindFirstObjectByType<GameManager>();
-        sm.OnUpdateGlobalEvents += AddBookmarks;
     }
 
     private void Start()
@@ -123,15 +122,15 @@ public class ScheduleUI : MonoBehaviour
         float maxRange = gm.currentDay * 24 + 23;
 
         // Add immutable blocks
-        foreach (ScheduleBlock block in sm.immutableBlocks)
+        foreach (ScheduleBlock block in sm.dimmutableBlocks)
         {
-            if (BlockPassed(new ScheduleBlock(block.periodName, block.room, block.length, block.time + (gm.currentDay * 24)))) continue;
-            ScheduleBlock nBlock = new ScheduleBlock(block.periodName, block.room, block.length, block.time + (gm.currentDay * 24));
+            if (BlockPassed(new ScheduleBlock(block.periodName.ToString(), block.room.ToString(), block.length, block.time + (gm.currentDay * 24)))) continue;
+            ScheduleBlock nBlock = new ScheduleBlock(block.periodName.ToString(), block.room.ToString(), block.length, block.time + (gm.currentDay * 24));
             blocks.Add(nBlock);
         }
 
         // Add mutable blocks
-        foreach (ScheduleBlock block in sm.localSchedule)
+        foreach (ScheduleBlock block in sm.dlocalSchedule)
         {
             if (BlockPassed(block)) continue;
             if (block.time < minRange || block.time > maxRange) continue;
@@ -182,8 +181,8 @@ public class ScheduleUI : MonoBehaviour
         listedBlocks.Insert(setPos, new UIBlock(block, nbt));
 
         // Sets text data on block
-        nbt.GetChild(1).GetComponent<TextMeshProUGUI>().text = block.periodName;
-        nbt.GetChild(2).GetComponent<TextMeshProUGUI>().text = block.room;
+        nbt.GetChild(1).GetComponent<TextMeshProUGUI>().text = block.periodName.ToString();
+        nbt.GetChild(2).GetComponent<TextMeshProUGUI>().text = block.room.ToString();
         // Time data
         string clockTimeStart = gm.PeriodToClockString(block.time);
         string clockTimeEnd = gm.PeriodToClockString(block.time + block.length);
@@ -219,16 +218,16 @@ public class ScheduleUI : MonoBehaviour
         // Empty periods
         if (to.Equals(ScheduleBlock.None))
         {
-            int afterIndex = sm.orderedBlocks.IndexOf(from) + 1;
-            if (afterIndex > sm.orderedBlocks.Count - 1) return;
+            int afterIndex = sm.dorderedBlocks.IndexOf(from) + 1;
+            if (afterIndex > sm.dorderedBlocks.Count - 1) return;
             timeStart = from.time + from.length;
-            timeEnd = sm.orderedBlocks[afterIndex].time;
+            timeEnd = sm.dorderedBlocks[afterIndex].time;
             periodName = emptyPeriod;
         }
         else
         {
-            periodName = to.periodName;
-            room = to.room;
+            periodName = to.periodName.ToString();
+            room = to.room.ToString();
             timeStart = to.time;
             timeEnd = to.time + to.length;
         }
@@ -261,6 +260,7 @@ public class ScheduleUI : MonoBehaviour
         Destroy(t.gameObject);
     }
 
+    /**
     void AddBookmarks()
     {
         ClearBookmarks();
@@ -279,6 +279,7 @@ public class ScheduleUI : MonoBehaviour
             newBookmark.GetComponent<RawImage>().color = newColor;
         }
     }
+    **/
 
     void ClearBookmarks()
     {

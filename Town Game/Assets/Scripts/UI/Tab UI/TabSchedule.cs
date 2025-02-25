@@ -27,8 +27,8 @@ public class TabSchedule : MonoBehaviour
 
     private void Start()
     {
-        List<ScheduleBlock> sortedBlocks = sm.immutableBlocks.OrderBy(o => o.time).ToList();
-        ScheduleBlock lastBlock = sortedBlocks[sm.immutableBlocks.Count - 1];
+        List<ScheduleBlock> sortedBlocks = sm.dimmutableBlocks.OrderBy(o => o.time).ToList();
+        ScheduleBlock lastBlock = sortedBlocks[sm.dimmutableBlocks.Count - 1];
         hourHeight = blockHolder.GetComponent<RectTransform>().sizeDelta.y / ((lastBlock.time + lastBlock.length) - (sortedBlocks[0].time));
     }
 
@@ -60,9 +60,9 @@ public class TabSchedule : MonoBehaviour
         float maxRange = readDay * 24 + 23;
 
         // Add immutable blocks
-        foreach (ScheduleBlock block in sm.immutableBlocks)
+        foreach (ScheduleBlock block in sm.dimmutableBlocks)
         {
-            ScheduleBlock nBlock = new ScheduleBlock(block.periodName, block.room, block.length, block.time + (gm.currentDay * 24));
+            ScheduleBlock nBlock = new ScheduleBlock(block.periodName.ToString(), block.room.ToString(), block.length, block.time + (gm.currentDay * 24));
             blocks.Add(block);
         }
 
@@ -120,7 +120,7 @@ public class TabSchedule : MonoBehaviour
             RectTransform bt = newBlock.GetComponent<RectTransform>();
 
             //bt.SetHeight(block.length * hourHeight);
-            bt.GetChild(0).GetComponent<TextMeshProUGUI>().text = block.periodName;
+            bt.GetChild(0).GetComponent<TextMeshProUGUI>().text = block.periodName.ToString();
 
             if (block.length < 1f)
             {
@@ -129,7 +129,7 @@ public class TabSchedule : MonoBehaviour
                 continue;
             }
 
-            bt.GetChild(1).GetComponent<TextMeshProUGUI>().text = block.room;
+            bt.GetChild(1).GetComponent<TextMeshProUGUI>().text = block.room.ToString();
             bt.GetChild(2).GetComponent<TextMeshProUGUI>().text = $"{gm.PeriodToClockString(block.time)} - {gm.PeriodToClockString(block.time + block.length)}";
 
             Image nbI = newBlock.GetComponent<Image>();

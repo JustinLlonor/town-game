@@ -82,8 +82,8 @@ public class TasksUI : MonoBehaviour
     // Gets task holder of the room and calls get tasks
     void GetRoomTasks(MapRoom room)
     {
-        if (sm.currentBlock.Equals(ScheduleBlock.None)) return;
-        if (sm.currentBlock.room != room.roomName) return;
+        if (sm.dcurrentBlock.Equals(ScheduleBlock.None)) return;
+        if (sm.dcurrentBlock.room != room.roomName) return;
         if (room.taskHolder == null)
         {
             Debug.LogWarning("GetRoomTasks called, but no task holder on the room.");

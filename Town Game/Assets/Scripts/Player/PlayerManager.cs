@@ -49,6 +49,7 @@ public class PlayerManager : NetworkBehaviour
         public bool isCultist;
         public int room;
         public int currency;
+        public List<int> groups; // -1 = Cultist, -2 = Innocent, 0 and above are job indices
 
         public PlayerProperties(string nickname, bool isCultist, int room, int currency)
         {
@@ -71,6 +72,39 @@ public class PlayerManager : NetworkBehaviour
         public void SetCurrency(int newCurrency)
         {
             currency = newCurrency;
+        }
+
+        public void AddToGroup(int groupIndex)
+        {
+            groups.Add(groupIndex);
+        }
+
+        public void RemoveFromGroup(int groupIndex)
+        {
+            if (groups.Contains(groupIndex))
+            {
+                groups.Remove(groupIndex);
+            }
+        }
+
+        /// <summary>
+        /// Checks if this player is part of a list of groups
+        /// </summary>
+        /// <param name="groups"></param>
+        /// <returns></returns>
+        public bool IsPartOfGroups(List<int> groups)
+        {
+            if (groups == null) return true;
+            foreach (int group in groups)
+            {
+                if (this.groups.Contains(group)) return true; // If the groups in this instance contain a group in the gorups instance, return true
+            }
+            return false;
+        }
+
+        public bool IsPartOfGroup(int group)
+        {
+            return (this.groups.Contains(group));
         }
     }
 
@@ -178,5 +212,18 @@ public class PlayerManager : NetworkBehaviour
         cm.yRotation = rotation.eulerAngles.y;
         cm.xRotation = rotation.eulerAngles.x;
         OnTeleportPlayer?.Invoke();
+    }
+
+    public List<PlayerRef> GetPlayersInGroup(int group)
+    {
+        List<PlayerRef> output = new List<PlayerRef>();
+        foreach (KeyValuePair<PlayerRef, PlayerProperties> kvp in playerProperties)
+        {
+            if (kvp.Value.IsPartOfGroup(group))
+            {
+                output.Add(kvp.Key);
+            }
+        }
+        return output;
     }
 }
