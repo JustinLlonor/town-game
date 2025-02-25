@@ -11,22 +11,28 @@ public class ScheduleManager : NetworkBehaviour
     public List<ScheduleBlock> localSchedule;
     public Dictionary<PlayerRef, List<ScheduleBlock>> playerSchedules = new Dictionary<PlayerRef, List<ScheduleBlock>>(); // Contains the assigned schedule blocks of every player, to be revealed on other clients
     public Dictionary<PlayerRef, List<ScheduleBlock>> proxySchedules = new Dictionary<PlayerRef, List<ScheduleBlock>>(); // For clients, the schedule blocks that are revealed to them
+    public List<ScheduleBlock> currentBlocks = new List<ScheduleBlock>();
+    List<ScheduleBlock> previousBlocks = new List<ScheduleBlock>();
+
     // Soon to be deprecated code
     #region
     // Dictionary for the schedules of each player
     public Dictionary<PlayerRef, List<ScheduleBlock>> dplayerSchedules => default;
     // this client's schedule
-    public List<ScheduleBlock> dlocalSchedule;
-    public List<ScheduleBlock> dimmutableBlocks = new List<ScheduleBlock>();
-    [HideInInspector] public List<ScheduleBlock> dorderedBlocks = new List<ScheduleBlock>();
-    //PhotonView view;
     [HideInInspector] public ScheduleBlock dcurrentBlock = ScheduleBlock.None;
     ScheduleBlock dpreviousBlock = ScheduleBlock.None;
+    public List<ScheduleBlock> dlocalSchedule;
+    public List<ScheduleBlock> dimmutableBlocks = new List<ScheduleBlock>();
+    [HideInInspector] public List<ScheduleBlock> orderedBlocks = new List<ScheduleBlock>();
+    //PhotonView view;
     #endregion
 
     [HideInInspector] public GameManager gm;
 
     public ScheduleEvent OnUpdateSchedule;
+    public BlockEvent OnBlockStart;
+    public BlockEvent OnBlockEnd;
+
     public BlockChange OnBlockChange;
 
     public delegate void ScheduleEvent();
@@ -36,6 +42,7 @@ public class ScheduleManager : NetworkBehaviour
     /// <param name="from"></param>
     /// <param name="to"></param>
     public delegate void BlockChange(ScheduleBlock from, ScheduleBlock to);
+    public delegate void BlockEvent(ScheduleBlock block);
 
     PlayerManager playerManager;
 
@@ -43,9 +50,9 @@ public class ScheduleManager : NetworkBehaviour
     {
         playerManager = FindFirstObjectByType<PlayerManager>();
         //view = gameObject.GetComponent<PhotonView>();
-        OnUpdateSchedule += UpdateOrderedBlocks;
-        gm.OnChangeDay += ResetBlockCheck;
+        OnUpdateSchedule += UpdateOrderedBlocks; // When schedule updates or when the day changes, ordered blocks is updated
         gm.OnChangeDay += UpdateOrderedBlocks;
+        gm.OnChangeDay += ResetBlockCheck; // Find out what this does
         //view.RPC("AddSchedulePlayer", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer);
     }
 
@@ -67,7 +74,7 @@ public class ScheduleManager : NetworkBehaviour
 
     private void Update()
     {
-        CheckBlockChange();
+        CheckBlockChanges();
     }
 
     /// <summary>
@@ -115,7 +122,7 @@ public class ScheduleManager : NetworkBehaviour
             }
         }
         // Send the schedule block to groups who can see it (interestGroup)
-        SendProxyBlock(block);
+        SendToInterests(block);
     }
 
     void SendRemoveBlockData(ScheduleBlock block)
@@ -128,7 +135,7 @@ public class ScheduleManager : NetworkBehaviour
             }
         }
         // Send the schedule block to groups who can see it (interestGroup)
-        SendProxyRemove(block);
+        RemoveFromInterests(block);
     }
 
     /// <summary>
@@ -168,7 +175,7 @@ public class ScheduleManager : NetworkBehaviour
     }
 
     // Sends the proxy block to interest groups
-    void SendProxyBlock(ScheduleBlock block)
+    void SendToInterests(ScheduleBlock block)
     {
         if (block.interestGroups == null)
         {
@@ -219,11 +226,11 @@ public class ScheduleManager : NetworkBehaviour
         ScheduleBlock sentBlock = new ScheduleBlock(periodName, room, length, time, assignedPlayers.ToList(), interestGroups.ToList());
         foreach (PlayerRef proxy in assignedPlayers) // Updates all proxy schedules on this client
         {
-            AddProxyBlock(proxy, sentBlock);
+            proxySchedules[proxy].Add(sentBlock);
         }
     }
 
-    void SendProxyRemove(ScheduleBlock block)
+    void RemoveFromInterests(ScheduleBlock block)
     {
         if (block.interestGroups == null)
         {
@@ -283,12 +290,92 @@ public class ScheduleManager : NetworkBehaviour
         }
     }
 
-    public void AddProxyBlock(PlayerRef player, ScheduleBlock proxyBlock)
+    void CheckBlockChanges()
     {
-        proxySchedules[player].Add(proxyBlock);
+        if (orderedBlocks.Count == 0) return;
+        while (gm.currentPeriod > orderedBlocks[0].time + orderedBlocks[0].length) // Removes anything behind the current time
+        {
+            orderedBlocks.RemoveAt(0);
+            if (orderedBlocks.Count == 0)
+            {
+                currentBlocks = new List<ScheduleBlock>();
+                CheckPreviousBlock();
+                return;
+            }
+        }
+
+        // Add all periods to newBlocks
+        bool invokeChange = false;
+        List<ScheduleBlock> newBlocks = new List<ScheduleBlock>();
+        for (int i = 0; i < orderedBlocks.Count; i++)
+        {
+            ScheduleBlock cBlock = orderedBlocks[0];
+            if (gm.currentPeriod >= cBlock.time && gm.currentPeriod <= (cBlock.length + cBlock.time)) // If the current period is within
+            {
+                newBlocks.Add(cBlock);
+            }
+        }
+
+        List<ScheduleBlock> addedBlocks = new List<ScheduleBlock>();
+        // Find added blocks
+        foreach (ScheduleBlock block in newBlocks)
+        {
+            if (!currentBlocks.Contains(block))
+            {
+                addedBlocks.Add(block);
+            }
+        }
+
+        List<ScheduleBlock> removedBlocks = new List<ScheduleBlock>();
+        // Find removed blocks
+        foreach (ScheduleBlock block in currentBlocks)
+        {
+            if (!newBlocks.Contains(block))
+            {
+                removedBlocks.Add(block);
+            }
+        }
+
+        // If diffBlock is not empty, invoke change
+        CheckDelegate(addedBlocks, OnBlockStart);
+        CheckDelegate(removedBlocks, OnBlockEnd);
+
+        currentBlocks = newBlocks; // Current block list becomes new block list
+    }
+
+    // Invokes the specified event for every block
+    void CheckDelegate(List<ScheduleBlock> blocks, BlockEvent bl)
+    {
+        if (blocks.Count == 0) return;
+        foreach (ScheduleBlock block in blocks)
+        {
+            bl?.Invoke(block);
+        }
+    }
+
+    void UpdateOrderedBlocks()
+    {
+        List<ScheduleBlock> newOrdered = new List<ScheduleBlock>();
+        float minRange = gm.currentDay * 24 - 1;
+        float maxRange = gm.currentDay * 24 + 23;
+
+        foreach (ScheduleBlock block in dimmutableBlocks)
+        {
+            newOrdered.Add(new ScheduleBlock(block.periodName.ToString(), block.room.ToString(), block.length, block.time + (gm.currentDay * 24)));
+        }
+
+        foreach (ScheduleBlock block in dlocalSchedule)
+        {
+            if (block.time < minRange || block.time > maxRange) continue;
+            newOrdered.Add(new ScheduleBlock(block.periodName.ToString(), block.room.ToString(), block.length, block.time));
+        }
+
+        newOrdered = newOrdered.OrderBy(o => o.time).ToList();
+        orderedBlocks = newOrdered;
     }
 
     // Below is reference code (may be deprecated)
+    #region
     //[PunRPC]
     public void AddSchedulePlayer(PlayerRef player)
     {
@@ -367,33 +454,6 @@ public class ScheduleManager : NetworkBehaviour
         return output;
     }
 
-    // Block check code
-
-    void CheckBlockChange()
-    {
-        if (dorderedBlocks.Count == 0) return;
-        while (gm.currentPeriod > dorderedBlocks[0].time + dorderedBlocks[0].length) // Removes anything behind the current time
-        {
-            dorderedBlocks.RemoveAt(0);
-            if (dorderedBlocks.Count == 0)
-            {
-                dcurrentBlock = ScheduleBlock.None;
-                CheckPreviousBlock();
-                return;
-            }
-        }
-        if (gm.currentPeriod < dorderedBlocks[0].time) // if the current time is behind the next period
-        {
-            dcurrentBlock = ScheduleBlock.None;
-        }
-        else if (!dorderedBlocks[0].Equals(dcurrentBlock))
-        {
-            dcurrentBlock = new ScheduleBlock(dorderedBlocks[0].periodName.ToString(), dorderedBlocks[0].room.ToString(), dorderedBlocks[0].length, dorderedBlocks[0].time);
-        }
-
-        CheckPreviousBlock();
-    }
-
     void CheckPreviousBlock()
     {
         if (!dpreviousBlock.Equals(dcurrentBlock))
@@ -409,24 +469,5 @@ public class ScheduleManager : NetworkBehaviour
         dpreviousBlock = ScheduleBlock.None;
     }
 
-    void UpdateOrderedBlocks()
-    {
-        List<ScheduleBlock> newOrdered = new List<ScheduleBlock>();
-        float minRange = gm.currentDay * 24 - 1;
-        float maxRange = gm.currentDay * 24 + 23;
-
-        foreach (ScheduleBlock block in dimmutableBlocks)
-        {
-            newOrdered.Add(new ScheduleBlock(block.periodName.ToString(), block.room.ToString(), block.length, block.time + (gm.currentDay * 24)));
-        }
-
-        foreach (ScheduleBlock block in dlocalSchedule)
-        {
-            if (block.time < minRange || block.time > maxRange) continue;
-            newOrdered.Add(new ScheduleBlock(block.periodName.ToString(), block.room.ToString(), block.length, block.time));
-        }
-
-        newOrdered = newOrdered.OrderBy(o => o.time).ToList();
-        dorderedBlocks = newOrdered;
-    }
+    #endregion
 }

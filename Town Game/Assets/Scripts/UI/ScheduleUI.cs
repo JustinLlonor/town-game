@@ -218,10 +218,10 @@ public class ScheduleUI : MonoBehaviour
         // Empty periods
         if (to.Equals(ScheduleBlock.None))
         {
-            int afterIndex = sm.dorderedBlocks.IndexOf(from) + 1;
-            if (afterIndex > sm.dorderedBlocks.Count - 1) return;
+            int afterIndex = sm.orderedBlocks.IndexOf(from) + 1;
+            if (afterIndex > sm.orderedBlocks.Count - 1) return;
             timeStart = from.time + from.length;
-            timeEnd = sm.dorderedBlocks[afterIndex].time;
+            timeEnd = sm.orderedBlocks[afterIndex].time;
             periodName = emptyPeriod;
         }
         else

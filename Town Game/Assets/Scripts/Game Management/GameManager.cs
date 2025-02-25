@@ -503,6 +503,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
 
     public float GetDayProgress()
     {
+        if (!init) return 0f;
         return (gameTime - hourLength * 24f * currentDay) / (hourLength * 24f);
     }
 

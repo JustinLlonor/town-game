@@ -10,7 +10,7 @@ public class PlayerClothing : NetworkBehaviour
     public bool isCorpse = false;
     [Tooltip("Change the capacity in code when adding/removing attires")]
     public Attire[] attires;
-    [Networked, Capacity(5)] public NetworkArray<int> nAttires { get; } = MakeInitializer(new int[5]); // Change this number as you add more clothes
+    [Networked, Capacity(6)] public NetworkArray<int> nAttires { get; } = MakeInitializer(new int[5]); // Change this number as you add more clothes
     public RandomizedClothing[] randomizedClothing;
     [Networked] public int skinTone { get; set; }
     public Material[] skinTones;
