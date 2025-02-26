@@ -11,8 +11,6 @@ using static PlayerManager;
 
 public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
 {
-    //public Vector2Int testTime;, not part
-    public GlobalEvent testevent;
     // gamePhase 0 = initialize game/assign roles 1 = main game 2 = results screen, not part
     public int gamePhase = 0;
     [Header("Game Variables")]
@@ -155,16 +153,6 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         UpdateGameTime();
         if (!Runner.IsServer) return;
         //if (Input.GetKeyDown(KeyCode.Backspace)) SetTime(testTime.x, testTime.y);
-        if (Input.GetKeyDown(KeyCode.Backspace))
-        {
-            string[] newStrings = new string[] { testevent.name };
-            float[] newTimes = new float[] { testevent.time };
-            float[] newLengths = new float[] { testevent.length };
-            bool[] newCultistEvents = new bool[] { testevent.cultistEvent };
-            //PhotonNetwork.OpCleanRpcBuffer(sm.GetComponent<PhotonView>());
-            // Filter cultists events when making function
-            //sm.GetComponent<PhotonView>().RPC("AddGlobalEvents", RpcTarget.AllBuffered, (object)newStrings, (object)newTimes, (object)newLengths, (object)newCultistEvents);
-        }
         PhaseProperties();
         CheckNightSkip();
         CheckDayStart();

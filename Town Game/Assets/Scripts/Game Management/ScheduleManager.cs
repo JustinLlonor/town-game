@@ -12,7 +12,7 @@ public class ScheduleManager : NetworkBehaviour
     public Dictionary<PlayerRef, List<ScheduleBlock>> playerSchedules = new Dictionary<PlayerRef, List<ScheduleBlock>>(); // Contains the assigned schedule blocks of every player, to be revealed on other clients
     public Dictionary<PlayerRef, List<ScheduleBlock>> proxySchedules = new Dictionary<PlayerRef, List<ScheduleBlock>>(); // For clients, the schedule blocks that are revealed to them
     public List<ScheduleBlock> currentBlocks = new List<ScheduleBlock>();
-    List<ScheduleBlock> previousBlocks = new List<ScheduleBlock>();
+    public List<ScheduleBlock> orderedBlocks = new List<ScheduleBlock>();
 
     // Soon to be deprecated code
     #region
@@ -23,7 +23,6 @@ public class ScheduleManager : NetworkBehaviour
     ScheduleBlock dpreviousBlock = ScheduleBlock.None;
     public List<ScheduleBlock> dlocalSchedule;
     public List<ScheduleBlock> dimmutableBlocks = new List<ScheduleBlock>();
-    [HideInInspector] public List<ScheduleBlock> orderedBlocks = new List<ScheduleBlock>();
     //PhotonView view;
     #endregion
 
@@ -45,7 +44,13 @@ public class ScheduleManager : NetworkBehaviour
     public delegate void BlockEvent(ScheduleBlock block);
 
     PlayerManager playerManager;
+    bool init = false;
 
+    void TestFunc(ScheduleBlock block)
+    {
+        Debug.Log(block.time);
+    }
+    
     private void Awake()
     {
         playerManager = FindFirstObjectByType<PlayerManager>();
@@ -53,11 +58,19 @@ public class ScheduleManager : NetworkBehaviour
         OnUpdateSchedule += UpdateOrderedBlocks; // When schedule updates or when the day changes, ordered blocks is updated
         gm.OnChangeDay += UpdateOrderedBlocks;
         gm.OnChangeDay += ResetBlockCheck; // Find out what this does
+        OnBlockStart += TestFunc;
+        OnBlockEnd += TestFunc;
         //view.RPC("AddSchedulePlayer", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer);
     }
 
     private void Start()
     {
+        //view.RPC("AddScheduleBlock", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer, "Patrol", "", 13f, 1f);
+    }
+
+    public override void Spawned()
+    {
+        init = true;
         // Initialize proxy array
         foreach (PlayerRef player in Runner.ActivePlayers)
         {
@@ -69,11 +82,15 @@ public class ScheduleManager : NetworkBehaviour
         {
             playerSchedules.Add(player, new List<ScheduleBlock>());
         }
-        //view.RPC("AddScheduleBlock", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer, "Patrol", "", 13f, 1f);
     }
 
     private void Update()
     {
+        if (!init) return;
+        if (Input.GetKeyDown(KeyCode.Backspace))
+        {
+            AddBlock("Lunch", "Lunch Room", 7f, 1f, new List<PlayerRef>() { Runner.LocalPlayer });
+        }
         CheckBlockChanges();
     }
 
@@ -88,6 +105,7 @@ public class ScheduleManager : NetworkBehaviour
     /// <returns>The added schedule block</returns>
     public ScheduleBlock AddBlock(string periodName, string room, float time, float length, List<PlayerRef> assignedPlayers, List<int> interestGroups = null)
     {
+        if (interestGroups == null) interestGroups = new List<int>();
         ScheduleBlock newBlock = new ScheduleBlock(periodName, room, length, time, assignedPlayers, interestGroups);
         masterSchedule.Add(newBlock);
         SendAddBlockData(newBlock);
@@ -151,9 +169,10 @@ public class ScheduleManager : NetworkBehaviour
     {
         ScheduleBlock newBlock = new ScheduleBlock(periodName, room, length, time, assignedPlayers.ToList(), interest.ToList());
         localSchedule.Add(newBlock);
-
+        Debug.Log("bruh");
         OnUpdateSchedule?.Invoke();
     }
+
     /// <summary>
     /// Removes the specified equivalent schedule block on the player's local schedule
     /// </summary>
@@ -162,7 +181,6 @@ public class ScheduleManager : NetworkBehaviour
     /// <param name="room"></param>
     /// <param name="time"></param>
     /// <param name="length"></param>
-
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
     public void RPC_RemoveScheduleBlock([RpcTarget] PlayerRef player, string periodName, string room, float time, float length)
     {
@@ -172,6 +190,7 @@ public class ScheduleManager : NetworkBehaviour
         {
             localSchedule.Remove(localRemoved);
         }
+        OnUpdateSchedule?.Invoke();
     }
 
     // Sends the proxy block to interest groups
@@ -292,16 +311,9 @@ public class ScheduleManager : NetworkBehaviour
 
     void CheckBlockChanges()
     {
-        if (orderedBlocks.Count == 0) return;
-        while (gm.currentPeriod > orderedBlocks[0].time + orderedBlocks[0].length) // Removes anything behind the current time
+        while (orderedBlocks.Count > 0 && gm.currentPeriod > orderedBlocks[0].time + orderedBlocks[0].length) // Removes anything behind the current time
         {
             orderedBlocks.RemoveAt(0);
-            if (orderedBlocks.Count == 0)
-            {
-                currentBlocks = new List<ScheduleBlock>();
-                CheckPreviousBlock();
-                return;
-            }
         }
 
         // Add all periods to newBlocks
@@ -359,15 +371,10 @@ public class ScheduleManager : NetworkBehaviour
         float minRange = gm.currentDay * 24 - 1;
         float maxRange = gm.currentDay * 24 + 23;
 
-        foreach (ScheduleBlock block in dimmutableBlocks)
-        {
-            newOrdered.Add(new ScheduleBlock(block.periodName.ToString(), block.room.ToString(), block.length, block.time + (gm.currentDay * 24)));
-        }
-
-        foreach (ScheduleBlock block in dlocalSchedule)
+        foreach (ScheduleBlock block in localSchedule)
         {
             if (block.time < minRange || block.time > maxRange) continue;
-            newOrdered.Add(new ScheduleBlock(block.periodName.ToString(), block.room.ToString(), block.length, block.time));
+            newOrdered.Add(new ScheduleBlock(block.periodName, block.room, block.length, block.time));
         }
 
         newOrdered = newOrdered.OrderBy(o => o.time).ToList();
