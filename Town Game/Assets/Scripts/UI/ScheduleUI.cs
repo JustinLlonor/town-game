@@ -113,14 +113,19 @@ public class ScheduleUI : MonoBehaviour
         return block.time + block.length < gm.currentPeriod;
     }
 
+    /// <summary>
+    /// Updates the UI schedule to reflect the day
+    /// </summary>
     void ReadSchedule()
     {
         ClearScheduleBlocks();
 
+        // Create list of blocks to become schedule blocks
         List<ScheduleBlock> blocks = new List<ScheduleBlock>();
         float minRange = gm.currentDay * 24 - 1;
         float maxRange = gm.currentDay * 24 + 23;
 
+        /**
         // Add immutable blocks
         foreach (ScheduleBlock block in sm.dimmutableBlocks)
         {
@@ -128,12 +133,13 @@ public class ScheduleUI : MonoBehaviour
             ScheduleBlock nBlock = new ScheduleBlock(block.periodName.ToString(), block.room.ToString(), block.length, block.time + (gm.currentDay * 24));
             blocks.Add(nBlock);
         }
+        **/
 
-        // Add mutable blocks
-        foreach (ScheduleBlock block in sm.dlocalSchedule)
+        // Adds all schedule blocks in the day
+        foreach (ScheduleBlock block in sm.localSchedule)
         {
             if (BlockPassed(block)) continue;
-            if (block.time < minRange || block.time > maxRange) continue;
+            if (block.time < minRange || block.time > maxRange) continue; // If outside the time range, don't add
             blocks.Add(block);
         }
 
@@ -142,13 +148,17 @@ public class ScheduleUI : MonoBehaviour
 
         // Add empty spaces
         List<ScheduleBlock> blocksCheck = new List<ScheduleBlock>(blocks);
+        blocksCheck.Insert(0, new ScheduleBlock("", "", 1f, minRange - 1f));
+        blocksCheck.Add(new ScheduleBlock("", "", 1f, maxRange + 1f));
         for (int i = 0; i < blocksCheck.Count; i++)
         {
             int nextI = i + 1;
             if (nextI >= blocksCheck.Count) break;
             if (blocksCheck[i].time + blocksCheck[i].length == blocksCheck[nextI].time) continue; // Continue if there is no space in between blocks
-            if (BlockPassed(new ScheduleBlock(emptyPeriod, "", blocksCheck[nextI].time - (blocksCheck[i].time + blocksCheck[i].length), blocksCheck[i].time + blocksCheck[i].length))) continue; // ... fuck you
-            blocks.Add(new ScheduleBlock(emptyPeriod, "", blocksCheck[nextI].time - (blocksCheck[i].time + blocksCheck[i].length), blocksCheck[i].time + blocksCheck[i].length));
+            ScheduleBlock emptySpace = new ScheduleBlock(emptyPeriod, "", blocksCheck[nextI].time - (blocksCheck[i].time + blocksCheck[i].length), blocksCheck[i].time + blocksCheck[i].length);
+            // If we passed the empty space, then continue
+            if (BlockPassed(emptySpace)) continue; 
+            blocks.Add(emptySpace);
         }
 
         GroupAddScheduleBlocks(blocks);
@@ -202,6 +212,9 @@ public class ScheduleUI : MonoBehaviour
         listedBlocks.RemoveAt(index);
     }
 
+    /// <summary>
+    /// Clears UI listed blocks
+    /// </summary>
     void ClearScheduleBlocks()
     {
         listedBlocks.Clear();

@@ -169,7 +169,6 @@ public class ScheduleManager : NetworkBehaviour
     {
         ScheduleBlock newBlock = new ScheduleBlock(periodName, room, length, time, assignedPlayers.ToList(), interest.ToList());
         localSchedule.Add(newBlock);
-        Debug.Log("bruh");
         OnUpdateSchedule?.Invoke();
     }
 
