@@ -186,6 +186,16 @@ public class ScheduleUI : MonoBehaviour
         }
         listedBlocks.Insert(setPos, new UIBlock(block, nbt));
 
+        // Sets color data (VERY SPAGHETTI, CHANGE LATER)
+        if (!block.color.Equals(new Color()))
+        {
+            nbt.GetChild(0).GetChild(0).GetComponent<Image>().color = block.color;
+            float h, s, v;
+            Color.RGBToHSV(block.color, out h, out s, out v);
+            v = Mathf.Clamp01(v - 0.45f);
+            Color stripeColor = Color.HSVToRGB(h, s, v);
+            nbt.GetChild(0).GetChild(0).GetChild(0).GetComponent<RawImage>().color = stripeColor;
+        }
         // Sets text data on block
         nbt.GetChild(1).GetComponent<TextMeshProUGUI>().text = block.periodName.ToString();
         nbt.GetChild(2).GetComponent<TextMeshProUGUI>().text = block.room.ToString();

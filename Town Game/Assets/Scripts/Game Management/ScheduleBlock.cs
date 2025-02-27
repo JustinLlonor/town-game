@@ -1,5 +1,6 @@
 using Fusion;
 using System.Collections.Generic;
+using UnityEngine;
 
 [System.Serializable]
 public struct ScheduleBlock
@@ -12,6 +13,8 @@ public struct ScheduleBlock
     public float length;
     // Start time of the block
     public float time;
+    // Color of the block
+    public Color color;
     /// <summary>
     /// The players this schedule block is assigned to. This schedule block will appear under their name
     /// </summary>
@@ -23,12 +26,13 @@ public struct ScheduleBlock
     // If the schedule is only visible to the player (program later when needed)
     // public bool isPrivate
 
-    public ScheduleBlock(string periodName, string room, float length, float time, List<PlayerRef> assignedPlayers = null, List<int> interestGroups = null)
+    public ScheduleBlock(string periodName, string room, float length, float time, Color color = new Color(), List<PlayerRef> assignedPlayers = null, List<int> interestGroups = null)
     {
         this.periodName = periodName;
         this.room = room;
         this.length = length;
         this.time = time;
+        this.color = color;
         this.assignedPlayers = assignedPlayers;
         this.interestGroups = interestGroups;
     }
@@ -86,7 +90,7 @@ public struct ScheduleBlock
     {
         get
         {
-            ScheduleBlock result = new ScheduleBlock(null, null, -1f, -1f, null);
+            ScheduleBlock result = new ScheduleBlock(null, null, -1f, -1f);
             return result;
         }
     }

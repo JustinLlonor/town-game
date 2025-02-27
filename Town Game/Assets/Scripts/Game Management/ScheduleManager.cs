@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using Fusion;
+using System;
 
 public class ScheduleManager : NetworkBehaviour
 {
@@ -11,8 +12,8 @@ public class ScheduleManager : NetworkBehaviour
     public Dictionary<PlayerRef, List<ScheduleBlock>> playerSchedules = new Dictionary<PlayerRef, List<ScheduleBlock>>(); // Contains the assigned schedule blocks of every player, to be revealed on other clients
     public Dictionary<PlayerRef, List<ScheduleBlock>> proxySchedules = new Dictionary<PlayerRef, List<ScheduleBlock>>(); // For clients, the schedule blocks that are revealed to them
     public List<ScheduleBlock> currentBlocks = new List<ScheduleBlock>();
-    public List<ScheduleBlock> orderedBlocks = new List<ScheduleBlock>();
     public List<ScheduleBlock> dailyBlocks = new List<ScheduleBlock>();
+    [HideInInspector] public List<ScheduleBlock> orderedBlocks = new List<ScheduleBlock>();
 
     // Soon to be deprecated code
     #region
@@ -88,7 +89,7 @@ public class ScheduleManager : NetworkBehaviour
         if (!init) return;
         if (Input.GetKeyDown(KeyCode.Backspace))
         {
-            AddBlock("Lunch", "Lunch Room", 7f, 1f, new List<PlayerRef>() { Runner.LocalPlayer });
+            AddBlock("Lunch", "Lunch Room", 7f, 1f, Color.magenta, new List<PlayerRef>() { Runner.LocalPlayer });
         }
         CheckBlockChanges();
     }
@@ -102,10 +103,10 @@ public class ScheduleManager : NetworkBehaviour
     /// <param name="length"></param>
     /// <param name="interestGroups"></param>
     /// <returns>The added schedule block</returns>
-    public ScheduleBlock AddBlock(string periodName, string room, float time, float length, List<PlayerRef> assignedPlayers, List<int> interestGroups = null)
+    public ScheduleBlock AddBlock(string periodName, string room, float time, float length, Color color, List<PlayerRef> assignedPlayers, List<int> interestGroups = null)
     {
         if (interestGroups == null) interestGroups = new List<int>();
-        ScheduleBlock newBlock = new ScheduleBlock(periodName, room, length, time, assignedPlayers, interestGroups);
+        ScheduleBlock newBlock = new ScheduleBlock(periodName, room, length, time, color, assignedPlayers, interestGroups);
         masterSchedule.Add(newBlock);
         SendAddBlockData(newBlock);
         return newBlock;
@@ -135,7 +136,8 @@ public class ScheduleManager : NetworkBehaviour
         {
             if (block.assignedPlayers.Contains(player.Key)) // Iterates over every player who is assigned to this block
             {
-                RPC_SendScheduleBlock(player.Key, block.periodName, block.room, block.time, block.length, block.assignedPlayers.ToArray(), block.interestGroups.ToArray());
+                int colorInt = ColorToInt(block.color);
+                RPC_SendScheduleBlock(player.Key, block.periodName, block.room, block.time, block.length, colorInt, block.assignedPlayers.ToArray(), block.interestGroups.ToArray());
             }
         }
         // Send the schedule block to groups who can see it (interestGroup)
@@ -164,9 +166,12 @@ public class ScheduleManager : NetworkBehaviour
     /// <param name="time"></param>
     /// <param name="length"></param>
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
-    public void RPC_SendScheduleBlock([RpcTarget] PlayerRef player, string periodName, string room, float time, float length, PlayerRef[] assignedPlayers, int[] interest)
+    public void RPC_SendScheduleBlock([RpcTarget] PlayerRef player, string periodName, string room, float time, float length, int color, PlayerRef[] assignedPlayers, int[] interest)
     {
-        ScheduleBlock newBlock = new ScheduleBlock(periodName, room, length, time, assignedPlayers.ToList(), interest.ToList());
+        // Code for converting the integer to a hex color
+        Color blockColor = IntToColor(color);
+
+        ScheduleBlock newBlock = new ScheduleBlock(periodName, room, length, time, blockColor, assignedPlayers.ToList(), interest.ToList());
         localSchedule.Add(newBlock);
         OnUpdateSchedule?.Invoke();
     }
@@ -182,7 +187,7 @@ public class ScheduleManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
     public void RPC_RemoveScheduleBlock([RpcTarget] PlayerRef player, string periodName, string room, float time, float length)
     {
-        ScheduleBlock removedBlock = new ScheduleBlock(periodName, room, length, time);
+        ScheduleBlock removedBlock = new ScheduleBlock(periodName, room, length, time, Color.white);
         ScheduleBlock localRemoved = removedBlock.GetEquivalentBlockInSchedule(localSchedule);
         if (!localRemoved.Equals(ScheduleBlock.None))
         {
@@ -215,7 +220,7 @@ public class ScheduleManager : NetworkBehaviour
                 if (sentPlayers.Contains(player)) continue; // To prevent double sending
                 sentPlayers.Add(player);
                 // Sends to all players in the interest group the individual assigned player's schedule block
-                RPC_SendProxyBlock(player, block.periodName, block.room, block.time, block.length, block.assignedPlayers.ToArray(), block.interestGroups.ToArray());
+                RPC_SendProxyBlock(player, block.periodName, block.room, block.time, block.length, ColorToInt(block.color), block.assignedPlayers.ToArray(), block.interestGroups.ToArray());
             }
         }
     }
@@ -225,7 +230,7 @@ public class ScheduleManager : NetworkBehaviour
     {
         foreach (PlayerRef player in Runner.ActivePlayers)
         {
-            RPC_SendProxyBlock(player, block.periodName, block.room, block.time, block.length, block.assignedPlayers.ToArray(), block.interestGroups.ToArray());
+            RPC_SendProxyBlock(player, block.periodName, block.room, block.time, block.length, ColorToInt(block.color), block.assignedPlayers.ToArray(), block.interestGroups.ToArray());
         }
     }
 
@@ -238,9 +243,10 @@ public class ScheduleManager : NetworkBehaviour
     /// <param name="time"></param>
     /// <param name="length"></param>
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
-    public void RPC_SendProxyBlock([RpcTarget] PlayerRef player, string periodName, string room, float time, float length, PlayerRef[] assignedPlayers, int[] interestGroups)
+    public void RPC_SendProxyBlock([RpcTarget] PlayerRef player, string periodName, string room, float time, float length, int color, PlayerRef[] assignedPlayers, int[] interestGroups)
     {
-        ScheduleBlock sentBlock = new ScheduleBlock(periodName, room, length, time, assignedPlayers.ToList(), interestGroups.ToList());
+        Color blockColor = IntToColor(color);
+        ScheduleBlock sentBlock = new ScheduleBlock(periodName, room, length, time, blockColor, assignedPlayers.ToList(), interestGroups.ToList());
         foreach (PlayerRef proxy in assignedPlayers) // Updates all proxy schedules on this client
         {
             proxySchedules[proxy].Add(sentBlock);
@@ -270,7 +276,7 @@ public class ScheduleManager : NetworkBehaviour
                 if (sentPlayers.Contains(player)) continue; // To prevent double sending
                 sentPlayers.Add(player);
                 // Sends to all players in the interest group the individual assigned player's schedule block
-                RPC_SendProxyBlock(player, block.periodName, block.room, block.time, block.length, block.assignedPlayers.ToArray(), block.interestGroups.ToArray());
+                RPC_SendProxyBlock(player, block.periodName, block.room, block.time, block.length, ColorToInt(block.color), block.assignedPlayers.ToArray(), block.interestGroups.ToArray());
             }
         }
     }
@@ -296,7 +302,7 @@ public class ScheduleManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
     public void RPC_RemoveProxyBlock([RpcTarget] PlayerRef player, string periodName, string room, float time, float length, PlayerRef[] assignedPlayers, int[] interestGroups)
     {
-        ScheduleBlock checkedBlock = new ScheduleBlock(periodName, room, length, time, assignedPlayers.ToList(), interestGroups.ToList());
+        ScheduleBlock checkedBlock = new ScheduleBlock(periodName, room, length, time);
         foreach (PlayerRef proxy in assignedPlayers)
         {
             ScheduleBlock foundBlock = checkedBlock.GetEquivalentBlockInSchedule(playerSchedules[proxy]);
@@ -377,6 +383,22 @@ public class ScheduleManager : NetworkBehaviour
 
         newOrdered = newOrdered.OrderBy(o => o.time).ToList();
         orderedBlocks = newOrdered;
+    }
+
+    Color IntToColor(int colorInt)
+    {
+        string htmlValue = colorInt.ToString("X");
+        while (htmlValue.Length < 6) htmlValue.Insert(0, "0");
+        Color blockColor = Color.white;
+        ColorUtility.TryParseHtmlString("#" + htmlValue, out blockColor);
+        return blockColor;
+    }
+
+    int ColorToInt(Color color)
+    {
+        string hexString = ColorUtility.ToHtmlStringRGB(color);
+        int colorInt = int.Parse(hexString, System.Globalization.NumberStyles.HexNumber);
+        return colorInt;
     }
 
     // Below is reference code (may be deprecated)
