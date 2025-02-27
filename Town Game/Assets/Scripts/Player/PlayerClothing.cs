@@ -181,7 +181,8 @@ public class PlayerClothing : NetworkBehaviour
     {
         foreach (Attire attire in attires)
         {
-            attire.renderer.SetMaterials(new List<Material>() { material });
+            attire.renderer.material = null;
+            attire.renderer.material = material;
         }
     }
 

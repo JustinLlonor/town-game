@@ -98,14 +98,14 @@ MonoBehaviour:
   currentDay: 0
   _timeStopped: 0
   cultistAssignment: 0100000000010000000100000001000000010000
-  hourLength: 12
+  hourLength: 30
   timeSpeed: 1
   startCurrency: 100
   startTime: {x: 7, y: 0}
   buildingChooseTimer: 8
-  timeSkipPeriod: 22.5
+  timeSkipPeriod: 21.25
   timeSkippedPeriod: 4.5
-  dayStartPeriod: 6.5
+  dayStartPeriod: 6.75
   days:
   - Monday
   - Tuesday
@@ -211,6 +211,20 @@ MonoBehaviour:
   masterSchedule: []
   localSchedule: []
   currentBlocks: []
+  orderedBlocks: []
+  dailyBlocks:
+  - periodName: Breakfast
+    room: Cafeteria
+    length: 2
+    time: 7
+    assignedPlayers: []
+    interestGroups: 
+  - periodName: Dinner
+    room: Cafeteria
+    length: 2
+    time: 19
+    assignedPlayers: []
+    interestGroups: 
   dcurrentBlock:
     periodName: 
     room: 
@@ -219,8 +233,6 @@ MonoBehaviour:
     assignedPlayers: []
     interestGroups: 
   dlocalSchedule: []
-  dimmutableBlocks: []
-  orderedBlocks: []
   gm: {fileID: 1676236008550905741}
 --- !u!1 &5211516756420375758
 GameObject:

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using Fusion;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class ScheduleManager : NetworkBehaviour
 {
@@ -13,6 +12,7 @@ public class ScheduleManager : NetworkBehaviour
     public Dictionary<PlayerRef, List<ScheduleBlock>> proxySchedules = new Dictionary<PlayerRef, List<ScheduleBlock>>(); // For clients, the schedule blocks that are revealed to them
     public List<ScheduleBlock> currentBlocks = new List<ScheduleBlock>();
     public List<ScheduleBlock> orderedBlocks = new List<ScheduleBlock>();
+    public List<ScheduleBlock> dailyBlocks = new List<ScheduleBlock>();
 
     // Soon to be deprecated code
     #region
@@ -22,7 +22,6 @@ public class ScheduleManager : NetworkBehaviour
     [HideInInspector] public ScheduleBlock dcurrentBlock = ScheduleBlock.None;
     ScheduleBlock dpreviousBlock = ScheduleBlock.None;
     public List<ScheduleBlock> dlocalSchedule;
-    public List<ScheduleBlock> dimmutableBlocks = new List<ScheduleBlock>();
     //PhotonView view;
     #endregion
 
@@ -442,7 +441,7 @@ public class ScheduleManager : NetworkBehaviour
                 output = true; break;
             }
         }
-        foreach (ScheduleBlock block in dimmutableBlocks)
+        foreach (ScheduleBlock block in dailyBlocks)
         {
             if (block.time > startTime && block.time < endTime)
             {

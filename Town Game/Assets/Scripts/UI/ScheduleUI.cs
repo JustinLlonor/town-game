@@ -125,15 +125,13 @@ public class ScheduleUI : MonoBehaviour
         float minRange = gm.currentDay * 24 - 1;
         float maxRange = gm.currentDay * 24 + 23;
 
-        /**
         // Add immutable blocks
-        foreach (ScheduleBlock block in sm.dimmutableBlocks)
+        foreach (ScheduleBlock block in sm.dailyBlocks)
         {
             if (BlockPassed(new ScheduleBlock(block.periodName.ToString(), block.room.ToString(), block.length, block.time + (gm.currentDay * 24)))) continue;
             ScheduleBlock nBlock = new ScheduleBlock(block.periodName.ToString(), block.room.ToString(), block.length, block.time + (gm.currentDay * 24));
             blocks.Add(nBlock);
         }
-        **/
 
         // Adds all schedule blocks in the day
         foreach (ScheduleBlock block in sm.localSchedule)
@@ -148,8 +146,6 @@ public class ScheduleUI : MonoBehaviour
 
         // Add empty spaces
         List<ScheduleBlock> blocksCheck = new List<ScheduleBlock>(blocks);
-        blocksCheck.Insert(0, new ScheduleBlock("", "", 1f, minRange - 1f));
-        blocksCheck.Add(new ScheduleBlock("", "", 1f, maxRange + 1f));
         for (int i = 0; i < blocksCheck.Count; i++)
         {
             int nextI = i + 1;
@@ -197,13 +193,6 @@ public class ScheduleUI : MonoBehaviour
         string clockTimeStart = gm.PeriodToClockString(block.time);
         string clockTimeEnd = gm.PeriodToClockString(block.time + block.length);
         nbt.GetChild(3).GetComponent<TextMeshProUGUI>().text = $"{clockTimeStart} - {clockTimeEnd}";
-
-        Color newColor = primaryColor;
-        if (setPos % 2 != 0) newColor = secondaryColor;
-        foreach (Transform child in nbt.GetChild(0))
-        {
-            child.GetComponent<RawImage>().color = newColor;
-        }
     }
 
     void RemoveScheduleBlock(int index)

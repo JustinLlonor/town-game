@@ -27,8 +27,8 @@ public class TabSchedule : MonoBehaviour
 
     private void Start()
     {
-        List<ScheduleBlock> sortedBlocks = sm.dimmutableBlocks.OrderBy(o => o.time).ToList();
-        ScheduleBlock lastBlock = sortedBlocks[sm.dimmutableBlocks.Count - 1];
+        List<ScheduleBlock> sortedBlocks = sm.dailyBlocks.OrderBy(o => o.time).ToList();
+        ScheduleBlock lastBlock = sortedBlocks[sm.dailyBlocks.Count - 1];
         hourHeight = blockHolder.GetComponent<RectTransform>().sizeDelta.y / ((lastBlock.time + lastBlock.length) - (sortedBlocks[0].time));
     }
 
@@ -60,7 +60,7 @@ public class TabSchedule : MonoBehaviour
         float maxRange = readDay * 24 + 23;
 
         // Add immutable blocks
-        foreach (ScheduleBlock block in sm.dimmutableBlocks)
+        foreach (ScheduleBlock block in sm.dailyBlocks)
         {
             ScheduleBlock nBlock = new ScheduleBlock(block.periodName.ToString(), block.room.ToString(), block.length, block.time + (gm.currentDay * 24));
             blocks.Add(block);
