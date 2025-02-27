@@ -11,7 +11,7 @@ public class PhysTask : MonoBehaviour
     float progress;
     public float textOffset;
 
-    public void SetTask(string name)
+    public void SetText(string name)
     {
         taskName = name;
         UpdateText();

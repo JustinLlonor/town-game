@@ -156,7 +156,7 @@ public class TasksUI : MonoBehaviour
     {
         GameObject newTask = Instantiate(physTaskPrefab, taskHolder);
         PhysTask pt = newTask.GetComponent<PhysTask>();
-        pt.SetTask(taskName);
+        pt.SetText(taskName);
         if (progression >= 0f) pt.SetProgress(progression);
         physTasks.Add(new PTask(newTask, taskName));
         ContentSizeFitter csf = newTask.GetComponent<ContentSizeFitter>();

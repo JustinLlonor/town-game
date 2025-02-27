@@ -45,11 +45,6 @@ public class ScheduleManager : NetworkBehaviour
 
     PlayerManager playerManager;
     bool init = false;
-
-    void TestFunc(ScheduleBlock block)
-    {
-        Debug.Log(block.time);
-    }
     
     private void Awake()
     {
@@ -58,8 +53,6 @@ public class ScheduleManager : NetworkBehaviour
         OnUpdateSchedule += UpdateOrderedBlocks; // When schedule updates or when the day changes, ordered blocks is updated
         gm.OnChangeDay += UpdateOrderedBlocks;
         gm.OnChangeDay += ResetBlockCheck; // Find out what this does
-        OnBlockStart += TestFunc;
-        OnBlockEnd += TestFunc;
         //view.RPC("AddSchedulePlayer", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer);
     }
 
