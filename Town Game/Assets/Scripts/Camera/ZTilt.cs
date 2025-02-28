@@ -11,12 +11,6 @@ public class ZTilt : MonoBehaviour
     public float stepSpeed = 5f;
     float desiredZ = 0f;
     float cmX = 0f;
-    int tFrame = 30;
-
-    private void Start()
-    {
-        Application.targetFrameRate = 30;
-    }
 
     public void ReceiveCM(Vector2 cameraMovement)
     {
@@ -25,9 +19,10 @@ public class ZTilt : MonoBehaviour
 
     private void Update()
     {
-        if (!cb.isCrouching) desiredZ = Mathf.Clamp((cmX * camXMultiplier) / (Time.deltaTime * 90f), -maxDeg, maxDeg); // Consistent with all mouse speeds
-        else desiredZ = 0f;
-        float newZ = Mathf.MoveTowardsAngle(transform.eulerAngles.z, desiredZ, Time.deltaTime * stepSpeed);
-        transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, newZ);
+        desiredZ = Mathf.Clamp((cmX * camXMultiplier) / (Time.deltaTime * 90f), -maxDeg, maxDeg); // Consistent with all mouse speeds
+        //if (!cb.isCrouching) desiredZ = Mathf.Clamp((cmX * camXMultiplier) / (Time.deltaTime * 90f), -maxDeg, maxDeg); // Consistent with all mouse speeds
+        //else desiredZ = 0f;
+        float newZ = Mathf.MoveTowardsAngle(transform.localRotation.eulerAngles.z, desiredZ, Time.deltaTime * stepSpeed);
+        transform.localRotation = Quaternion.Euler(new Vector3(transform.localRotation.eulerAngles.x, transform.localRotation.eulerAngles.y, newZ));
     }
 }

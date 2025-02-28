@@ -130,7 +130,7 @@ MonoBehaviour:
   wAmplitude: 0.03
   sAmplitude: 0.05
   cAmplitude: 0.04
-  zTilt: 210
+  zTilt: 50
   resetSpeed: 5
   transitionSpeed: 5
   isBobbing: 0
@@ -673,7 +673,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cb: {fileID: 5936565786900437778}
   maxDeg: 10
-  camXMultiplier: 1.4
+  camXMultiplier: 0.8
   stepSpeed: 20
 --- !u!1001 &5748298751459455394
 PrefabInstance:
