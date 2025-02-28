@@ -17,11 +17,21 @@ public class PlayerClothing : NetworkBehaviour
     ObjectManager om;
     ChangeDetector changeDetector;
     FirstPerson fps;
+    Material updatedMat = null;
     //PhotonView view;
 
     private void Start()
     {
         RenderAllClothing();
+    }
+
+    private void Update()
+    {
+        if (updatedMat != null)
+        {
+            SetAllAttireMaterials(updatedMat);
+            updatedMat = null;
+        }
     }
 
     public override void Spawned()
@@ -46,16 +56,11 @@ public class PlayerClothing : NetworkBehaviour
                     RenderAllClothing();
                     break;
                 case nameof(skinTone):
-                    SetAllAttireMaterials(skinTones[skinTone]);
+                    updatedMat = skinTones[skinTone];
                     if (HasInputAuthority) fps.ChangeArmMaterials(skinTones[skinTone]);
                     break;
             }
         }
-    }
-
-    public void Init()
-    {
-
     }
 
     void RenderAllClothing()
@@ -181,7 +186,6 @@ public class PlayerClothing : NetworkBehaviour
     {
         foreach (Attire attire in attires)
         {
-            attire.renderer.material = null;
             attire.renderer.material = material;
         }
     }
