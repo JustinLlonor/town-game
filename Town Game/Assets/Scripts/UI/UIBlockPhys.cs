@@ -38,7 +38,7 @@ public class UIBlockPhys : MonoBehaviour
         float h, s, v;
         Color.RGBToHSV(color, out h, out s, out v);
         Color stripColor = Color.HSVToRGB(h, s, Mathf.Clamp01(v - 0.45f));
-        stripeImage.color = stripColor;
+        if (stripeImage != null) stripeImage.color = stripColor;
         Color borderColor = Color.HSVToRGB(h, s, Mathf.Clamp01(v - 0.35f));
         border.color = borderColor;
     }

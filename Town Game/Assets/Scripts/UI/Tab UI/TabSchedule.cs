@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-//using Photon.Pun;
 using System.Linq;
 using UnityEngine.UI;
+using Fusion;
 
 public class TabSchedule : MonoBehaviour
 {
@@ -14,7 +14,7 @@ public class TabSchedule : MonoBehaviour
     public int readDay;
     public Color primaryColor;
     public Color secondaryColor;
-    //Photon.Realtime.Player selectedPlayer;
+    PlayerRef selectedPlayer;
     ScheduleManager sm;
     GameManager gm;
     public float hourHeight = 0f;
@@ -34,14 +34,14 @@ public class TabSchedule : MonoBehaviour
 
     private void OnDisable()
     {
-        //selectedPlayer = null;
+        selectedPlayer = PlayerRef.None;
     }
 
     // Shows the schedule a day in advance
     public void ScrollForward()
     {
         readDay++;
-        //if (selectedPlayer != null) DisplaySchedule(selectedPlayer);
+        if (selectedPlayer != PlayerRef.None) DisplaySchedule(selectedPlayer);
     }
 
     // Shows the schedule a day before
@@ -49,12 +49,12 @@ public class TabSchedule : MonoBehaviour
     {
         if (readDay == 0) return;
         readDay--;
-        //if (selectedPlayer != null) DisplaySchedule(selectedPlayer);
+        if (selectedPlayer != PlayerRef.None) DisplaySchedule(selectedPlayer);
     }
 
-    public void DisplaySchedule()//Photon.Realtime.Player player)
+    public void DisplaySchedule(PlayerRef player)
     {
-        //selectedPlayer = player;
+        selectedPlayer = player;
         List<ScheduleBlock> blocks = new List<ScheduleBlock>();
         float minRange = readDay * 24 - 1;
         float maxRange = readDay * 24 + 23;
@@ -67,12 +67,13 @@ public class TabSchedule : MonoBehaviour
         }
 
         // Add mutable blocks from selected player
-        //foreach (ScheduleBlock block in sm.playerSchedules[player])
-        //{
-        //    if (block.time < minRange || block.time > maxRange) continue;
-        //    blocks.Add(block);
-        //}
+        foreach (ScheduleBlock block in sm.proxySchedules[player])
+        {
+            if (block.time < minRange || block.time > maxRange) continue;
+            blocks.Add(block);
+        }
 
+        /**
         // Sort blocks
         blocks = blocks.OrderBy(o => o.time).ToList();
 
@@ -85,6 +86,7 @@ public class TabSchedule : MonoBehaviour
             if (blocksCheck[i].time + blocksCheck[i].length == blocksCheck[nextI].time) continue; // Continue if there is no space in between blocks
             blocks.Add(new ScheduleBlock("Free Time", "", blocksCheck[nextI].time - (blocksCheck[i].time + blocksCheck[i].length), blocksCheck[i].time + blocksCheck[i].length));
         }
+        **/
 
         blocks = blocks.OrderBy(o => o.time).ToList();
         UpdateSchedule(blocks);
@@ -94,17 +96,17 @@ public class TabSchedule : MonoBehaviour
     }
 
     // Sets the read day to the current day
-    //public void ResetReadDay(Photon.Realtime.Player player = null)
-    //{
-    //    readDay = gm.currentDay;
-    //}
+    public void ResetReadDay(PlayerRef player)
+    {
+        readDay = gm.currentDay;
+    }
 
-    //public void DeselectSchedule(Photon.Realtime.Player player = null)
-    //{
-    //    ClearSchedule();
-    //    selectedPlayer = null;
-    //    dateText.text = "...";
-    //}
+    public void DeselectSchedule(PlayerRef player)
+    {
+        ClearSchedule();
+        selectedPlayer = PlayerRef.None;
+        dateText.text = "...";
+    }
 
     void UpdateSchedule(List<ScheduleBlock> blocks)
     {
@@ -118,20 +120,18 @@ public class TabSchedule : MonoBehaviour
             // Creates block
             GameObject newBlock = Instantiate(blockPrefab, blockHolder);
             RectTransform bt = newBlock.GetComponent<RectTransform>();
+            UIBlockPhys ubp = newBlock.GetComponent<UIBlockPhys>();
 
-            //bt.SetHeight(block.length * hourHeight);
-            bt.GetChild(0).GetComponent<TextMeshProUGUI>().text = block.periodName.ToString();
+            bt.sizeDelta = new Vector3(bt.sizeDelta.x, (block.length * hourHeight));
+            float roundedTime = block.time - 24f * gm.currentDay;
+            float yPos = (roundedTime - 7f) * hourHeight;
+            bt.localPosition = new Vector3(0f, -yPos);
+            ubp.SetBlockColor(block.color);
+            ubp.SetNameText(block.periodName);
+            ubp.SetRoomText(block.room);
+            //ubp.SetTimeText($"{gm.PeriodToClockString(block.time)} - {gm.PeriodToClockString(block.time + block.length)}");
 
-            if (block.length < 1f)
-            {
-                Destroy(bt.GetChild(1).gameObject);
-                Destroy(bt.GetChild(2).gameObject);
-                continue;
-            }
-
-            bt.GetChild(1).GetComponent<TextMeshProUGUI>().text = block.room.ToString();
-            bt.GetChild(2).GetComponent<TextMeshProUGUI>().text = $"{gm.PeriodToClockString(block.time)} - {gm.PeriodToClockString(block.time + block.length)}";
-
+            /**
             Image nbI = newBlock.GetComponent<Image>();
 
             // Sets color
@@ -143,7 +143,7 @@ public class TabSchedule : MonoBehaviour
                 nbI.color = secondaryColor;
             }
             i++;
-
+            **/
         }
     }
 

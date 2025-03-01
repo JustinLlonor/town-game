@@ -31,6 +31,10 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
     [HideInInspector] public bool isHoldSI;
     public bool firstFrame = true;
 
+    public PlayerEvent onPlayerJoin;
+    public PlayerEvent onPlayerLeave;
+    public delegate void PlayerEvent(PlayerRef player);
+
     PlayerManager pm;
 
     public async void StartGame(GameMode mode, string name, int sceneIndex)
@@ -64,10 +68,21 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
+        onPlayerJoin?.Invoke(player);
         if (runner.IsServer)
         {
             pm = FindFirstObjectByType<PlayerManager>();
             if (pm.spawnPlayersOnJoin) pm.SpawnPlayer(runner, player); // Adds a new player when a player joins
+        }
+    }
+
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+    {
+        onPlayerLeave?.Invoke(player);
+        if (nRunner.LocalPlayer == player) SteamMatchmaking.LeaveLobby((CSteamID)SessionData.steamIdLobby); // Leaves steam lobby
+        if (runner.IsServer)
+        {
+            pm.RemovePlayer(player); // annihalates the palyer
         }
     }
 
@@ -126,15 +141,6 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         }
 
         input.Set(data);
-    }
-
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
-    {
-        if (nRunner.LocalPlayer == player) SteamMatchmaking.LeaveLobby((CSteamID)SessionData.steamIdLobby); // Leaves steam lobby
-        if (runner.IsServer)
-        {
-            pm.RemovePlayer(player); // annihalates the palyer
-        }
     }
 
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
