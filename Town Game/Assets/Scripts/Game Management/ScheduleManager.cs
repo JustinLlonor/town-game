@@ -246,7 +246,7 @@ public class ScheduleManager : NetworkBehaviour
             proxySchedules[proxy].Add(sentBlock);
         }
     }
-
+    
     void RemoveFromInterests(ScheduleBlock block)
     {
         if (block.interestGroups == null)
@@ -372,7 +372,12 @@ public class ScheduleManager : NetworkBehaviour
         foreach (ScheduleBlock block in localSchedule)
         {
             if (block.time < minRange || block.time > maxRange) continue;
-            newOrdered.Add(new ScheduleBlock(block.periodName, block.room, block.length, block.time));
+            newOrdered.Add(new ScheduleBlock(block.periodName, block.room, block.length, block.time, block.color));
+        }
+
+        foreach (ScheduleBlock block in dailyBlocks)
+        {
+            newOrdered.Add(new ScheduleBlock(block.periodName, block.room, block.length, gm.currentDay * 24 + block.time, block.color));
         }
 
         newOrdered = newOrdered.OrderBy(o => o.time).ToList();

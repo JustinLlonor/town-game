@@ -101,7 +101,7 @@ MonoBehaviour:
   hourLength: 30
   timeSpeed: 1
   startCurrency: 100
-  startTime: {x: 7, y: 0}
+  startTime: {x: 7, y: 25}
   buildingChooseTimer: 8
   timeSkipPeriod: 21.25
   timeSkippedPeriod: 4.5
@@ -211,25 +211,28 @@ MonoBehaviour:
   masterSchedule: []
   localSchedule: []
   currentBlocks: []
-  orderedBlocks: []
   dailyBlocks:
   - periodName: Breakfast
     room: Cafeteria
     length: 2
     time: 7
+    color: {r: 0.20392157, g: 0.6509804, b: 0.972549, a: 1}
     assignedPlayers: []
     interestGroups: 
   - periodName: Dinner
     room: Cafeteria
     length: 2
     time: 19
+    color: {r: 0.20392157, g: 0.6509804, b: 0.972549, a: 1}
     assignedPlayers: []
     interestGroups: 
+  orderedBlocks: []
   dcurrentBlock:
     periodName: 
     room: 
     length: -1
     time: -1
+    color: {r: 0, g: 0, b: 0, a: 0}
     assignedPlayers: []
     interestGroups: 
   dlocalSchedule: []

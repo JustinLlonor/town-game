@@ -4,19 +4,26 @@ using System.Linq;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.Rendering.PostProcessing;
 
 public class ScheduleUI : MonoBehaviour
 {
     public int foresight = 3;
     public float hourLength = 50f;
     public float repositionSpeed = 3f;
+    public float tearoutHeight = 53f;
     public GameObject scheduleBlockPrefab;
     public GameObject tearoutPrefab;
     public GameObject bookmarkPrefab;
     public Transform blockHolder;
-    public Transform tearoutHolder;
     public Transform bookmarkHolder;
-    public List<ScheduleBlock> tearoutBuffer;
+    public Transform tearoutHolder;
+    public Transform minimapHolder;
+    public float tearoutAnimationSpeed = .5f;
+    List<ScheduleBlock> tearoutBuffer = new List<ScheduleBlock>();
+    GameObject currentTearout;
+    ScheduleBlock previousBuffer = ScheduleBlock.None;
+    IEnumerator minimapAnimation = null;
     [Header("Block Settings")]
     public string emptyPeriod = "Free Time";
     public Color primaryColor;
@@ -30,6 +37,7 @@ public class ScheduleUI : MonoBehaviour
     GameManager gm;
     ScheduleManager sm;
     public float tearoutRemovalTime = -1;
+    float originalMinimapY = 0f;
 
     [System.Serializable]
     public class UIBlock
@@ -48,6 +56,9 @@ public class ScheduleUI : MonoBehaviour
     {
         sm = FindFirstObjectByType<ScheduleManager>();
         gm = FindFirstObjectByType<GameManager>();
+        sm.OnBlockStart += AddTearout;
+        sm.OnBlockEnd += RemoveTearout;
+        originalMinimapY = minimapHolder.localPosition.y;
     }
 
     private void Start()
@@ -55,17 +66,127 @@ public class ScheduleUI : MonoBehaviour
         ((RectTransform)blockHolder).SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, hourLength * (float)foresight);
     }
 
+    void AddTearout(ScheduleBlock block)
+    {
+        Debug.Log("updating");
+        tearoutBuffer.Add(block);
+        UpdateTearoutUI();
+    }
+
+    void RemoveTearout(ScheduleBlock block)
+    {
+        tearoutBuffer.Remove(block);
+        UpdateTearoutUI();
+    }
+
+    void UpdateTearoutUI()
+    {
+        ScheduleBlock currentBlock = ScheduleBlock.None;
+        if (tearoutBuffer.Count > 0) currentBlock = tearoutBuffer[0];
+
+        if (previousBuffer.Equals(currentBlock)) return;
+
+        if (!currentBlock.Equals(ScheduleBlock.None))
+        {
+            GameObject newTearout = Instantiate(tearoutPrefab, tearoutHolder);
+            UIBlockPhys pub = newTearout.GetComponent<UIBlockPhys>();
+            SetUIBlockProperties(pub, currentBlock);
+
+            if (currentTearout != null) Destroy(currentTearout);
+            currentTearout = newTearout;
+
+            if (previousBuffer.Equals(ScheduleBlock.None))
+            {
+                RectTransform rt = (RectTransform)newTearout.transform;
+                rt.sizeDelta = new Vector2(rt.sizeDelta.x, 0f);
+                StartCoroutine(StartTearoutHeightAnimation(newTearout, 0f, tearoutHeight));
+                StartMinimapAnimation(MinimapAnimation(0f, tearoutHeight));
+            }
+            else
+            {
+                RectTransform rt = (RectTransform)newTearout.transform;
+                rt.sizeDelta = new Vector2(rt.sizeDelta.x, tearoutHeight);
+            }
+            previousBuffer = currentBlock;
+            // none -> something, play the animation
+        }
+        else
+        {
+            previousBuffer = currentBlock;
+            // previous is not current block, and current block is none, or previous was something and current is nothing
+            if (currentTearout != null)
+            {
+                StartCoroutine(StartTearoutHeightAnimation(currentTearout, tearoutHeight, 0f, true)); // Start animation to destroy this
+                StartMinimapAnimation(MinimapAnimation(tearoutHeight, 0f));
+            }
+        }
+    }
+
+    void StartMinimapAnimation(IEnumerator newAnimation)
+    {
+        if (minimapAnimation != null) StopCoroutine(minimapAnimation);
+        minimapAnimation = newAnimation;
+        StartCoroutine(minimapAnimation);
+    }
+
+    void SetUIBlockProperties(UIBlockPhys pub, ScheduleBlock block)
+    {
+        pub.SetNameText(block.periodName);
+        pub.SetRoomText(block.room);
+        string clockTimeStart = gm.PeriodToClockString(block.time);
+        string clockTimeEnd = gm.PeriodToClockString(block.time + block.length);
+        pub.SetTimeText($"{clockTimeStart} - {clockTimeEnd}");
+        pub.SetBlockColor(block.color);
+    }
+
+    IEnumerator StartTearoutHeightAnimation(GameObject tearout, float startHeight, float endHeight, bool destroyAfterFinished = false)
+    {
+        RectTransform rt = (RectTransform)tearout.transform;
+        float height = startHeight;
+        float progress = 0f;
+        while (progress < 1f)
+        {
+            yield return null;
+            progress += Time.deltaTime * tearoutAnimationSpeed;
+            height = Mathf.SmoothStep(startHeight, endHeight, progress);
+            rt.sizeDelta = new Vector3(rt.sizeDelta.x, height);
+        }
+        rt.sizeDelta = new Vector3(rt.sizeDelta.x, endHeight);
+
+        if (destroyAfterFinished) Destroy(tearout);
+    }
+
+    // Minimap animation done separately so it can cancel
+    IEnumerator MinimapAnimation(float startHeight, float endHeight)
+    {
+        float height = startHeight;
+        float progress = 0f;
+        while (progress < 1f)
+        {
+            yield return null;
+            progress += Time.deltaTime * tearoutAnimationSpeed;
+            height = Mathf.SmoothStep(startHeight, endHeight, progress);
+            minimapHolder.localPosition = new Vector3(minimapHolder.localPosition.x, originalMinimapY - height);
+        }
+        minimapHolder.localPosition = new Vector3(minimapHolder.localPosition.x, originalMinimapY - endHeight);
+
+    }
+
     private void OnEnable()
     {
+        /**
         ReadSchedule();
         gm.OnChangeDay += ReadSchedule;
         sm.OnUpdateSchedule += ReadSchedule; // Make so that tearout is updated when schedule is updated
+        **/
     }
 
     private void OnDisable()
     {
+        /**
         gm.OnChangeDay -= ReadSchedule;
         sm.OnUpdateSchedule -= ReadSchedule;
+        **/
     }
 
     private void Update()
@@ -84,16 +205,6 @@ public class ScheduleUI : MonoBehaviour
         float currentPeriod = gm.currentPeriod - (gm.currentDay * 24f);
         blockHolder.localPosition = new Vector2(0f, hourLength * currentPeriod);
         bookmarkHolder.localPosition = new Vector2(0f, hourLength * currentPeriod);
-    }
-
-    void AddTearout(ScheduleBlock block)
-    {
-
-    }
-
-    void RemoveTearout(ScheduleBlock block)
-    {
-
     }
 
     // Deprecated tearout code
