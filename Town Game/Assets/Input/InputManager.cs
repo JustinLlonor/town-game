@@ -105,6 +105,7 @@ public class InputManager : MonoBehaviour
     public InputEvent onPrimaryFire;
     public InputEvent onSecondaryFire;
     public InputValueEvent onCamera;
+    public InputEvent onScheduleSwap;
     // Interaction
     public InputValueEvent onInteract1;
     public InputValueEvent onInteract2;
@@ -126,6 +127,7 @@ public class InputManager : MonoBehaviour
     private void OnPrimaryFire() { onPrimaryFire?.Invoke(); }
     private void OnSecondaryFire() { onSecondaryFire?.Invoke(); }
     private void OnCamera(InputValue iv) { onCamera?.Invoke(iv); }
+    private void OnScheduleSwap () { onScheduleSwap?.Invoke(); }
     private void OnInteract1(InputValue iv) { onInteract1?.Invoke(iv); }
     private void OnInteract2(InputValue iv) { onInteract2?.Invoke(iv); }
     private void OnInteract3(InputValue iv) { onInteract3?.Invoke(iv); }
