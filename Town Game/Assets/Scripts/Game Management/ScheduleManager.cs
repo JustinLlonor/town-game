@@ -82,7 +82,8 @@ public class ScheduleManager : NetworkBehaviour
         if (!init) return;
         if (Input.GetKeyDown(KeyCode.Backspace))
         {
-            AddBlock("Lunch", "Lunch Room", 7f, 1f, Color.magenta, new List<PlayerRef>() { Runner.LocalPlayer });
+            AddBlock("Food Research", "Food Labs", 9f, 1f, Color.magenta, new List<PlayerRef>() { Runner.LocalPlayer });
+            AddBlock("Patrol Town", "", 10f, 3f, Color.green, new List<PlayerRef>() { Runner.LocalPlayer });
         }
         CheckBlockChanges();
     }
@@ -381,8 +382,8 @@ public class ScheduleManager : NetworkBehaviour
     Color IntToColor(int colorInt)
     {
         string htmlValue = colorInt.ToString("X");
-        while (htmlValue.Length < 6) htmlValue.Insert(0, "0");
-        Color blockColor = Color.white;
+        while (htmlValue.Length < 6) htmlValue = "0" + htmlValue; // Adds leading 0s
+        Color blockColor;
         ColorUtility.TryParseHtmlString("#" + htmlValue, out blockColor);
         return blockColor;
     }

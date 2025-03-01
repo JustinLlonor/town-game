@@ -71,7 +71,7 @@ public class ScheduleUI : MonoBehaviour
     private void Update()
     {
         //if (Input.GetKeyDown(KeyCode.O)) AddScheduleBlock(new ScheduleBlock(testBlock.periodName, testBlock.room, testBlock.length, testBlock.time));
-        ScrollSchedule();
+        //ScrollSchedule();
     }
 
     void ScrollSchedule()
@@ -86,12 +86,12 @@ public class ScheduleUI : MonoBehaviour
         bookmarkHolder.localPosition = new Vector2(0f, hourLength * currentPeriod);
     }
 
-    void AddToTearoutBuffer(ScheduleBlock block)
+    void AddTearout(ScheduleBlock block)
     {
 
     }
 
-    void RemoveFromTearoutBuffer(ScheduleBlock block)
+    void RemoveTearout(ScheduleBlock block)
     {
 
     }
