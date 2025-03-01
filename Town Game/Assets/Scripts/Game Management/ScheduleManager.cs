@@ -82,7 +82,7 @@ public class ScheduleManager : NetworkBehaviour
         if (!init) return;
         if (Input.GetKeyDown(KeyCode.Backspace))
         {
-            AddBlock("Food Research", "Food Labs", 9f, 1f, Color.magenta, new List<PlayerRef>() { Runner.LocalPlayer });
+            AddBlock("Blackmarket", "Random Alleyway", 7f, 1f, Color.red, new List<PlayerRef>() { Runner.LocalPlayer });
             AddBlock("Patrol Town", "", 10f, 3f, Color.green, new List<PlayerRef>() { Runner.LocalPlayer });
         }
         CheckBlockChanges();
@@ -315,11 +315,10 @@ public class ScheduleManager : NetworkBehaviour
         }
 
         // Add all periods to newBlocks
-        bool invokeChange = false;
         List<ScheduleBlock> newBlocks = new List<ScheduleBlock>();
         for (int i = 0; i < orderedBlocks.Count; i++)
         {
-            ScheduleBlock cBlock = orderedBlocks[0];
+            ScheduleBlock cBlock = orderedBlocks[i];
             if (gm.currentPeriod >= cBlock.time && gm.currentPeriod <= (cBlock.length + cBlock.time)) // If the current period is within
             {
                 newBlocks.Add(cBlock);

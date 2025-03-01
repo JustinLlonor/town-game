@@ -86,6 +86,18 @@ public struct ScheduleBlock
         return ScheduleBlock.None;
     }
 
+    public bool IsContainedWithinSchedule(List<ScheduleBlock> schedule)
+    {
+        foreach (ScheduleBlock scheduleBlock in schedule)
+        {
+            if (this.Equals(scheduleBlock))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static ScheduleBlock None
     {
         get

@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using UnityEngine.Rendering.PostProcessing;
+using UnityEngine.InputSystem;
 
 public class ScheduleUI : MonoBehaviour
 {
@@ -20,6 +20,7 @@ public class ScheduleUI : MonoBehaviour
     public Transform tearoutHolder;
     public Transform minimapHolder;
     public float tearoutAnimationSpeed = .5f;
+    public InputActionReference tearoutSwap;
     List<ScheduleBlock> tearoutBuffer = new List<ScheduleBlock>();
     GameObject currentTearout;
     ScheduleBlock previousBuffer = ScheduleBlock.None;
@@ -38,6 +39,7 @@ public class ScheduleUI : MonoBehaviour
     ScheduleManager sm;
     public float tearoutRemovalTime = -1;
     float originalMinimapY = 0f;
+    bool firstFrame = true;
 
     [System.Serializable]
     public class UIBlock
@@ -58,6 +60,7 @@ public class ScheduleUI : MonoBehaviour
         gm = FindFirstObjectByType<GameManager>();
         sm.OnBlockStart += AddTearout;
         sm.OnBlockEnd += RemoveTearout;
+        FindFirstObjectByType<InputManager>().onScheduleSwap += OnTearoutSwap;
         originalMinimapY = minimapHolder.localPosition.y;
     }
 
@@ -78,18 +81,37 @@ public class ScheduleUI : MonoBehaviour
         UpdateTearoutUI();
     }
 
-    void UpdateTearoutUI()
+    void OnTearoutSwap()
+    {
+        if (tearoutBuffer.Count <= 1) return;
+
+        tearoutBuffer.Add(tearoutBuffer[0]);
+        tearoutBuffer.RemoveAt(0);
+        firstFrame = true;
+        UpdateTearoutUI(true);
+    }
+
+    void UpdateTearoutUI(bool swapAnimation = false)
     {
         ScheduleBlock currentBlock = ScheduleBlock.None;
         if (tearoutBuffer.Count > 0) currentBlock = tearoutBuffer[0];
 
-        if (previousBuffer.Equals(currentBlock)) return;
+        if (previousBuffer.Equals(currentBlock)) { 
+            if (firstFrame)
+            {
+                firstFrame = false;
+                UpdateTearoutBuffer();
+            }
+            return; 
+        }
 
+        firstFrame = true;
         if (!currentBlock.Equals(ScheduleBlock.None))
         {
             GameObject newTearout = Instantiate(tearoutPrefab, tearoutHolder);
             UIBlockPhys pub = newTearout.GetComponent<UIBlockPhys>();
             SetUIBlockProperties(pub, currentBlock);
+            if (swapAnimation) pub.PlayAnimation("TearoutSwap");
 
             if (currentTearout != null) Destroy(currentTearout);
             currentTearout = newTearout;
@@ -108,6 +130,7 @@ public class ScheduleUI : MonoBehaviour
             }
             previousBuffer = currentBlock;
             // none -> something, play the animation
+            UpdateTearoutBuffer();
         }
         else
         {
@@ -118,6 +141,26 @@ public class ScheduleUI : MonoBehaviour
                 StartCoroutine(StartTearoutHeightAnimation(currentTearout, tearoutHeight, 0f, true)); // Start animation to destroy this
                 StartMinimapAnimation(MinimapAnimation(tearoutHeight, 0f));
             }
+        }
+    }
+
+    void UpdateTearoutBuffer()
+    {
+        if (currentTearout == null) return;
+        // Tearout overlap
+        UIBlockPhys ubp = currentTearout.GetComponent<UIBlockPhys>();
+        if (tearoutBuffer.Count > 1)
+        {
+            ubp.SetKeyVisibility(true);
+            ubp.SetOverlap("(" + tearoutBuffer.Count + ")");
+            string interactText = InputControlPath.ToHumanReadableString(
+                tearoutSwap.action.bindings[0].effectivePath,
+                InputControlPath.HumanReadableStringOptions.OmitDevice);
+            ubp.SetKeyText(interactText);
+        }
+        else
+        {
+            ubp.SetKeyVisibility(false);
         }
     }
 
