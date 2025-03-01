@@ -15,6 +15,7 @@ public class UIBlockPhys : MonoBehaviour
     public TextMeshProUGUI keyText;
     public GameObject keyImage;
     public Animator animator;
+    public Image border;
 
     public void SetNameText(string name)
     {
@@ -36,9 +37,10 @@ public class UIBlockPhys : MonoBehaviour
         blockImage.color = color;
         float h, s, v;
         Color.RGBToHSV(color, out h, out s, out v);
-        v = Mathf.Clamp01(v - 0.45f);
-        Color newColor = Color.HSVToRGB(h, s, v);
-        stripeImage.color = newColor;
+        Color stripColor = Color.HSVToRGB(h, s, Mathf.Clamp01(v - 0.45f));
+        stripeImage.color = stripColor;
+        Color borderColor = Color.HSVToRGB(h, s, Mathf.Clamp01(v - 0.35f));
+        border.color = borderColor;
     }
 
     public void SetOverlap(string overlap)
