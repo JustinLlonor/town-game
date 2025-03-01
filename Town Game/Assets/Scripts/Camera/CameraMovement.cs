@@ -114,13 +114,13 @@ public class CameraMovement : MonoBehaviour
         canMove = (mode == CameraManager.CameraMode.FirstPerson); // Sets the canMove to true if it is first person
         if (mode == CameraManager.CameraMode.FirstPerson)
         {
-            Cursor.visible = true;
+            Cursor.visible = false;
             cursorManager.Lock();
             cameraState = pCamState;
         }
         if (mode == CameraManager.CameraMode.Observe)
         {
-            //Cursor.visible = false;
+            Cursor.visible = true;
             cursorManager.Unlock();
             cameraState = oCamState;
         }

@@ -68,7 +68,6 @@ public class ScheduleUI : MonoBehaviour
 
     void AddTearout(ScheduleBlock block)
     {
-        Debug.Log("updating");
         tearoutBuffer.Add(block);
         UpdateTearoutUI();
     }
