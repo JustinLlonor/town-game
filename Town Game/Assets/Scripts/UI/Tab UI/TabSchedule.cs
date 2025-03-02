@@ -53,6 +53,7 @@ public class TabSchedule : MonoBehaviour
     {
         sm = FindFirstObjectByType<ScheduleManager>();
         gm = FindFirstObjectByType<GameManager>();
+        sm.OnProxyScheduleChange += UpdateProxySchedule;
     }
 
     private void Start()
@@ -85,6 +86,12 @@ public class TabSchedule : MonoBehaviour
         if (readDay == 0) return;
         readDay--;
         if (selectedPlayer != PlayerRef.None) DisplaySchedule(selectedPlayer);
+    }
+
+    void UpdateProxySchedule(PlayerRef player)
+    {
+        if (selectedPlayer != player) return;
+        DisplaySchedule(player);
     }
 
     public void DisplaySchedule(PlayerRef player)

@@ -31,6 +31,7 @@ public class ScheduleManager : NetworkBehaviour
     public ScheduleEvent OnUpdateSchedule;
     public BlockEvent OnBlockStart;
     public BlockEvent OnBlockEnd;
+    public PlayerEvent OnProxyScheduleChange;
 
     public BlockChange OnBlockChange;
 
@@ -42,6 +43,7 @@ public class ScheduleManager : NetworkBehaviour
     /// <param name="to"></param>
     public delegate void BlockChange(ScheduleBlock from, ScheduleBlock to);
     public delegate void BlockEvent(ScheduleBlock block);
+    public delegate void PlayerEvent(PlayerRef player);
 
     PlayerManager playerManager;
     bool init = false;
@@ -246,6 +248,7 @@ public class ScheduleManager : NetworkBehaviour
         foreach (PlayerRef proxy in assignedPlayers) // Updates all proxy schedules on this client
         {
             proxySchedules[proxy].Add(sentBlock);
+            OnProxyScheduleChange?.Invoke(proxy);
         }
     }
     
@@ -305,6 +308,7 @@ public class ScheduleManager : NetworkBehaviour
             if (!foundBlock.Equals(ScheduleBlock.None))
             {
                 playerSchedules[proxy].Remove(foundBlock);
+                OnProxyScheduleChange?.Invoke(proxy);
             }
         }
     }
