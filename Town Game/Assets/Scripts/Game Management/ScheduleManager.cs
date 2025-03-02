@@ -83,7 +83,9 @@ public class ScheduleManager : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.Backspace))
         {
             AddBlock("Blackmarket", "Random Alleyway", 7f, 1f, Color.red, new List<PlayerRef>() { Runner.LocalPlayer });
-            AddBlock("Patrol Town", "", 10f, 3f, Color.green, new List<PlayerRef>() { Runner.LocalPlayer });
+            AddBlock("Patrol Town", "", 7f, 3f, Color.green, new List<PlayerRef>() { Runner.LocalPlayer });
+            AddBlock("Election", "", 12f, 2f, Color.cyan, new List<PlayerRef>() { Runner.LocalPlayer });
+            AddBlock("Judgement", "", 12f, 2f, Color.yellow, new List<PlayerRef>() { Runner.LocalPlayer });
         }
         CheckBlockChanges();
     }
