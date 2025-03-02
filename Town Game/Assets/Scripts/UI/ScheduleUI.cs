@@ -40,6 +40,7 @@ public class ScheduleUI : MonoBehaviour
     public float tearoutRemovalTime = -1;
     float originalMinimapY = 0f;
     bool firstFrame = true;
+    int previousKeyText = 0;
 
     [System.Serializable]
     public class UIBlock
@@ -97,7 +98,7 @@ public class ScheduleUI : MonoBehaviour
         if (tearoutBuffer.Count > 0) currentBlock = tearoutBuffer[0];
 
         if (previousBuffer.Equals(currentBlock)) { 
-            if (firstFrame)
+            if (firstFrame || previousKeyText != tearoutBuffer.Count)
             {
                 firstFrame = false;
                 UpdateTearoutBuffer();
@@ -146,6 +147,7 @@ public class ScheduleUI : MonoBehaviour
 
     void UpdateTearoutBuffer()
     {
+        previousKeyText = tearoutBuffer.Count;
         if (currentTearout == null) return;
         // Tearout overlap
         UIBlockPhys ubp = currentTearout.GetComponent<UIBlockPhys>();
