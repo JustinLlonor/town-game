@@ -176,7 +176,6 @@ public class TabSchedule : MonoBehaviour
     {
         // Clears blocks
         ClearSchedule();
-        Debug.Log(volumes.Count);
 
         // Instantiates new blocks with color
         foreach (BlockVolume volume in volumes)
@@ -195,9 +194,16 @@ public class TabSchedule : MonoBehaviour
                 float blockWidth = maxWidth / volume.blocks.Count;
                 bt.sizeDelta = new Vector3(blockWidth, volume.length * hourHeight);
                 bt.localPosition = new Vector3(blockWidth * i, -yPos);
+                float pivotX = 0f;
+                if (volume.blocks.Count > 1)
+                {
+                    pivotX = (1f / (volume.blocks.Count - 1f)) * i;
+                    SetPivot(bt, new Vector2(pivotX, 1f));
+                }
                 ubp.SetBlockColor(block.color);
                 ubp.SetNameText(block.periodName);
                 ubp.SetRoomText(block.room);
+                if (volume.blocks.Count > 0) newBlock.GetComponent<TabBlockPhys>().Init(maxWidth, blockWidth, pivotX, ySize);
                 i++;
             }
             //ubp.SetTimeText($"{gm.PeriodToClockString(block.time)} - {gm.PeriodToClockString(block.time + block.length)}");
@@ -216,6 +222,17 @@ public class TabSchedule : MonoBehaviour
             i++;
             **/
         }
+    }
+
+    void SetPivot(RectTransform rectTransform, Vector2 pivot)
+    {
+        if (rectTransform == null) return;
+
+        Vector2 size = rectTransform.rect.size;
+        Vector2 deltaPivot = rectTransform.pivot - pivot;
+        Vector3 deltaPosition = new Vector3(deltaPivot.x * size.x, deltaPivot.y * size.y);
+        rectTransform.pivot = pivot;
+        rectTransform.localPosition -= deltaPosition;
     }
 
     void ClearSchedule()
