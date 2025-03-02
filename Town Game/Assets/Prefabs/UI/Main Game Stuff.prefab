@@ -166,7 +166,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   masterSchedule: []
   localSchedule: []
-  currentBlocks: []
   dailyBlocks:
   - periodName: Breakfast
     room: Cafeteria
@@ -182,17 +181,93 @@ MonoBehaviour:
     color: {r: 0.20392157, g: 0.6509804, b: 0.972549, a: 1}
     assignedPlayers: []
     interestGroups: 
+  currentBlocks: []
   orderedBlocks: []
-  dcurrentBlock:
-    periodName: 
-    room: 
-    length: -1
-    time: -1
-    color: {r: 0, g: 0, b: 0, a: 0}
-    assignedPlayers: []
-    interestGroups: 
-  dlocalSchedule: []
+  currentMasterBlocks: []
   gm: {fileID: 1676236008550905741}
+--- !u!1 &4099744197750326124
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5669130914447257882}
+  m_Layer: 0
+  m_Name: Jobs
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5669130914447257882
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4099744197750326124}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2980941156791059792}
+  m_Father: {fileID: 466519801941495353}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5129982233875511372
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2980941156791059792}
+  - component: {fileID: 4308037574435337792}
+  m_Layer: 0
+  m_Name: Patrol
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2980941156791059792
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5129982233875511372}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5669130914447257882}
+  m_RootOrder: -2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4308037574435337792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5129982233875511372}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de452253259a0eb4aa019398f4edffd2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  subtexts: []
+  activeTasks: []
+  assignedPlayers: []
+  jobColor: {r: 1, g: 1, b: 1, a: 1}
+  taskCategories: []
+  generalPeriodName: General Job Stuff
+  jobIconIndex: 0
 --- !u!1 &5211516756420375758
 GameObject:
   m_ObjectHideFlags: 0
@@ -224,6 +299,7 @@ Transform:
   m_Children:
   - {fileID: 7228556260798279275}
   - {fileID: 3217437418723125412}
+  - {fileID: 5669130914447257882}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -246,4 +322,5 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 1676236008550905741}
   - {fileID: 5478285723541767041}
+  - {fileID: 4308037574435337792}
   ForceRemoteRenderTimeframe: 0

@@ -9,39 +9,28 @@ public class ScheduleManager : NetworkBehaviour
 {
     public List<ScheduleBlock> masterSchedule = new List<ScheduleBlock>();
     public List<ScheduleBlock> localSchedule;
+    public List<ScheduleBlock> dailyBlocks = new List<ScheduleBlock>();
     public Dictionary<PlayerRef, List<ScheduleBlock>> playerSchedules = new Dictionary<PlayerRef, List<ScheduleBlock>>(); // Contains the assigned schedule blocks of every player, to be revealed on other clients
     public Dictionary<PlayerRef, List<ScheduleBlock>> proxySchedules = new Dictionary<PlayerRef, List<ScheduleBlock>>(); // For clients, the schedule blocks that are revealed to them
-    public List<ScheduleBlock> currentBlocks = new List<ScheduleBlock>();
-    public List<ScheduleBlock> dailyBlocks = new List<ScheduleBlock>();
+    [HideInInspector] public List<ScheduleBlock> currentBlocks = new List<ScheduleBlock>();
     [HideInInspector] public List<ScheduleBlock> orderedBlocks = new List<ScheduleBlock>();
-
-    // Soon to be deprecated code
-    #region
-    // Dictionary for the schedules of each player
-    public Dictionary<PlayerRef, List<ScheduleBlock>> dplayerSchedules => default;
-    // this client's schedule
-    [HideInInspector] public ScheduleBlock dcurrentBlock = ScheduleBlock.None;
-    ScheduleBlock dpreviousBlock = ScheduleBlock.None;
-    public List<ScheduleBlock> dlocalSchedule;
-    //PhotonView view;
-    #endregion
+    [HideInInspector] public List<ScheduleBlock> currentMasterBlocks = new List<ScheduleBlock>();
+    List<ScheduleBlock> orderedMasterBlocks;
 
     [HideInInspector] public GameManager gm;
 
+    // Client events
     public ScheduleEvent OnUpdateSchedule;
     public BlockEvent OnBlockStart;
     public BlockEvent OnBlockEnd;
     public PlayerEvent OnProxyScheduleChange;
 
-    public BlockChange OnBlockChange;
+    // Server events
+    public ScheduleEvent OnUpdateMasterSchedule;
+    public BlockEvent OnMasterBlockStart;
+    public BlockEvent OnMasterBlockEnd;
 
     public delegate void ScheduleEvent();
-    /// <summary>
-    /// Called when a schedule block ends and another begins
-    /// </summary>
-    /// <param name="from"></param>
-    /// <param name="to"></param>
-    public delegate void BlockChange(ScheduleBlock from, ScheduleBlock to);
     public delegate void BlockEvent(ScheduleBlock block);
     public delegate void PlayerEvent(PlayerRef player);
 
@@ -53,8 +42,8 @@ public class ScheduleManager : NetworkBehaviour
         playerManager = FindFirstObjectByType<PlayerManager>();
         //view = gameObject.GetComponent<PhotonView>();
         OnUpdateSchedule += UpdateOrderedBlocks; // When schedule updates or when the day changes, ordered blocks is updated
+        OnUpdateMasterSchedule += UpdateMasterOrdered;
         gm.OnChangeDay += UpdateOrderedBlocks;
-        gm.OnChangeDay += ResetBlockCheck; // Find out what this does
         //view.RPC("AddSchedulePlayer", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer);
     }
 
@@ -90,6 +79,7 @@ public class ScheduleManager : NetworkBehaviour
             AddBlock("Judgement", "", 12f, 2f, Color.yellow, new List<PlayerRef>() { Runner.LocalPlayer });
         }
         CheckBlockChanges();
+        CheckMasterBlockChanges();
     }
 
     /// <summary>
@@ -106,6 +96,7 @@ public class ScheduleManager : NetworkBehaviour
         if (interestGroups == null) interestGroups = new List<int>();
         ScheduleBlock newBlock = new ScheduleBlock(periodName, room, length, time, color, assignedPlayers, interestGroups);
         masterSchedule.Add(newBlock);
+        OnUpdateMasterSchedule?.Invoke();
         SendAddBlockData(newBlock);
         return newBlock;
     }
@@ -120,6 +111,7 @@ public class ScheduleManager : NetworkBehaviour
         if (blockIndex == -1) return;
         SendRemoveBlockData(block);
         masterSchedule.RemoveAt(blockIndex);
+        OnUpdateMasterSchedule?.Invoke();
         // Add code for removing on clients later
     }
 
@@ -171,6 +163,8 @@ public class ScheduleManager : NetworkBehaviour
 
         ScheduleBlock newBlock = new ScheduleBlock(periodName, room, length, time, blockColor, assignedPlayers.ToList(), interest.ToList());
         localSchedule.Add(newBlock);
+        proxySchedules[Runner.LocalPlayer] = localSchedule;
+        OnProxyScheduleChange?.Invoke(Runner.LocalPlayer);
         OnUpdateSchedule?.Invoke();
     }
 
@@ -190,8 +184,10 @@ public class ScheduleManager : NetworkBehaviour
         if (!localRemoved.Equals(ScheduleBlock.None))
         {
             localSchedule.Remove(localRemoved);
+            proxySchedules[Runner.LocalPlayer] = localSchedule;
+            OnProxyScheduleChange?.Invoke(Runner.LocalPlayer);
+            OnUpdateSchedule?.Invoke();
         }
-        OnUpdateSchedule?.Invoke();
     }
 
     // Sends the proxy block to interest groups
@@ -247,6 +243,7 @@ public class ScheduleManager : NetworkBehaviour
         ScheduleBlock sentBlock = new ScheduleBlock(periodName, room, length, time, blockColor, assignedPlayers.ToList(), interestGroups.ToList());
         foreach (PlayerRef proxy in assignedPlayers) // Updates all proxy schedules on this client
         {
+            if (proxy == Runner.LocalPlayer) continue;
             proxySchedules[proxy].Add(sentBlock);
             OnProxyScheduleChange?.Invoke(proxy);
         }
@@ -304,6 +301,7 @@ public class ScheduleManager : NetworkBehaviour
         ScheduleBlock checkedBlock = new ScheduleBlock(periodName, room, length, time);
         foreach (PlayerRef proxy in assignedPlayers)
         {
+            if (proxy == Runner.LocalPlayer) continue;
             ScheduleBlock foundBlock = checkedBlock.GetEquivalentBlockInSchedule(playerSchedules[proxy]);
             if (!foundBlock.Equals(ScheduleBlock.None))
             {
@@ -370,6 +368,7 @@ public class ScheduleManager : NetworkBehaviour
 
     void UpdateOrderedBlocks()
     {
+        // Client
         List<ScheduleBlock> newOrdered = new List<ScheduleBlock>();
         float minRange = gm.currentDay * 24 - 1;
         float maxRange = gm.currentDay * 24 + 23;
@@ -389,6 +388,57 @@ public class ScheduleManager : NetworkBehaviour
         orderedBlocks = newOrdered;
     }
 
+    void UpdateMasterOrdered()
+    {
+        orderedMasterBlocks = masterSchedule.OrderBy(o => o.time).ToList();
+    }
+
+    void CheckMasterBlockChanges()
+    {
+        if (!Runner.IsServer) return;
+        while (orderedMasterBlocks.Count > 0 && gm.currentPeriod > orderedMasterBlocks[0].time + orderedMasterBlocks[0].length) // Removes anything behind the current time
+        {
+            orderedMasterBlocks.RemoveAt(0);
+        }
+
+        // Add all periods to newBlocks
+        List<ScheduleBlock> newBlocks = new List<ScheduleBlock>();
+        for (int i = 0; i < orderedMasterBlocks.Count; i++)
+        {
+            ScheduleBlock cBlock = orderedMasterBlocks[i];
+            if (gm.currentPeriod >= cBlock.time && gm.currentPeriod <= (cBlock.length + cBlock.time)) // If the current period is within
+            {
+                newBlocks.Add(cBlock);
+            }
+        }
+
+        List<ScheduleBlock> addedBlocks = new List<ScheduleBlock>();
+        // Find added blocks
+        foreach (ScheduleBlock block in newBlocks)
+        {
+            if (!currentMasterBlocks.Contains(block))
+            {
+                addedBlocks.Add(block);
+            }
+        }
+
+        List<ScheduleBlock> removedBlocks = new List<ScheduleBlock>();
+        // Find removed blocks
+        foreach (ScheduleBlock block in currentMasterBlocks)
+        {
+            if (!newBlocks.Contains(block))
+            {
+                removedBlocks.Add(block);
+            }
+        }
+
+        // If diffBlock is not empty, invoke change
+        CheckDelegate(addedBlocks, OnMasterBlockStart);
+        CheckDelegate(removedBlocks, OnMasterBlockEnd);
+
+        currentMasterBlocks = newBlocks; // Current block list becomes new block list
+    }
+
     Color IntToColor(int colorInt)
     {
         string htmlValue = colorInt.ToString("X");
@@ -404,101 +454,4 @@ public class ScheduleManager : NetworkBehaviour
         int colorInt = int.Parse(hexString, System.Globalization.NumberStyles.HexNumber);
         return colorInt;
     }
-
-    // Below is reference code (may be deprecated)
-    #region
-    //[PunRPC]
-    public void AddSchedulePlayer(PlayerRef player)
-    {
-        dplayerSchedules.Add(player, new List<ScheduleBlock>());
-    }
-
-    //[PunRPC]
-    public void AddScheduleBlock(PlayerRef player, string periodName, string room, float time, float length)
-    {
-        dplayerSchedules[player].Add(new ScheduleBlock(periodName, room, length, time));
-
-        if (player == Runner.LocalPlayer) dlocalSchedule.Add(new ScheduleBlock(periodName, room, length, time));
-        OnUpdateSchedule?.Invoke();
-    }
-
-    //[PunRPC]
-    public void RemoveScheduleBlock(PlayerRef player, float time)
-    {
-        int i = 0;
-        foreach (ScheduleBlock block in new List<ScheduleBlock>(dplayerSchedules[player])) // Removes from dictionary
-        {
-            if (block.time == time)
-            {
-                dplayerSchedules[player].RemoveAt(i);
-                break;
-            }
-            i++;
-        }
-
-        // Removes locally
-        if (player == Runner.LocalPlayer) dlocalSchedule.RemoveAt(i);
-        OnUpdateSchedule?.Invoke();
-    }
-
-    //[PunRPC]
-    public void ClearSchedule()
-    {
-        dlocalSchedule.Clear();
-
-        OnUpdateSchedule?.Invoke();
-    }
-
-    public bool PeriodOverlaps(float startTime, float endTime, PlayerRef player)
-    {
-        bool output = false;
-        foreach (ScheduleBlock block in dplayerSchedules[player])
-        {
-            if (block.time > startTime && block.time < endTime)
-            {
-                output = true; break;
-            }
-            if (block.time + block.length > startTime && block.time + block.length < endTime)
-            {
-                output = true; break;
-            }
-            if (block.time < startTime && block.time + block.length > endTime)
-            {
-                output = true; break;
-            }
-        }
-        foreach (ScheduleBlock block in dailyBlocks)
-        {
-            if (block.time > startTime && block.time < endTime)
-            {
-                output = true; break;
-            }
-            if (block.time + block.length > startTime && block.time + block.length < endTime)
-            {
-                output = true; break;
-            }
-            if (block.time < startTime && block.time + block.length > endTime)
-            {
-                output = true; break;
-            }
-        }
-        return output;
-    }
-
-    void CheckPreviousBlock()
-    {
-        if (!dpreviousBlock.Equals(dcurrentBlock))
-        {
-            OnBlockChange?.Invoke(dpreviousBlock, dcurrentBlock);
-            dpreviousBlock = dcurrentBlock;
-        }
-    }
-
-    void ResetBlockCheck()
-    {
-        dcurrentBlock = ScheduleBlock.None;
-        dpreviousBlock = ScheduleBlock.None;
-    }
-
-    #endregion
 }

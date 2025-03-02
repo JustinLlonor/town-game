@@ -5,20 +5,32 @@ using UnityEngine;
 [System.Serializable]
 public class Task
 {
+    public static int idIndex = 0;
+
     public string name;
-    public Type type;
-    public float progress;
+    public int category;
+    public float secondsTaken = 20f;
+    public int id;
 
-    public enum Type
-    {
-        Completion = 0,
-        Maintainence = 1
-    }
-
-    public Task(string name, Type type, float progress)
+    /// <summary>
+    /// Constructor for a task. If the id parameter is left alone, will automatically increment task id index.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="category"></param>
+    /// <param name="secondsTaken"></param>
+    /// <param name="id"></param>
+    public Task(string name, int category, float secondsTaken, int id = -1)
     {
         this.name = name;
-        this.type = type;
-        this.progress = progress;
+        this.category = category;
+        this.secondsTaken = secondsTaken;
+        if (id != -1)
+        {
+            this.id = idIndex++;
+        }
+        else
+        {
+            this.id = id;
+        }
     }
 }

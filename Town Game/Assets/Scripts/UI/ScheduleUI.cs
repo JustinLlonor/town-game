@@ -5,8 +5,9 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using Fusion;
 
-public class ScheduleUI : MonoBehaviour
+public class ScheduleUI : NetworkBehaviour
 {
     public int foresight = 3;
     public float hourLength = 50f;
@@ -22,6 +23,7 @@ public class ScheduleUI : MonoBehaviour
     public float tearoutAnimationSpeed = .5f;
     public InputActionReference tearoutSwap;
     List<ScheduleBlock> tearoutBuffer = new List<ScheduleBlock>();
+    List<SubtextInfo> clientSubtextBuffer = new List<SubtextInfo>();
     GameObject currentTearout;
     ScheduleBlock previousBuffer = ScheduleBlock.None;
     IEnumerator minimapAnimation = null;
@@ -29,10 +31,6 @@ public class ScheduleUI : MonoBehaviour
     public string emptyPeriod = "Free Time";
     public Color primaryColor;
     public Color secondaryColor;
-    [Header("Bookmarks")]
-    public float bookmarkOffset = 5f;
-    public Color innoBookmark;
-    public Color cultistBookmark;
     List<UIBlock> listedBlocks = new List<UIBlock>();
     GameObject tearout;
     GameManager gm;
@@ -43,7 +41,7 @@ public class ScheduleUI : MonoBehaviour
     int previousKeyText = 0;
 
     [System.Serializable]
-    public class UIBlock
+    class UIBlock
     {
         public ScheduleBlock block;
         public Transform transform;
@@ -52,6 +50,20 @@ public class ScheduleUI : MonoBehaviour
         {
             this.block = block;
             this.transform = transform;
+        }
+    }
+
+    struct SubtextInfo
+    {
+        public ScheduleBlock trackedBlock;
+        public string subText;
+        public List<Task> tasks;
+
+        public SubtextInfo(ScheduleBlock trackedBlock, string subText, List<Task> tasks)
+        {
+            this.trackedBlock = trackedBlock;
+            this.subText = subText;
+            this.tasks = tasks;
         }
     }
 
@@ -68,6 +80,27 @@ public class ScheduleUI : MonoBehaviour
     private void Start()
     {
         ((RectTransform)blockHolder).SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, hourLength * (float)foresight);
+    }
+
+    // Replaces period task info with this
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_SendTearoutInfo([RpcTarget] PlayerRef player, string periodName, string room, float time, float length, string subtext, string[] tasks)
+    {
+
+    }
+
+    // Sends task completion info
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_SendTaskCompletion([RpcTarget] PlayerRef player, string periodName, string room, float time, float length, string task)
+    {
+
+    }
+
+    // Sends a subtext change for the spcified period
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_SendSubtextChange([RpcTarget] PlayerRef player, string periodName, string room, float time, float length, string subtext)
+    {
+
     }
 
     void AddTearout(ScheduleBlock block)
@@ -216,42 +249,12 @@ public class ScheduleUI : MonoBehaviour
 
     }
 
-    private void OnEnable()
+    bool BlockPassed(ScheduleBlock block)
     {
-        /**
-        ReadSchedule();
-        gm.OnChangeDay += ReadSchedule;
-        sm.OnUpdateSchedule += ReadSchedule; // Make so that tearout is updated when schedule is updated
-        **/
+        return block.time + block.length < gm.currentPeriod;
     }
 
-    private void OnDisable()
-    {
-        /**
-        gm.OnChangeDay -= ReadSchedule;
-        sm.OnUpdateSchedule -= ReadSchedule;
-        **/
-    }
-
-    private void Update()
-    {
-        //if (Input.GetKeyDown(KeyCode.O)) AddScheduleBlock(new ScheduleBlock(testBlock.periodName, testBlock.room, testBlock.length, testBlock.time));
-        //ScrollSchedule();
-    }
-
-    void ScrollSchedule()
-    {
-        if (listedBlocks.Count == 0) return;
-        if (BlockPassed(listedBlocks[0].block))
-        {
-            RemoveScheduleBlock(0);
-        }
-        float currentPeriod = gm.currentPeriod - (gm.currentDay * 24f);
-        blockHolder.localPosition = new Vector2(0f, hourLength * currentPeriod);
-        bookmarkHolder.localPosition = new Vector2(0f, hourLength * currentPeriod);
-    }
-
-    // Deprecated tearout code
+    // Deprecated code
     #region
     void CheckTearout()
     {
@@ -326,10 +329,6 @@ public class ScheduleUI : MonoBehaviour
     /// </summary>
     /// <param name="block"></param>
     /// <returns></returns>
-    bool BlockPassed(ScheduleBlock block)
-    {
-        return block.time + block.length < gm.currentPeriod;
-    }
 
     /// <summary>
     /// Updates the UI schedule to reflect the day
@@ -378,6 +377,18 @@ public class ScheduleUI : MonoBehaviour
         **/
 
         GroupAddScheduleBlocks(blocks);
+    }
+
+    void ScrollSchedule()
+    {
+        if (listedBlocks.Count == 0) return;
+        if (BlockPassed(listedBlocks[0].block))
+        {
+            RemoveScheduleBlock(0);
+        }
+        float currentPeriod = gm.currentPeriod - (gm.currentDay * 24f);
+        blockHolder.localPosition = new Vector2(0f, hourLength * currentPeriod);
+        bookmarkHolder.localPosition = new Vector2(0f, hourLength * currentPeriod);
     }
 
     void GroupAddScheduleBlocks(List<ScheduleBlock> blocks)
@@ -438,34 +449,5 @@ public class ScheduleUI : MonoBehaviour
     {
         listedBlocks.Clear();
         foreach (Transform child in blockHolder) Destroy(child.gameObject);
-    }
-
-    /**
-    void AddBookmarks()
-    {
-        ClearBookmarks();
-        foreach (GlobalEvent ge in sm.globalEvents)
-        {
-            Color newColor = innoBookmark;
-            if (ge.cultistEvent) newColor = cultistBookmark;
-
-            GameObject newBookmark = Instantiate(bookmarkPrefab, bookmarkHolder);
-            float currentPosition = -ge.time * hourLength;
-            float offset = -bookmarkOffset;
-            if (ge.cultistEvent) offset = bookmarkOffset;
-            RectTransform rt = newBookmark.GetComponent<RectTransform>();
-            rt.sizeDelta = new Vector2(rt.sizeDelta.x, ge.length * hourLength);
-            rt.localPosition = new Vector2(offset, currentPosition + hourLength * 3); // idk why its this number specifically
-            newBookmark.GetComponent<RawImage>().color = newColor;
-        }
-    }
-    **/
-
-    void ClearBookmarks()
-    {
-        foreach (Transform child in bookmarkHolder)
-        {
-            Destroy(child.gameObject);
-        }
     }
 }
