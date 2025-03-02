@@ -90,11 +90,13 @@ public class UIManager : MonoBehaviour
         tabUI.gameObject.SetActive(true);
         OnUIOpen.Invoke();
         tabUI.UpdatePlayerList();
+        Cursor.visible = true;
         //tabUI.playerList.OnDeselectPlayer?.Invoke(null);
     }
 
     public void CloseTabMenu()
     {
+        Cursor.visible = false;
         tabUI.gameObject.SetActive(false);
     }
 }

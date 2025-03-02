@@ -20,6 +20,8 @@ public class TabSchedule : MonoBehaviour
     GameManager gm;
     public float hourHeight = 0f;
     public float maxWidth = 262.7293f;
+    public GameObject select;
+    public GameObject grid;
 
     struct BlockVolume
     {
@@ -96,6 +98,8 @@ public class TabSchedule : MonoBehaviour
 
     public void DisplaySchedule(PlayerRef player)
     {
+        select.SetActive(false);
+        grid.SetActive(true);
         selectedPlayer = player;
         List<ScheduleBlock> blocks = new List<ScheduleBlock>();
         float minRange = readDay * 24 - 1;
@@ -169,6 +173,8 @@ public class TabSchedule : MonoBehaviour
     {
         ClearSchedule();
         selectedPlayer = PlayerRef.None;
+        select.SetActive(true);
+        grid.SetActive(false);
         dateText.text = "...";
     }
 

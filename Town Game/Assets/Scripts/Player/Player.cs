@@ -46,7 +46,7 @@ public class Player : NetworkBehaviour
         Init?.Invoke();
         if (!HasInputAuthority) return;
         if (SteamManager.Initialized) RPC_SendNickname(SteamFriends.GetPersonaName());
-        else RPC_SendNickname(Object.InputAuthority.PlayerId.ToString());
+        else RPC_SendNickname("Player " + Object.InputAuthority.PlayerId.ToString());
         UIManager.instance.OnUIOpen += MenuOpen;
         UIManager.instance.OnUIClose += MenuClose;
         InputManager inputManager = FindFirstObjectByType<InputManager>();
