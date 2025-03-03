@@ -10,7 +10,6 @@ public class Task
     public int category;
     public float secondsTaken;
     public string room;
-    public List<PlayerRef> assignedPlayers;
     public int id;
 
     /// <summary>
@@ -26,11 +25,6 @@ public class Task
         this.category = category;
         this.secondsTaken = secondsTaken;
         this.room = room;
-        if (assignedPlayers == null)
-        {
-            assignedPlayers = new List<PlayerRef>();
-        }
-        this.assignedPlayers = assignedPlayers;
         if (id != -1)
         {
             this.id = idIndex++;

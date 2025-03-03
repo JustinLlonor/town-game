@@ -9,7 +9,7 @@ public class MapRoom : MonoBehaviour
     public RoomType roomType = RoomType.Living;
     public Transform spawnTransform;
     public Transform viewTransform; // The transform of the camera when the player selects this building
-    public JobHolder taskHolder;
+    public JobHandler taskHolder;
     //public List<Photon.Realtime.Player> workers = new List<Photon.Realtime.Player>();
 
     public enum RoomType

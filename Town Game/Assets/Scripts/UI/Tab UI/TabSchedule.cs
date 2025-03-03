@@ -119,21 +119,6 @@ public class TabSchedule : MonoBehaviour
             blocks.Add(block);
         }
 
-        /**
-        // Sort blocks
-        blocks = blocks.OrderBy(o => o.time).ToList();
-
-        // Add empty spaces
-        List<ScheduleBlock> blocksCheck = new List<ScheduleBlock>(blocks);
-        for (int i = 0; i < blocksCheck.Count; i++)
-        {
-            int nextI = i + 1;
-            if (nextI >= blocksCheck.Count) break;
-            if (blocksCheck[i].time + blocksCheck[i].length == blocksCheck[nextI].time) continue; // Continue if there is no space in between blocks
-            blocks.Add(new ScheduleBlock("Free Time", "", blocksCheck[nextI].time - (blocksCheck[i].time + blocksCheck[i].length), blocksCheck[i].time + blocksCheck[i].length));
-        }
-        **/
-
         // Create block volumes
         List<BlockBound> blockBounds = new List<BlockBound>();
         for (int i = 0; i < blocks.Count; i++)
