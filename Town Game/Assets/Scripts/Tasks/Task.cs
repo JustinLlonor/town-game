@@ -19,7 +19,7 @@ public class Task
     /// <param name="category"></param>
     /// <param name="secondsTaken"></param>
     /// <param name="id"></param>
-    public Task(string name, int category, float secondsTaken, string room, int id = -1)
+    public Task(string name, int category, float secondsTaken, string room, bool isCompleted = false, int id = -1)
     {
         this.name = name;
         this.category = category;

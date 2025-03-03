@@ -3,16 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Fusion;
+using UnityEngine.InputSystem.LowLevel;
 
 public class JobHandler : NetworkBehaviour
 {
-    // All schedule blocks relating to this job, only blocks in the future can be removed or added
-    [SerializeField] private string subtext;
-    // All tasks that have not been completed
+    // All tasks
     public List<Task> activeTasks = new List<Task>();
     // The amount of tasks assigned to a category it takes to create a new state
     public int stateCreationThreshold = 2;
-    public TasksUpdate OnTasksUpdate;
     public List<PlayerRef> hiredPlayers = new List<PlayerRef>();
     public ScheduleUI scheduleUI;
     [Header("Period Settings")]
@@ -23,13 +21,23 @@ public class JobHandler : NetworkBehaviour
     public string[] taskCategories = new string[0];
     public string generalPeriodName = "General Job Stuff";
     public int jobIconIndex;
+
     private List<TaskState> states = new List<TaskState>();
+    private Dictionary<TaskState, ScheduleBlock> taskBlocks = new Dictionary<TaskState, ScheduleBlock>(); 
+
+    public JobHandlerEvent OnTasksUpdate;
+    public StateEvent OnStatesAdd;
+    public StateEvent OnStatesRemove;
+    public delegate void JobHandlerEvent();
+    public delegate void StateEvent(TaskState[] states);
+
     RunnerManager runnerManager;
     ScheduleManager scheduleManager;
     GameManager gameManager;
 
-    public delegate void TasksUpdate();
-
+    /// <summary>
+    /// Stores tasks, general summary, and room of a potential schedule block
+    /// </summary>
     public class TaskState
     {
         public string category;
@@ -89,10 +97,62 @@ public class JobHandler : NetworkBehaviour
         gameManager = FindFirstObjectByType<GameManager>();
         if (!Runner.IsServer) return;
         scheduleManager.OnMasterBlockStart += CheckActiveBlock;
-        runnerManager.onPlayerLeave += RemovePlayer;
-        OnTasksUpdate += UpdateScheduleTasks;
+        runnerManager.onPlayerLeave += FirePlayer;
     }
 
+    /// <summary>
+    /// Assigns a player to this job
+    /// </summary>
+    /// <param name="player"></param>
+    public void HirePlayer(PlayerRef player)
+    {
+        if (hiredPlayers.Contains(player)) return;
+        hiredPlayers.Add(player);
+    }
+
+    /// <summary>
+    /// Removes a player from this job
+    /// </summary>
+    /// <param name="player"></param>
+    public void FirePlayer(PlayerRef player)
+    {
+        if (!hiredPlayers.Contains(player)) return;
+        hiredPlayers.Remove(player);
+    }
+
+    public void AddTasks(List<Task> tasks)
+    {
+        foreach (Task task in tasks)
+        {
+            activeTasks.Add(task);
+        }
+        OnTasksUpdate?.Invoke();
+
+        AddTasksToStates(tasks);
+    }
+
+    public void RemoveTask(Task taskReference)
+    {
+        activeTasks.Remove(taskReference);
+
+        OnTasksUpdate?.Invoke();
+        // Remove the task from states
+
+        // If the task was completed, send this rpc to the tearout, otherwise send rpc task removal
+    }
+
+    /// <summary>
+    /// Sends schedule subtext to a player
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="subtext"></param>
+    /// <param name="insertedIndex"></param>
+    public void SendSubtext(PlayerRef player, string subtext, int insertedIndex)
+    {
+
+    }
+
+    // State behaviours
     /// <summary>
     /// Adds the specified tasks to the states
     /// </summary>
@@ -103,11 +163,13 @@ public class JobHandler : NetworkBehaviour
     {
         if (stateClosed)
         {
-            AddState(categoryName, new List<Task>(tasks), false);
+            TaskState newState = AddStates(categoryName, new List<Task>(tasks), false);
+            OnStatesAdd?.Invoke(new TaskState[] { newState });
             return;
         }
 
         List<Task> remainingTasks = new List<Task>(tasks);
+        List<TaskState> addedStates = new List<TaskState>();
 
         // Find compatible states to add to
         for (int i = 0; i < states.Count; i++)
@@ -156,46 +218,78 @@ public class JobHandler : NetworkBehaviour
                 addedTime += task.secondsTaken; // If its full, create a new state for the same category
                 if (addedTime > maxTime)
                 {
-                    AddState(ct.Key, new List<Task>(taskList), false);
+                    TaskState newState = AddStates(ct.Key, new List<Task>(taskList), false);
                     addedTime = 0f;
                     taskList.Clear();
+                    addedStates.Add(newState); // Add the created  state
                 }
             }
             if (taskList.Count > 0)
             {
-                AddState(ct.Key, new List<Task>(taskList), false);
+                TaskState newState = AddStates(ct.Key, new List<Task>(taskList), false);
+                addedStates.Add(newState);
             }
         }
+
+        if (addedStates.Count > 0) OnStatesAdd?.Invoke(addedStates.ToArray());
     }
 
+    /// <summary>
+    /// Removes the specified tasks from states
+    /// </summary>
+    /// <param name="tasks"></param>
     private void RemoveTasksFromStates(List<Task> tasks)
     {
-        // If a state is removed here, call AddtasksToStates
+        List<TaskState> statesToRemove = new List<TaskState>();
+        List<Task> remainingTasks = new List<Task>(tasks); // Tasks that are yet to be removed
+
+        for (int i = 0; i < states.Count; i++)
+        {
+            TaskState currentState = states[i];
+            for (int o = 0; o < currentState.tasks.Count; o++)
+            {
+                if (remainingTasks.Contains(currentState.tasks[o]))
+                {
+                    states[i].tasks.RemoveAt(o);
+                    o--;
+                    remainingTasks.Remove(currentState.tasks[o]);
+                }
+            }
+
+            if (states[i].tasks.Count == 0 && (!states[i].closed))
+            {
+                statesToRemove.Add(states[i]);
+                i--;
+            }
+        }
+
+        if (statesToRemove.Count > 0) OnStatesRemove?.Invoke(statesToRemove.ToArray());
+        RemoveStates(statesToRemove);
     }
 
     // State creating methods
-    private void AddState(int category, List<Task> tasks, bool closed)
+    private TaskState AddStates(int category, List<Task> tasks, bool closed)
     {
         TaskState newState = new TaskState(taskCategories[category], "", tasks, closed);
         newState.UpdateRoomName();
         states.Add(newState);
+        return newState;
     }
-    private void AddState(string category, List<Task> tasks, bool closed)
+
+    private TaskState AddStates(string category, List<Task> tasks, bool closed)
     {
         TaskState newState = new TaskState(category, "", tasks, closed);
         newState.UpdateRoomName();
         states.Add(newState);
+        return newState;
     }
 
-    public void AddTasks(List<Task> tasks)
+    private void RemoveStates(List<TaskState> stateList)
     {
-        foreach (Task task in tasks)
+        foreach (TaskState state in stateList)
         {
-            activeTasks.Add(task);
+            states.Remove(state);
         }
-        OnTasksUpdate?.Invoke();
-
-        AddTasksToStates(tasks);
     }
 
     public void AddClosedState(List<Task> tasks, string categoryName)
@@ -203,84 +297,25 @@ public class JobHandler : NetworkBehaviour
         AddTasksToStates(tasks, true, categoryName);
     }
 
-    public void RemoveTask(Task taskReference, bool isCompleted)
+    private void AddStates(TaskState[] states)
     {
-        activeTasks.Remove(taskReference);
-
-        OnTasksUpdate?.Invoke();
-        // Remove the task from states
-
-        // If the task was completed, send this rpc to the tearout, otherwise send rpc task removal
+        
     }
 
-    public void SetSubtext(string newSubtext)
+    private void RemoveStates(TaskState[] states)
     {
-        subtext = newSubtext;
+
     }
 
-    /// <summary>
-    /// Assigns a player to this job
-    /// </summary>
-    /// <param name="player"></param>
-    public void AssignPlayer(PlayerRef player)
+    private void ReorganizeStateBlocks()
     {
-        if (hiredPlayers.Contains(player)) return;
-        hiredPlayers.Add(player);
-        UpdateScheduleTasks();
+
     }
 
-    /// <summary>
-    /// Removes a player from this job
-    /// </summary>
-    /// <param name="player"></param>
-    public void RemovePlayer(PlayerRef player)
+    // For when periods end and tasks have not been completed yet, only taget uncompleted tasks
+    private void ReassignStateTasks()
     {
-        if (!hiredPlayers.Contains(player)) return;
-        hiredPlayers.Remove(player);
-        UpdateScheduleTasks();
-    }
 
-    // Updates the schedule per player for this job.
-    private void UpdateScheduleTasks()
-    {
-        /**
-        // Tasks that are already added
-        List<Task> culledTasks = new List<Task>();
-        // Periods that are not full
-        List<int> freePeriods = new List<int>();
-        int i = 0;
-        foreach (TrackedBlock block in trackedBlocks)
-        {
-            foreach (Task task in block.tasks)
-            {
-                culledTasks.Add(task);
-            }
-            if (!TrackedBlockIsFull(block)) freePeriods.Add(i);
-            i++;
-        }
-
-        // Blocks to be added to schedule manager
-        List<ScheduleBlock> addedBlocks = new List<ScheduleBlock>();
-        // Iterate over every task and add to a period
-        foreach (Task task in activeTasks)
-        {
-            // Doesn't add any tasks already added
-            if (culledTasks.Contains(task)) continue;
-
-            // Check free periods to add
-            if (freePeriods.Count > 0)
-            {
-                trackedBlocks[freePeriods[0]].tasks.Add(task);
-                if (TrackedBlockIsFull(trackedBlocks[freePeriods[0]])) freePeriods.RemoveAt(0); // Removes if its full
-                continue;
-            }
-
-            // If everything else is full, create a new period
-            float newTime = 0f;
-        }
-        **/
-
-        // Update period names
     }
 
     // Checks if the current block is within our active blocks. If it is, send this information to the assigned
