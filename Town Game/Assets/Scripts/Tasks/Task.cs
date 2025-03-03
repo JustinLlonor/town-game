@@ -1,6 +1,5 @@
-using System.Collections;
+using Fusion;
 using System.Collections.Generic;
-using UnityEngine;
 
 [System.Serializable]
 public class Task
@@ -9,7 +8,9 @@ public class Task
 
     public string name;
     public int category;
-    public float secondsTaken = 20f;
+    public float secondsTaken;
+    public string room;
+    public List<PlayerRef> assignedPlayers;
     public int id;
 
     /// <summary>
@@ -19,11 +20,17 @@ public class Task
     /// <param name="category"></param>
     /// <param name="secondsTaken"></param>
     /// <param name="id"></param>
-    public Task(string name, int category, float secondsTaken, int id = -1)
+    public Task(string name, int category, float secondsTaken, string room, int id = -1)
     {
         this.name = name;
         this.category = category;
         this.secondsTaken = secondsTaken;
+        this.room = room;
+        if (assignedPlayers == null)
+        {
+            assignedPlayers = new List<PlayerRef>();
+        }
+        this.assignedPlayers = assignedPlayers;
         if (id != -1)
         {
             this.id = idIndex++;

@@ -144,13 +144,13 @@ public class TabSchedule : MonoBehaviour
 
         // Sort the block bounds
         blockBounds = blockBounds.OrderBy(o => o.time).ToList();
-        List<BlockVolume> blockVolumes = new List<BlockVolume>();
 
+        List<BlockVolume> blockVolumes = new List<BlockVolume>();
         List<ScheduleBlock> currentBlocks = new List<ScheduleBlock>();
         float previousBound = -1f;
         foreach (BlockBound bound in blockBounds) // Create the volumes, every time there is a bound start it adds the block to a future volume, else it removes the block from future volume.
         {
-            if (currentBlocks.Count > 0) blockVolumes.Add(new BlockVolume(previousBound, bound.time - previousBound, new List<ScheduleBlock>(currentBlocks)));
+            if (currentBlocks.Count > 0 && (bound.time - previousBound != 0f)) blockVolumes.Add(new BlockVolume(previousBound, bound.time - previousBound, new List<ScheduleBlock>(currentBlocks)));
             if (bound.isStart) currentBlocks.Add(blocks[bound.blockIndex]);
             else currentBlocks.Remove(blocks[bound.blockIndex]);
 

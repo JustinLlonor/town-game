@@ -15,7 +15,7 @@ public class ScheduleManager : NetworkBehaviour
     [HideInInspector] public List<ScheduleBlock> currentBlocks = new List<ScheduleBlock>();
     [HideInInspector] public List<ScheduleBlock> orderedBlocks = new List<ScheduleBlock>();
     [HideInInspector] public List<ScheduleBlock> currentMasterBlocks = new List<ScheduleBlock>();
-    List<ScheduleBlock> orderedMasterBlocks;
+    List<ScheduleBlock> orderedMasterBlocks = new List<ScheduleBlock>();
 
     [HideInInspector] public GameManager gm;
 
