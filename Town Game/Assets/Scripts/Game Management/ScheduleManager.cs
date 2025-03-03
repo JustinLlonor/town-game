@@ -4,6 +4,8 @@ using UnityEngine;
 using System.Linq;
 using Fusion;
 using System;
+using static UnityEditor.Rendering.CameraUI;
+using UnityEngine.Rendering.Universal;
 
 public class ScheduleManager : NetworkBehaviour
 {
@@ -453,5 +455,21 @@ public class ScheduleManager : NetworkBehaviour
         string hexString = ColorUtility.ToHtmlStringRGB(color);
         int colorInt = int.Parse(hexString, System.Globalization.NumberStyles.HexNumber);
         return colorInt;
+    }
+
+    /// <summary>
+    /// If lines in 1d space overlap
+    /// </summary>
+    /// <param name="start1">Start of line 1</param>
+    /// <param name="end1">End of line 1</param>
+    /// <param name="start2">Start of line 2</param>
+    /// <param name="end2">End of line 2</param>
+    /// <returns></returns>
+    public static bool TimeOverlaps(float start1, float end1, float start2, float end2)
+    {
+        if (start1 > start2 && start1 < end2) return true;
+        if (end1 > start2 && end1 < end2) return true;
+        if (start1 <= start2 && end2 >= end1) return true;
+        return false;
     }
 }

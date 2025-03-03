@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public struct ScheduleBlock
+public class ScheduleBlock
 {
     // The name of the activity
     public string periodName;
