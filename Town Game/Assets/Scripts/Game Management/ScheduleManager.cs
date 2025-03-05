@@ -307,7 +307,7 @@ public class ScheduleManager : NetworkBehaviour
             ScheduleBlock foundBlock = checkedBlock.GetEquivalentBlockInSchedule(playerSchedules[proxy]);
             if (!foundBlock.Equals(ScheduleBlock.None))
             {
-                playerSchedules[proxy].Remove(foundBlock);
+                proxySchedules[proxy].Remove(foundBlock);
                 OnProxyScheduleChange?.Invoke(proxy);
             }
         }

@@ -37,12 +37,10 @@ public class TabBlockPhys : MonoBehaviour
             StopAllCoroutines();
             if (hovering)
             {
-                Debug.Log("Starting expansion");
                 SetToTopLayer();
                 StartCoroutine(Expand(currentWidth, maxWidth));
             } else
             {
-                Debug.Log("Ending");
                 StartCoroutine(Expand(currentWidth, minWidth));
             }
         }
