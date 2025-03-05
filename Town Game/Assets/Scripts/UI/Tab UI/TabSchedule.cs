@@ -108,8 +108,7 @@ public class TabSchedule : MonoBehaviour
         // Add immutable blocks
         foreach (ScheduleBlock block in sm.dailyBlocks)
         {
-            ScheduleBlock nBlock = new ScheduleBlock(block.periodName.ToString(), block.room.ToString(), block.length, block.time + (readDay * 24));
-            Debug.Log(block.time - (readDay * 24));
+            ScheduleBlock nBlock = new ScheduleBlock(block.periodName, block.room, block.length, block.time + (readDay * 24), Color.clear);
             blocks.Add(nBlock);
         }
 
@@ -192,7 +191,7 @@ public class TabSchedule : MonoBehaviour
                     pivotX = (1f / (volume.blocks.Count - 1f)) * i;
                     SetPivot(bt, new Vector2(pivotX, 1f));
                 }
-                ubp.SetBlockColor(block.color);
+                if (block.color != Color.clear) ubp.SetBlockColor(block.color);
                 ubp.SetNameText(block.periodName);
                 ubp.SetRoomText(block.room);
                 if (volume.blocks.Count > 0) newBlock.GetComponent<TabBlockPhys>().Init(maxWidth, blockWidth, pivotX, ySize);
@@ -219,7 +218,6 @@ public class TabSchedule : MonoBehaviour
     void SetPivot(RectTransform rectTransform, Vector2 pivot)
     {
         if (rectTransform == null) return;
-
         Vector2 size = rectTransform.rect.size;
         Vector2 deltaPivot = rectTransform.pivot - pivot;
         Vector3 deltaPosition = new Vector3(deltaPivot.x * size.x, deltaPivot.y * size.y);
