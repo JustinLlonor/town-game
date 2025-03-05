@@ -17,7 +17,7 @@ public class JobHandler : NetworkBehaviour
     public ScheduleUI scheduleUI;
     [Header("Period Settings")]
     [Tooltip("The range of the period blocks from this job holder we can have. x is the beginning bounds, y is the end bounds")]
-    public Vector3Int periodAddRange = new Vector3Int(9, 19);
+    public Vector2Int periodAddRange = new Vector2Int(9, 19);
     public float periodLength = 2f;
     public float periodSpacing = 2f;
     public float periodTimePerDay = 4f;
@@ -416,7 +416,13 @@ public class JobHandler : NetworkBehaviour
         {
             for (float period = periodAddRange.x; period < periodAddRange.y + 0.25f; period += 0.25f)
             {
-
+                foreach (ScheduleBlock block in scheduleManager.playerSchedules[player])
+                {
+                    float periodTime = period + gameManager.currentDay * 24f;
+                    bool doesntFit = ScheduleManager.TimeOverlaps(periodTime, periodTime + stateLength, block.time, block.time + block.length);
+                    if (doesntFit) continue; // If this block overlaps with our current period
+                    return periodTime;
+                }
             }
         }
         return -1f;
