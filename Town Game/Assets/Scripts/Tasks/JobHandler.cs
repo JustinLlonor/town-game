@@ -414,7 +414,7 @@ public class JobHandler : NetworkBehaviour
         // Only checks if overlapping with jobs blocks, not any other blocks
         for (int day = 0; day < maxDays + 1; day++) // Iterate over every day and hour
         {
-            for (float period = periodAddRange.x; period < periodAddRange.y + 0.5f; period += 0.5f)
+            for (float period = periodAddRange.x; period < periodAddRange.y + 0.25f; period += 0.25f)
             {
 
             }
