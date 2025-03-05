@@ -74,19 +74,6 @@ public class PlayerManager : NetworkBehaviour
             currency = newCurrency;
         }
 
-        public void AddToGroup(int groupIndex)
-        {
-            groups.Add(groupIndex);
-        }
-
-        public void RemoveFromGroup(int groupIndex)
-        {
-            if (groups.Contains(groupIndex))
-            {
-                groups.Remove(groupIndex);
-            }
-        }
-
         /// <summary>
         /// Checks if this player is part of a list of groups
         /// </summary>
@@ -212,6 +199,18 @@ public class PlayerManager : NetworkBehaviour
         cm.yRotation = rotation.eulerAngles.y;
         cm.xRotation = rotation.eulerAngles.x;
         OnTeleportPlayer?.Invoke();
+    }
+
+    public void AddPlayerToGroup(PlayerRef player, int group)
+    {
+        if (playerProperties[player].groups.Contains(group)) return;
+        playerProperties[player].groups.Add(group);
+    }
+
+    public void RemovePlayerFromGroup(PlayerRef player, int group)
+    {
+        if (!playerProperties[player].groups.Contains(group)) return;
+        playerProperties[player].groups.RemoveAt(playerProperties[player].groups.IndexOf(group));
     }
 
     public List<PlayerRef> GetPlayersInGroup(int group)

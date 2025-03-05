@@ -108,8 +108,9 @@ public class TabSchedule : MonoBehaviour
         // Add immutable blocks
         foreach (ScheduleBlock block in sm.dailyBlocks)
         {
-            ScheduleBlock nBlock = new ScheduleBlock(block.periodName.ToString(), block.room.ToString(), block.length, block.time + (gm.currentDay * 24));
-            blocks.Add(block);
+            ScheduleBlock nBlock = new ScheduleBlock(block.periodName.ToString(), block.room.ToString(), block.length, block.time + (readDay * 24));
+            Debug.Log(block.time - (readDay * 24));
+            blocks.Add(nBlock);
         }
 
         // Add mutable blocks from selected player
@@ -173,7 +174,7 @@ public class TabSchedule : MonoBehaviour
         {
             // Creates block
             float ySize = volume.length * hourHeight;
-            float roundedTime = volume.time - 24f * gm.currentDay;
+            float roundedTime = volume.time - (24f * readDay);
             float yPos = (roundedTime - 7f) * hourHeight;
 
             int i = 0;

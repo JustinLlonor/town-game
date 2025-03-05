@@ -261,17 +261,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de452253259a0eb4aa019398f4edffd2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  subtext: 
+  testTask:
+    name: Serve
+    category: 0
+    secondsTaken: 20
+    room: Cafeteria
+    id: -1
   activeTasks: []
-  assignedPlayers: []
+  stateCreationThreshold: 2
+  hiredPlayers: []
+  interestGroup: 0
   scheduleUI: {fileID: 0}
-  periodAddRange: {x: 9, y: 19, z: 9}
-  periodLength: 120
-  jobColor: {r: 1, g: 1, b: 1, a: 1}
-  taskCategories: []
+  periodAddRange: {x: 9, y: 19}
+  periodLength: 2
+  periodSpacing: 2
+  periodTimePerDay: 4
+  maxDays: 3
+  jobColor: {r: 0.29622638, g: 0.54840404, b: 1, a: 1}
+  taskCategories:
+  - Work in Cafeteria
   generalPeriodName: General Job Stuff
   jobIconIndex: 0
-  a: 0
 --- !u!1 &5211516756420375758
 GameObject:
   m_ObjectHideFlags: 0

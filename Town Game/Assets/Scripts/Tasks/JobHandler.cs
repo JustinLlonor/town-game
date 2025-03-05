@@ -8,12 +8,13 @@ using JetBrains.Annotations;
 
 public class JobHandler : NetworkBehaviour
 {
+    public Task testTask = new Task("Serve", 0, 20f, "Cafeteria");
     // All tasks
     public List<Task> activeTasks = new List<Task>();
     // The amount of tasks assigned to a category it takes to create a new state
     public int stateCreationThreshold = 2;
     public List<PlayerRef> hiredPlayers = new List<PlayerRef>();
-    public int interestGroup;
+    public int groupIndex = 0;
     public ScheduleUI scheduleUI;
     [Header("Period Settings")]
     [Tooltip("The range of the period blocks from this job holder we can have. x is the beginning bounds, y is the end bounds")]
@@ -41,6 +42,15 @@ public class JobHandler : NetworkBehaviour
     RunnerManager runnerManager;
     ScheduleManager scheduleManager;
     GameManager gameManager;
+    PlayerManager playerManager;
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            AddTasks(new List<Task>() { testTask });
+        }
+    }
 
     /// <summary>
     /// Stores tasks, general summary, and room of a potential schedule block
@@ -117,12 +127,15 @@ public class JobHandler : NetworkBehaviour
         runnerManager = FindFirstObjectByType<RunnerManager>();
         scheduleManager = FindFirstObjectByType<ScheduleManager>();
         gameManager = FindFirstObjectByType<GameManager>();
+        playerManager = FindFirstObjectByType<PlayerManager>();
         if (!Runner.IsServer) return;
         scheduleManager.OnMasterBlockStart += CheckActiveBlock;
         runnerManager.onPlayerLeave += FirePlayer;
         OnStatesAdd += OnAddStates;
         OnStatesRemove += OnRemoveStates;
         OnStateModify += ModifyState;
+        // Test code delete later
+        HirePlayer(Runner.LocalPlayer);
     }
 
     /// <summary>
@@ -132,7 +145,9 @@ public class JobHandler : NetworkBehaviour
     public void HirePlayer(PlayerRef player)
     {
         if (hiredPlayers.Contains(player)) return;
+        Debug.Log("Hired player");
         hiredPlayers.Add(player);
+        playerManager.AddPlayerToGroup(player, groupIndex);
     }
 
     /// <summary>
@@ -143,10 +158,12 @@ public class JobHandler : NetworkBehaviour
     {
         if (!hiredPlayers.Contains(player)) return;
         hiredPlayers.Remove(player);
+        playerManager.RemovePlayerFromGroup(player, groupIndex);
     }
 
     public void AddTasks(List<Task> tasks)
     {
+        Debug.Log("Adding tasks");
         foreach (Task task in tasks)
         {
             activeTasks.Add(task);
@@ -230,7 +247,8 @@ public class JobHandler : NetworkBehaviour
                 }
                 else
                 {
-                    categoryTasks[task.category] = new List<Task>();
+                    categoryTasks[task.category] = new List<Task>() { task };
+                    Debug.Log("Category task");
                 }
             }
         }
@@ -239,6 +257,7 @@ public class JobHandler : NetworkBehaviour
         // Adds each state
         foreach (KeyValuePair<int, List<Task>> ct in categoryTasks)
         {
+            Debug.Log("adding states");
             List<Task> taskList = new List<Task>();
             float addedTime = 0f;
             foreach (Task task in ct.Value)
@@ -256,6 +275,7 @@ public class JobHandler : NetworkBehaviour
             if (taskList.Count > 0)
             {
                 TaskState newState = AddStates(ct.Key, new List<Task>(taskList), false);
+                Debug.Log("Added state");
                 addedStates.Add(newState);
             }
         }
@@ -338,6 +358,7 @@ public class JobHandler : NetworkBehaviour
 
     private void OnAddStates(TaskState[] states)
     {
+        Debug.Log("on add state called");
         // Code to add the state to a player's schedule as a schedule block
         // Checks every schedule for an available space near optimal time
         foreach (TaskState state in states)
@@ -347,7 +368,8 @@ public class JobHandler : NetworkBehaviour
             float bestFitTime = Mathf.Infinity;
             foreach (PlayerRef player in hiredPlayers)
             {
-                float playerAvailability = GetFirstAvailableTime(player, state.GetPeriodLength(gameManager.hourLength)); // The nearest avaiable time for this player
+                float playerAvailability = GetFirstAvailableTime(player, periodLength); // The nearest avaiable time for this player
+                Debug.Log("Availability: " + playerAvailability);
                 if (playerAvailability < bestFitTime)
                 {
                     bestFitPlayer = player;
@@ -355,7 +377,7 @@ public class JobHandler : NetworkBehaviour
                 }
             }
             if (bestFitPlayer == PlayerRef.None) continue;
-            DeployTaskBlock(state, bestFitTime, state.GetPeriodLength(gameManager.hourLength), bestFitPlayer);
+            DeployTaskBlock(state, bestFitTime, periodLength, bestFitPlayer);
         }
     }
 
@@ -372,10 +394,10 @@ public class JobHandler : NetworkBehaviour
 
     private void DeployTaskBlock(TaskState state, float time, float length, PlayerRef player)
     {
+        Debug.Log("Task block deployed");
         if (!taskBlocks.ContainsKey(state))
         {
             ScheduleBlock sBlock = scheduleManager.AddBlock(state.category, state.room, time, length, jobColor, new List<PlayerRef>() { player });
-            scheduleManager.AddBlock(state.category, state.room, time, length, jobColor, new List<PlayerRef>() { player });
             taskBlocks.Add(state, sBlock);
         } else
         {
@@ -412,17 +434,28 @@ public class JobHandler : NetworkBehaviour
          * periodTimePerDay
         **/
         // Only checks if overlapping with jobs blocks, not any other blocks
-        for (int day = 0; day < maxDays + 1; day++) // Iterate over every day and hour
+        int localMaxDay = gameManager.currentDay + maxDays;
+        float spacedLength = stateLength + (2f * periodSpacing);
+        for (int day = gameManager.currentDay; day < localMaxDay; day++) // Iterate over every day and hour in the future
         {
-            for (float period = periodAddRange.x; period < periodAddRange.y + 0.25f; period += 0.25f)
+            float periodStart = periodAddRange.x + gameManager.currentDay * 24;
+            float periodEnd = (periodAddRange.y - stateLength) + gameManager.currentDay * 24;
+            for (float period = periodStart; period < periodEnd; period += 0.25f)
             {
+                bool isValid = true;
+                float periodTime = period + day * 24f;
+                Debug.Log(scheduleManager.playerSchedules[player].Count);
+
                 foreach (ScheduleBlock block in scheduleManager.playerSchedules[player])
                 {
-                    float periodTime = period + gameManager.currentDay * 24f;
-                    bool doesntFit = ScheduleManager.TimeOverlaps(periodTime, periodTime + stateLength, block.time, block.time + block.length);
-                    if (doesntFit) continue; // If this block overlaps with our current period
-                    return periodTime;
+                    bool doesntFit = ScheduleManager.TimeOverlaps(periodTime, periodTime + spacedLength, block.time, block.time + block.length);
+                    if (doesntFit)
+                    {
+                        isValid = false;
+                        break; // If this block overlaps with our current period
+                    }
                 }
+                if (isValid) return periodTime + periodSpacing;
             }
         }
         return -1f;

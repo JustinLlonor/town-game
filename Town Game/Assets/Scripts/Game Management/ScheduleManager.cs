@@ -75,10 +75,10 @@ public class ScheduleManager : NetworkBehaviour
         if (!init) return;
         if (Input.GetKeyDown(KeyCode.Backspace))
         {
-            AddBlock("Blackmarket", "Random Alleyway", 7f, 1f, Color.red, new List<PlayerRef>() { Runner.LocalPlayer });
-            AddBlock("Patrol Town", "", 7f, 3f, Color.green, new List<PlayerRef>() { Runner.LocalPlayer });
-            AddBlock("Election", "", 12f, 2f, Color.cyan, new List<PlayerRef>() { Runner.LocalPlayer });
-            AddBlock("Judgement", "", 12f, 2f, Color.yellow, new List<PlayerRef>() { Runner.LocalPlayer });
+            AddBlock("Blackmarket", "Random Alleyway", 7f + 24f, 1f, Color.red, new List<PlayerRef>() { Runner.LocalPlayer });
+            AddBlock("Patrol Town", "", 7f + 24f, 3f, Color.green, new List<PlayerRef>() { Runner.LocalPlayer });
+            AddBlock("Election", "", 12f + 24f, 2f, Color.cyan, new List<PlayerRef>() { Runner.LocalPlayer });
+            AddBlock("Judgement", "", 12f + 24f, 2f, Color.yellow, new List<PlayerRef>() { Runner.LocalPlayer });
         }
         CheckBlockChanges();
         CheckMasterBlockChanges();
@@ -98,6 +98,7 @@ public class ScheduleManager : NetworkBehaviour
         if (interestGroups == null) interestGroups = new List<int>();
         ScheduleBlock newBlock = new ScheduleBlock(periodName, room, length, time, color, assignedPlayers, interestGroups);
         masterSchedule.Add(newBlock);
+        foreach (PlayerRef player in assignedPlayers) playerSchedules[player].Add(newBlock);
         OnUpdateMasterSchedule?.Invoke();
         SendAddBlockData(newBlock);
         return newBlock;
@@ -112,6 +113,10 @@ public class ScheduleManager : NetworkBehaviour
         int blockIndex = masterSchedule.IndexOf(block);
         if (blockIndex == -1) return;
         SendRemoveBlockData(block);
+        foreach (PlayerRef player in block.assignedPlayers)
+        {
+            if (playerSchedules[player].Contains(block)) playerSchedules[player].Remove(block);
+        }
         masterSchedule.RemoveAt(blockIndex);
         OnUpdateMasterSchedule?.Invoke();
         // Add code for removing on clients later
@@ -195,12 +200,7 @@ public class ScheduleManager : NetworkBehaviour
     // Sends the proxy block to interest groups
     void SendToInterests(ScheduleBlock block)
     {
-        if (block.interestGroups == null)
-        {
-            SendProxyBlockToAll(block);
-            return;
-        }
-        if (block.interestGroups.Count == 0)
+        if (block.interestGroups == null || block.interestGroups.Count == 0)
         {
             SendProxyBlockToAll(block);
             return;
@@ -469,7 +469,7 @@ public class ScheduleManager : NetworkBehaviour
     {
         if (start1 > start2 && start1 < end2) return true;
         if (end1 > start2 && end1 < end2) return true;
-        if (start1 <= start2 && end2 >= end1) return true;
+        if (start1 <= start2 && end1 >= end2) return true;
         return false;
     }
 }
