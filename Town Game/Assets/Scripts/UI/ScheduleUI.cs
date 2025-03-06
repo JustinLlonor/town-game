@@ -84,13 +84,20 @@ public class ScheduleUI : NetworkBehaviour
 
     // Replaces period task info with this
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
-    public void RPC_SendTearoutInfo([RpcTarget] PlayerRef player, string periodName, string room, float time, float length, string subtext, string[] tasks, bool[] completed)
+    public void RPC_SendTearoutInfo([RpcTarget] PlayerRef player, string periodName, string room, float time, float length, string[] tasks, bool[] completed)
     {
 
     }
 
     // Removes the tearout info of the specified tearout
     public void RPC_RemoveTearoutInfo([RpcTarget] PlayerRef player, string periodName, string room, float time, float length)
+    {
+
+    }
+
+    // Sends the specified subtext
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_SendSubtext([RpcTarget] PlayerRef player, string periodName, string room, float time, float length, string subtext)
     {
 
     }

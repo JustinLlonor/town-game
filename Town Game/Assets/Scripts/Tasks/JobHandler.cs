@@ -433,6 +433,9 @@ public class JobHandler : NetworkBehaviour
 
     private void ModifyState(TaskState state)
     {
+        if (!taskBlocks.ContainsKey(state)) return;
+        ScheduleBlock block = taskBlocks[state];
+        SendStateInfoToPlayers(state, block);
         // Send the info to assigned tearout
     }
 
@@ -502,9 +505,14 @@ public class JobHandler : NetworkBehaviour
         TaskState deployedState = GetDeployedState(block);
         if (deployedState == null) return;
         // Send the info to assigned tearout
+        SendStateInfoToPlayers(deployedState, block);
+    }
+
+    private void SendStateInfoToPlayers(TaskState state, ScheduleBlock block)
+    {
         List<string> taskNames = new List<string>();
         List<bool> taskCompletions = new List<bool>();
-        foreach (Task task in deployedState.tasks)
+        foreach (Task task in state.tasks)
         {
             taskNames.Add(task.name);
             taskCompletions.Add(task.isCompleted);
@@ -513,6 +521,7 @@ public class JobHandler : NetworkBehaviour
         foreach (PlayerRef player in assignedPlayers)
         {
             // Send the info to that player
+            scheduleUI.RPC_SendTearoutInfo(player, block.periodName, block.room, block.time, block.length, taskNames.ToArray(), taskCompletions.ToArray());
         }
         // send this info to scheduleui rpc
     }
