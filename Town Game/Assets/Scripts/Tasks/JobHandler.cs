@@ -42,6 +42,7 @@ public class JobHandler : NetworkBehaviour
     ScheduleManager scheduleManager;
     GameManager gameManager;
     PlayerManager playerManager;
+    ScheduleUI scheduleUI;
 
     private void Update()
     {
@@ -128,6 +129,7 @@ public class JobHandler : NetworkBehaviour
         scheduleManager = FindFirstObjectByType<ScheduleManager>();
         gameManager = FindFirstObjectByType<GameManager>();
         playerManager = FindFirstObjectByType<PlayerManager>();
+        scheduleUI = FindFirstObjectByType<ScheduleUI>();
         if (!Runner.IsServer) return;
         scheduleManager.OnMasterBlockStart += CheckActiveBlock;
         runnerManager.onPlayerLeave += FirePlayer;
@@ -429,7 +431,15 @@ public class JobHandler : NetworkBehaviour
 
     private void ModifyState(TaskState state)
     {
-        // Code which sends an updated version of tearout
+        // Send the info to assigned tearout
+    }
+
+    // Checks if the current block is within our active blocks. If it is, send this information to the assigned
+    void CheckActiveBlock(ScheduleBlock block)
+    {
+        TaskState deployedState = GetDeployedState(block);
+        if (deployedState == null) return;
+        // Send the info to assigned tearout
     }
 
     private void DeployTaskBlock(TaskState state, float time, float length, PlayerRef player)
@@ -450,21 +460,12 @@ public class JobHandler : NetworkBehaviour
         }
     }
 
+
+
     private void OnPeriodEnd(ScheduleBlock block)
     {
         TaskState deployedState = GetDeployedState(block);
         if (deployedState == null) return;
-
-    }
-
-    // For when periods end and tasks have not been completed yet, only taget uncompleted tasks
-    private void ReassignStateTasks()
-    {
-
-    }
-
-    private void DeployState()
-    {
 
     }
 
@@ -511,12 +512,6 @@ public class JobHandler : NetworkBehaviour
             }
         }
         return -1f;
-    }
-
-    // Checks if the current block is within our active blocks. If it is, send this information to the assigned
-    void CheckActiveBlock(ScheduleBlock block)
-    {
-
     }
 
     private TaskState GetDeployedState(ScheduleBlock block)
