@@ -418,6 +418,12 @@ public class JobHandler : NetworkBehaviour
 
     private void OnRemoveStates(TaskState[] states)
     {
+        foreach (TaskState state in states)
+        {
+            if (!taskBlocks.ContainsKey(state)) continue;
+            scheduleManager.RemoveBlock(taskBlocks[state]);
+            taskBlocks.Remove(state);
+        }
         // Code to remove the state and shift other states
     }
 
