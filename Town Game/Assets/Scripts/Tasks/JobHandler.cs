@@ -10,12 +10,11 @@ public class JobHandler : NetworkBehaviour
 {
     public Task testTask = new Task("Serve", 0, 20f, "Cafeteria");
     // All tasks
-    public List<Task> activeTasks = new List<Task>();
+    public Dictionary<Task, TaskState> activeTasks = new Dictionary<Task, TaskState>();
     // The amount of tasks assigned to a category it takes to create a new state
     public int stateCreationThreshold = 2;
     public List<PlayerRef> hiredPlayers = new List<PlayerRef>();
     public int groupIndex = 0;
-    public ScheduleUI scheduleUI;
     [Header("Period Settings")]
     [Tooltip("The range of the period blocks from this job holder we can have. x is the beginning bounds, y is the end bounds")]
     public Vector2Int periodAddRange = new Vector2Int(9, 19);
@@ -48,8 +47,9 @@ public class JobHandler : NetworkBehaviour
     {
         if (Input.GetKeyDown(KeyCode.U))
         {
-            AddTasks(new List<Task>() { testTask });
+            AddTasks(new List<Task>() { new Task(testTask.name, testTask.category, testTask.secondsTaken, testTask.room)});
         }
+        if (Input.GetKeyDown(KeyCode.Y)) HirePlayer(Runner.LocalPlayer);
     }
 
     /// <summary>
@@ -131,11 +131,12 @@ public class JobHandler : NetworkBehaviour
         if (!Runner.IsServer) return;
         scheduleManager.OnMasterBlockStart += CheckActiveBlock;
         runnerManager.onPlayerLeave += FirePlayer;
-        OnStatesAdd += OnAddStates;
+        gameManager.OnChangeDay += CheckOverflowStates;
+        scheduleManager.OnBlockEnd += OnPeriodEnd;
+        OnStatesAdd += TryDeployStates;
         OnStatesRemove += OnRemoveStates;
         OnStateModify += ModifyState;
         // Test code delete later
-        HirePlayer(Runner.LocalPlayer);
     }
 
     /// <summary>
@@ -166,7 +167,7 @@ public class JobHandler : NetworkBehaviour
         Debug.Log("Adding tasks");
         foreach (Task task in tasks)
         {
-            activeTasks.Add(task);
+            activeTasks.Add(task, null);
         }
         OnTasksUpdate?.Invoke();
 
@@ -175,12 +176,19 @@ public class JobHandler : NetworkBehaviour
 
     public void RemoveTask(Task taskReference)
     {
+        if (!activeTasks.ContainsKey(taskReference)) return;
         activeTasks.Remove(taskReference);
-
         OnTasksUpdate?.Invoke();
         // Remove the task from states
+        RemoveTasksFromStates(new List<Task>() { taskReference });
+    }
 
-        // If the task was completed, send this rpc to the tearout, otherwise send rpc task removal
+    public void CompleteTask(Task task)
+    {
+        if (!activeTasks.ContainsKey(task)) return;
+        int taskIndex = activeTasks[task].tasks.IndexOf(task);
+        activeTasks[task].tasks[taskIndex].isCompleted = true;
+        OnStateModify?.Invoke(activeTasks[task]);
     }
 
     /// <summary>
@@ -219,11 +227,19 @@ public class JobHandler : NetworkBehaviour
         {
             if (IsStateFull(states[i])) continue; // If the state has no more time for new tasks
             if (states[i].closed) continue; // If the state is closed/is immutable, return
+            if (taskBlocks.ContainsKey(states[i]))
+            {
+                if (gameManager.currentPeriod > taskBlocks[states[i]].time)
+                {
+                    continue; // If the deployed block has already passed
+                }
+            }
             for (int t = 0; t < remainingTasks.Count; t++) // Check every remainng task on this state to see if they can add
             {
                 if (taskCategories[remainingTasks[t].category] == states[i].category && (!IsStateFull(states[i]))) // If the category of the current state is the same as the current task, and its not full, add this task
                 {
                     states[i].tasks.Add(tasks[t]); // Add this task
+                    activeTasks[tasks[t]] = states[i];
                     remainingTasks.Remove(tasks[t]);
                     if (!modifiedStates.Contains(states[i])) modifiedStates.Add(states[i]);
                     states[i].UpdateRoomName();
@@ -277,6 +293,7 @@ public class JobHandler : NetworkBehaviour
                 TaskState newState = AddStates(ct.Key, new List<Task>(taskList), false);
                 Debug.Log("Added state");
                 addedStates.Add(newState);
+                foreach (Task task in taskList) activeTasks[task] = newState;
             }
         }
 
@@ -318,6 +335,7 @@ public class JobHandler : NetworkBehaviour
         if (statesToRemove.Count > 0) OnStatesRemove?.Invoke(statesToRemove.ToArray());
         RemoveStates(statesToRemove);
         foreach (TaskState state in modifiedStates) OnStateModify?.Invoke(state);
+        CheckOverflowStates();
     }
 
     // State creating methods
@@ -356,9 +374,12 @@ public class JobHandler : NetworkBehaviour
      * When a state is modified, it is checked for task threshold before being added as a block
     **/
 
-    private void OnAddStates(TaskState[] states)
+    /// <summary>
+    /// Attempts to deploy an array of states
+    /// </summary>
+    /// <param name="states"></param>
+    private void TryDeployStates(TaskState[] states)
     {
-        Debug.Log("on add state called");
         // Code to add the state to a player's schedule as a schedule block
         // Checks every schedule for an available space near optimal time
         foreach (TaskState state in states)
@@ -369,7 +390,7 @@ public class JobHandler : NetworkBehaviour
             foreach (PlayerRef player in hiredPlayers)
             {
                 float playerAvailability = GetFirstAvailableTime(player, periodLength); // The nearest avaiable time for this player
-                Debug.Log("Availability: " + playerAvailability);
+                if (playerAvailability == -1f) continue; // If this player is not available at all, don't log them
                 if (playerAvailability < bestFitTime)
                 {
                     bestFitPlayer = player;
@@ -381,6 +402,20 @@ public class JobHandler : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Check for any states that aren't deployed and try to deploy them
+    /// </summary>
+    private void CheckOverflowStates()
+    {
+        List<TaskState> overflow = new List<TaskState>();
+        foreach (TaskState state in states)
+        {
+            if (!taskBlocks.ContainsKey(state)) overflow.Add(state); // Creates the list of overflow states
+        }
+
+        if (overflow.Count > 0) TryDeployStates(overflow.ToArray());
+    }
+
     private void OnRemoveStates(TaskState[] states)
     {
         // Code to remove the state and shift other states
@@ -388,8 +423,7 @@ public class JobHandler : NetworkBehaviour
 
     private void ModifyState(TaskState state)
     {
-        // Code which checks if its above the task threshold to be added
-        // Code which checks if its the current period  
+        // Code which sends an updated version of tearout
     }
 
     private void DeployTaskBlock(TaskState state, float time, float length, PlayerRef player)
@@ -408,6 +442,13 @@ public class JobHandler : NetworkBehaviour
             scheduleManager.AddBlock(state.category, state.room, time, length, jobColor, new List<PlayerRef>() { player });
             taskBlocks.Add(state, sBlock);
         }
+    }
+
+    private void OnPeriodEnd(ScheduleBlock block)
+    {
+        TaskState deployedState = GetDeployedState(block);
+        if (deployedState == null) return;
+
     }
 
     // For when periods end and tasks have not been completed yet, only taget uncompleted tasks
@@ -435,7 +476,6 @@ public class JobHandler : NetworkBehaviour
         **/
         // Only checks if overlapping with jobs blocks, not any other blocks
         int localMaxDay = gameManager.currentDay + maxDays;
-        float spacedLength = stateLength + (2f * periodSpacing);
         for (int day = gameManager.currentDay; day < localMaxDay; day++) // Iterate over every day and hour in the future
         {
             float periodStart = periodAddRange.x + gameManager.currentDay * 24;
@@ -444,18 +484,24 @@ public class JobHandler : NetworkBehaviour
             {
                 bool isValid = true;
                 float periodTime = period + day * 24f;
-                Debug.Log(scheduleManager.playerSchedules[player].Count);
-
                 foreach (ScheduleBlock block in scheduleManager.playerSchedules[player])
                 {
-                    bool doesntFit = ScheduleManager.TimeOverlaps(periodTime, periodTime + spacedLength, block.time, block.time + block.length);
+                    bool doesntFit;
+                    if (GetDeployedState(block) != null)
+                    {
+                        doesntFit = ScheduleManager.TimeOverlaps(periodTime - periodSpacing, periodTime + stateLength + periodSpacing, block.time, block.time + block.length);
+                    }
+                    else
+                    {
+                        doesntFit = ScheduleManager.TimeOverlaps(periodTime, periodTime + stateLength, block.time, block.time + block.length);
+                    }
                     if (doesntFit)
                     {
                         isValid = false;
                         break; // If this block overlaps with our current period
                     }
                 }
-                if (isValid) return periodTime + periodSpacing;
+                if (isValid) return periodTime;
             }
         }
         return -1f;
@@ -465,6 +511,15 @@ public class JobHandler : NetworkBehaviour
     void CheckActiveBlock(ScheduleBlock block)
     {
 
+    }
+
+    private TaskState GetDeployedState(ScheduleBlock block)
+    {
+        foreach (KeyValuePair<TaskState, ScheduleBlock> kvp in taskBlocks)
+        {
+            if (kvp.Value == block) return kvp.Key;
+        }
+        return null;
     }
 
     bool IsStateFull(TaskState state)

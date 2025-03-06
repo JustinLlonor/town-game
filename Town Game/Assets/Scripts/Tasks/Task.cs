@@ -10,6 +10,7 @@ public class Task
     public int category;
     public float secondsTaken;
     public string room;
+    public bool isCompleted;
     public int id;
 
     /// <summary>
@@ -25,6 +26,7 @@ public class Task
         this.category = category;
         this.secondsTaken = secondsTaken;
         this.room = room;
+        this.isCompleted = isCompleted;
         if (id != -1)
         {
             this.id = idIndex++;
