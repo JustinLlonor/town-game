@@ -23,6 +23,8 @@ public class ScheduleUI : NetworkBehaviour
     public float tearoutAnimationSpeed = .5f;
     public InputActionReference tearoutSwap;
     List<ScheduleBlock> tearoutBuffer = new List<ScheduleBlock>();
+    Dictionary<ScheduleBlock, List<UITask>> tearoutTasks = new Dictionary<ScheduleBlock, List<UITask>>();
+    List<UITask> uiTasks = new List<UITask>(); // All the tasks that are displayed on a tearout, to be compared when there are changes
     List<SubtextInfo> clientSubtextBuffer = new List<SubtextInfo>();
     GameObject currentTearout;
     ScheduleBlock previousBuffer = ScheduleBlock.None;
@@ -50,6 +52,18 @@ public class ScheduleUI : NetworkBehaviour
         {
             this.block = block;
             this.transform = transform;
+        }
+    }
+
+    class UITask
+    {
+        public string name;
+        public bool completed;
+
+        public UITask(string name, bool completed)
+        {
+            this.name = name;
+            this.completed = completed;
         }
     }
 
@@ -86,10 +100,29 @@ public class ScheduleUI : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
     public void RPC_SendTearoutInfo([RpcTarget] PlayerRef player, string periodName, string room, float time, float length, string[] tasks, bool[] completed)
     {
+        ScheduleBlock infoBlock = new ScheduleBlock(periodName, room, length, time);
+        List<UITask> receivedTasks = new List<UITask>();
+        // If the tearout tasks doesn't contain the key
+        for (int i = 0; i < tasks.Length; i++)
+        {
+            receivedTasks.Add(new UITask(tasks[i], completed[i]));
+        }
 
+        // If we haven't added this yet
+        ScheduleBlock tearoutKey = infoBlock.GetEquivalentBlockInSchedule(tearoutTasks.Keys.ToList());
+        if (tearoutKey == null)
+        {
+            tearoutTasks.Add(infoBlock, receivedTasks);
+        }
+        else
+        {
+            tearoutTasks[tearoutKey] = receivedTasks;
+            // Then check for the update if it is a current tearout
+        }
     }
 
     // Removes the tearout info of the specified tearout
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
     public void RPC_RemoveTearoutInfo([RpcTarget] PlayerRef player, string periodName, string room, float time, float length)
     {
 
@@ -98,6 +131,11 @@ public class ScheduleUI : NetworkBehaviour
     // Sends the specified subtext
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
     public void RPC_SendSubtext([RpcTarget] PlayerRef player, string periodName, string room, float time, float length, string subtext)
+    {
+
+    }
+
+    private void CheckRenderTearout()
     {
 
     }
