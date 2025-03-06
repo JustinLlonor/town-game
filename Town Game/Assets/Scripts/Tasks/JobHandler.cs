@@ -493,7 +493,7 @@ public class JobHandler : NetworkBehaviour
     {
         TaskState deployedState = GetDeployedState(block);
         if (deployedState == null) return;
-
+        // Re-add tasks that aren't completed
     }
 
     // Checks if the current block is within our active blocks. If it is, send this information to the assigned
@@ -502,6 +502,19 @@ public class JobHandler : NetworkBehaviour
         TaskState deployedState = GetDeployedState(block);
         if (deployedState == null) return;
         // Send the info to assigned tearout
+        List<string> taskNames = new List<string>();
+        List<bool> taskCompletions = new List<bool>();
+        foreach (Task task in deployedState.tasks)
+        {
+            taskNames.Add(task.name);
+            taskCompletions.Add(task.isCompleted);
+        }
+        List<PlayerRef> assignedPlayers = block.assignedPlayers;
+        foreach (PlayerRef player in assignedPlayers)
+        {
+            // Send the info to that player
+        }
+        // send this info to scheduleui rpc
     }
 
     /// <summary>
