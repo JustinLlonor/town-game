@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.14712596, g: 0.17876688, b: 0.11010601, a: 1}
+  m_IndirectSpecularColor: {r: 0.14712575, g: 0.17876674, b: 0.11010596, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -6110,6 +6110,10 @@ PrefabInstance:
     - target: {fileID: 2146126489367553974, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: jobColor.r
       value: 0.5981015
+      objectReference: {fileID: 0}
+    - target: {fileID: 2146126489367553974, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: testTask.name
+      value: Serve food
       objectReference: {fileID: 0}
     - target: {fileID: 3042919538494657000, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: sceneViewId
