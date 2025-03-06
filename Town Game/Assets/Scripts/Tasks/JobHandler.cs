@@ -138,6 +138,7 @@ public class JobHandler : NetworkBehaviour
         OnStatesAdd += TryDeployStates;
         OnStatesRemove += OnRemoveStates;
         OnStateModify += ModifyState;
+        runnerManager.onPlayerLeave += OnPlayerLeave;
         // Test code delete later
     }
 
@@ -162,6 +163,7 @@ public class JobHandler : NetworkBehaviour
         if (!hiredPlayers.Contains(player)) return;
         hiredPlayers.Remove(player);
         playerManager.RemovePlayerFromGroup(player, groupIndex);
+        RemovePlayerFromDeployed(player);
     }
 
     public void AddTasks(List<Task> tasks)
@@ -434,14 +436,6 @@ public class JobHandler : NetworkBehaviour
         // Send the info to assigned tearout
     }
 
-    // Checks if the current block is within our active blocks. If it is, send this information to the assigned
-    void CheckActiveBlock(ScheduleBlock block)
-    {
-        TaskState deployedState = GetDeployedState(block);
-        if (deployedState == null) return;
-        // Send the info to assigned tearout
-    }
-
     private void DeployTaskBlock(TaskState state, float time, float length, PlayerRef player)
     {
         Debug.Log("Task block deployed");
@@ -460,13 +454,54 @@ public class JobHandler : NetworkBehaviour
         }
     }
 
+    private void OnPlayerLeave(PlayerRef player)
+    {
+        FirePlayer(player);
+    }
 
+    /// <summary>
+    /// Called when a player is fired
+    /// </summary>
+    /// <param name="player"></param>
+    private void RemovePlayerFromDeployed(PlayerRef player)
+    {
+        foreach (KeyValuePair<TaskState, ScheduleBlock> kvp in taskBlocks)
+        {
+            List<PlayerRef> assignedPlayers = new List<PlayerRef>(kvp.Value.assignedPlayers);
+            bool changeBlock = false;
+            if (assignedPlayers.Contains(player))
+            {
+                changeBlock = true;
+                assignedPlayers.Remove(player);
+            }
+            if (assignedPlayers.Count == 0) // If there are no more players assigned to this, remove the block
+            {
+                // Deletes the schedule block
+                scheduleManager.RemoveBlock(kvp.Value);
+                taskBlocks.Remove(kvp.Key);
+                continue;
+            }
+            if (changeBlock)
+            {
+                ScheduleBlock newBlock = scheduleManager.AddBlock(kvp.Value.periodName, kvp.Value.room, kvp.Value.time, kvp.Value.length, kvp.Value.color, assignedPlayers, new List<int>(kvp.Value.interestGroups));
+                scheduleManager.RemoveBlock(kvp.Value);
+            }
+        }
+    }
 
     private void OnPeriodEnd(ScheduleBlock block)
     {
         TaskState deployedState = GetDeployedState(block);
         if (deployedState == null) return;
 
+    }
+
+    // Checks if the current block is within our active blocks. If it is, send this information to the assigned
+    void CheckActiveBlock(ScheduleBlock block)
+    {
+        TaskState deployedState = GetDeployedState(block);
+        if (deployedState == null) return;
+        // Send the info to assigned tearout
     }
 
     /// <summary>
