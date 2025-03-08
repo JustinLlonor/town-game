@@ -211,6 +211,11 @@ public class JobHandler : NetworkBehaviour
         return newState;
     }
 
+    public void RemoveClosedState(TaskState state)
+    {
+
+    }
+
     /// <summary>
     /// Sends schedule subtext to a player
     /// </summary>
