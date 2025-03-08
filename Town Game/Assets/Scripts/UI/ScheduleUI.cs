@@ -175,25 +175,18 @@ public class ScheduleUI : NetworkBehaviour
         if (tearoutKey == null) return;
         if (tearoutTasks[tearoutKey] == null) return;
         diffList = tearoutTasks[tearoutKey];
-        Debug.Log("Finding tearout differences");
-        Debug.Log(diffList.Count);
         if (diffList.Count != uiTasks.Count || diffList.Count == 0)
         {
             //RenderCurrentTasks(false);
             return; // Render current tasks without finding differences
         }
-        Debug.Log("Doing");
         for (int i = 0; i < uiTasks.Count; i++) // Find differences between uiTasks and diffList
         {
-            Debug.Log("Before name");
             if (uiTasks[i].name != diffList[i].name) return;
-            Debug.Log(uiTasks[i].completed);
-            Debug.Log(diffList[i].completed);
             if (uiTasks[i].completed != diffList[i].completed)
             {
-                Debug.Log("Found");
                 uiTasks[i].completed = diffList[i].completed;
-                SetUITaskCompleted(i, diffList[i].completed);
+                SetUITaskCompleted(i, diffList[i].completed); // Later make this into an animation
             }
         }
     }

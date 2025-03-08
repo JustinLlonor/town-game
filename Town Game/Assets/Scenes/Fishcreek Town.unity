@@ -5049,13 +5049,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de452253259a0eb4aa019398f4edffd2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testTask:
-    name: Spy on GloriousToast
-    category: 0
-    secondsTaken: 20
-    room: 
-    isCompleted: 0
-    id: -1
   stateCreationThreshold: 2
   hiredPlayers: []
   groupIndex: 0
@@ -5069,6 +5062,13 @@ MonoBehaviour:
   - Spy on Others
   generalPeriodName: General Job Stuff
   jobIconIndex: 0
+  testTask:
+    name: Spy on GloriousToast
+    category: 0
+    secondsTaken: 20
+    room: 
+    isCompleted: 0
+    id: -1
 --- !u!1 &1848423333
 GameObject:
   m_ObjectHideFlags: 0
@@ -6117,7 +6117,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2146126489367553974, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: periodAddRange.x
-      value: 7
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 3042919538494657000, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: sceneViewId

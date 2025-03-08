@@ -158,6 +158,7 @@ public class JobHandler : NetworkBehaviour
         Debug.Log("Hired player");
         hiredPlayers.Add(player);
         playerManager.AddPlayerToGroup(player, groupIndex);
+        CheckOverflowStates();
     }
 
     /// <summary>
@@ -417,13 +418,19 @@ public class JobHandler : NetworkBehaviour
     /// </summary>
     private void CheckOverflowStates()
     {
+        List<TaskState> overflow = GetOverflowStates();
+
+        if (overflow.Count > 0) TryDeployStates(overflow.ToArray());
+    }
+
+    private List<TaskState> GetOverflowStates()
+    {
         List<TaskState> overflow = new List<TaskState>();
         foreach (TaskState state in states)
         {
             if (!taskBlocks.ContainsKey(state)) overflow.Add(state); // Creates the list of overflow states
         }
-
-        if (overflow.Count > 0) TryDeployStates(overflow.ToArray());
+        return overflow;
     }
 
     private void OnRemoveStates(TaskState[] states)
