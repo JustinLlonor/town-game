@@ -23,6 +23,8 @@ public class ScheduleUI : NetworkBehaviour
     public float tearoutAnimationSpeed = .5f;
     public InputActionReference tearoutSwap;
     List<ScheduleBlock> tearoutBuffer = new List<ScheduleBlock>();
+    Dictionary<ScheduleBlock, List<UITask>> tearoutTasks = new Dictionary<ScheduleBlock, List<UITask>>();
+    List<UITask> uiTasks = new List<UITask>(); // All the tasks that are displayed on a tearout currently, to be compared when there are changes
     List<SubtextInfo> clientSubtextBuffer = new List<SubtextInfo>();
     GameObject currentTearout;
     ScheduleBlock previousBuffer = ScheduleBlock.None;
@@ -50,6 +52,18 @@ public class ScheduleUI : NetworkBehaviour
         {
             this.block = block;
             this.transform = transform;
+        }
+    }
+
+    class UITask
+    {
+        public string name;
+        public bool completed;
+
+        public UITask(string name, bool completed)
+        {
+            this.name = name;
+            this.completed = completed;
         }
     }
 
@@ -84,15 +98,95 @@ public class ScheduleUI : NetworkBehaviour
 
     // Replaces period task info with this
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
-    public void RPC_SendTearoutInfo([RpcTarget] PlayerRef player, string periodName, string room, float time, float length, string subtext, string[] tasks, bool[] completed)
+    public void RPC_SendTearoutInfo([RpcTarget] PlayerRef player, string periodName, string room, float time, float length, string[] tasks, bool[] completed)
+    {
+        ScheduleBlock infoBlock = new ScheduleBlock(periodName, room, length, time);
+        List<UITask> receivedTasks = new List<UITask>();
+        // If the tearout tasks doesn't contain the key
+        for (int i = 0; i < tasks.Length; i++)
+        {
+            receivedTasks.Add(new UITask(tasks[i], completed[i]));
+        }
+
+        // If we haven't added this yet
+        ScheduleBlock tearoutKey = infoBlock.GetEquivalentBlockInSchedule(tearoutTasks.Keys.ToList());
+        if (tearoutKey == null)
+        {
+            tearoutTasks.Add(infoBlock, receivedTasks);
+            RenderCurrentTasks(false); // New thing created, dont render differences
+        }
+        else
+        {
+            tearoutTasks[tearoutKey] = receivedTasks;
+            RenderCurrentTasks(true); // Modified current thing, render the differences
+        }
+    }
+
+    // Removes the tearout info of the specified tearout
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_RemoveTearoutInfo([RpcTarget] PlayerRef player, string periodName, string room, float time, float length)
     {
 
     }
 
-    // Removes the tearout info of the specified tearout
-    public void RPC_RemoveTearoutInfo([RpcTarget] PlayerRef player, string periodName, string room, float time, float length)
+    // Sends the specified subtext
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_SendSubtext([RpcTarget] PlayerRef player, string periodName, string room, float time, float length, string subtext)
     {
 
+    }
+
+    private void RenderCurrentTasks(bool renderDifferences = false)
+    {
+        ScheduleBlock selectedTearout = previousBuffer;
+        if (!tearoutTasks.ContainsKey(selectedTearout))
+        {
+            ClearUITasks();
+            return;
+        } // If the selected tearout has no tasks
+        if (renderDifferences)
+        {
+            RenderTearoutDifferences(selectedTearout);
+            return;
+        }
+        ClearUITasks();
+        TearoutPhys tPhys = currentTearout.GetComponent<TearoutPhys>();
+        if (tPhys == null) return;
+        foreach (UITask task in tearoutTasks[selectedTearout])
+        {
+            AddUITask(task, tPhys);
+        }
+    }
+
+    private void RenderTearoutDifferences(ScheduleBlock selectedTearout)
+    {
+        List<UITask> diffList = new List<UITask>(tearoutTasks[selectedTearout]);
+        for (int i = 0; i < uiTasks.Count; i++) // Find and set differences
+        {
+            if (diffList.Count >= i) break;
+            if (uiTasks[i].name != diffList[i].name) return;
+            if (uiTasks[i].completed != diffList[i].completed)
+            {
+                uiTasks[i].completed = diffList[i].completed;
+                SetUITaskCompleted(i, diffList[i].completed);
+            }
+        }
+    }
+
+    private void AddUITask(UITask task, TearoutPhys tPhys)
+    {
+        tPhys.AddUITask(task.name, task.completed);
+    }
+
+    private void SetUITaskCompleted(int blockIndex, bool completed)
+    {
+        if (currentTearout != null) currentTearout.GetComponent<TearoutPhys>().SetUITaskCompleted(blockIndex, completed);
+    }
+
+    private void ClearUITasks()
+    {
+        uiTasks.Clear();
+        if (currentTearout != null) currentTearout.GetComponent<TearoutPhys>().ClearUITasks();
     }
 
     void AddTearout(ScheduleBlock block)
@@ -241,6 +335,11 @@ public class ScheduleUI : NetworkBehaviour
 
     }
 
+    /// <summary>
+    /// Checks if the specified period has already passed in game time
+    /// </summary>
+    /// <param name="block"></param>
+    /// <returns></returns>
     bool BlockPassed(ScheduleBlock block)
     {
         return block.time + block.length < gm.currentPeriod;
@@ -315,12 +414,6 @@ public class ScheduleUI : NetworkBehaviour
         Destroy(t.gameObject);
     }
     #endregion
-
-    /// <summary>
-    /// Checks if the specified period has already passed in game time
-    /// </summary>
-    /// <param name="block"></param>
-    /// <returns></returns>
 
     /// <summary>
     /// Updates the UI schedule to reflect the day
