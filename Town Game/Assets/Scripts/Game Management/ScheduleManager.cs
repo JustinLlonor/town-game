@@ -70,6 +70,7 @@ public class ScheduleManager : NetworkBehaviour
     private void Update()
     {
         if (!init) return;
+        /**
         if (Input.GetKeyDown(KeyCode.Backspace))
         {
             AddBlock("Blackmarket", "Random Alleyway", 7f + 24f, 1f, Color.red, new List<PlayerRef>() { Runner.LocalPlayer });
@@ -77,6 +78,7 @@ public class ScheduleManager : NetworkBehaviour
             AddBlock("Election", "", 12f + 24f, 2f, Color.cyan, new List<PlayerRef>() { Runner.LocalPlayer });
             AddBlock("Judgement", "", 12f + 24f, 2f, Color.yellow, new List<PlayerRef>() { Runner.LocalPlayer });
         }
+        **/
         CheckBlockChanges();
         CheckMasterBlockChanges();
     }

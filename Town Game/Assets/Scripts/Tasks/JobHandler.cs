@@ -8,7 +8,6 @@ using JetBrains.Annotations;
 
 public class JobHandler : NetworkBehaviour
 {
-    public Task testTask = new Task("Serve", 0, 20f, "Cafeteria");
     // All tasks
     public Dictionary<Task, TaskState> activeTasks = new Dictionary<Task, TaskState>();
     // The amount of tasks assigned to a category it takes to create a new state
@@ -44,13 +43,20 @@ public class JobHandler : NetworkBehaviour
     PlayerManager playerManager;
     ScheduleUI scheduleUI;
 
+    // Test
+    public Task testTask = new Task("Serve", 0, 20f, "Cafeteria");
+    Task recentTask;
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.U))
         {
-            AddTasks(new List<Task>() { new Task(testTask.name, testTask.category, testTask.secondsTaken, testTask.room)});
+            Task newTask = new Task(testTask.name, testTask.category, testTask.secondsTaken, testTask.room);
+            AddTasks(new List<Task>() { newTask });
+            recentTask = newTask;
         }
         if (Input.GetKeyDown(KeyCode.Y)) HirePlayer(Runner.LocalPlayer);
+        if (Input.GetKeyDown(KeyCode.I)) CompleteTask(recentTask);
     }
 
     /// <summary>
@@ -436,6 +442,8 @@ public class JobHandler : NetworkBehaviour
     {
         if (!taskBlocks.ContainsKey(state)) return;
         ScheduleBlock block = taskBlocks[state];
+        if (block.GetEquivalentBlockInSchedule(scheduleManager.currentMasterBlocks).Equals(ScheduleBlock.None)) return;
+        Debug.Log("Modfy state info");
         SendStateInfoToPlayers(state, block);
         // Send the info to assigned tearout
     }

@@ -14,7 +14,7 @@ public class Task
     public int id;
 
     /// <summary>
-    /// Constructor for a task. If the id parameter is left alone, will automatically increment task id index.
+    /// Constructor for a task. If the id parameter is left alone, will automatically increment task id index
     /// </summary>
     /// <param name="name"></param>
     /// <param name="category"></param>

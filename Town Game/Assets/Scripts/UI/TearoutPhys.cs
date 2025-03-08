@@ -7,6 +7,7 @@ public class TearoutPhys : MonoBehaviour
 {
     public GameObject taskPrefab;
     public Transform subtextHolder;
+    public float padding = 20.4f;
 
     public void AddUITask(string name, bool completed)
     {
@@ -17,6 +18,7 @@ public class TearoutPhys : MonoBehaviour
 
     public void SetUITaskCompleted(int blockIndex, bool completed)
     {
+        Debug.Log("Setting");
         subtextHolder.GetChild(blockIndex).GetChild(0).gameObject.SetActive(completed);
     }
 
@@ -28,8 +30,13 @@ public class TearoutPhys : MonoBehaviour
         }
     }
 
-    public void StartTaskReveal(GameObject minimapHolder) // Add to delegate?
+    public float GetSubtextHeight()
     {
-
+        float totalHeight = 0f;
+        foreach (Transform child in subtextHolder)
+        {
+            totalHeight += ((RectTransform)child).sizeDelta.y * ((RectTransform)subtextHolder).localScale.y;
+        }
+        return totalHeight;
     }
 }

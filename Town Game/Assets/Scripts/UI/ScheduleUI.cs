@@ -41,6 +41,8 @@ public class ScheduleUI : NetworkBehaviour
     float originalMinimapY = 0f;
     bool firstFrame = true;
     int previousKeyText = 0;
+    bool taskRevealStarted = false;
+    bool canStartReveal = false;
 
     [System.Serializable]
     class UIBlock
@@ -96,11 +98,15 @@ public class ScheduleUI : NetworkBehaviour
         ((RectTransform)blockHolder).SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, hourLength * (float)foresight);
     }
 
+    private void Update()
+    {
+        CheckTaskRevealStart();
+    }
+
     // Replaces period task info with this
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
     public void RPC_SendTearoutInfo([RpcTarget] PlayerRef player, string periodName, string room, float time, float length, string[] tasks, bool[] completed)
     {
-        ScheduleBlock infoBlock = new ScheduleBlock(periodName, room, length, time);
         List<UITask> receivedTasks = new List<UITask>();
         // If the tearout tasks doesn't contain the key
         for (int i = 0; i < tasks.Length; i++)
@@ -108,9 +114,10 @@ public class ScheduleUI : NetworkBehaviour
             receivedTasks.Add(new UITask(tasks[i], completed[i]));
         }
 
+        ScheduleBlock infoBlock = new ScheduleBlock(periodName, room, length, time);
         // If we haven't added this yet
         ScheduleBlock tearoutKey = infoBlock.GetEquivalentBlockInSchedule(tearoutTasks.Keys.ToList());
-        if (tearoutKey == null)
+        if (!tearoutTasks.ContainsKey(tearoutKey))
         {
             tearoutTasks.Add(infoBlock, receivedTasks);
             RenderCurrentTasks(false); // New thing created, dont render differences
@@ -118,6 +125,7 @@ public class ScheduleUI : NetworkBehaviour
         else
         {
             tearoutTasks[tearoutKey] = receivedTasks;
+            Debug.Log("Rendering true");
             RenderCurrentTasks(true); // Modified current thing, render the differences
         }
     }
@@ -139,7 +147,7 @@ public class ScheduleUI : NetworkBehaviour
     private void RenderCurrentTasks(bool renderDifferences = false)
     {
         ScheduleBlock selectedTearout = previousBuffer;
-        if (!tearoutTasks.ContainsKey(selectedTearout))
+        if (selectedTearout.GetEquivalentBlockInSchedule(tearoutTasks.Keys.ToList()) == null)
         {
             ClearUITasks();
             return;
@@ -152,7 +160,9 @@ public class ScheduleUI : NetworkBehaviour
         ClearUITasks();
         TearoutPhys tPhys = currentTearout.GetComponent<TearoutPhys>();
         if (tPhys == null) return;
-        foreach (UITask task in tearoutTasks[selectedTearout])
+        ScheduleBlock tearoutKey = selectedTearout.GetEquivalentBlockInSchedule(tearoutTasks.Keys.ToList());
+        if (!tearoutTasks.ContainsKey(tearoutKey) || tearoutTasks[tearoutKey] == null) return;
+        foreach (UITask task in tearoutTasks[tearoutKey])
         {
             AddUITask(task, tPhys);
         }
@@ -160,13 +170,28 @@ public class ScheduleUI : NetworkBehaviour
 
     private void RenderTearoutDifferences(ScheduleBlock selectedTearout)
     {
-        List<UITask> diffList = new List<UITask>(tearoutTasks[selectedTearout]);
-        for (int i = 0; i < uiTasks.Count; i++) // Find and set differences
+        List<UITask> diffList = new List<UITask>();
+        ScheduleBlock tearoutKey = selectedTearout.GetEquivalentBlockInSchedule(tearoutTasks.Keys.ToList());
+        if (tearoutKey == null) return;
+        if (tearoutTasks[tearoutKey] == null) return;
+        diffList = tearoutTasks[tearoutKey];
+        Debug.Log("Finding tearout differences");
+        Debug.Log(diffList.Count);
+        if (diffList.Count != uiTasks.Count || diffList.Count == 0)
         {
-            if (diffList.Count >= i) break;
+            //RenderCurrentTasks(false);
+            return; // Render current tasks without finding differences
+        }
+        Debug.Log("Doing");
+        for (int i = 0; i < uiTasks.Count; i++) // Find differences between uiTasks and diffList
+        {
+            Debug.Log("Before name");
             if (uiTasks[i].name != diffList[i].name) return;
+            Debug.Log(uiTasks[i].completed);
+            Debug.Log(diffList[i].completed);
             if (uiTasks[i].completed != diffList[i].completed)
             {
+                Debug.Log("Found");
                 uiTasks[i].completed = diffList[i].completed;
                 SetUITaskCompleted(i, diffList[i].completed);
             }
@@ -175,6 +200,8 @@ public class ScheduleUI : NetworkBehaviour
 
     private void AddUITask(UITask task, TearoutPhys tPhys)
     {
+        uiTasks.Add(task);
+        Debug.Log("Adding new uitask");
         tPhys.AddUITask(task.name, task.completed);
     }
 
@@ -209,9 +236,10 @@ public class ScheduleUI : NetworkBehaviour
         tearoutBuffer.RemoveAt(0);
         firstFrame = true;
         UpdateTearoutUI(true);
+        RenderCurrentTasks();
     }
 
-    void UpdateTearoutUI(bool swapAnimation = false)
+    void UpdateTearoutUI(bool isSwapping = false)
     {
         ScheduleBlock currentBlock = ScheduleBlock.None;
         if (tearoutBuffer.Count > 0) currentBlock = tearoutBuffer[0];
@@ -225,13 +253,20 @@ public class ScheduleUI : NetworkBehaviour
             return; 
         }
 
+        canStartReveal = false;
         firstFrame = true;
         if (!currentBlock.Equals(ScheduleBlock.None))
         {
             GameObject newTearout = Instantiate(tearoutPrefab, tearoutHolder);
             UIBlockPhys pub = newTearout.GetComponent<UIBlockPhys>();
             SetUIBlockProperties(pub, currentBlock);
-            if (swapAnimation) pub.PlayAnimation("TearoutSwap");
+            if (isSwapping)
+            {
+                pub.PlayAnimation("TearoutSwap");
+                canStartReveal = true;
+                taskRevealStarted = false;
+                ResetMinimapPosition();
+            } // Animation for swapping tearout
 
             if (currentTearout != null) Destroy(currentTearout);
             currentTearout = newTearout;
@@ -240,7 +275,7 @@ public class ScheduleUI : NetworkBehaviour
             {
                 RectTransform rt = (RectTransform)newTearout.transform;
                 rt.sizeDelta = new Vector2(rt.sizeDelta.x, 0f);
-                StartCoroutine(StartTearoutHeightAnimation(newTearout, 0f, tearoutHeight));
+                StartCoroutine(StartTearoutHeightAnimation(newTearout, 0f, tearoutHeight, false, true));
                 StartMinimapAnimation(MinimapAnimation(0f, tearoutHeight));
             }
             else
@@ -302,7 +337,7 @@ public class ScheduleUI : NetworkBehaviour
         pub.SetBlockColor(block.color);
     }
 
-    IEnumerator StartTearoutHeightAnimation(GameObject tearout, float startHeight, float endHeight, bool destroyAfterFinished = false)
+    IEnumerator StartTearoutHeightAnimation(GameObject tearout, float startHeight, float endHeight, bool destroyAfterFinished = false, bool setCanStartReveal = false)
     {
         RectTransform rt = (RectTransform)tearout.transform;
         float height = startHeight;
@@ -310,13 +345,15 @@ public class ScheduleUI : NetworkBehaviour
         while (progress < 1f)
         {
             yield return null;
+            if (rt == null) yield break;
             progress += Time.deltaTime * tearoutAnimationSpeed;
             height = Mathf.SmoothStep(startHeight, endHeight, progress);
             rt.sizeDelta = new Vector3(rt.sizeDelta.x, height);
         }
-        rt.sizeDelta = new Vector3(rt.sizeDelta.x, endHeight);
+        if (rt != null) rt.sizeDelta = new Vector3(rt.sizeDelta.x, endHeight);
 
         if (destroyAfterFinished) Destroy(tearout);
+        if (setCanStartReveal) canStartReveal = true;
     }
 
     // Minimap animation done separately so it can cancel
@@ -335,6 +372,35 @@ public class ScheduleUI : NetworkBehaviour
 
     }
 
+    private void CheckTaskRevealStart()
+    {
+        // Starts the reveal the first available frame canStartReveal is true, and if reveal hasn't started
+        if (!canStartReveal)
+        {
+            taskRevealStarted = false;
+            return;
+        }
+        if (taskRevealStarted) return;
+
+        if (currentTearout == null) return;
+        TearoutPhys tp = currentTearout.GetComponent<TearoutPhys>();
+        if (tp == null) return;
+
+        float newHeight = tp.GetSubtextHeight();
+        if (newHeight != 0f) newHeight += tp.padding;
+        else return;
+        taskRevealStarted = true;
+        StartCoroutine(StartTearoutHeightAnimation(tp.gameObject, tearoutHeight, newHeight + tearoutHeight));
+        StartMinimapAnimation(MinimapAnimation(tearoutHeight, newHeight + tearoutHeight + 4f));
+    }
+
+    private void ResetMinimapPosition()
+    {
+        if (minimapAnimation != null) StopCoroutine(minimapAnimation);
+        minimapAnimation = null;
+        minimapHolder.localPosition = new Vector3(minimapHolder.localPosition.x, originalMinimapY - tearoutHeight);
+    }
+
     /// <summary>
     /// Checks if the specified period has already passed in game time
     /// </summary>
@@ -343,196 +409,5 @@ public class ScheduleUI : NetworkBehaviour
     bool BlockPassed(ScheduleBlock block)
     {
         return block.time + block.length < gm.currentPeriod;
-    }
-
-    // Deprecated code
-    #region
-    void CheckTearout()
-    {
-        if (tearoutRemovalTime == -1f) return;
-        if (!(gm.currentPeriod >= tearoutRemovalTime)) return;
-        DestroyTearout();
-        tearoutRemovalTime = -1f;
-    }
-
-    void DestroyTearout()
-    {
-        if (tearout == null) return;
-        StartCoroutine(RemoveTearout(tearout.transform));
-        tearout = null;
-    }
-
-    void UpdateTearout(ScheduleBlock from, ScheduleBlock to)
-    {
-        if (tearout != null) DestroyTearout();
-        string periodName;
-        string room = "";
-        float timeStart;
-        float timeEnd;
-        // Empty periods
-        if (to.Equals(ScheduleBlock.None))
-        {
-            int afterIndex = sm.orderedBlocks.IndexOf(from) + 1;
-            if (afterIndex > sm.orderedBlocks.Count - 1) return;
-            timeStart = from.time + from.length;
-            timeEnd = sm.orderedBlocks[afterIndex].time;
-            periodName = emptyPeriod;
-        }
-        else
-        {
-            periodName = to.periodName.ToString();
-            room = to.room.ToString();
-            timeStart = to.time;
-            timeEnd = to.time + to.length;
-        }
-        // Removal Time
-        tearoutRemovalTime = timeEnd - 0.95f;
-        // Text data
-        GameObject newTearout = Instantiate(tearoutPrefab, tearoutHolder);
-        Transform nbt = newTearout.transform;
-        tearout = newTearout;
-        nbt.GetChild(0).GetComponent<TextMeshProUGUI>().text = periodName;
-        nbt.GetChild(1).GetComponent<TextMeshProUGUI>().text = room;
-        // Time data
-        string clockTimeStart = gm.PeriodToClockString(timeStart);
-        string clockTimeEnd = gm.PeriodToClockString(timeEnd);
-        nbt.GetChild(2).GetComponent<TextMeshProUGUI>().text = $"{clockTimeStart} - {clockTimeEnd}";
-    }
-
-    IEnumerator RemoveTearout(Transform t)
-    {
-        float time = 0f;
-        float endX = t.localPosition.x + 365f;
-        float ogX = t.localPosition.x;
-        while (time < 1f)
-        {
-            yield return null;
-            time += Time.deltaTime;
-            float newX = Mathf.SmoothStep(ogX, endX, time);
-            t.localPosition = new Vector2(newX, t.localPosition.y);
-        }
-        Destroy(t.gameObject);
-    }
-    #endregion
-
-    /// <summary>
-    /// Updates the UI schedule to reflect the day
-    /// </summary>
-    void ReadSchedule()
-    {
-        ClearScheduleBlocks();
-
-        // Create list of blocks to become schedule blocks
-        List<ScheduleBlock> blocks = new List<ScheduleBlock>();
-        float minRange = gm.currentDay * 24 - 1;
-        float maxRange = gm.currentDay * 24 + 23;
-
-        // Add immutable blocks
-        foreach (ScheduleBlock block in sm.dailyBlocks)
-        {
-            if (BlockPassed(new ScheduleBlock(block.periodName.ToString(), block.room.ToString(), block.length, block.time + (gm.currentDay * 24)))) continue;
-            ScheduleBlock nBlock = new ScheduleBlock(block.periodName.ToString(), block.room.ToString(), block.length, block.time + (gm.currentDay * 24));
-            blocks.Add(nBlock);
-        }
-
-        // Adds all schedule blocks in the day
-        foreach (ScheduleBlock block in sm.localSchedule)
-        {
-            if (BlockPassed(block)) continue;
-            if (block.time < minRange || block.time > maxRange) continue; // If outside the time range, don't add
-            blocks.Add(block);
-        }
-
-        // Sort blocks
-        blocks = blocks.OrderBy(o => o.time).ToList();
-
-        /**
-        // Add empty spaces (deprecated)
-        List<ScheduleBlock> blocksCheck = new List<ScheduleBlock>(blocks);
-        for (int i = 0; i < blocksCheck.Count; i++)
-        {
-            int nextI = i + 1;
-            if (nextI >= blocksCheck.Count) break;
-            if (blocksCheck[i].time + blocksCheck[i].length == blocksCheck[nextI].time) continue; // Continue if there is no space in between blocks
-            ScheduleBlock emptySpace = new ScheduleBlock(emptyPeriod, "", blocksCheck[nextI].time - (blocksCheck[i].time + blocksCheck[i].length), blocksCheck[i].time + blocksCheck[i].length);
-            // If we passed the empty space, then continue
-            if (BlockPassed(emptySpace)) continue; 
-            blocks.Add(emptySpace);
-        }
-        **/
-
-        GroupAddScheduleBlocks(blocks);
-    }
-
-    void ScrollSchedule()
-    {
-        if (listedBlocks.Count == 0) return;
-        if (BlockPassed(listedBlocks[0].block))
-        {
-            RemoveScheduleBlock(0);
-        }
-        float currentPeriod = gm.currentPeriod - (gm.currentDay * 24f);
-        blockHolder.localPosition = new Vector2(0f, hourLength * currentPeriod);
-        bookmarkHolder.localPosition = new Vector2(0f, hourLength * currentPeriod);
-    }
-
-    void GroupAddScheduleBlocks(List<ScheduleBlock> blocks)
-    {
-        blocks = blocks.OrderBy(o => o.time).ToList();
-
-        foreach (ScheduleBlock block in blocks)
-        {
-            AddScheduleBlock(block);
-        }
-    }
-
-    void AddScheduleBlock(ScheduleBlock block)
-    {
-        GameObject newBlock = Instantiate(scheduleBlockPrefab, blockHolder);
-        Transform nbt = newBlock.transform;
-        float currentPosition = (block.time - (gm.currentDay * 24f)) * hourLength;
-        nbt.localPosition = new Vector2(0f, -currentPosition);
-        RectTransform rt = (RectTransform)nbt;
-        rt.sizeDelta = new Vector2(rt.sizeDelta.x, block.length * hourLength);
-
-        int setPos = 0;
-        for (int i = 0; i < listedBlocks.Count; i++)
-        {
-            if (block.time > listedBlocks[i].block.time) setPos++;
-        }
-        listedBlocks.Insert(setPos, new UIBlock(block, nbt));
-
-        // Sets color data (VERY SPAGHETTI, CHANGE LATER)
-        if (!block.color.Equals(new Color()))
-        {
-            nbt.GetChild(0).GetChild(0).GetComponent<Image>().color = block.color;
-            float h, s, v;
-            Color.RGBToHSV(block.color, out h, out s, out v);
-            v = Mathf.Clamp01(v - 0.45f);
-            Color stripeColor = Color.HSVToRGB(h, s, v);
-            nbt.GetChild(0).GetChild(0).GetChild(0).GetComponent<RawImage>().color = stripeColor;
-        }
-        // Sets text data on block
-        nbt.GetChild(1).GetComponent<TextMeshProUGUI>().text = block.periodName.ToString();
-        nbt.GetChild(2).GetComponent<TextMeshProUGUI>().text = block.room.ToString();
-        // Time data
-        string clockTimeStart = gm.PeriodToClockString(block.time);
-        string clockTimeEnd = gm.PeriodToClockString(block.time + block.length);
-        nbt.GetChild(3).GetComponent<TextMeshProUGUI>().text = $"{clockTimeStart} - {clockTimeEnd}";
-    }
-
-    void RemoveScheduleBlock(int index)
-    {
-        Destroy(listedBlocks[index].transform.gameObject);
-        listedBlocks.RemoveAt(index);
-    }
-
-    /// <summary>
-    /// Clears UI listed blocks
-    /// </summary>
-    void ClearScheduleBlocks()
-    {
-        listedBlocks.Clear();
-        foreach (Transform child in blockHolder) Destroy(child.gameObject);
     }
 }
