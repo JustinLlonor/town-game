@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Fusion;
-using UnityEngine.InputSystem.LowLevel;
-using JetBrains.Annotations;
 
 public class JobHandler : NetworkBehaviour
 {
@@ -27,12 +25,16 @@ public class JobHandler : NetworkBehaviour
     public int jobIconIndex;
 
     private List<TaskState> states = new List<TaskState>();
-    private Dictionary<TaskState, ScheduleBlock> taskBlocks = new Dictionary<TaskState, ScheduleBlock>(); 
+    private Dictionary<TaskState, ScheduleBlock> taskBlocks = new Dictionary<TaskState, ScheduleBlock>();
 
     public JobHandlerEvent OnTasksUpdate;
     public StatesEvent OnStatesAdd;
     public StatesEvent OnStatesRemove;
     public StateEvent OnStateModify;
+    /// <summary>
+    /// Called when a closed state has been removed, as a result of a player being fired, or a closed state ending. The job behaviour decides what to do with this.
+    /// </summary>
+    public StateEvent OnClosedStateEnd;
     public delegate void JobHandlerEvent();
     public delegate void StatesEvent(TaskState[] states);
     public delegate void StateEvent(TaskState state);
@@ -41,6 +43,7 @@ public class JobHandler : NetworkBehaviour
     ScheduleManager scheduleManager;
     GameManager gameManager;
     PlayerManager playerManager;
+    AnnouncementManager announcementManager;
     ScheduleUI scheduleUI;
 
     // Test
@@ -52,10 +55,21 @@ public class JobHandler : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.U))
         {
             Task newTask = new Task(testTask.name, testTask.category, testTask.secondsTaken, testTask.room);
-            AddTasks(new List<Task>() { newTask });
+            Task newTask2 = new Task(testTask.name, testTask.category, testTask.secondsTaken, testTask.room);
+            AddClosedState(new List<Task>() { newTask, newTask2 }, "Gordon Ramsay this biach");
             recentTask = newTask;
         }
-        if (Input.GetKeyDown(KeyCode.Y)) HirePlayer(Runner.LocalPlayer);
+        if (Input.GetKeyDown(KeyCode.Y))
+        {
+            if (!hiredPlayers.Contains(Runner.LocalPlayer))
+            {
+                HirePlayer(Runner.LocalPlayer);
+            }
+            else
+            {
+                FirePlayer(Runner.LocalPlayer);
+            }
+        }
         if (Input.GetKeyDown(KeyCode.I)) CompleteTask(recentTask);
     }
 
@@ -136,11 +150,12 @@ public class JobHandler : NetworkBehaviour
         gameManager = FindFirstObjectByType<GameManager>();
         playerManager = FindFirstObjectByType<PlayerManager>();
         scheduleUI = FindFirstObjectByType<ScheduleUI>();
+        announcementManager = FindFirstObjectByType<AnnouncementManager>();
         if (!Runner.IsServer) return;
         scheduleManager.OnMasterBlockStart += CheckActiveBlock;
         runnerManager.onPlayerLeave += FirePlayer;
         gameManager.OnChangeDay += CheckOverflowStates;
-        scheduleManager.OnBlockEnd += OnPeriodEnd;
+        scheduleManager.OnMasterBlockEnd += OnPeriodEnd;
         OnStatesAdd += TryDeployStates;
         OnStatesRemove += OnRemoveStates;
         OnStateModify += ModifyState;
@@ -171,6 +186,11 @@ public class JobHandler : NetworkBehaviour
         hiredPlayers.Remove(player);
         playerManager.RemovePlayerFromGroup(player, groupIndex);
         RemovePlayerFromDeployed(player);
+    }
+
+    public void StrikePlayer(PlayerRef player)
+    {
+
     }
 
     public void AddTasks(List<Task> tasks)
@@ -468,7 +488,6 @@ public class JobHandler : NetworkBehaviour
         {
             List<PlayerRef> assignedPlayers = taskBlocks[state].assignedPlayers;
             assignedPlayers.Add(player);
-            Debug.Log("2");
             scheduleManager.RemoveBlock(taskBlocks[state]);
             ScheduleBlock sBlock = scheduleManager.AddBlock(state.category, state.room, time, length, jobColor, assignedPlayers);
             scheduleManager.AddBlock(state.category, state.room, time, length, jobColor, new List<PlayerRef>() { player });
@@ -487,10 +506,12 @@ public class JobHandler : NetworkBehaviour
     /// <param name="player"></param>
     private void RemovePlayerFromDeployed(PlayerRef player)
     {
+        List<TaskState> removedStates = new List<TaskState>();
         foreach (KeyValuePair<TaskState, ScheduleBlock> kvp in taskBlocks)
         {
             List<PlayerRef> assignedPlayers = new List<PlayerRef>(kvp.Value.assignedPlayers);
             bool changeBlock = false;
+            
             if (assignedPlayers.Contains(player))
             {
                 changeBlock = true;
@@ -498,9 +519,20 @@ public class JobHandler : NetworkBehaviour
             }
             if (assignedPlayers.Count == 0) // If there are no more players assigned to this, remove the block
             {
-                // Deletes the schedule block
-                scheduleManager.RemoveBlock(kvp.Value);
-                taskBlocks.Remove(kvp.Key);
+                Debug.Log("count 0");
+                // Deletes the schedule block, removes from deployed
+                // If we are in the future or this block is in the present, remove it
+                if (gameManager.currentPeriod < kvp.Value.time || scheduleManager.currentMasterBlocks.Contains(kvp.Value))
+                {
+                    Debug.Log("Removing block");
+                    scheduleManager.RemoveBlock(kvp.Value);
+                    if (kvp.Key.closed)
+                    {
+                        states.Remove(kvp.Key);
+                        OnClosedStateEnd?.Invoke(kvp.Key); // We ended the closed state
+                    }
+                }
+                removedStates.Add(kvp.Key);
                 continue;
             }
             if (changeBlock)
@@ -509,13 +541,59 @@ public class JobHandler : NetworkBehaviour
                 scheduleManager.RemoveBlock(kvp.Value);
             }
         }
+
+        foreach (TaskState state in removedStates)
+        {
+            taskBlocks.Remove(state);
+        }
     }
 
     private void OnPeriodEnd(ScheduleBlock block)
     {
         TaskState deployedState = GetDeployedState(block);
         if (deployedState == null) return;
+        if (deployedState.closed)
+        {
+            states.Remove(deployedState);
+            taskBlocks.Remove(deployedState);
+            OnClosedStateEnd?.Invoke(deployedState);
+            return;
+        }
         // Re-add tasks that aren't completed
+        bool incomplete = RemoveIncompleteTasks(deployedState);
+        if (!incomplete) return;
+        if (block.assignedPlayers == null) return;
+        foreach (PlayerRef player in block.assignedPlayers)
+        {
+            StrikePlayer(player);
+        }
+    }
+
+    /// <summary>
+    /// Removes incomplete tasks within a state and clears it. Returns true if there was at least 1 incomplete task.
+    /// </summary>
+    /// <param name="state"></param>
+    /// <returns></returns>
+    bool RemoveIncompleteTasks(TaskState state)
+    {
+        Debug.Log("removing");
+        bool incomplete = false;
+        List<Task> incompleteTasks = new List<Task>();
+        foreach (Task task in state.tasks)
+        {
+            if (!task.isCompleted)
+            {
+                incompleteTasks.Add(task);
+                incomplete = true;
+            } // If its not completed, add to incomplete tasks and mark the state as incomplete
+            if (activeTasks.ContainsKey(task)) activeTasks.Remove(task);
+        }
+        if (incompleteTasks.Count > 0)
+        {
+            AddTasksToStates(incompleteTasks);
+        }
+        state.tasks = null;
+        return incomplete;
     }
 
     // Checks if the current block is within our active blocks. If it is, send this information to the assigned
@@ -590,10 +668,15 @@ public class JobHandler : NetworkBehaviour
         return -1f;
     }
 
-    private TaskState GetDeployedState(ScheduleBlock block)
+    private TaskState GetDeployedState(ScheduleBlock block, bool useEquals = false)
     {
         foreach (KeyValuePair<TaskState, ScheduleBlock> kvp in taskBlocks)
         {
+            if (useEquals)
+            {
+                if (kvp.Value.Equals(block)) return kvp.Key;
+                continue;
+            }
             if (kvp.Value == block) return kvp.Key;
         }
         return null;
@@ -601,6 +684,7 @@ public class JobHandler : NetworkBehaviour
 
     bool IsStateFull(TaskState state)
     {
+        if (state.tasks == null) return true;
         float totalTime = 0f;
         float maxTime = periodLength * gameManager.hourLength;
         foreach (Task task in state.tasks)

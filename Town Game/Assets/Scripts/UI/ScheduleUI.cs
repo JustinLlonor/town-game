@@ -275,6 +275,8 @@ public class ScheduleUI : NetworkBehaviour
             {
                 RectTransform rt = (RectTransform)newTearout.transform;
                 rt.sizeDelta = new Vector2(rt.sizeDelta.x, tearoutHeight);
+                canStartReveal = true;
+                taskRevealStarted = false;
             }
             previousBuffer = currentBlock;
             // none -> something, play the animation
@@ -286,8 +288,9 @@ public class ScheduleUI : NetworkBehaviour
             // previous is not current block, and current block is none, or previous was something and current is nothing
             if (currentTearout != null)
             {
-                StartCoroutine(StartTearoutHeightAnimation(currentTearout, tearoutHeight, 0f, true)); // Start animation to destroy this
-                StartMinimapAnimation(MinimapAnimation(tearoutHeight, 0f));
+                float height = ((RectTransform)currentTearout.transform).sizeDelta.y;
+                StartCoroutine(StartTearoutHeightAnimation(currentTearout, height, 0f, true)); // Start animation to destroy this
+                StartMinimapAnimation(MinimapAnimation(height, 0f));
             }
         }
     }

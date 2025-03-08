@@ -14,6 +14,7 @@ public class LobbyManager : MonoBehaviour//PunCallbacks
     public GameObject lobby;
     public TextMeshProUGUI createText;
     public TextMeshProUGUI joinText;
+    public bool testSingle = true;
     private RunnerManager runnerManager;
 
     private void FixedUpdate()
@@ -44,6 +45,7 @@ public class LobbyManager : MonoBehaviour//PunCallbacks
     public void TestPress()
     {
         SessionData.isTesting = true;
-        runnerManager.StartGame(GameMode.Single, joinText.text, runnerManager.testRoomIndex);
+        if (testSingle) runnerManager.StartGame(GameMode.Single, joinText.text, runnerManager.testRoomIndex);
+        if (!testSingle) runnerManager.StartGame(GameMode.Host, joinText.text, runnerManager.testRoomIndex);
     }
 }

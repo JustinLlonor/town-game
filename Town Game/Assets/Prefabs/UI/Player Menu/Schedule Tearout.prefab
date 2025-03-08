@@ -1210,7 +1210,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 108.20003, y: -13.360559}
+  m_AnchoredPosition: {x: 108.20003, y: -15.2}
   m_SizeDelta: {x: 200, y: 22.9893}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &788019635440919090
@@ -1241,7 +1241,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Food Research
+  m_text: 'Work in Cafeteria
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0f2c5b093abd269459ac917deccf24f6, type: 2}
   m_sharedMaterial: {fileID: -206912222861086037, guid: 0f2c5b093abd269459ac917deccf24f6, type: 2}
