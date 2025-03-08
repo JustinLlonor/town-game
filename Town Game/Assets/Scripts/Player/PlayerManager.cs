@@ -203,12 +203,14 @@ public class PlayerManager : NetworkBehaviour
 
     public void AddPlayerToGroup(PlayerRef player, int group)
     {
+        if (playerProperties[player].groups == null) playerProperties[player].groups = new List<int>();
         if (playerProperties[player].groups.Contains(group)) return;
         playerProperties[player].groups.Add(group);
     }
 
     public void RemovePlayerFromGroup(PlayerRef player, int group)
     {
+        if (playerProperties[player].groups == null) playerProperties[player].groups = new List<int>();
         if (!playerProperties[player].groups.Contains(group)) return;
         playerProperties[player].groups.RemoveAt(playerProperties[player].groups.IndexOf(group));
     }

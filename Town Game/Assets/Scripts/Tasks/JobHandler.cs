@@ -424,6 +424,7 @@ public class JobHandler : NetworkBehaviour
         {
             if (!taskBlocks.ContainsKey(state)) continue;
             scheduleManager.RemoveBlock(taskBlocks[state]);
+            Debug.Log("1");
             taskBlocks.Remove(state);
         }
         // Code to remove the state and shift other states
@@ -453,6 +454,7 @@ public class JobHandler : NetworkBehaviour
         {
             List<PlayerRef> assignedPlayers = taskBlocks[state].assignedPlayers;
             assignedPlayers.Add(player);
+            Debug.Log("2");
             scheduleManager.RemoveBlock(taskBlocks[state]);
             ScheduleBlock sBlock = scheduleManager.AddBlock(state.category, state.room, time, length, jobColor, assignedPlayers);
             scheduleManager.AddBlock(state.category, state.room, time, length, jobColor, new List<PlayerRef>() { player });

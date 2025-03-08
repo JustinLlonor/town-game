@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using Fusion;
-using System;
-using static UnityEditor.Rendering.CameraUI;
-using UnityEngine.Rendering.Universal;
 
 public class ScheduleManager : NetworkBehaviour
 {
@@ -95,6 +92,7 @@ public class ScheduleManager : NetworkBehaviour
     /// <returns>The added schedule block</returns>
     public ScheduleBlock AddBlock(string periodName, string room, float time, float length, Color color, List<PlayerRef> assignedPlayers, List<int> interestGroups = null)
     {
+        Debug.Log("Adding block");
         if (interestGroups == null) interestGroups = new List<int>();
         ScheduleBlock newBlock = new ScheduleBlock(periodName, room, length, time, color, assignedPlayers, interestGroups);
         masterSchedule.Add(newBlock);
@@ -110,6 +108,7 @@ public class ScheduleManager : NetworkBehaviour
     /// <param name="block"></param>
     public void RemoveBlock(ScheduleBlock block)
     {
+        Debug.Log("removing block");
         int blockIndex = masterSchedule.IndexOf(block);
         if (blockIndex == -1) return;
         SendRemoveBlockData(block);
