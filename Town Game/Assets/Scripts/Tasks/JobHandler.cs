@@ -202,6 +202,15 @@ public class JobHandler : NetworkBehaviour
         OnStateModify?.Invoke(activeTasks[task]);
     }
 
+    public TaskState AddClosedState(List<Task> tasks, string categoryName)
+    {
+        TaskState newState = AddStates(categoryName, new List<Task>(tasks), false);
+        foreach (Task task in tasks) activeTasks.Add(task, newState);
+        OnTasksUpdate?.Invoke();
+        OnStatesAdd?.Invoke(new TaskState[] { newState });
+        return newState;
+    }
+
     /// <summary>
     /// Sends schedule subtext to a player
     /// </summary>
@@ -220,15 +229,8 @@ public class JobHandler : NetworkBehaviour
     /// <param name="tasks">The list of tasks to be added</param>
     /// <param name="stateClosed">If the state is closed or not. If it is closed, the state is created with all of the tasks</param>
     /// <param name="categoryName">Only used if the state is closed. Sets the state category name</param>
-    private void AddTasksToStates(List<Task> tasks, bool stateClosed = false, string categoryName = "")
+    private void AddTasksToStates(List<Task> tasks)
     {
-        if (stateClosed)
-        {
-            TaskState newState = AddStates(categoryName, new List<Task>(tasks), false);
-            OnStatesAdd?.Invoke(new TaskState[] { newState });
-            return;
-        }
-
         List<Task> remainingTasks = new List<Task>(tasks);
         List<TaskState> addedStates = new List<TaskState>();
         List<TaskState> modifiedStates = new List<TaskState>();
@@ -372,11 +374,6 @@ public class JobHandler : NetworkBehaviour
         {
             states.Remove(state);
         }
-    }
-
-    public void AddClosedState(List<Task> tasks, string categoryName)
-    {
-        AddTasksToStates(tasks, true, categoryName);
     }
 
     /**
