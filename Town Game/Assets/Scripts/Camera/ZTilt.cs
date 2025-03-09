@@ -9,8 +9,26 @@ public class ZTilt : MonoBehaviour
     public float maxDeg = 10f;
     public float camXMultiplier = 2.5f;
     public float stepSpeed = 5f;
+    bool canTurn = true;
     float desiredZ = 0f;
     float cmX = 0f;
+
+    private void Awake()
+    {
+        UIManager um = FindFirstObjectByType<UIManager>();
+        um.OnUIOpen += SetCanTurnFalse;
+        um.OnUIClose += SetCanTurnTrue;
+    }
+
+    void SetCanTurnTrue()
+    {
+        canTurn = true;
+    }
+
+    void SetCanTurnFalse()
+    {
+        canTurn = false;
+    }
 
     public void ReceiveCM(Vector2 cameraMovement)
     {
@@ -20,6 +38,7 @@ public class ZTilt : MonoBehaviour
     private void Update()
     {
         desiredZ = Mathf.Clamp((cmX * camXMultiplier) / (Time.deltaTime * 90f), -maxDeg, maxDeg); // Consistent with all mouse speeds
+        if (!canTurn) desiredZ = 0f;
         //if (!cb.isCrouching) desiredZ = Mathf.Clamp((cmX * camXMultiplier) / (Time.deltaTime * 90f), -maxDeg, maxDeg); // Consistent with all mouse speeds
         //else desiredZ = 0f;
         float newZ = Mathf.MoveTowardsAngle(transform.localRotation.eulerAngles.z, desiredZ, Time.deltaTime * stepSpeed);
