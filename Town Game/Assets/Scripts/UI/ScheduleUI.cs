@@ -43,6 +43,7 @@ public class ScheduleUI : NetworkBehaviour
     int previousKeyText = 0;
     bool taskRevealStarted = false;
     bool canStartReveal = false;
+    bool readjust = false;
 
     [System.Serializable]
     class UIBlock
@@ -103,6 +104,11 @@ public class ScheduleUI : NetworkBehaviour
         CheckTaskRevealStart();
     }
 
+    private void LateUpdate()
+    {
+        CheckReadjustment();
+    }
+
     // Replaces period task info with this
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
     public void RPC_SendTearoutInfo([RpcTarget] PlayerRef player, string periodName, string room, float time, float length, string[] tasks, bool[] completed)
@@ -158,30 +164,27 @@ public class ScheduleUI : NetworkBehaviour
             return;
         }
         ClearUITasks();
-        TearoutPhys tPhys = currentTearout.GetComponent<TearoutPhys>();
-        if (tPhys == null) return;
         ScheduleBlock tearoutKey = selectedTearout.GetEquivalentBlockInSchedule(tearoutTasks.Keys.ToList());
         if (!tearoutTasks.ContainsKey(tearoutKey) || tearoutTasks[tearoutKey] == null) return;
         foreach (UITask task in tearoutTasks[tearoutKey])
         {
-            AddUITask(task, tPhys);
+            AddUITask(task);
         }
     }
 
     private void RenderTearoutDifferences(ScheduleBlock selectedTearout)
     {
-        List<UITask> diffList = new List<UITask>();
+        if (currentTearout == null) return;
         ScheduleBlock tearoutKey = selectedTearout.GetEquivalentBlockInSchedule(tearoutTasks.Keys.ToList());
         if (tearoutKey == null) return;
         if (tearoutTasks[tearoutKey] == null) return;
-        diffList = tearoutTasks[tearoutKey];
-        if (diffList.Count != uiTasks.Count || diffList.Count == 0)
+        List<UITask> diffList = tearoutTasks[tearoutKey]; // new list of uitasks
+        for (int i = 0; i < diffList.Count; i++) // Find differences between uiTasks and diffList
         {
-            //RenderCurrentTasks(false);
-            return; // Render current tasks without finding differences
-        }
-        for (int i = 0; i < uiTasks.Count; i++) // Find differences between uiTasks and diffList
-        {
+            if (i >= uiTasks.Count)
+            {
+                AddUITask(new UITask(diffList[i].name, diffList[i].completed));
+            }
             if (uiTasks[i].name != diffList[i].name) return;
             if (uiTasks[i].completed != diffList[i].completed)
             {
@@ -189,10 +192,14 @@ public class ScheduleUI : NetworkBehaviour
                 SetUITaskCompleted(i, diffList[i].completed); // Later make this into an animation
             }
         }
+
+        readjust = true;
     }
 
-    private void AddUITask(UITask task, TearoutPhys tPhys)
+    private void AddUITask(UITask task)
     {
+        TearoutPhys tPhys = currentTearout.GetComponent<TearoutPhys>();
+        if (tPhys == null) return;
         uiTasks.Add(task);
         Debug.Log("Adding new uitask");
         tPhys.AddUITask(task.name, task.completed);
@@ -200,7 +207,9 @@ public class ScheduleUI : NetworkBehaviour
 
     private void SetUITaskCompleted(int blockIndex, bool completed)
     {
-        if (currentTearout != null) currentTearout.GetComponent<TearoutPhys>().SetUITaskCompleted(blockIndex, completed);
+        TearoutPhys tPhys = currentTearout.GetComponent<TearoutPhys>();
+        if (tPhys == null) return;
+        tPhys.SetUITaskCompleted(blockIndex, completed);
     }
 
     private void ClearUITasks()
@@ -295,6 +304,19 @@ public class ScheduleUI : NetworkBehaviour
         }
     }
 
+    void ReadjustTearoutHeight()
+    {
+        if (currentTearout == null) return;
+        TearoutPhys tPhys = currentTearout.GetComponent<TearoutPhys>();
+        float height = ((RectTransform)currentTearout.transform).sizeDelta.y; // Current height
+        float newHeight = tPhys.GetSubtextHeight() + tearoutHeight + tPhys.padding;
+        Debug.Log(height);
+        Debug.Log(newHeight);
+        if (height == newHeight) return;
+        StartCoroutine(StartTearoutHeightAnimation(currentTearout, height, newHeight)); // Start animation to destroy this
+        StartMinimapAnimation(MinimapAnimation(height, newHeight));
+    }
+
     void UpdateTearoutBuffer()
     {
         previousKeyText = tearoutBuffer.Count;
@@ -366,6 +388,14 @@ public class ScheduleUI : NetworkBehaviour
         }
         minimapHolder.localPosition = new Vector3(minimapHolder.localPosition.x, originalMinimapY - endHeight);
 
+    }
+
+    private void CheckReadjustment()
+    {
+        if (!readjust) return;
+        readjust = false;
+        Debug.Log("readjusting");
+        ReadjustTearoutHeight();
     }
 
     private void CheckTaskRevealStart()

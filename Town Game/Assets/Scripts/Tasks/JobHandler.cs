@@ -48,26 +48,16 @@ public class JobHandler : NetworkBehaviour
     ScheduleUI scheduleUI;
 
     // Test
-    public Task testTask = new Task("Serve", 0, 20f, "Cafeteria");
+    public Task testTask = new Task("Serve Food", 0, 20f, "Cafeteria");
     Task recentTask;
-
-    private void Awake()
-    {
-        OnClosedStateEnd += test;
-    }
-
-    void test(TaskState state)
-    {
-        Debug.Log("Ended state");
-    }
+    TaskState recentState;
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.U))
         {
             Task newTask = new Task(testTask.name, testTask.category, testTask.secondsTaken, testTask.room);
-            Task newTask2 = new Task(testTask.name, testTask.category, testTask.secondsTaken, testTask.room);
-            AddClosedState(new List<Task>() { newTask, newTask2 }, "Gordon Ramsay this biach", new List<PlayerRef>() { Runner.LocalPlayer }, 9f, 1f);
+            recentState = AddClosedState(new List<Task>() { newTask }, "Maintain Cafeteria", new List<PlayerRef>() { Runner.LocalPlayer }, 9f, 1f);
             recentTask = newTask;
         }
         if (Input.GetKeyDown(KeyCode.Y))
@@ -82,6 +72,12 @@ public class JobHandler : NetworkBehaviour
             }
         }
         if (Input.GetKeyDown(KeyCode.I)) CompleteTask(recentTask);
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            Task newTask = new Task(testTask.name, testTask.category, testTask.secondsTaken, testTask.room);
+            recentTask = newTask;
+            AddTaskToState(newTask, recentState);
+        }
     }
 
     /// <summary>
@@ -151,6 +147,21 @@ public class JobHandler : NetworkBehaviour
             foreach (Task task in tasks)
             {
                 output += task.secondsTaken / hourLength;
+            }
+            return output;
+        }
+
+        /// <summary>
+        /// Returns all incomplete tasks of this task state
+        /// </summary>
+        /// <returns></returns>
+        public List<Task> GetIncompleteTasks()
+        {
+            if (tasks == null) return new List<Task>();
+            List<Task> output = new List<Task>();
+            foreach (Task task in tasks)
+            {
+                if (!task.isCompleted) output.Add(task);
             }
             return output;
         }
@@ -282,6 +293,18 @@ public class JobHandler : NetworkBehaviour
         return newState;
     }
 
+    public void AddTaskToState(Task task, TaskState state) 
+    {
+        if (state.tasks == null) state.tasks = new List<Task>();
+        state.tasks.Add(task);
+        activeTasks.Add(task, state);
+        OnStateModify?.Invoke(state);
+    }
+
+    /// <summary>
+    /// Not programmed yet!
+    /// </summary>
+    /// <param name="state"></param>
     public void RemoveClosedState(TaskState state)
     {
 
@@ -651,15 +674,9 @@ public class JobHandler : NetworkBehaviour
     bool RemoveIncompleteTasks(TaskState state)
     {
         Debug.Log("removing");
-        bool incomplete = false;
-        List<Task> incompleteTasks = new List<Task>();
-        foreach (Task task in state.tasks)
+        List<Task> incompleteTasks = state.GetIncompleteTasks();
+        foreach (Task task in state.tasks) 
         {
-            if (!task.isCompleted)
-            {
-                incompleteTasks.Add(task);
-                incomplete = true;
-            } // If its not completed, add to incomplete tasks and mark the state as incomplete
             if (activeTasks.ContainsKey(task)) activeTasks.Remove(task);
         }
         if (incompleteTasks.Count > 0)
@@ -667,7 +684,7 @@ public class JobHandler : NetworkBehaviour
             AddTasksToStates(incompleteTasks);
         }
         state.tasks = null;
-        return incomplete;
+        return (incompleteTasks.Count > 0);
     }
 
     // Checks if the current block is within our active blocks. If it is, send this information to the assigned

@@ -29,13 +29,10 @@ public class RoleText : MonoBehaviour
         yield return new WaitForSeconds(wait);
         roleText.color = color;
         string newText = "";
-        string newCursor = "|";
         for (int i = 0; i < text.Length; i++)
         {
             newText += text[i];
-            newCursor = " " + newCursor;
             roleText.text = newText;
-            cursorText.text = newCursor;
             yield return new WaitForSeconds(rollTextDuration / text.Length);
         }
         yield return null;

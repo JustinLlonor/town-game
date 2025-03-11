@@ -68,8 +68,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 12:00 AM - 12:00 PM
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: b074a65aeeac49d46b8dba6011799cfc, type: 2}
-  m_sharedMaterial: {fileID: 242149440542166516, guid: b074a65aeeac49d46b8dba6011799cfc, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1555df677f31e148a18b95e59e87c9a, type: 2}
+  m_sharedMaterial: {fileID: 6009405203510403485, guid: a1555df677f31e148a18b95e59e87c9a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -93,8 +93,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 15
-  m_fontSizeBase: 15
+  m_fontSize: 13
+  m_fontSizeBase: 13
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -276,8 +276,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Food Labs
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: b074a65aeeac49d46b8dba6011799cfc, type: 2}
-  m_sharedMaterial: {fileID: 242149440542166516, guid: b074a65aeeac49d46b8dba6011799cfc, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1555df677f31e148a18b95e59e87c9a, type: 2}
+  m_sharedMaterial: {fileID: 6009405203510403485, guid: a1555df677f31e148a18b95e59e87c9a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -301,8 +301,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 15
-  m_fontSizeBase: 15
+  m_fontSize: 13
+  m_fontSizeBase: 13
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -411,8 +411,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: T
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 446d24c8e75c4004f9f47472e0912266, type: 2}
-  m_sharedMaterial: {fileID: -7106828267311449158, guid: 446d24c8e75c4004f9f47472e0912266, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1555df677f31e148a18b95e59e87c9a, type: 2}
+  m_sharedMaterial: {fileID: 6009405203510403485, guid: a1555df677f31e148a18b95e59e87c9a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -761,6 +761,7 @@ MonoBehaviour:
   taskPrefab: {fileID: 4645189561075795136, guid: 87e32c794f2b19949a84e1af11f96a25, type: 3}
   subtextHolder: {fileID: 7126765567258436460}
   padding: 16.8
+  layoutGroup: {fileID: 7832678958395138458}
 --- !u!1 &5252242657514745142
 GameObject:
   m_ObjectHideFlags: 0
@@ -829,8 +830,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: (2)
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 0f2c5b093abd269459ac917deccf24f6, type: 2}
-  m_sharedMaterial: {fileID: -206912222861086037, guid: 0f2c5b093abd269459ac917deccf24f6, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1555df677f31e148a18b95e59e87c9a, type: 2}
+  m_sharedMaterial: {fileID: 6009405203510403485, guid: a1555df677f31e148a18b95e59e87c9a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -854,8 +855,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 9.94
-  m_fontSizeBase: 9.94
+  m_fontSize: 8.52
+  m_fontSizeBase: 8.52
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1135,7 +1136,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -21.4, y: -11.4}
+  m_AnchoredPosition: {x: -23.098, y: -13.1}
   m_SizeDelta: {x: 26.996582, y: 13.486702}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &6431019754591933972
@@ -1245,8 +1246,8 @@ MonoBehaviour:
 
 '
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 0f2c5b093abd269459ac917deccf24f6, type: 2}
-  m_sharedMaterial: {fileID: -206912222861086037, guid: 0f2c5b093abd269459ac917deccf24f6, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1555df677f31e148a18b95e59e87c9a, type: 2}
+  m_sharedMaterial: {fileID: 6009405203510403485, guid: a1555df677f31e148a18b95e59e87c9a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1270,8 +1271,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 22
-  m_fontSizeBase: 22
+  m_fontSize: 19.23
+  m_fontSizeBase: 19.23
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

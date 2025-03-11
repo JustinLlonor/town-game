@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class TearoutPhys : MonoBehaviour
 {
     public GameObject taskPrefab;
     public Transform subtextHolder;
     public float padding = 20.4f;
+    public VerticalLayoutGroup layoutGroup;
 
     public void AddUITask(string name, bool completed)
     {
@@ -19,7 +21,9 @@ public class TearoutPhys : MonoBehaviour
     public void SetUITaskCompleted(int blockIndex, bool completed)
     {
         Debug.Log("Setting");
-        subtextHolder.GetChild(blockIndex).GetChild(0).gameObject.SetActive(completed);
+        Transform completedT = subtextHolder.GetChild(blockIndex);
+        completedT.gameObject.GetComponent<Animator>().Play("TaskComplete");
+        completedT.GetChild(0).gameObject.SetActive(completed);
     }
 
     public void ClearUITasks()
@@ -32,10 +36,12 @@ public class TearoutPhys : MonoBehaviour
 
     public float GetSubtextHeight()
     {
+        Canvas.ForceUpdateCanvases();
         float totalHeight = 0f;
         foreach (Transform child in subtextHolder)
         {
             totalHeight += ((RectTransform)child).sizeDelta.y * ((RectTransform)subtextHolder).localScale.y;
+            Debug.Log("new total: " + totalHeight);
         }
         return totalHeight;
     }
