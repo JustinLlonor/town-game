@@ -10,6 +10,8 @@ public class BlackScreen : MonoBehaviour
     public TextMeshProUGUI[] texts;
     public GameObject roleStuff;
     public GameObject cover;
+    public Transform uiFront;
+    public Transform uiFrontHolder;
 
     private void Awake()
     {
@@ -37,6 +39,14 @@ public class BlackScreen : MonoBehaviour
     public void SetAlpha(float alpha)
     {
         img.color = new Color(0f, 0f, 0f, alpha);
+        if (alpha == 0f)
+        {
+            uiFront.parent = uiFrontHolder;
+        }
+        if (alpha == 1f)
+        {
+            uiFront.parent = transform;
+        }
         foreach (var t in texts)
         {
             t.color = new Color(t.color.r, t.color.g, t.color.b, alpha);
