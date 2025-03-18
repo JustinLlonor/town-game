@@ -156,7 +156,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         if (hotbar[previous].ToString().IsNullOrEmpty()) return;
         if (itemManager.itemSearch[hotbar[previous].ToString()] as Weapon)
         {
-            attackManager.ResetAttack();
+            
         }
     }
 

@@ -13,6 +13,7 @@ public class ItemUse : NetworkBehaviour
     ObjectManager itemManager;
     //PhotonView view;
     CursorManager cm;
+    RunnerManager runnerManager;
 
     private void Awake()
     {
@@ -34,26 +35,27 @@ public class ItemUse : NetworkBehaviour
         InputManager inputManager = FindFirstObjectByType<InputManager>();
         inputManager.onPrimaryFire += OnPrimaryItem;
         inputManager.onSecondaryFire += OnSecondaryItem;
+        runnerManager = FindFirstObjectByType<RunnerManager>();
     }
 
     private void OnPrimaryItem()
     {
-        UseItem();
+        runnerManager.itemUse = true;
     }
 
     private void OnSecondaryItem()
     {
-        UseSecondary();
+        runnerManager.itemUseSecondary = true;
     }
     
-    void UseItem()
+    public void UseItem()
     {
         if (inventory.hotbar[inventory.equippedSlot].ToString().IsNullOrEmpty()) return;
         Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
         if (item as Weapon)
         {
             Weapon weapon = (Weapon)item;
-            attackManager.Attack(weapon);
+            attackManager.Attack(weapon); // called on client and server
             return;
         }
         if (item == null) return; // If item doesn't exist
@@ -61,7 +63,7 @@ public class ItemUse : NetworkBehaviour
         inventory.itemComponentObject.SendMessage("OnPrimaryUse", SendMessageOptions.DontRequireReceiver); // Sends the message OnPrimaryUse to every component in the item component holder
     }
 
-    void UseSecondary()
+    public void UseSecondary()
     {
         if (inventory.hotbar[inventory.equippedSlot].ToString().IsNullOrEmpty()) return;
         Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];

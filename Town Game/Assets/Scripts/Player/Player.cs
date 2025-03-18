@@ -13,6 +13,7 @@ public class Player : NetworkBehaviour
     [HideInInspector] public PlayerInventory pi;
     [HideInInspector] public PlayerDropManager dropManager;
     [HideInInspector] public InteractableFinder inf;
+    [HideInInspector] public ItemUse itemUse;
     Transform playerGFX;
     Transform cameraPosition;
     PlayerManager playerManager;
@@ -98,7 +99,16 @@ public class Player : NetworkBehaviour
             if (data.subInteractableIndex != -1 && !Runner.IsResimulation)
             {
                 IncreaseSIAtIndex(data.subInteractableIndex);
-            } 
+            }
+            // Items
+            if (data.buttons.IsSet(NetworkInputData.Buttons.PrimaryItem))
+            {
+                itemUse.UseItem();
+            }
+            if (data.buttons.IsSet(NetworkInputData.Buttons.SecondaryItem))
+            {
+                itemUse.UseSecondary();
+            }
         }
         Simulate();
     }

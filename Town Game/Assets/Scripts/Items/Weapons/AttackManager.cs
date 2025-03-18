@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Fusion;
 
-public class AttackManager : MonoBehaviour
+public class AttackManager : NetworkBehaviour
 {
     public bool isAttacking = false;
     public float animationCooldown = .1f;
@@ -40,6 +41,8 @@ public class AttackManager : MonoBehaviour
     {
         
     }
+
+    // Called o client and server to attack
     public void Attack(Weapon weapon)
     {
         /**

@@ -27,6 +27,8 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
     public bool dropPressed = false;
     public bool exitObservePressed = false;
     public int siPressed = -1;
+    public bool itemUse;
+    public bool itemUseSecondary;
     [HideInInspector] public bool heldOnSI = false;
     [HideInInspector] public bool isHoldSI;
     public bool firstFrame = true;
@@ -139,6 +141,11 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
             firstFrame = true;
             data.subInteractableIndex = -1;
         }
+        // Item use
+        data.buttons.Set(NetworkInputData.Buttons.PrimaryItem, itemUse);
+        data.buttons.Set(NetworkInputData.Buttons.SecondaryItem, itemUseSecondary);
+        itemUse = false;
+        itemUseSecondary = false;
 
         input.Set(data);
     }
