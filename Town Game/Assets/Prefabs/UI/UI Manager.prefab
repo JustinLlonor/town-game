@@ -4020,9 +4020,35 @@ MonoBehaviour:
   renderTextureHolder: {fileID: 7701112223339237995}
   textureOffsetFrequency: 86.4
   maxTextureOffsetDistance: 26.5
+  maxTextOffsetDistance: 300
+  textOffsetCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  textureOffsetStartLength: 0.15
+  textureOffsetStart: 500
   textHolder: {fileID: 3443572988790035220}
   textOffsetFrequency: 28.4
-  maxTextOffsetDistance: 300
   text: ATTACK
 --- !u!1 &6940270483775225277
 GameObject:
