@@ -6,13 +6,14 @@ using UnityEngine;
 public class Weapon : Item
 {
     [Header("Weapon Settings")]
-    public float damage = 20f;
+    [Tooltip("The capacity for a weapon to overpower another weapon. A value of 0 makes the weapon unusable for offense")]
+    [Range(0, 10)]
+    public int strength = 5;
+    [Range(0, 10)]
+    [Tooltip("The capacity for a weapon to resist attacks from another weapon. A value of 0 makes the weapon unusable for defense")]
+    public int defense = 5;
+    [Tooltip("The raycast range of the weapon")]
     public float range = 0.8f;
-    public float attackLength = 1f;
-    [Tooltip("Amount of time for the attack raycast to be sent")]
-    public float attackCharge = 0.44f;
-    [Tooltip("How long before the player can attack again")]
-    public float attackCooldown = .44f;
     public Shake shake;
     [Header("Sounds")]
     public string[] attackSounds = new string[] { };

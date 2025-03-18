@@ -21,8 +21,10 @@ public class Item : ScriptableObject
     [Header("Client Animation")]
     public string holdPose = "ArmHoldNormal_f";
     public string gripPose;
+    [Tooltip("The client sided use animations for this item. For weapons, the first state is attack, and the second state is defense.")]
     public string[] clientAnimations;
     [Header("Character Animation")]
+    [Tooltip("The server sided use animations for this item. For weapons, the first state is attack, and the second state is defense.")]
     public AnimationState[] useAnimations;
     public AnimationState[] holdPoses;
     
