@@ -14,6 +14,8 @@ public class Weapon : Item
     public int defense = 5;
     [Tooltip("The raycast range of the weapon")]
     public float range = 0.8f;
+    [Tooltip("The name of the animation state when the victim loses an encounter to this weapon")]
+    public string deathScreenAnimationState;
     public Shake shake;
     [Header("Sounds")]
     public string[] attackSounds = new string[] { };
