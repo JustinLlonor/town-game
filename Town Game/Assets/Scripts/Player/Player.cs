@@ -9,11 +9,14 @@ public class Player : NetworkBehaviour
     [Networked] public string nickname { get; set; } = "";
     public delegate void PlayerEvent();
     public PlayerEvent Init;
+    public LayerMask glitchLayer;
+    public GameObject serverItem;
     [HideInInspector] public PlayerMovement pm;
     [HideInInspector] public PlayerInventory pi;
     [HideInInspector] public PlayerDropManager dropManager;
     [HideInInspector] public InteractableFinder inf;
     [HideInInspector] public ItemUse itemUse;
+    [HideInInspector] public PlayerClothing playerClothing;
     Transform playerGFX;
     Transform cameraPosition;
     PlayerManager playerManager;
@@ -218,4 +221,15 @@ public class Player : NetworkBehaviour
         pm.SetDirection(direction);
     }
 
+    public void EnableUIFront()
+    {
+        playerClothing.SetClothingLayer((int)Mathf.Log(glitchLayer.value, 2));
+        serverItem.layer = (int)Mathf.Log(glitchLayer.value, 2);
+    }
+
+    public void DisableUIFront()
+    {
+        playerClothing.SetClothingLayer(0);
+        serverItem.layer = 0;
+    }
 }

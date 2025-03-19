@@ -73,7 +73,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     {
         Previous();
         if (!HasInputAuthority) return;
-        if (equippedItem != null) largeUI.SetActive(equippedItem.large);
+        //if (equippedItem != null) largeUI.SetActive(equippedItem.large);
     }
 
     private void LateUpdate()
@@ -107,7 +107,9 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
             switch (change)
             {
                 case nameof(equippedSlot):
-                    
+                    if (!IsProxy) return;
+                    if (hotbar[equippedSlot].ToString().IsNullOrEmpty()) return;
+                    ShowItem(hotbar[equippedSlot].ToString());
                     break;
             }
         }

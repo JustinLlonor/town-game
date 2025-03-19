@@ -14,6 +14,7 @@ public class UIManager : MonoBehaviour
     public GameObject gameplayUI;
     public GameObject hotbarUI;
     public TabUI tabUI;
+    public GameObject glitchObject;
 
     CursorManager cm;
     InteractableFinder iFinder;

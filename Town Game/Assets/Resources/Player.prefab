@@ -625,11 +625,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _nickname: 
+  glitchLayer:
+    serializedVersion: 2
+    m_Bits: 32768
+  serverItem: {fileID: 8761597498468105624}
   pm: {fileID: 6160271850420175375}
   pi: {fileID: 1106844264840172896}
   dropManager: {fileID: 8777106030094182887}
   inf: {fileID: 8489816749943817623}
   itemUse: {fileID: 2378964989146487730}
+  playerClothing: {fileID: 873785079005984450}
   _camDirection: 0
   _camDirectionX: 0
 --- !u!114 &2540704478665164047
@@ -807,7 +812,7 @@ MonoBehaviour:
   - {fileID: 804241609843201094}
   - {fileID: 5577768305694560694}
   - {fileID: 2113896290026379922}
-  dmgMask:
+  playerMask:
     serializedVersion: 2
     m_Bits: 64
   environmentMask:

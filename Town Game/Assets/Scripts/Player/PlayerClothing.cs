@@ -215,4 +215,12 @@ public class PlayerClothing : NetworkBehaviour
         [Range(0f, 1f)]
         public float nullChance;
     }
+
+    public void SetClothingLayer(int layer)
+    {
+        foreach (Attire attire in attires)
+        {
+            attire.renderer.gameObject.layer = layer;
+        }
+    }
 }
