@@ -39,6 +39,47 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
 
     PlayerManager pm;
 
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        ResetInputs();
+    }
+
+
+    /// <summary>
+    /// Resets the inputs for this client, call 
+    /// </summary>
+    public void ResetInputs()
+    {
+        moveDirection = Vector2.zero;
+        orientation = 0f;
+        camOrientation = 0f;
+        jump = false;
+        crouch = false;
+        sprint = false;
+        menu = false;
+        hotbarKey = 1;
+        interactionPressed = false;
+        interactionKey = 0;
+        dropPressed = false;
+        exitObservePressed = false;
+        siPressed = -1;
+        itemUse = false;
+        itemUseSecondary = false;
+        heldOnSI = false;
+        isHoldSI = false;
+        firstFrame = true;
+    }
+
     public async void StartGame(GameMode mode, string name, int sceneIndex)
     {
         // Create the Fusion runner and let it know that we will be providing user input

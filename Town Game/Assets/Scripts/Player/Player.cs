@@ -6,6 +6,7 @@ using WebSocketSharp;
 
 public class Player : NetworkBehaviour
 {
+    [Networked] public PlayerRef owner { get; set; }
     [Networked] public string nickname { get; set; } = "";
     public delegate void PlayerEvent();
     public PlayerEvent Init;
@@ -140,6 +141,13 @@ public class Player : NetworkBehaviour
         if (nicknameSet) return;
         nickname = name;
         nicknameSet = true;
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_ResetInput()
+    {
+        if (!HasInputAuthority) return;
+        rm.ResetInputs();
     }
 
     private void Update()

@@ -32,12 +32,14 @@ public class LobbyManager : MonoBehaviour//PunCallbacks
 
     public void CreatePress()
     {
+        SessionData.isTesting = false;
         if (SteamManager.Initialized) SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePrivate, 15);
         runnerManager.StartGame(GameMode.Host, createText.text, runnerManager.waitingRoomIndex);
     }
 
     public void JoinPress()
     {
+        SessionData.isTesting = false;
         Debug.Log("Joining");
         runnerManager.StartGame(GameMode.Client, joinText.text, runnerManager.waitingRoomIndex);
     }

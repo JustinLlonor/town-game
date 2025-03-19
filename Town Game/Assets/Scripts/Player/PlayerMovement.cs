@@ -16,7 +16,7 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
     public float crouchMultiplier = 0.4f;
     public float sprintStaminaConsumption = 20f;
     public float groundDrag = 6f;
-    public bool canMove = true;
+    [Networked] public bool canMove { get; set; } = true;
 
     [Header("Aerial")]
     public float jumpHeight = 3;

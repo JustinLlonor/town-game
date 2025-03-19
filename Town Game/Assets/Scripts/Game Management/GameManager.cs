@@ -180,9 +180,20 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         }
     }
 
+    IEnumerator UnfreezeAll(float time)
+    {
+        yield return new WaitForSeconds(time);
+        foreach (KeyValuePair<PlayerRef, NetworkObject> kvp in pm.playerObjects)
+        {
+            NetworkObject player = kvp.Value;
+            GameObject playerObject = player.gameObject;
+            playerObject.GetComponent<PlayerMovement>().Unfreeze();
+        }
+    }
+
     void Phase0()
     {
-        CreatePlayerProperties();
+        CreatePlayerProperties(); // Initialize player properties
         AssignRooms(); // Sets the room properties of each player
         SetCurrency(); // Sets the default currency of each player
         SpawnPositions(); // Spawns each player
@@ -369,6 +380,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
 
         cultists = assignedCultists.ToArray();
 
+        if (!SessionData.isTesting) StartCoroutine(UnfreezeAll(8f));
         foreach (PlayerRef player in Runner.ActivePlayers)
         {
             RPC_SendRole(player, pm.playerProperties[player].isCultist);
@@ -386,7 +398,8 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         foreach (PlayerRef player in Runner.ActivePlayers)
         {
             Transform roomT = rm.playerRooms[pm.playerProperties[player].room].spawnTransform;
-            pm.SpawnPlayerAtTransform(Runner, player, roomT);
+            GameObject playerObject = pm.SpawnPlayerAtTransform(Runner, player, roomT);
+            if (!SessionData.isTesting) playerObject.GetComponent<PlayerMovement>().Freeze();
         }
         //OnRevealRoles?.Invoke((bool)PhotonNetwork.LocalPlayer.CustomProperties["isCultist"]);
     }

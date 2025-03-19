@@ -151,14 +151,18 @@ public class PlayerManager : NetworkBehaviour
     public void SpawnPlayer(NetworkRunner runner, PlayerRef player)
     {
         NetworkObject playerObject = runner.Spawn(playerPrefab, spawn.position, Quaternion.identity, player);
+        playerObject.GetComponent<Player>().owner = player;
         playerObjects.Add(player, playerObject);
         // Add OnInstantiate later
     }
 
-    public void SpawnPlayerAtTransform(NetworkRunner runner, PlayerRef player, Transform transform)
+    public GameObject SpawnPlayerAtTransform(NetworkRunner runner, PlayerRef player, Transform transform)
     {
         NetworkObject playerObject = runner.Spawn(playerPrefab, transform.position, Quaternion.identity, player);
+        playerObject.GetComponent<Player>().owner = player;
         playerObjects.Add(player, playerObject);
+        if (playerObject == null) return null;
+        return playerObject.gameObject;
     }
 
     public void RemovePlayer(PlayerRef player)
@@ -226,5 +230,11 @@ public class PlayerManager : NetworkBehaviour
             }
         }
         return output;
+    }
+
+    public GameObject GetPlayerObject(PlayerRef player)
+    {
+        if (!playerObjects.ContainsKey(player)) return null;
+        return playerObjects[player].gameObject;
     }
 }
