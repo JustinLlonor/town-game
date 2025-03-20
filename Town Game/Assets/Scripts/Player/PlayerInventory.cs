@@ -10,6 +10,7 @@ using UnityEngine.InputSystem;
 public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
 {
     [Networked] public int equippedSlot { get; set; } // To be synced, along with item show functions
+    [Networked] public bool canSwitchSlots { get; set; } = true;
     [Networked] bool reequipTick { get; set; }
     bool previousReequip;
     [Header("Hotbar")]

@@ -6,7 +6,6 @@ using Fusion;
 public class AttackManager : NetworkBehaviour
 {
 
-    [Networked] public bool isEngaged { get; set; } = false;
     public Collider[] colliders; // DO NOT DELETE YET, use damage colliders for better player interactable  hover
     public LayerMask playerMask;
     public LayerMask environmentMask;
@@ -16,6 +15,8 @@ public class AttackManager : NetworkBehaviour
     GameObject lockedPlayer;
 
     //Engagement
+    [Networked] public bool isEngaged { get; set; } = false;
+    bool previouslyEngaged = false;
 
 
     Player player;
@@ -57,6 +58,18 @@ public class AttackManager : NetworkBehaviour
     private void Update()
     {
         DetectLockedPlayer();
+    }
+
+    void DetectEngagedChange()
+    {
+        if (previouslyEngaged == isEngaged) return;
+        previouslyEngaged = isEngaged; // When there is a change
+        OnEngagedChange();
+    }
+
+    void OnEngagedChange()
+    {
+
     }
 
     bool WeaponEquipped()
@@ -159,23 +172,43 @@ public class AttackManager : NetworkBehaviour
         RaycastHit hit;
         if (!Physics.Raycast(castPosition, castDirection, out hit, currentWeapon.range, (int)playerMask)) return; // if no hit player
 
+        // If we get a hit, check the victim and then start engagement 
         PlayerRef victim = hit.transform.GetComponent<Player>().owner; // Gets the victim 
         if (victim == player.owner) return; // Can't hit self
         if (!playerManager.playerObjects.ContainsKey(victim)) return;
 
-        conflictManager.StartEngagement(player.owner, victim); // Start an engagement with the owner and the victim
+        conflictManager.StartEngagement(player.owner, victim, currentWeapon); // Start an engagement with the owner and the victim
 
         // Raycast to victim object
+    }
+
+    /// <summary>
+    /// Plays the first person attack animation for the client
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="text"></param>
+    /// <param name="lifespan"></param>
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_PlayAttackAnimation([RpcTarget] PlayerRef player)
+    {
+
+    }
+
+    /// <summary>
+    /// Plays the first person defense animation for the client
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="text"></param>
+    /// <param name="lifespan"></param>
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_PlayDefenseAnimation([RpcTarget] PlayerRef player)
+    {
+
     }
 
     public void PlayShake(Shake shake)
     {
         cShake.StartShake(shake.shakeProperties);
-    }
-
-    public void CastAttackRay(float distance, float damage, Weapon weapon = null)
-    {
-        
     }
 
     // Plays the 3rd person animation state

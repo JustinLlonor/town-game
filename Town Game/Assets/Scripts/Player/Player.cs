@@ -203,6 +203,7 @@ public class Player : NetworkBehaviour
 
     private void PlayerInventory(int slot)
     {
+        if (!pi.canSwitchSlots) return; // If can't switch slots, return
         if (!pi.hotbar[pi.equippedSlot].ToString().IsNullOrEmpty())
         {
             // if (pi.equippedItem.large) return; Do later, if the equipped item is large then return
