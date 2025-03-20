@@ -76,6 +76,32 @@ MonoBehaviour:
   observableCursor: {fileID: 0}
   primaryDown: 0
   zTilt: {fileID: 4939450418021904383}
+  lockedPlayer: {fileID: 0}
+  lockLerpTime: 1
+  lockCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 3.1446538
+      outSlope: 3.1446538
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.0375
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   xRotation: 0
   yRotation: 0
   canMove: 0

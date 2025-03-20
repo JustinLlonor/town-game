@@ -8,6 +8,8 @@ public class Player : NetworkBehaviour
 {
     [Networked] public PlayerRef owner { get; set; }
     [Networked] public string nickname { get; set; } = "";
+    [Networked] public PlayerRef lockedPlayer { get; set; } = PlayerRef.None;
+    PlayerRef previousLocked = PlayerRef.None;
     public delegate void PlayerEvent();
     public PlayerEvent Init;
     public LayerMask glitchLayer;
@@ -23,6 +25,7 @@ public class Player : NetworkBehaviour
     PlayerManager playerManager;
     RunnerManager rm;
     CameraManager cm;
+    CameraMovement camMovement;
     // To sync the inputs on all other clients
     [Networked] public float camDirection { get; set; }
     [Networked] public float camDirectionX { get; set; }
@@ -47,6 +50,7 @@ public class Player : NetworkBehaviour
     public override void Spawned()
     {
         cm = FindFirstObjectByType<CameraManager>();
+        camMovement = FindFirstObjectByType<CameraMovement>();
         rm = FindFirstObjectByType<RunnerManager>();
         Init?.Invoke();
         if (!HasInputAuthority) return;
@@ -152,6 +156,11 @@ public class Player : NetworkBehaviour
 
     private void Update()
     {
+        if (previousLocked != lockedPlayer && HasInputAuthority)
+        {
+            previousLocked = lockedPlayer;
+            OnLockedChange();
+        }
         if (IsProxy)
         {
             Prediction();
@@ -240,5 +249,22 @@ public class Player : NetworkBehaviour
     {
         playerClothing.SetClothingLayer(0);
         serverItem.layer = 0;
+    }
+
+    private void OnLockedChange()
+    {
+        if (lockedPlayer == PlayerRef.None)
+        {
+            camMovement.lockedPlayer = null;
+            return;
+        }
+        GameObject playerObject = playerManager.GetPlayerObject(lockedPlayer);
+        if (playerObject == null)
+        {
+            camMovement.lockedPlayer = null;
+            return;
+        }
+        camMovement.ResetLerpTimer();
+        camMovement.lockedPlayer = playerObject.transform;
     }
 }

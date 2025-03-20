@@ -18,6 +18,9 @@ public class CameraMovement : MonoBehaviour
     public ZTilt zTilt;
     private PlayerCameraMovement pCamState = new PlayerCameraMovement();
     private ObservableCameraMovement oCamState = new ObservableCameraMovement();
+    public Transform lockedPlayer = null;
+    public float lockLerpTime = 2f;
+    public AnimationCurve lockCurve;
 
     Transform fpsTransform;
     NetworkRigidbody3D playerRb;
@@ -30,6 +33,9 @@ public class CameraMovement : MonoBehaviour
     public bool canMove = true;
     bool settable = true;
     Vector2 cameraDelta;
+    float lockLerpTimer = 0f;
+    float startX = 0f;
+    float startY = 0f;
 
     private void Awake()
     {
@@ -53,6 +59,11 @@ public class CameraMovement : MonoBehaviour
 
     private void Update()
     {
+        if (lockedPlayer != null)
+        {
+            LockLerp();
+            return;
+        }
         CameraLook();
     }
 
@@ -128,5 +139,39 @@ public class CameraMovement : MonoBehaviour
         {
             headAim.position = transform.position;
         }
+    }
+
+    public void ResetLerpTimer()
+    {
+        lockLerpTimer = 0f;
+        startX = xRotation;
+        startY = yRotation;
+    }
+
+    void LockLerp()
+    {
+        if (lockLerpTimer > 1f)
+        {
+            Vector3 targetD = (lockedPlayer.position - player.position).normalized;
+            Quaternion targetR = Quaternion.LookRotation(targetD);
+            Vector3 targetE = targetR.eulerAngles;
+            yRotation = targetE.y;
+            xRotation = targetE.x;
+
+            runnerManager.orientation = yRotation;
+            runnerManager.camOrientation = xRotation;
+            return;
+        }
+        lockLerpTimer += Time.deltaTime/lockLerpTime;
+        transform.eulerAngles = new Vector3(xRotation, yRotation, 0f);
+        Vector3 targetDirection = (lockedPlayer.position - player.position).normalized;
+        Debug.Log(targetDirection);
+        Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+        Vector3 targetEuler = targetRotation.eulerAngles;
+        yRotation = Mathf.LerpAngle(startY, targetEuler.y, lockCurve.Evaluate(lockLerpTimer));
+        xRotation = Mathf.LerpAngle(startX, targetEuler.x, lockCurve.Evaluate(lockLerpTimer));
+
+        runnerManager.orientation = yRotation;
+        runnerManager.camOrientation = xRotation;
     }
 }

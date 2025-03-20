@@ -12,6 +12,7 @@ public class ConflictManager : NetworkBehaviour
     public ObjectManager objectManager;
 
     public delegate void ConflictEvent();
+    bool init = false;
 
     /// <summary>
     /// The class for all attacks
@@ -40,6 +41,11 @@ public class ConflictManager : NetworkBehaviour
         }
     }
 
+    public override void Spawned()
+    {
+        init = true;
+    }
+
     private void Update()
     {
         CheckConflicts();
@@ -47,6 +53,7 @@ public class ConflictManager : NetworkBehaviour
 
     void CheckConflicts()
     {
+        if (!init) return;
         if (!Runner.IsServer) return; // Only execute this code for the server
         if (engagements.Count == 0) return;
         // Call the end conflict function and remove the conflict if the timer has expired
@@ -82,6 +89,7 @@ public class ConflictManager : NetworkBehaviour
         // Variable setting for conflict
         aGo.GetComponent<PlayerMovement>().Freeze();
         dGo.GetComponent<PlayerMovement>().Freeze();
+
         AttackManager attackerAM = aGo.GetComponent<AttackManager>();
         AttackManager defenderAM = dGo.GetComponent<AttackManager>();
         attackerAM.isEngaged = true;
@@ -108,7 +116,8 @@ public class ConflictManager : NetworkBehaviour
         engagements.Add(new Conflict(conflictTimer, attacker, attackPower, defender, defensePower));
 
         // Start camera lerp
-
+        aGo.GetComponent<Player>().lockedPlayer = defender;
+        dGo.GetComponent<Player>().lockedPlayer = attacker;
 
         // Tell the players to play the FPS animation on their end
         attackerAM.RPC_PlayAttackAnimation(attacker);
