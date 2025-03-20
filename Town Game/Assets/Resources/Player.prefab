@@ -751,6 +751,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _equippedSlot: 0
+  _canSwitchSlots: 1
   hotbarLength: 4
   _hotbar: []
   _itemData: []
@@ -795,7 +796,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7d2cd3ae1d0b2546bdd9f6a30b8a6a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _isEngaged: 0
   colliders:
   - {fileID: 100124761108778186}
   - {fileID: 4938274588834256044}
@@ -815,10 +815,11 @@ MonoBehaviour:
     m_Bits: 64
   environmentMask:
     serializedVersion: 2
-    m_Bits: 8192
+    m_Bits: 128
   animator: {fileID: 5001893267009733704}
   animHolder: {fileID: 0}
   rb: {fileID: 2546787659200004203}
+  _isEngaged: 0
 --- !u!114 &6160271850420175375
 MonoBehaviour:
   m_ObjectHideFlags: 0

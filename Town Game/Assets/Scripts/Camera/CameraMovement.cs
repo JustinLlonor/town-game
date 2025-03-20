@@ -152,7 +152,7 @@ public class CameraMovement : MonoBehaviour
     {
         if (lockLerpTimer > 1f)
         {
-            Vector3 targetD = (lockedPlayer.position - player.position).normalized;
+            Vector3 targetD = (lockedPlayer.position - transform.position).normalized;
             Quaternion targetR = Quaternion.LookRotation(targetD);
             Vector3 targetE = targetR.eulerAngles;
             yRotation = targetE.y;
@@ -164,7 +164,7 @@ public class CameraMovement : MonoBehaviour
         }
         lockLerpTimer += Time.deltaTime/lockLerpTime;
         transform.eulerAngles = new Vector3(xRotation, yRotation, 0f);
-        Vector3 targetDirection = (lockedPlayer.position - player.position).normalized;
+        Vector3 targetDirection = (lockedPlayer.position - transform.position).normalized;
         Debug.Log(targetDirection);
         Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
         Vector3 targetEuler = targetRotation.eulerAngles;

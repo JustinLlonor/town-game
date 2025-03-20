@@ -265,6 +265,6 @@ public class Player : NetworkBehaviour
             return;
         }
         camMovement.ResetLerpTimer();
-        camMovement.lockedPlayer = playerObject.transform;
+        camMovement.lockedPlayer = playerObject.GetComponent<PlayerMovement>().cameraPosition;
     }
 }

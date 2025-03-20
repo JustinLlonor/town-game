@@ -72,6 +72,25 @@ public class ConflictManager : NetworkBehaviour
     void EndConflict(Conflict conflict)
     {
         // call end conflict delegate
+        // Variable resetting
+        GameObject aGo = playerManager.GetPlayerObject(conflict.attacker);
+        GameObject dGo = playerManager.GetPlayerObject(conflict.defender);
+
+        aGo.GetComponent<PlayerMovement>().Unfreeze();
+        dGo.GetComponent<PlayerMovement>().Unfreeze();
+
+        AttackManager attackerAM = aGo.GetComponent<AttackManager>();
+        AttackManager defenderAM = dGo.GetComponent<AttackManager>();
+        attackerAM.isEngaged = false;
+        defenderAM.isEngaged = false;
+
+        PlayerInventory attackerInventory = aGo.GetComponent<PlayerInventory>();
+        PlayerInventory victimInventory = dGo.GetComponent<PlayerInventory>();
+        attackerInventory.canSwitchSlots = true;
+        victimInventory.canSwitchSlots = true;
+
+        aGo.GetComponent<Player>().lockedPlayer = PlayerRef.None;
+        dGo.GetComponent<Player>().lockedPlayer = PlayerRef.None;
     }
 
     /// <summary>
@@ -100,6 +119,7 @@ public class ConflictManager : NetworkBehaviour
         attackerInventory.canSwitchSlots = false;
         victimInventory.canSwitchSlots = false;
 
+        // Create thge conflict
         TickTimer conflictTimer = TickTimer.CreateFromSeconds(Runner, conflictLength);
         // Get attacker's weapon power
         int attackPower = attackWeapon.strength;
