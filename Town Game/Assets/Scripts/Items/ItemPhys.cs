@@ -101,7 +101,7 @@ public class ItemPhys : NetworkBehaviour
     public void PickUpItem(PlayerRef player)
     {
         if (pickedUp) return;
-        PlayerInventory inventory = playerManager.playerObjects[player].GetComponent<PlayerInventory>();
+        PlayerInventory inventory = playerManager.GetPlayerNetworkObject(player).GetComponent<PlayerInventory>();
         if (inventory == null) return;
         string eName = inventory.hotbar[inventory.equippedSlot].ToString();
         if (!eName.IsNullOrEmpty())

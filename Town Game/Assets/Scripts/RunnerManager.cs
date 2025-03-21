@@ -125,7 +125,8 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         if (nRunner.LocalPlayer == player) SteamMatchmaking.LeaveLobby((CSteamID)SessionData.steamIdLobby); // Leaves steam lobby
         if (runner.IsServer)
         {
-            pm.RemovePlayer(player); // annihalates the palyer
+            pm.RemovePlayer(player);
+            //pm.RemovePlayer(player); // annihalates the palyer
         }
     }
 

@@ -16,7 +16,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     [Header("Game Variables")]
     public PlayerRef leader;
     public PlayerRef[] cultists = new PlayerRef[] { };
-    public PlayerRef[] alivePlayers = new PlayerRef[] { }; // doesn't update with alive players yet
+    public List<PlayerRef> alivePlayers = new List<PlayerRef>(); // doesn't update with alive players yet
     public Dictionary<string, Position> playerPositions = new Dictionary<string, Position>();
     //public Dictionary<Player, string> chosenBuildings = new Dictionary<Player, string>();
     [Networked] public float gameTime { get; set; } = 0f;
@@ -43,6 +43,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     RoomManager rm;
     PlayerManager pm;
     ScheduleManager sm;
+    RunnerManager runnerManager;
     bool skippedNight = false;
     bool startedDay = false;
     GameTimer gt;
@@ -93,6 +94,8 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         pm = FindFirstObjectByType<PlayerManager>();
         sm = FindFirstObjectByType<ScheduleManager>();
         gt = gameObject.GetComponent<GameTimer>();
+        runnerManager = FindFirstObjectByType<RunnerManager>();
+        runnerManager.onPlayerLeave += RemoveAlivePlayer;
         //cm = FindFirstObjectByType<CameraManager>();
         if (!SessionData.isTesting)
         {
@@ -100,9 +103,23 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         }
     }
 
+    void RemoveAlivePlayer(PlayerRef player)
+    {
+        alivePlayers.Remove(player);
+    }
+
     public override void Spawned()
     {
         init = true;
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (alivePlayers.Count < pm.playerObjects.Count)
+        {
+            pm.removePlayers = true;
+            Debug.Log("setting");
+        } // More alive players than there are playe robjects
     }
 
     // Assigns rooms to different players, sohuld only be called on state authority
@@ -183,9 +200,9 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     IEnumerator UnfreezeAll(float time)
     {
         yield return new WaitForSeconds(time);
-        foreach (KeyValuePair<PlayerRef, NetworkObject> kvp in pm.playerObjects)
+        foreach (KeyValuePair<PlayerRef, NetworkId> kvp in pm.playerObjects)
         {
-            NetworkObject player = kvp.Value;
+            NetworkObject player = pm.GetPlayerNetworkObject(kvp.Key);
             GameObject playerObject = player.gameObject;
             playerObject.GetComponent<PlayerMovement>().Unfreeze();
         }
@@ -350,7 +367,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
             AssignRole(player, false);
             players.Add(player);
         }
-        alivePlayers = players.ToArray();
+        alivePlayers = new List<PlayerRef>(players);
 
         // Sets cultistNumber to the amount of cultists in the game
         int cultistNumber = 0;

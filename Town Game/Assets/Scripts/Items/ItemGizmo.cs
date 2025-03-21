@@ -42,7 +42,7 @@ public class ItemGizmo : NetworkBehaviour
         {
             yield return null;
         }
-        playerManager.playerObjects[Object.InputAuthority].GetComponent<PlayerDropManager>().gizmo = this;
+        playerManager.GetPlayerNetworkObject(Object.InputAuthority).GetComponent<PlayerDropManager>().gizmo = this;
     }
 
     public bool CheckPlaceable()

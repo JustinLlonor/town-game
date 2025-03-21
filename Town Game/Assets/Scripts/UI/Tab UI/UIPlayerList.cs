@@ -51,7 +51,7 @@ public class UIPlayerList : MonoBehaviour//PunCallbacks
             bool disconnected = true;
             foreach (PlayerRef player in playerList)
             {
-                if (playerManager.playerObjects[player].GetComponent<Player>().nickname == tp.nick)
+                if (playerManager.GetPlayerNetworkObject(player).GetComponent<Player>().nickname == tp.nick)
                 {
                     disconnected = false;
                     break;
@@ -76,7 +76,7 @@ public class UIPlayerList : MonoBehaviour//PunCallbacks
         // Add missing players
         foreach (PlayerRef player in playerList)
         {
-            if (!containedPlayers.Contains(playerManager.playerObjects[player].GetComponent<Player>().nickname))
+            if (!containedPlayers.Contains(playerManager.GetPlayerNetworkObject(player).GetComponent<Player>().nickname))
             {
                 AddPlayer(player);
             }
@@ -89,7 +89,7 @@ public class UIPlayerList : MonoBehaviour//PunCallbacks
 
     public void AddPlayer(PlayerRef player)
     {
-        string name = playerManager.playerObjects[player].GetComponent<Player>().nickname;
+        string name = playerManager.GetPlayerNetworkObject(player).GetComponent<Player>().nickname;
         GameObject newPlayer = Instantiate(tabPlayerPrefab, contentHolder);
         TabPlayer tp = newPlayer.GetComponent<TabPlayer>();
         tp.uPlayerList = this;

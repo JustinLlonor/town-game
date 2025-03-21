@@ -4,12 +4,13 @@ using Steamworks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PlayerManager : NetworkBehaviour
 {
     public bool spawnPlayersOnJoin = true;
-    [Networked, Capacity(20)] public NetworkDictionary<PlayerRef, NetworkObject> playerObjects => default;
+    [Networked, Capacity(20)] public NetworkDictionary<PlayerRef, NetworkId> playerObjects => default;
     public Dictionary<PlayerRef, Observable> playerObservables = new Dictionary<PlayerRef, Observable>();
     public Dictionary<PlayerRef, PlayerProperties> playerProperties = new Dictionary<PlayerRef, PlayerProperties>();
     public PlayerProperties currentPlayerProperties = new PlayerProperties("", false, 0, 0);
@@ -35,6 +36,8 @@ public class PlayerManager : NetworkBehaviour
     public delegate void PlayerEvent();
 
     private NetworkRunner networkRunner;
+
+    public bool removePlayers = false;
 
     [System.Serializable]
     public class PlayerSettings
@@ -114,7 +117,18 @@ public class PlayerManager : NetworkBehaviour
 
     public override void Spawned()
     {
+        Debug.Log("Spawned");
         networkRunner = FindFirstObjectByType<NetworkRunner>();
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (!networkRunner.IsServer) return;
+        if (removePlayers)
+        {
+            removePlayers = false;
+            RemoveLeftPlayers();
+        }
     }
 
     private void Update()
@@ -127,6 +141,7 @@ public class PlayerManager : NetworkBehaviour
                 //Physics.simulationMode = SimulationMode.FixedUpdate;
             }
         }
+        
     }
 
     public void SetupMovementSettings(GameObject player)
@@ -165,16 +180,44 @@ public class PlayerManager : NetworkBehaviour
         return playerObject.gameObject;
     }
 
+    public void RemoveLeftPlayers()
+    {
+        List<PlayerRef> removedPlayers = new List<PlayerRef>();
+        foreach (KeyValuePair<PlayerRef, NetworkId> kvp in playerObjects)
+        {
+            if (!Runner.ActivePlayers.ToList().Contains(kvp.Key)) // active players doesnt contain the player object
+            {
+                removedPlayers.Add(kvp.Key);
+            }
+        }
+        foreach (PlayerRef player in removedPlayers) playerObjects.Remove(player);
+    }
+
     public void RemovePlayer(PlayerRef player)
     {
-        NetworkObject obj = playerObjects[player];
-        Runner.Despawn(obj.GetComponent<PlayerDropManager>().gizmo.GetComponent<NetworkObject>()); // Removes the item gizmo
-        Runner.Despawn(obj);
-        playerObjects.Remove(player);
+        // Make this less spaghetti later (by attaching removal to removeplayers variable and accessing playerobjects dict through that)
+        NetworkObject obj = null;
+        NetworkObject[] playerNObjects = Resources.FindObjectsOfTypeAll(typeof(NetworkObject)) as NetworkObject[];
+        foreach (NetworkObject nObj in playerNObjects)
+        {
+            Player playerComponent = nObj.GetComponent<Player>();
+            if (playerComponent == null) continue;
+            if (playerComponent.owner == player)
+            {
+                obj = nObj;
+                break;
+            }
+        }
+        if (obj == null) return;
+        NetworkObject gizmoObj = obj.GetComponent<PlayerDropManager>().gizmo.GetComponent<NetworkObject>();
+        if (gizmoObj != null) networkRunner.Despawn(gizmoObj); // Removes the item gizmo
+        networkRunner.Despawn(obj);
+        removePlayers = true; // So that its modified only on fixedupdatenetwork
+        //playerObjects.Remove(player);
         // Removes the player from observable dictionary if they are observing something
         if (playerObservables.ContainsKey(player))
         {
-            playerObjects[player].GetComponent<Player>().inf.SetCanInteract(true);
+            GetPlayerNetworkObject(player).GetComponent<Player>().inf.SetCanInteract(true);
             playerObservables.Remove(player);
             Object.AssignInputAuthority(PlayerRef.None);
             playerObservables[player].currentPlayer = PlayerRef.None;
@@ -190,7 +233,7 @@ public class PlayerManager : NetworkBehaviour
     public void Teleport(PlayerRef player, Vector3 location, Quaternion rotation)
     {
         if (!Runner.IsServer) return;
-        GameObject tpPlayer = playerObjects.Get(player).gameObject;
+        GameObject tpPlayer = GetPlayerObject(player);
         Rigidbody rb = tpPlayer.GetComponent<Rigidbody>();
         PlayerMovement pm = tpPlayer.GetComponent<PlayerMovement>();
         CameraMovement cm = FindFirstObjectByType<CameraMovement>();
@@ -235,6 +278,18 @@ public class PlayerManager : NetworkBehaviour
     public GameObject GetPlayerObject(PlayerRef player)
     {
         if (!playerObjects.ContainsKey(player)) return null;
-        return playerObjects[player].gameObject;
+        NetworkObject nObj;
+        bool foundObject = Runner.TryFindObject(playerObjects[player], out nObj);
+        if (!foundObject) return null;
+        return nObj.gameObject;
+    }
+
+    public NetworkObject GetPlayerNetworkObject(PlayerRef player)
+    {
+        if (!playerObjects.ContainsKey(player)) return null;
+        NetworkObject nObj;
+        bool foundObject = Runner.TryFindObject(playerObjects[player], out nObj);
+        if (!foundObject) return null;
+        return nObj;
     }
 }
