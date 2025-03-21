@@ -109,7 +109,11 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
             {
                 case nameof(equippedSlot):
                     if (!IsProxy) return;
-                    if (hotbar[equippedSlot].ToString().IsNullOrEmpty()) return;
+                    if (hotbar[equippedSlot].ToString().IsNullOrEmpty())
+                    {
+                        HideItem();
+                        return;
+                    }
                     ShowItem(hotbar[equippedSlot].ToString());
                     break;
             }
@@ -242,6 +246,8 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     // Shows the item on both client and server side
     public void ShowItem(string itemName)
     {
+        Debug.Log("Showing");
+        if (itemName.IsNullOrEmpty()) return;
         Item equippedItem = itemManager.itemSearch[itemName];
         sFilter.mesh = equippedItem.mesh;
         sRenderer.material.SetTexture("_MainTex", equippedItem.texture);
@@ -258,6 +264,13 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         // Client side
         if (!HasInputAuthority) return;
         fps.ShowClientItem(equippedItem);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_ShowItem()
+    {
+        if (!IsProxy) return;
+        ShowItem(hotbar[equippedSlot].ToString());
     }
 
     // Hides the item by disabling renderers
@@ -320,7 +333,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         {
             slot = emptySlot; // Given slot
         }
-        if (!hotbar[slot].ToString().IsNullOrEmpty()) return -1;
+        if (!hotbar[slot].ToString().IsNullOrEmpty()) return -1; // Full inventory
         if (itemManager.itemSearch.ContainsKey(itemName))
         {
             hotbar.Set(slot, itemName);
@@ -329,6 +342,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
             if (Runner.IsServer) reequipTick = !reequipTick;
         }
         if (HasInputAuthority) UpdateHotbarUI();
+        RPC_ShowItem();
         return slot;
     }
 
