@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
+using TMPro;
 
 public class AttackManager : NetworkBehaviour
 {
@@ -108,20 +109,26 @@ public class AttackManager : NetworkBehaviour
         Weapon currentWeapon = GetWeapon();
 
         // Raycasting
-        if (Physics.Raycast(camTransform.position, camTransform.rotation * Vector3.forward, currentWeapon.range, (int)environmentMask))
+        RaycastHit envHit;
+        RaycastHit playerHit;
+        bool isEnv = Physics.Raycast(camTransform.position, camTransform.rotation * Vector3.forward, out envHit, currentWeapon.range, (int)environmentMask);
+        bool isPlayer = Physics.Raycast(camTransform.position, camTransform.rotation * Vector3.forward, out playerHit, currentWeapon.range, (int)playerMask);
+        if (isEnv && isPlayer) // If a raycast hit both an environment and player
+        {
+            if (envHit.distance < playerHit.distance) // If the environment is in front of the player, return and reset glitch effect
+            {
+                ResetGlitchEffect();
+                return;
+            }
+        }
+        if (!isPlayer)
         {
             ResetGlitchEffect();
             return;
-        } // Hits environment, return
-        RaycastHit hit;
-        if (!Physics.Raycast(camTransform.position, camTransform.rotation * Vector3.forward, out hit, currentWeapon.range, (int)playerMask))
-        {
-            ResetGlitchEffect();
-            return;
-        } // Hits player, continue
+        }
 
         // Change detector
-        GameObject currentPlayer = hit.transform.gameObject;
+        GameObject currentPlayer = playerHit.transform.gameObject;
         if (currentPlayer == lockedPlayer) return;
 
         // After we lock onto a player
@@ -167,13 +174,20 @@ public class AttackManager : NetworkBehaviour
         Vector3 castDirection = inf.forwardDirection;
 
         Weapon currentWeapon = GetWeapon();
+
         // Raycasting
-        if (Physics.Raycast(castPosition, castDirection, currentWeapon.range, (int)environmentMask)) return; // if hit 
-        RaycastHit hit;
-        if (!Physics.Raycast(castPosition, castDirection, out hit, currentWeapon.range, (int)playerMask)) return; // if no hit player
+        RaycastHit envHit;
+        RaycastHit playerHit;
+        bool isEnv = Physics.Raycast(castPosition, castDirection, out envHit, currentWeapon.range, (int)environmentMask);
+        bool isPlayer = Physics.Raycast(castPosition, castDirection, out playerHit, currentWeapon.range, (int)playerMask);
+        if (isEnv && isPlayer)
+        {
+            if (envHit.distance < playerHit.distance) return;
+        }
+        if (!isPlayer) return;
 
         // If we get a hit, check the victim and then start engagement 
-        PlayerRef victim = hit.transform.GetComponent<Player>().owner; // Gets the victim 
+        PlayerRef victim = playerHit.transform.GetComponent<Player>().owner; // Gets the victim 
         if (victim == player.owner) return; // Can't hit self
         if (!playerManager.playerObjects.ContainsKey(victim)) return;
 

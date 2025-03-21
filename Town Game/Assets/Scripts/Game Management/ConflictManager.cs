@@ -136,8 +136,12 @@ public class ConflictManager : NetworkBehaviour
         engagements.Add(new Conflict(conflictTimer, attacker, attackPower, defender, defensePower));
 
         // Start camera lerp
-        aGo.GetComponent<Player>().lockedPlayer = defender;
-        dGo.GetComponent<Player>().lockedPlayer = attacker;
+        Player attackPlayer = aGo.GetComponent<Player>();
+        Player defenderPlayer = dGo.GetComponent<Player>();
+        attackPlayer.RPC_ResetInput();
+        defenderPlayer.RPC_ResetInput();
+        attackPlayer.lockedPlayer = defender;
+        defenderPlayer.lockedPlayer = attacker;
 
         // Tell the players to play the FPS animation on their end
         attackerAM.RPC_PlayAttackAnimation(attacker);
