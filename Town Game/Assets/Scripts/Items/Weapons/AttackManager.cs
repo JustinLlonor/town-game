@@ -12,8 +12,10 @@ public class AttackManager : NetworkBehaviour
     [HideInInspector] public Animator animator;
     [HideInInspector] public Transform animHolder;
     public Rigidbody rb;
-    public float minSpeed = 50f;
-    public float maxSpeed = 100f;
+    public float minSliderSpeed = 350f;
+    public float maxSliderSpeed = 700f;
+    public float minTargetLength = 50f;
+    public float maxTargetLength = 300f;
     GameObject lockedPlayer;
 
     //Engagement
@@ -253,8 +255,14 @@ public class AttackManager : NetworkBehaviour
         }
         else
         {
-            attackQTE.gameObject.SetActive(true);
-            attackQTE.Init(350f, 300f);
+            if (defense != 0)
+            {
+                attackQTE.gameObject.SetActive(true);
+                float potency = Mathf.Clamp((float)(attack - defense + 1), 0f, 10f) / 10f;
+                float sliderSpeed = (maxSliderSpeed - minSliderSpeed) * potency + minSliderSpeed;
+                float targetLength = (maxTargetLength - minTargetLength) * potency + minTargetLength;
+                attackQTE.Init(sliderSpeed, targetLength); // Calculate this based on attack and defense later
+            }
             // Play defense animation, defense sequence
         }
         uiManager.ExitUI();

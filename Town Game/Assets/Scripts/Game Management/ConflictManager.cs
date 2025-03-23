@@ -151,6 +151,7 @@ public class ConflictManager : NetworkBehaviour
         int defenseSlot = GetStrongestDefenseWeapon(victimInventory.hotbar);
         if (defenseSlot >= 0)
         {
+            Debug.Log("Equipping strongest");
             victimInventory.EquipItem(defenseSlot);
             Weapon foundWeapon = (Weapon)objectManager.itemSearch[victimInventory.hotbar[defenseSlot].ToString()]; // The weapon found in the slot defenseSlot of the victim's inventory.
             defensePower = foundWeapon.defense;
@@ -167,6 +168,7 @@ public class ConflictManager : NetworkBehaviour
         attackPlayer.lockedPlayer = defender;
         defenderPlayer.lockedPlayer = attacker;
 
+        Debug.Log(defensePower);
         // Play engagement sequence on player end
         attackerAM.RPC_StartEngagementSequence(attacker, true, attackPower, defensePower);
         defenderAM.RPC_StartEngagementSequence(defender, false, attackPower, defensePower);
@@ -219,12 +221,14 @@ public class ConflictManager : NetworkBehaviour
             i++;
             if (itemString.ToString().IsNullOrEmpty()) continue; // Empty slot, continue
             Item item = objectManager.itemSearch[itemString.ToString()];
+            Debug.Log("1b");
             if (!(item is Weapon)) continue; // If the item is not a weapon, not applicable.
+            Debug.Log("2b");
             Weapon weapon = (Weapon)item;
             if (weapon.defense > highestDefense) // Greater than highest defense, set highest defense weapon to this index.
             {
                 highestDefense = weapon.defense;
-                highestDefense = i;
+                highestDefenseWeapon = i;
             }
         }
         return highestDefenseWeapon;

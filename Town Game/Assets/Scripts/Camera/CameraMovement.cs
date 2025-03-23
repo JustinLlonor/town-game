@@ -165,7 +165,6 @@ public class CameraMovement : MonoBehaviour
         lockLerpTimer += Time.deltaTime/lockLerpTime;
         transform.eulerAngles = new Vector3(xRotation, yRotation, 0f);
         Vector3 targetDirection = (lockedPlayer.position - transform.position).normalized;
-        Debug.Log(targetDirection);
         Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
         Vector3 targetEuler = targetRotation.eulerAngles;
         yRotation = Mathf.LerpAngle(startY, targetEuler.y, lockCurve.Evaluate(lockLerpTimer));
