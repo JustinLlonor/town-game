@@ -94,7 +94,7 @@ public class ConflictManager : NetworkBehaviour
         attackerInventory.canSwitchSlots = true;
         Player attackPlayer = aGo.GetComponent<Player>();
         attackPlayer.lockedPlayer = PlayerRef.None;
-        attackPlayer.inf.canInteract = true;
+        attackPlayer.inf.SetCanInteract(true);
     }
 
     void ConflictTie(Conflict conflict)
@@ -117,8 +117,8 @@ public class ConflictManager : NetworkBehaviour
 
         Player attackPlayer = aGo.GetComponent<Player>();
         Player defenderPlayer = dGo.GetComponent<Player>();
-        attackPlayer.inf.canInteract = true;
-        defenderPlayer.inf.canInteract = true;
+        attackPlayer.inf.SetCanInteract(true);
+        defenderPlayer.inf.SetCanInteract(true);
         attackPlayer.lockedPlayer = PlayerRef.None;
         defenderPlayer.lockedPlayer = PlayerRef.None;
     }
@@ -174,10 +174,9 @@ public class ConflictManager : NetworkBehaviour
         attackPlayer.lockedPlayer = defender;
         defenderPlayer.lockedPlayer = attacker;
         // Disable interactable UI
-        attackPlayer.inf.canInteract = false;
-        defenderPlayer.inf.canInteract = false;
+        attackPlayer.inf.SetCanInteract(false);
+        defenderPlayer.inf.SetCanInteract(false);
 
-        Debug.Log(defensePower);
         // Play engagement sequence on player end
         attackerAM.RPC_StartEngagementSequence(attacker, true, attackPower, defensePower);
         defenderAM.RPC_StartEngagementSequence(defender, false, attackPower, defensePower);
