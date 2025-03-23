@@ -12,6 +12,8 @@ public class AttackManager : NetworkBehaviour
     [HideInInspector] public Animator animator;
     [HideInInspector] public Transform animHolder;
     public Rigidbody rb;
+    public float minSpeed = 50f;
+    public float maxSpeed = 100f;
     GameObject lockedPlayer;
 
     //Engagement
@@ -28,12 +30,15 @@ public class AttackManager : NetworkBehaviour
     PlayerManager playerManager;
     InputManager inputManager;
     UIManager uiManager;
+    AttackQTE attackQTE;
 
     Transform camTransform;
 
     private void Awake()
     {
         uiManager = FindFirstObjectByType<UIManager>();
+        attackQTE = FindFirstObjectByType<AttackQTE>();
+        attackQTE = uiManager.attackQTE;
         inputManager = FindFirstObjectByType<InputManager>();
         playerManager = FindFirstObjectByType<PlayerManager>();
         cShake = FindFirstObjectByType<CameraShake>();
@@ -43,7 +48,6 @@ public class AttackManager : NetworkBehaviour
         UIManager um = FindFirstObjectByType<UIManager>();
         if (um != null) uiGlitch = um.glitchObject;
         inventory = gameObject.GetComponent<PlayerInventory>();
-        inputManager.onJump += EngagementQTE;
         camTransform = Camera.main.transform;
         //if (!view.IsMine) return;
         foreach(Collider collider in colliders)
@@ -52,8 +56,14 @@ public class AttackManager : NetworkBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        inputManager.onJump += EngagementQTE;
+    }
+
     private void OnDisable()
     {
+        inputManager.onJump -= EngagementQTE;
         if (HasInputAuthority)
         {
             if (uiGlitch != null) uiGlitch.SetActive(false);
@@ -63,6 +73,7 @@ public class AttackManager : NetworkBehaviour
     private void Update()
     {
         DetectLockedPlayer();
+        DetectEngagedChange();
     }
 
     void DetectEngagedChange()
@@ -74,7 +85,10 @@ public class AttackManager : NetworkBehaviour
 
     void OnEngagedChange()
     {
-
+        if (!isEngaged)
+        {
+            ResetGlitchEffect();
+        }
     }
 
     bool WeaponEquipped()
@@ -134,6 +148,7 @@ public class AttackManager : NetworkBehaviour
         // Change detector
         GameObject currentPlayer = playerHit.transform.gameObject;
         if (currentPlayer == lockedPlayer) return;
+        if (currentPlayer == gameObject) return;
 
         // After we lock onto a player
         uiGlitch.SetActive(true);
@@ -204,12 +219,23 @@ public class AttackManager : NetworkBehaviour
     /// </summary>
     void EngagementQTE()
     {
+        if (!HasInputAuthority) return;
         Debug.Log("Engaging");
         if (!isEngaged) return;
         Debug.Log("1");
         if (isAttacker) return;
         Debug.Log("2");
-        conflictManager.RPC_WonQuicktime();
+        if (!attackQTE.enabled) return;
+        Debug.Log("3");
+        if (!attackQTE.GetSliderSuccess()) return;
+        Debug.Log("4");
+        RPC_WonQTE();
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_WonQTE()
+    {
+        conflictManager.WonQuicktime(Object.InputAuthority);
     }
 
     /// <summary>
@@ -218,16 +244,18 @@ public class AttackManager : NetworkBehaviour
     /// <param name="player"></param>
     /// <param name="isAttacker"></param>
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
-    public void RPC_StartEngagementSequence([RpcTarget] PlayerRef player, bool isAttacker)
+    public void RPC_StartEngagementSequence([RpcTarget] PlayerRef player, bool isAttacker, int attack, int defense)
     {
         this.isAttacker = isAttacker;
         if (isAttacker)
         {
-            // Play attack animation
+            // Play attack animation, attack sequence
         }
         else
         {
-            // Play defense animation
+            attackQTE.gameObject.SetActive(true);
+            attackQTE.Init(350f, 300f);
+            // Play defense animation, defense sequence
         }
         uiManager.ExitUI();
     }

@@ -493,7 +493,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.1981132, g: 0.1964934, b: 0.19530971, a: 0}
+  m_BackGroundColor: {r: 0.182373, g: 0.20754719, b: 0.16349237, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -1028,6 +1028,8 @@ MonoBehaviour:
   dropPressed: 0
   exitObservePressed: 0
   siPressed: -1
+  itemUse: 0
+  itemUseSecondary: 0
   heldOnSI: 0
   isHoldSI: 0
   firstFrame: 1

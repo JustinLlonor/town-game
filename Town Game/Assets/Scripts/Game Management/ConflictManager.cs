@@ -167,9 +167,9 @@ public class ConflictManager : NetworkBehaviour
         attackPlayer.lockedPlayer = defender;
         defenderPlayer.lockedPlayer = attacker;
 
-        // Tell the players to play the FPS animation on their end
-        attackerAM.RPC_StartEngagementSequence(attacker, true);
-        defenderAM.RPC_StartEngagementSequence(defender, false);
+        // Play engagement sequence on player end
+        attackerAM.RPC_StartEngagementSequence(attacker, true, attackPower, defensePower);
+        defenderAM.RPC_StartEngagementSequence(defender, false, attackPower, defensePower);
     }
 
     /// <summary>
@@ -195,7 +195,12 @@ public class ConflictManager : NetworkBehaviour
     {
         foreach (Conflict conflict in engagements)
         {
-            if (conflict.defender == victim) return conflict;
+            Debug.Log("engagement 1:");
+            Debug.Log(conflict.defender);
+            Debug.Log(victim);
+            Debug.Log(victim == conflict.defender);
+            Debug.Log(victim.Equals(conflict.defender));
+            if (conflict.defender.Equals(victim)) return conflict;
         }
         return null;
     }
@@ -228,12 +233,14 @@ public class ConflictManager : NetworkBehaviour
     /// <summary>
     /// Called when the victim of a quicktime event has won their quicktime event.
     /// </summary>
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_WonQuicktime(RpcInfo info = default)
+    public void WonQuicktime(PlayerRef wonPlayer)
     {
-        PlayerRef wonPlayer = info.Source;
         Conflict victimConflict = GetConflictFromVictim(wonPlayer);
+        Debug.Log("1a");
         if (victimConflict == null) return; // Return if they are not in a conflict as a victim
+        Debug.Log("2a");
+        if (victimConflict.defensePower == 0) return; // The player cannot defend by definition, return
+        Debug.Log("3a");
         victimConflict.defenderPassed = true;
     }
 }
