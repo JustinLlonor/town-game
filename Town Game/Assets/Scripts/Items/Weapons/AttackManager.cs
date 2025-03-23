@@ -6,7 +6,6 @@ using TMPro;
 
 public class AttackManager : NetworkBehaviour
 {
-
     public Collider[] colliders; // DO NOT DELETE YET, use damage colliders for better player interactable  hover
     public LayerMask playerMask;
     public LayerMask environmentMask;
@@ -18,7 +17,7 @@ public class AttackManager : NetworkBehaviour
     //Engagement
     [Networked] public bool isEngaged { get; set; } = false;
     bool previouslyEngaged = false;
-
+    bool isAttacker;
 
     Player player;
     GameObject uiGlitch;
@@ -27,11 +26,15 @@ public class AttackManager : NetworkBehaviour
     CameraShake cShake;
     ConflictManager conflictManager;
     PlayerManager playerManager;
+    InputManager inputManager;
+    UIManager uiManager;
 
     Transform camTransform;
 
     private void Awake()
     {
+        uiManager = FindFirstObjectByType<UIManager>();
+        inputManager = FindFirstObjectByType<InputManager>();
         playerManager = FindFirstObjectByType<PlayerManager>();
         cShake = FindFirstObjectByType<CameraShake>();
         fps = FindFirstObjectByType<FirstPerson>();
@@ -40,6 +43,7 @@ public class AttackManager : NetworkBehaviour
         UIManager um = FindFirstObjectByType<UIManager>();
         if (um != null) uiGlitch = um.glitchObject;
         inventory = gameObject.GetComponent<PlayerInventory>();
+        inputManager.onJump += EngagementQTE;
         camTransform = Camera.main.transform;
         //if (!view.IsMine) return;
         foreach(Collider collider in colliders)
@@ -151,7 +155,6 @@ public class AttackManager : NetworkBehaviour
     public void Attack(Weapon weapon)
     {
         // Put client sided stuff here
-        Debug.Log("1");
         if (!Runner.IsServer) return;
         TryEngagement(); // Cast a ray on the server
 
@@ -197,27 +200,36 @@ public class AttackManager : NetworkBehaviour
     }
 
     /// <summary>
-    /// Plays the first person attack animation for the client
+    /// Linked to onJump, the function for determining if this client won a quicktime event
     /// </summary>
-    /// <param name="player"></param>
-    /// <param name="text"></param>
-    /// <param name="lifespan"></param>
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
-    public void RPC_PlayAttackAnimation([RpcTarget] PlayerRef player)
+    void EngagementQTE()
     {
-
+        Debug.Log("Engaging");
+        if (!isEngaged) return;
+        Debug.Log("1");
+        if (isAttacker) return;
+        Debug.Log("2");
+        conflictManager.RPC_WonQuicktime();
     }
 
     /// <summary>
-    /// Plays the first person defense animation for the client
+    /// Starts the engagement sequence
     /// </summary>
     /// <param name="player"></param>
-    /// <param name="text"></param>
-    /// <param name="lifespan"></param>
+    /// <param name="isAttacker"></param>
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
-    public void RPC_PlayDefenseAnimation([RpcTarget] PlayerRef player)
+    public void RPC_StartEngagementSequence([RpcTarget] PlayerRef player, bool isAttacker)
     {
-
+        this.isAttacker = isAttacker;
+        if (isAttacker)
+        {
+            // Play attack animation
+        }
+        else
+        {
+            // Play defense animation
+        }
+        uiManager.ExitUI();
     }
 
     public void PlayShake(Shake shake)

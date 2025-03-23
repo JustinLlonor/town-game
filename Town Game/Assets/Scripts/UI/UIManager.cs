@@ -35,10 +35,13 @@ public class UIManager : MonoBehaviour
         PlayerManager pm = FindFirstObjectByType<PlayerManager>();
         FindFirstObjectByType<CameraManager>().OnSwitchCameraMode += OnCameraChangeMode;
         InputManager inputManager = FindFirstObjectByType<InputManager>();
-        inputManager.onExit += OnExit;
+        inputManager.onExit += ExitUI;
     }
 
-    private void OnExit()
+    /// <summary>
+    /// Attempts to close out of UI.
+    /// </summary>
+    public void ExitUI()
     {
         if (!uiOpened) return;
         OnUIClose.Invoke();

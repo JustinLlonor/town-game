@@ -25,7 +25,6 @@ public class ConflictManager : NetworkBehaviour
         public float attackPower;
         public PlayerRef defender;
         public float defensePower;
-        public ConflictEvent onConflictCancel;
 
         // Conflict real time stuff
         public bool defenderPassed;
@@ -71,8 +70,33 @@ public class ConflictManager : NetworkBehaviour
 
     void EndConflict(Conflict conflict)
     {
-        // call end conflict delegate
-        // Variable resetting
+        if (conflict.defenderPassed)
+        {
+            ConflictTie(conflict);
+        }
+        else
+        {
+            ConflictWin(conflict);
+        }
+    }
+
+    void ConflictWin(Conflict conflict)
+    {
+        GameObject aGo = playerManager.GetPlayerObject(conflict.attacker);
+        GameObject dGo = playerManager.GetPlayerObject(conflict.defender);
+
+        dGo.GetComponent<PlayerStats>().Kill();
+
+        aGo.GetComponent<PlayerMovement>().Unfreeze();
+        AttackManager attackerAM = aGo.GetComponent<AttackManager>();
+        attackerAM.isEngaged = false;
+        PlayerInventory attackerInventory = aGo.GetComponent<PlayerInventory>();
+        attackerInventory.canSwitchSlots = true;
+        aGo.GetComponent<Player>().lockedPlayer = PlayerRef.None;
+    }
+
+    void ConflictTie(Conflict conflict)
+    {
         GameObject aGo = playerManager.GetPlayerObject(conflict.attacker);
         GameObject dGo = playerManager.GetPlayerObject(conflict.defender);
 
@@ -144,8 +168,8 @@ public class ConflictManager : NetworkBehaviour
         defenderPlayer.lockedPlayer = attacker;
 
         // Tell the players to play the FPS animation on their end
-        attackerAM.RPC_PlayAttackAnimation(attacker);
-        defenderAM.RPC_PlayDefenseAnimation(defender);
+        attackerAM.RPC_StartEngagementSequence(attacker, true);
+        defenderAM.RPC_StartEngagementSequence(defender, false);
     }
 
     /// <summary>
@@ -160,6 +184,20 @@ public class ConflictManager : NetworkBehaviour
             if (conflict.attacker == player || conflict.defender == player) return true;
         }
         return false;
+    }
+
+    /// <summary>
+    /// Gets the conflict from the active conflicts in which this player is a victim. Returns null if nothing was found
+    /// </summary>
+    /// <param name="victim"></param>
+    /// <returns></returns>
+    public Conflict GetConflictFromVictim(PlayerRef victim)
+    {
+        foreach (Conflict conflict in engagements)
+        {
+            if (conflict.defender == victim) return conflict;
+        }
+        return null;
     }
 
     /// <summary>
@@ -185,5 +223,17 @@ public class ConflictManager : NetworkBehaviour
             }
         }
         return highestDefenseWeapon;
+    }
+
+    /// <summary>
+    /// Called when the victim of a quicktime event has won their quicktime event.
+    /// </summary>
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_WonQuicktime(RpcInfo info = default)
+    {
+        PlayerRef wonPlayer = info.Source;
+        Conflict victimConflict = GetConflictFromVictim(wonPlayer);
+        if (victimConflict == null) return; // Return if they are not in a conflict as a victim
+        victimConflict.defenderPassed = true;
     }
 }
