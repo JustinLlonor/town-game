@@ -1,5 +1,49 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &839336651037553361
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1751323930205034389}
+  - component: {fileID: 8649783803565719161}
+  m_Layer: 0
+  m_Name: Voting Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1751323930205034389
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 839336651037553361}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 466519801941495353}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8649783803565719161
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 839336651037553361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ea635c11fbf7a14cacf7683a147b4e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1395259030610307795
 GameObject:
   m_ObjectHideFlags: 0
@@ -194,6 +238,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5669130914447257882}
+  - component: {fileID: 5948805112163813116}
   m_Layer: 0
   m_Name: Jobs
   m_TagString: Untagged
@@ -217,6 +262,18 @@ Transform:
   m_Father: {fileID: 466519801941495353}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5948805112163813116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4099744197750326124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e6d70cd5cafc0d4ab13b75afaadc030, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5129982233875511372
 GameObject:
   m_ObjectHideFlags: 0
@@ -312,8 +369,9 @@ Transform:
   m_Children:
   - {fileID: 7228556260798279275}
   - {fileID: 3217437418723125412}
-  - {fileID: 5669130914447257882}
   - {fileID: 6875670804041311213}
+  - {fileID: 1751323930205034389}
+  - {fileID: 5669130914447257882}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -336,8 +394,10 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 1676236008550905741}
   - {fileID: 5478285723541767041}
-  - {fileID: 2146126489367553974}
   - {fileID: 5116018737537428875}
+  - {fileID: 8649783803565719161}
+  - {fileID: 5948805112163813116}
+  - {fileID: 2146126489367553974}
   ForceRemoteRenderTimeframe: 0
 --- !u!1 &8397003756874805080
 GameObject:
@@ -383,5 +443,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 904b5161fb0a6f44bbe3f0d06aff6422, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  conflictLength: 3.4
   engagements: []
   playerManager: {fileID: 0}
+  objectManager: {fileID: 0}
