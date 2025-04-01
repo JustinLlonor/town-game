@@ -274,6 +274,73 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e6d70cd5cafc0d4ab13b75afaadc030, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  branches:
+  - name: Town
+    category: 2
+    leadPositionName: Mayor
+    jobs:
+    - name: Cook
+      description: Uses ingredients to cook food for the town.
+      handler: {fileID: 0}
+      assignedPlayers: []
+    - name: Power Worker
+      description: Operates the power plant to generate energy for the town.
+      handler: {fileID: 0}
+      assignedPlayers: []
+    - name: Supplier
+      description: Delivers supplies to buildings, to keep operations running.
+      handler: {fileID: 0}
+      assignedPlayers: []
+    - name: Mail Carrier
+      description: Delivers mail to houses.
+      handler: {fileID: 0}
+      assignedPlayers: []
+    players: []
+  - name: Science
+    category: 4
+    leadPositionName: Head of Science
+    jobs:
+    - name: Technology Designer
+      description: Creates new devices and equipment for general use within the town.
+      handler: {fileID: 0}
+      assignedPlayers: []
+    - name: Anomaly Researcher
+      description: Researches supernatural phenomena for use against cultists.
+      handler: {fileID: 0}
+      assignedPlayers: []
+    - name: Forensics Scientist
+      description: Analyzes evidence and people to help find suspects.
+      handler: {fileID: 0}
+      assignedPlayers: []
+    - name: Weapons Researcher
+      description: Creates new weapons and devices dedicated to self-defense against
+        cultists.
+      handler: {fileID: 0}
+      assignedPlayers: []
+    players: []
+  - name: Security
+    category: 4
+    leadPositionName: Head of Security
+    jobs:
+    - name: Device Operator
+      description: Places security devices around town, to ensure the safety of civilians
+        during the night.
+      handler: {fileID: 0}
+      assignedPlayers: []
+    - name: Investigator
+      description: Pursues suspicious individuals with the help of specialized devices.
+      handler: {fileID: 0}
+      assignedPlayers: []
+    - name: Watcher
+      description: Patrols certain areas of the map, looking for signs of tampering
+        as well as suspicious activity.
+      handler: {fileID: 0}
+      assignedPlayers: []
+    - name: Bodyguard
+      description: Offers protection for other players during the night.
+      handler: {fileID: 0}
+      assignedPlayers: []
+    players: []
 --- !u!1 &5129982233875511372
 GameObject:
   m_ObjectHideFlags: 0

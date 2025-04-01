@@ -1,9 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//using Photon.Pun;
 using System;
-//using Photon.Realtime;
 using System.Linq;
 using Steamworks;
 
@@ -27,14 +25,10 @@ public class RoomManager : MonoBehaviour
         cm = FindFirstObjectByType<CameraManager>();
         foreach (Transform child in transform)
         {
-            MapRoom.RoomType type = child.GetComponent<MapRoom>().roomType;
-            if (type == MapRoom.RoomType.Living)
+            RoomCategory type = child.GetComponent<MapRoom>().roomCategory;
+            if (type == RoomCategory.House)
             {
                 playerRooms.Add(child.GetComponent<MapRoom>());
-            }
-            if (type == MapRoom.RoomType.Work)
-            {
-                workRooms.Add(child.GetComponent<MapRoom>());
             }
         }
     }
@@ -54,33 +48,6 @@ public class RoomManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.DownArrow)) ChooseBuilding();
         UpdateCamPosition();
     }
-
-    //[PunRPC]
-    //public void AddWorker(Photon.Realtime.Player player, string roomName)
-    //{
-    //    int index = Array.FindIndex(workRooms.ToArray(), room => room.name == roomName);
-    //    if (index == -1) return;
-
-    //    if (!workRooms[index].workers.Contains(player))
-    //    {
-    //        workRooms[index].workers.Add(player);
-    //        return;
-    //    }
-    //    Debug.LogError("Player already works at specified location!");
-    //}
-
-    //[PunRPC]
-    //public void RemoveWorker(Photon.Realtime.Player player, string roomName)
-    //{
-    //    int index = Array.FindIndex(workRooms.ToArray(), room => room.name == roomName);
-    //    if (index == -1) return;
-
-    //    if (workRooms[index].workers.Contains(player))
-    //    {
-    //        workRooms[index].workers.Remove(player);
-    //        return;
-    //    }
-    //}
 
     /// <summary>
     /// Building start seqeunce
