@@ -331,13 +331,14 @@ MonoBehaviour:
       description: Pursues suspicious individuals with the help of specialized devices.
       handler: {fileID: 0}
       assignedPlayers: []
-    - name: Watcher
+    - name: Guard
       description: Patrols certain areas of the map, looking for signs of tampering
-        as well as suspicious activity.
+        as well as suspicious activity. Can offer protection for civilians at night.
       handler: {fileID: 0}
       assignedPlayers: []
-    - name: Bodyguard
-      description: Offers protection for other players during the night.
+    - name: Exorcist
+      description: Provides protection against supernatural threats using anomalous
+        relics.
       handler: {fileID: 0}
       assignedPlayers: []
     players: []
