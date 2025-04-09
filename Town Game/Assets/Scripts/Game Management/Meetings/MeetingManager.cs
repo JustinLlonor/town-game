@@ -1,11 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//using Photon.Pun;
-//using Photon.Realtime;
 using System.Linq;
+using Fusion;
 
-public class MeetingManager : MonoBehaviour//PunCallbacks, IPunObservable
+public class MeetingManager : NetworkBehaviour
 {
-    // On Discord
+    public string meetingPeriodName = "Meeting";
+    public ScheduleManager scheduleManager;
+    public VotingManager votingManager;
+
+    public override void Spawned()
+    {
+        scheduleManager.OnMasterBlockStart += CheckMeetingStart;
+        scheduleManager.OnMasterBlockEnd += CheckMeetingEnd;
+    }
+
+    private void CheckMeetingStart(ScheduleBlock block)
+    {
+        if (block.periodName != meetingPeriodName) return;
+    }
+
+    private void CheckMeetingEnd(ScheduleBlock block)
+    {
+        if (block.periodName != meetingPeriodName) return;
+    }
 }

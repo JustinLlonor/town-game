@@ -44,6 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ea635c11fbf7a14cacf7683a147b4e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  activeVotes: []
 --- !u!1 &1395259030610307795
 GameObject:
   m_ObjectHideFlags: 0
@@ -164,6 +165,52 @@ MonoBehaviour:
   timerText: {fileID: 0}
   gameTimer: 0
   clientTimer: 0
+--- !u!1 &3203981357994812137
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1969580155241344749}
+  - component: {fileID: 1053691298493993009}
+  m_Layer: 0
+  m_Name: Meeting Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1969580155241344749
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3203981357994812137}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 466519801941495353}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1053691298493993009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3203981357994812137}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78c7fe40fa4922046b2a7c67a3714b43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scheduleManager: {fileID: 5478285723541767041}
+  votingManager: {fileID: 8649783803565719161}
 --- !u!1 &3648747623983838247
 GameObject:
   m_ObjectHideFlags: 0
@@ -440,6 +487,7 @@ Transform:
   - {fileID: 6875670804041311213}
   - {fileID: 1751323930205034389}
   - {fileID: 5669130914447257882}
+  - {fileID: 1969580155241344749}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -466,6 +514,7 @@ MonoBehaviour:
   - {fileID: 8649783803565719161}
   - {fileID: 5948805112163813116}
   - {fileID: 2146126489367553974}
+  - {fileID: 1053691298493993009}
   ForceRemoteRenderTimeframe: 0
 --- !u!1 &8397003756874805080
 GameObject:

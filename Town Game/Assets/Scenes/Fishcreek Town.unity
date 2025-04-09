@@ -2838,7 +2838,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh43938
+  m_Name: pb_Mesh32334
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -10115,7 +10115,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7710707397463329135, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: NetworkedBehaviours.Array.size
-      value: 7
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7710707397463329135, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[3]'
@@ -10133,6 +10133,10 @@ PrefabInstance:
       propertyPath: 'NetworkedBehaviours.Array.data[6]'
       value: 
       objectReference: {fileID: 1842509459}
+    - target: {fileID: 7710707397463329135, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: 'NetworkedBehaviours.Array.data[7]'
+      value: 
+      objectReference: {fileID: 110649284601070369}
     - target: {fileID: 8939135918072450520, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: sceneViewId
       value: 8
@@ -10190,6 +10194,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de452253259a0eb4aa019398f4edffd2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &110649284601070369 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1053691298493993009, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+  m_PrefabInstance: {fileID: 110649284601070364}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78c7fe40fa4922046b2a7c67a3714b43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &361995279573289457 stripped
