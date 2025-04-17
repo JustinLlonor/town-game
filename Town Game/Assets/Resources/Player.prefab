@@ -819,6 +819,10 @@ MonoBehaviour:
   animator: {fileID: 5001893267009733704}
   animHolder: {fileID: 0}
   rb: {fileID: 2546787659200004203}
+  minSliderSpeed: 350
+  maxSliderSpeed: 700
+  minTargetLength: 50
+  maxTargetLength: 300
   _isEngaged: 0
 --- !u!114 &6160271850420175375
 MonoBehaviour:
@@ -834,15 +838,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 3.75
   movementMultiplier: 10
-  sprintMultiplier: 1.8
+  sprintMultiplier: 2.2
   sprintStaminaRegenCooldown: 0.5
   crouchMultiplier: 0.7
-  sprintStaminaConsumption: 15
+  sprintStaminaConsumption: 10
   groundDrag: 6
   _canMove: 1
-  jumpHeight: 5
+  jumpHeight: 5.5
   jumpCooldown: 0
-  jumpStaminaConsumption: 25
+  jumpStaminaConsumption: 10
   canJump: 1
   airHandling: 0.2
   environmentMask:

@@ -19,6 +19,7 @@ public class MeetingManager : NetworkBehaviour
     private void CheckMeetingStart(ScheduleBlock block)
     {
         if (block.periodName != meetingPeriodName) return;
+        // Meeting start code
     }
 
     private void CheckMeetingEnd(ScheduleBlock block)
