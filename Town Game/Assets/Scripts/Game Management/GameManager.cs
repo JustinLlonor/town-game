@@ -18,7 +18,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     public PlayerRef[] cultists = new PlayerRef[] { };
     public List<PlayerRef> alivePlayers = new List<PlayerRef>(); // doesn't update with alive players yet
     public Dictionary<string, Position> playerPositions = new Dictionary<string, Position>();
-    //public Dictionary<Player, string> chosenBuildings = new Dictionary<Player, string>();
+    public Dictionary<PlayerRef, string> chosenBuildings = new Dictionary<PlayerRef, string>();
     [Networked] public float gameTime { get; set; } = 0f;
     public float currentPeriod;
     public int currentDay = 0;
@@ -58,6 +58,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     public GameEvent OnTimeResume;
     public delegate void GameEvent();
     public delegate void RevealRoles(bool isCultist);
+    private TickTimer nightTimer;
     bool init = false;
 
     public enum Position
@@ -166,13 +167,23 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     private void Update()
     {
         if (!init) return;
-        CheckDay();
+        CheckDay(); 
         UpdateGameTime();
         if (!Runner.IsServer) return;
         //if (Input.GetKeyDown(KeyCode.Backspace)) SetTime(testTime.x, testTime.y);
         PhaseProperties();
         CheckNightSkip();
+        CheckNightTimer();
         CheckDayStart();
+    }
+
+    void CheckNightTimer()
+    {
+        if (skippedNight) return;
+        if (nightTimer.ExpiredOrNotRunning(Runner))
+        {
+            SetNightTime();
+        }
     }
 
     void CheckDay()
@@ -261,6 +272,8 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     void NightSkip()
     {
         skippedNight = true;
+        nightTimer = TickTimer.CreateFromSeconds(Runner, buildingChooseTimer + 1f);
+        StopTime();
         RPC_NightSkipSequence();
     }
 
@@ -268,12 +281,12 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     public void RPC_NightSkipSequence()
     {
         OnNightSkipStart?.Invoke();
-        gt.StartTimer(buildingChooseTimer + 1f);
-        StopTime();
-        gt.onTimerFinish.AddListener(SetNightTime);
+        //gt.StartTimer(buildingChooseTimer + 1f);
+        //StopTime();
+        //gt.onTimerFinish.AddListener(SetNightTime); // When the building pick timer is over, set night time
         ResetChosenBuildings(); // Resets the building data for all clients
     }
-
+    
     public void SetNightTime()
     {
         //if (!PhotonNetwork.IsMasterClient) return;
