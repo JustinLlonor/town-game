@@ -41,11 +41,11 @@ public class BlackScreen : MonoBehaviour
         img.color = new Color(0f, 0f, 0f, alpha);
         if (alpha == 0f)
         {
-            uiFront.parent = uiFrontHolder;
+            uiFront.SetParent(uiFrontHolder);
         }
         if (alpha == 1f)
         {
-            uiFront.parent = transform;
+            uiFront.SetParent(transform);
         }
         foreach (var t in texts)
         {

@@ -17,12 +17,16 @@ public class RoomManager : MonoBehaviour
     [SerializeField] int currentBuilding = 0;
     CameraManager cm;
     GameManager gm;
+    PlayerManager pm;
+    InputManager inputManager;
     bool buildingsChosen = false; // If the building choosing sequence is happening
 
     private void Awake()
     {
         gm = FindFirstObjectByType<GameManager>();
         cm = FindFirstObjectByType<CameraManager>();
+        pm = FindFirstObjectByType<PlayerManager>();
+        inputManager = FindFirstObjectByType<InputManager>();
         foreach (Transform child in transform)
         {
             RoomCategory type = child.GetComponent<MapRoom>().roomCategory;
@@ -37,15 +41,15 @@ public class RoomManager : MonoBehaviour
     {
         gm.OnNightSkipStart += BuildingChooseStart;
         gm.OnNightSkip += BuildingChooseEnd;
+        inputManager.onScrollRight += ScrollRight;
+        inputManager.onScrollLeft += ScrollLeft;
+        inputManager.onChooseBuilding += ChooseBuilding;
     }
 
     private void Update()
     {
         // Debug inputs
         //if (Input.GetKeyDown(KeyCode.U)) AddWorker(PhotonNetwork.LocalPlayer, testRoom); // test
-        if (Input.GetKeyDown(KeyCode.RightArrow)) ScrollRight();
-        if (Input.GetKeyDown(KeyCode.LeftArrow)) ScrollLeft();
-        if (Input.GetKeyDown(KeyCode.DownArrow)) ChooseBuilding();
         UpdateCamPosition();
     }
 
@@ -55,7 +59,8 @@ public class RoomManager : MonoBehaviour
     void BuildingChooseStart()
     {
         //if (!gm.alivePlayers.Contains(PhotonNetwork.LocalPlayer)) return;
-        //ownedRooms = new List<MapRoom>() { playerRooms[(int)PhotonNetwork.LocalPlayer.CustomProperties["room"]] }; // Creates new owned rooms list
+        ownedRooms = new List<MapRoom>() { playerRooms[pm.currentPlayerProperties.room] }; // Creates new owned rooms list
+        //TODO: unlocked rooms add
         foreach (MapRoom room in workRooms)
         {
             //if (room.workers.Contains(PhotonNetwork.LocalPlayer)) ownedRooms.Add(room);
@@ -110,7 +115,8 @@ public class RoomManager : MonoBehaviour
             sentBuilding = ownedRooms[currentBuilding].roomName;
         }
         Debug.Log(sentBuilding);
-        //gm.photonView.RPC("SetChosenBuilding", RpcTarget.All, sentBuilding);
+        // Sends the chosen building to the server
+        pm.currentPlayer.GetComponent<PlayerRoomChoose>().RPC_ChooseBuilding(sentBuilding);
     }
 
     void BuildingChooseEnd()

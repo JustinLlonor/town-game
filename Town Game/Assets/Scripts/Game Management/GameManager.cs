@@ -46,7 +46,6 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     RunnerManager runnerManager;
     bool skippedNight = false;
     bool startedDay = false;
-    GameTimer gt;
     public GameEvent OnTimeChange;
     public RevealRoles OnRevealRoles;
     public GameEvent OnChangeDay;
@@ -94,7 +93,6 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         rm = FindFirstObjectByType<RoomManager>();
         pm = FindFirstObjectByType<PlayerManager>();
         sm = FindFirstObjectByType<ScheduleManager>();
-        gt = gameObject.GetComponent<GameTimer>();
         runnerManager = FindFirstObjectByType<RunnerManager>();
         runnerManager.onPlayerLeave += RemoveAlivePlayer;
         //cm = FindFirstObjectByType<CameraManager>();
@@ -152,6 +150,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         {
             PlayerRef rPlayer = new List<PlayerRef>(Runner.ActivePlayers)[i];
             pm.playerProperties[rPlayer].SetRoom(roomAssignment[i]);
+            RPC_SendRoom(rPlayer, roomAssignment[i]);
         }
     }
 
@@ -179,7 +178,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
 
     void CheckNightTimer()
     {
-        if (skippedNight) return;
+        if (!skippedNight) return;
         if (nightTimer.ExpiredOrNotRunning(Runner))
         {
             SetNightTime();
@@ -244,6 +243,12 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         OnRevealRoles?.Invoke(isCultist);
     }
 
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_SendRoom([RpcTarget] PlayerRef player, int room)
+    {
+        pm.currentPlayerProperties.SetRoom(room);
+    }
+
     void CheckDayStart()
     {
         if (startedDay) return;
@@ -274,6 +279,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         skippedNight = true;
         nightTimer = TickTimer.CreateFromSeconds(Runner, buildingChooseTimer + 1f);
         StopTime();
+        ResetChosenBuildings();
         RPC_NightSkipSequence();
     }
 
@@ -281,10 +287,6 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     public void RPC_NightSkipSequence()
     {
         OnNightSkipStart?.Invoke();
-        //gt.StartTimer(buildingChooseTimer + 1f);
-        //StopTime();
-        //gt.onTimerFinish.AddListener(SetNightTime); // When the building pick timer is over, set night time
-        ResetChosenBuildings(); // Resets the building data for all clients
     }
     
     public void SetNightTime()
@@ -298,54 +300,53 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         TeleportToBuildings();
     }
 
-    // Call to every client
-    //[PunRPC]
-    public void SetChosenBuilding(string buildingName)//, PhotonMessageInfo info) 
+    public void SetChosenBuilding(string buildingName, PlayerRef player)//, PhotonMessageInfo info) 
     {
-        //Player player = info.Sender;
         string newBuilding = "";
         if (buildingName != "house")
         {
             if (Array.Find(rm.workRooms.ToArray(), room => room.roomName == buildingName) != null) // if the room is found
             {
-                //if (chosenBuildings.ContainsKey(player)) chosenBuildings[player] = buildingName; // Set the chosen building
+                Debug.Log("successfully set to " + buildingName);
+                if (chosenBuildings.ContainsKey(player)) chosenBuildings[player] = buildingName; // Set the chosen building
             } 
         }
     }
 
-    //[PunRPC]
-    public void NightSkipEvent()
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_NightSkipEvent()
     {
         OnNightSkip?.Invoke();
     }
 
     void TeleportToBuildings()
     {
-        //foreach (KeyValuePair<Player, string> pair in  chosenBuildings)
-        //{
-        //    Transform tpTransform = null;
-        //    if (pair.Value == "house" || pair.Value.IsNullOrEmpty())
-        //    {
-        //        tpTransform = rm.playerRooms[(int)pair.Key.CustomProperties["room"]].spawnTransform;
-        //        Debug.Log("house set");
-        //    }
-        //    else
-        //    {
-        //        tpTransform = rm.GetWorkBuilding(pair.Value).spawnTransform;
-        //    }
-        //    Debug.Log(tpTransform.position);
-        //    pm.photonView.RPC("Teleport", pair.Key, tpTransform.position, tpTransform.rotation);
-        //}
-        //view.RPC("NightSkipEvent", RpcTarget.All);
+        // Teleports players to their chosen building from the chosen building list
+        foreach (KeyValuePair<PlayerRef, string> pair in  chosenBuildings)
+        {
+            Transform tpTransform = null;
+            if (pair.Value == "house" || pair.Value.IsNullOrEmpty())
+            {
+                tpTransform = rm.playerRooms[pm.playerProperties[pair.Key].room].spawnTransform;
+                Debug.Log("house set");
+            }
+            else
+            {
+                tpTransform = rm.GetWorkBuilding(pair.Value).spawnTransform;
+            }
+            Debug.Log(tpTransform.position);
+            pm.Teleport(pair.Key, tpTransform.position, tpTransform.rotation);
+        }
+        RPC_NightSkipEvent();
     }
 
     void ResetChosenBuildings()
     {
-        //chosenBuildings.Clear();
-        //foreach (Player player in alivePlayers)
-        //{
-        //    chosenBuildings.Add(player, "house"); // Adds the player's home as the default building
-        //}
+        chosenBuildings.Clear();
+        foreach (PlayerRef player in alivePlayers)
+        {
+            chosenBuildings.Add(player, "house"); // Adds the player's home as the default building
+        }
     }
 
     // Old code for position creation, ignore

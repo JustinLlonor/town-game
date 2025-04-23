@@ -9,6 +9,7 @@ public class InputManager : MonoBehaviour
     public string[] baseGameplayMaps = new string[] { };
     public string[] observableMaps = new string[] { };
     public string[] uiMaps = new string[] { };
+    public string[] buildingChooseMaps = new string[] { };
     private bool uiOpen = false;
     [HideInInspector] public PlayerInput input;
 
@@ -25,6 +26,9 @@ public class InputManager : MonoBehaviour
     {
         UIManager.instance.OnUIOpen += OnUIOpen;
         UIManager.instance.OnUIClose += OnUIClose;
+        Debug.Log(FindFirstObjectByType<GameManager>());
+        FindFirstObjectByType<GameManager>().OnNightSkipStart += SetCurrentToBuildingChoose;
+        FindFirstObjectByType<GameManager>().OnNightSkip += SetCurrentToBase;
     }
 
     // Map switching logic
@@ -54,6 +58,14 @@ public class InputManager : MonoBehaviour
         DisableMaps(currentMaps);
         currentMaps = observableMaps;
         if (!uiOpen) EnableMaps(currentMaps);
+    }
+
+    private void SetCurrentToBuildingChoose()
+    {
+        DisableMaps(currentMaps);
+        currentMaps = buildingChooseMaps;
+        if (uiOpen) OnExit();
+        EnableMaps(currentMaps);
     }
 
     private void ClearAndDisableCurrent()
@@ -117,6 +129,10 @@ public class InputManager : MonoBehaviour
     public InputEvent onExit;
     // ClosedUI
     public InputEvent onPlayerMenu;
+    // Building
+    public InputEvent onScrollLeft;
+    public InputEvent onScrollRight;
+    public InputEvent onChooseBuilding;
 
     private void OnJump() { onJump?.Invoke(); }
     private void OnMove(InputValue iv) { onMove?.Invoke(iv); }
@@ -135,4 +151,7 @@ public class InputManager : MonoBehaviour
     private void OnExit() { onExit?.Invoke(); }
     private void OnPlayerMenu() { onPlayerMenu?.Invoke(); }
     private void OnExitObserve() { onExitObserve?.Invoke(); }
+    private void OnScrollLeft() { onScrollLeft?.Invoke(); }
+    private void OnScrollRight() { onScrollRight?.Invoke(); }
+    private void OnChooseBuilding() { onChooseBuilding?.Invoke(); }
 }

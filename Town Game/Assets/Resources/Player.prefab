@@ -582,6 +582,7 @@ GameObject:
   - component: {fileID: 4000725801890306170}
   - component: {fileID: 4262745249595203894}
   - component: {fileID: 8777106030094182887}
+  - component: {fileID: 2324421915886620022}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -664,6 +665,7 @@ MonoBehaviour:
   - {fileID: 7478806533832175603}
   - {fileID: 873785079005984450}
   - {fileID: 8777106030094182887}
+  - {fileID: 2324421915886620022}
   - {fileID: 8314741821198590847}
   - {fileID: 8489816749943817623}
   - {fileID: 991788123578228062}
@@ -1182,6 +1184,18 @@ MonoBehaviour:
   canPlace: {fileID: 2100000, guid: b51cc5a231301754c859aebb437eb17a, type: 2}
   cantPlace: {fileID: 2100000, guid: 095279de25b14c94c8efcd5a31092d33, type: 2}
   gizmo: {fileID: 0}
+--- !u!114 &2324421915886620022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1787190705143953567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f4e6e72feb044a45a44fc877423c59d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2255715054737852972
 GameObject:
   m_ObjectHideFlags: 0
