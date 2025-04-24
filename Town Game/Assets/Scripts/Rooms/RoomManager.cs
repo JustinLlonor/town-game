@@ -13,6 +13,9 @@ public class RoomManager : MonoBehaviour
     [Header("Building Choosing Sequence")]
     public Transform buildingCameraTransform;
     public float buildingTransitionSpeed = 10f;
+    public AnimationCurve buildingTransitionCurve;
+    private float buildingTransitionProgress = 0f;
+    private Vector3 buildingTransitionStart;
     [SerializeField] List<MapRoom> ownedRooms = new List<MapRoom>();
     [SerializeField] int currentBuilding = 0;
     CameraManager cm;
@@ -40,7 +43,7 @@ public class RoomManager : MonoBehaviour
     private void Start()
     {
         gm.OnNightSkipStart += BuildingChooseStart;
-        gm.OnNightSkip += BuildingChooseEnd;
+        gm.OnNightSkipEnd += BuildingChooseEnd;
         inputManager.onScrollRight += ScrollRight;
         inputManager.onScrollLeft += ScrollLeft;
         inputManager.onChooseBuilding += ChooseBuilding;
@@ -63,6 +66,8 @@ public class RoomManager : MonoBehaviour
         //TODO: unlocked rooms add
         foreach (MapRoom room in workRooms)
         {
+            ownedRooms.Add(room);
+            Debug.Log("Added " + room.roomName);
             //if (room.workers.Contains(PhotonNetwork.LocalPlayer)) ownedRooms.Add(room);
         }
         // Sets the default hovered/selected building to the player's house
@@ -79,6 +84,7 @@ public class RoomManager : MonoBehaviour
     void ScrollRight()
     {
         currentBuilding++;
+        ResetBuildingTransition();
         if (currentBuilding >= ownedRooms.Count)
         {
             currentBuilding = 0; 
@@ -88,10 +94,17 @@ public class RoomManager : MonoBehaviour
     void ScrollLeft()
     {
         currentBuilding--;
+        ResetBuildingTransition();
         if (currentBuilding <= -1)
         {
             currentBuilding = ownedRooms.Count - 1;
         }
+    }
+
+    void ResetBuildingTransition()
+    {
+        buildingTransitionStart = buildingCameraTransform.position;
+        buildingTransitionProgress = 0f;
     }
 
     void UpdateCamPosition()
@@ -100,7 +113,10 @@ public class RoomManager : MonoBehaviour
         if (ownedRooms.Count == 0) return;
         Transform newTransform = ownedRooms[currentBuilding].viewTransform;
 
-        buildingCameraTransform.position = Vector3.Lerp(buildingCameraTransform.position, newTransform.position, Time.deltaTime * buildingTransitionSpeed);
+        buildingTransitionProgress += Time.deltaTime * buildingTransitionSpeed;
+        buildingTransitionProgress = Mathf.Clamp01(buildingTransitionProgress);
+        float time = buildingTransitionCurve.Evaluate(buildingTransitionProgress);
+        buildingCameraTransform.position = Vector3.Lerp(buildingTransitionStart, newTransform.position, time);
     }
 
     /// <summary>

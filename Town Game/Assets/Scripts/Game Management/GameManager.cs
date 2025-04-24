@@ -51,7 +51,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     public GameEvent OnChangeDay;
     public GameEvent OnUpdatePositions;
     public GameEvent OnNightSkipStart;
-    public GameEvent OnNightSkip;
+    public GameEvent OnNightSkipEnd;
     public GameEvent OnDayStart;
     public GameEvent OnTimeStop;
     public GameEvent OnTimeResume;
@@ -109,6 +109,10 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
 
     public override void Spawned()
     {
+        InputManager im = FindFirstObjectByType<InputManager>();
+        // Sets the input maps to building choose when night starts, and sets to base when night skip ends
+        OnNightSkipStart += im.SetCurrentToBuildingChoose;
+        OnNightSkipEnd += im.SetCurrentToBase;
         init = true;
     }
 
@@ -316,7 +320,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
     public void RPC_NightSkipEvent()
     {
-        OnNightSkip?.Invoke();
+        OnNightSkipEnd?.Invoke();
     }
 
     void TeleportToBuildings()

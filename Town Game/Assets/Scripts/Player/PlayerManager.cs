@@ -14,6 +14,7 @@ public class PlayerManager : NetworkBehaviour
     public Dictionary<PlayerRef, Observable> playerObservables = new Dictionary<PlayerRef, Observable>();
     public Dictionary<PlayerRef, PlayerProperties> playerProperties = new Dictionary<PlayerRef, PlayerProperties>();
     public PlayerProperties currentPlayerProperties = new PlayerProperties("", false, 0, 0);
+    private Dictionary<PlayerRef, TeleportInfo> teleportQueue = new Dictionary<PlayerRef, TeleportInfo>();
     
     public GameObject currentPlayer;
     public NetworkPrefabRef playerPrefab;
@@ -98,6 +99,18 @@ public class PlayerManager : NetworkBehaviour
         }
     }
 
+    private struct TeleportInfo
+    {
+        public Vector3 location;
+        public Quaternion rotation;
+
+        public TeleportInfo(Vector3 location, Quaternion rotation)
+        {
+            this.location = location;
+            this.rotation = rotation;
+        }
+    }
+
     private void Start()
     {
         //if (!PhotonNetwork.IsConnected) return;
@@ -124,6 +137,7 @@ public class PlayerManager : NetworkBehaviour
     public override void FixedUpdateNetwork()
     {
         if (!networkRunner.IsServer) return;
+        CheckTPQueue();
         if (removePlayers)
         {
             removePlayers = false;
@@ -232,6 +246,34 @@ public class PlayerManager : NetworkBehaviour
     /// <param name="rotation"></param>
     public void Teleport(PlayerRef player, Vector3 location, Quaternion rotation)
     {
+        TeleportInfo tpInfo = new TeleportInfo(location, rotation);
+        if (teleportQueue.ContainsKey(player))
+        {
+            teleportQueue[player] = tpInfo;
+        }
+        else
+        {
+            teleportQueue.Add(player, tpInfo);
+        }
+    }
+
+    /// <summary>
+    /// Checks the TP queue for players
+    /// </summary>
+    private void CheckTPQueue()
+    {
+        foreach (KeyValuePair<PlayerRef, TeleportInfo> kvp in  teleportQueue)
+        {
+            MovePlayer(kvp.Key, kvp.Value);
+        }
+        // Removes all players in teleport queue
+        teleportQueue.Clear();
+    }
+
+    private void MovePlayer(PlayerRef player, TeleportInfo tpInfo)
+    {
+        Vector3 location = tpInfo.location;
+        Quaternion rotation = tpInfo.rotation;
         if (!Runner.IsServer) return;
         GameObject tpPlayer = GetPlayerObject(player);
         Rigidbody rb = tpPlayer.GetComponent<Rigidbody>();

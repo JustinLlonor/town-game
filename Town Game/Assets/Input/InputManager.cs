@@ -12,6 +12,7 @@ public class InputManager : MonoBehaviour
     public string[] buildingChooseMaps = new string[] { };
     private bool uiOpen = false;
     [HideInInspector] public PlayerInput input;
+    private bool cinematicDisable = true;
 
     public delegate void InputEvent();
     public delegate void InputValueEvent(InputValue iv);
@@ -26,14 +27,12 @@ public class InputManager : MonoBehaviour
     {
         UIManager.instance.OnUIOpen += OnUIOpen;
         UIManager.instance.OnUIClose += OnUIClose;
-        Debug.Log(FindFirstObjectByType<GameManager>());
-        FindFirstObjectByType<GameManager>().OnNightSkipStart += SetCurrentToBuildingChoose;
-        FindFirstObjectByType<GameManager>().OnNightSkip += SetCurrentToBase;
     }
 
     // Map switching logic
     private void OnUIOpen()
     {
+        Debug.Log("1");
         uiOpen = true;
         DisableMaps(currentMaps);
         EnableMaps(uiMaps);
@@ -46,24 +45,25 @@ public class InputManager : MonoBehaviour
         EnableMaps(currentMaps);
     }
 
-    private void SetCurrentToBase()
+    public void SetCurrentToBase()
     {
         DisableMaps(currentMaps);
         currentMaps = baseGameplayMaps;
         if (!uiOpen) EnableMaps(currentMaps);
     }
 
-    private void SetCurrentToObservable()
+    public void SetCurrentToObservable()
     {
         DisableMaps(currentMaps);
         currentMaps = observableMaps;
         if (!uiOpen) EnableMaps(currentMaps);
     }
 
-    private void SetCurrentToBuildingChoose()
+    public void SetCurrentToBuildingChoose()
     {
         DisableMaps(currentMaps);
         currentMaps = buildingChooseMaps;
+        cinematicDisable = false;
         if (uiOpen) OnExit();
         EnableMaps(currentMaps);
     }
@@ -85,6 +85,11 @@ public class InputManager : MonoBehaviour
                 SetCurrentToObservable();
                 break;
             default:
+                if (!cinematicDisable)
+                {
+                    cinematicDisable = true;
+                    break;
+                }
                 ClearAndDisableCurrent();
                 break;
         }
@@ -103,6 +108,7 @@ public class InputManager : MonoBehaviour
         foreach (string map in maps)
         {
             input.actions.FindActionMap(map).Enable();
+            Debug.Log("Enabled " + map);
         }
     }
 
@@ -152,6 +158,6 @@ public class InputManager : MonoBehaviour
     private void OnPlayerMenu() { onPlayerMenu?.Invoke(); }
     private void OnExitObserve() { onExitObserve?.Invoke(); }
     private void OnScrollLeft() { onScrollLeft?.Invoke(); }
-    private void OnScrollRight() { onScrollRight?.Invoke(); }
+    private void OnScrollRight() { Debug.Log("Hey"); onScrollRight?.Invoke(); }
     private void OnChooseBuilding() { onChooseBuilding?.Invoke(); }
 }
