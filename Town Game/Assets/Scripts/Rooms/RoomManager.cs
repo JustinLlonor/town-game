@@ -94,6 +94,7 @@ public class RoomManager : MonoBehaviour
 
     public void ScrollRight()
     {
+        if (!buildingChooseUI.activeSelf) return;
         currentBuilding++;
         if (currentBuilding >= ownedRooms.Count)
         {
@@ -105,6 +106,7 @@ public class RoomManager : MonoBehaviour
 
     public void ScrollLeft()
     {
+        if (!buildingChooseUI.activeSelf) return;
         currentBuilding--;
         if (currentBuilding <= -1)
         {

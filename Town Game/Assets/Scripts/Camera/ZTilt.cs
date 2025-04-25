@@ -6,6 +6,7 @@ using UnityEngine;
 public class ZTilt : MonoBehaviour
 {
     public CameraBobbing cb;
+    public CameraManager cm;
     public float maxDeg = 10f;
     public float camXMultiplier = 2.5f;
     public float stepSpeed = 5f;
@@ -39,6 +40,7 @@ public class ZTilt : MonoBehaviour
     {
         desiredZ = Mathf.Clamp((cmX * camXMultiplier) / (Time.deltaTime * 90f), -maxDeg, maxDeg); // Consistent with all mouse speeds
         if (!canTurn) desiredZ = 0f;
+        if (cm.mode != CameraManager.CameraMode.FirstPerson) desiredZ = 0f;
         //if (!cb.isCrouching) desiredZ = Mathf.Clamp((cmX * camXMultiplier) / (Time.deltaTime * 90f), -maxDeg, maxDeg); // Consistent with all mouse speeds
         //else desiredZ = 0f;
         float newZ = Mathf.MoveTowardsAngle(transform.localRotation.eulerAngles.z, desiredZ, Time.deltaTime * stepSpeed);
