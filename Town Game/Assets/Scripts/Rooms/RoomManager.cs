@@ -147,7 +147,11 @@ public class RoomManager : MonoBehaviour
             sentBuilding = ownedRooms[currentBuilding].roomName;
             energyDiff = ownedRooms[currentBuilding].energyDiff;
         }
-        onSelectionUpdate?.Invoke(sentBuilding, energyDiff, true, true);
+        int nEnergyDiff = energyDiff;
+        bool canAfford = GetCanAfford(energyDiff);
+        if (!canAfford) return;
+        if ((pm.currentPlayerProperties.energy == gm.maxEnergy) && energyDiff > 0) nEnergyDiff = 0;
+        onSelectionUpdate?.Invoke(sentBuilding, nEnergyDiff, canAfford, true);
         // Sends the chosen building to the server
         chosenBuilding = currentBuilding;
         pm.currentPlayer.GetComponent<PlayerRoomChoose>().RPC_ChooseBuilding(sentBuilding);
@@ -162,13 +166,21 @@ public class RoomManager : MonoBehaviour
             sentBuilding = ownedRooms[currentBuilding].roomName;
             energyDiff = ownedRooms[currentBuilding].energyDiff;
         }
-        onSelectionUpdate?.Invoke(sentBuilding, energyDiff, true, chosenBuilding == currentBuilding); // selected if the hovered building is the current
+        int nEnergyDiff = energyDiff;
+        if ((pm.currentPlayerProperties.energy == gm.maxEnergy) && energyDiff > 0) nEnergyDiff = 0;
+        onSelectionUpdate?.Invoke(sentBuilding, nEnergyDiff, GetCanAfford(energyDiff), chosenBuilding == currentBuilding); // selected if the hovered building is the current
     }
 
     void BuildingChooseEnd()
     {
         buildingsChosen = false;
         cm.StartModeTransition(1f, CameraManager.CameraMode.FirstPerson);
+    }
+
+    private bool GetCanAfford(int energyDiff)
+    {
+        int newEnergy = energyDiff + pm.currentPlayerProperties.energy;
+        return newEnergy >= 0;
     }
 
     public MapRoom GetWorkBuilding(string roomName)

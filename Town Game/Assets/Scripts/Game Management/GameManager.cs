@@ -30,6 +30,11 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     public float hourLength = 60f;
     public float timeSpeed = 1f;
     public int startCurrency = 100;
+    public int startEnergy = 2;
+    /// <summary>
+    /// The maximum amount of energy the player is allowed to have
+    /// </summary>
+    public int maxEnergy = 2;
     public Vector2Int startTime;
     public float buildingChooseTimer = 8f;
     [Header("Day/Night Cycle")]
@@ -160,12 +165,16 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         }
     }
 
-    void SetCurrency()
+    /// <summary>
+    /// Sets the default properties of all players
+    /// </summary>
+    void SetProperties()
     {
         // Sets  the currency to the start currency for every player in the lobby
         foreach (PlayerRef player in  Runner.ActivePlayers)
         {
             pm.playerProperties[player].SetCurrency(startCurrency);
+            pm.playerProperties[player].SetEnergy(startEnergy);
         }
     }
 
@@ -240,7 +249,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     {
         CreatePlayerProperties(); // Initialize player properties
         AssignRooms(); // Sets the room properties of each player
-        SetCurrency(); // Sets the default currency of each player
+        SetProperties(); // Sets the default currency of each player
         SpawnPositions(); // Spawns each player
         AssignRoles(); // Assigns the roles of each player (and reveals)
         SetTime(startTime.x, startTime.y);
@@ -259,6 +268,12 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     {
         pm.currentPlayerProperties.SetIsCultist(isCultist);
         OnRevealRoles?.Invoke(isCultist);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_SendEnergy([RpcTarget] PlayerRef player, int energy)
+    {
+        pm.currentPlayerProperties.SetEnergy(energy);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
@@ -320,11 +335,14 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
 
     public void SetChosenBuilding(string buildingName, PlayerRef player)//, PhotonMessageInfo info) 
     {
-        string newBuilding = "";
         if (buildingName != "house")
         {
-            if (Array.Find(rm.workRooms.ToArray(), room => room.roomName == buildingName) != null) // if the room is found
+            MapRoom foundRoom = Array.Find(rm.workRooms.ToArray(), room => room.roomName == buildingName);
+            if (foundRoom != null) // if the room is found
             {
+                int energyDiff = foundRoom.energyDiff;
+                int playerEnergy = pm.playerProperties[player].energy;
+                if (playerEnergy + energyDiff < 0) return; // If the energy is invalid
                 Debug.Log("successfully set to " + buildingName);
                 if (chosenBuildings.ContainsKey(player)) chosenBuildings[player] = buildingName; // Set the chosen building
             }
@@ -338,23 +356,43 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     {
         OnNightSkipEnd?.Invoke();
     }
-
+    /// <summary>
+    /// Teleports players to their chosen building from the chosen building list
+    /// </summary>
     void TeleportToBuildings()
     {
-        // Teleports players to their chosen building from the chosen building list
         foreach (KeyValuePair<PlayerRef, string> pair in  chosenBuildings)
         {
+            PlayerRef player = pair.Key;
             Transform tpTransform = null;
+            MapRoom tpRoom = null;
             if (pair.Value == "house" || pair.Value.IsNullOrEmpty())
             {
-                tpTransform = rm.playerRooms[pm.playerProperties[pair.Key].room].spawnTransform;
+                tpRoom = rm.playerRooms[pm.playerProperties[player].room];
+                tpTransform = tpRoom.spawnTransform;
                 Debug.Log("house set");
             }
             else
             {
-                tpTransform = rm.GetWorkBuilding(pair.Value).spawnTransform;
+                tpRoom = rm.GetWorkBuilding(pair.Value);
+                int energyDiff = tpRoom.energyDiff;
+                int playerEnergy = pm.playerProperties[player].energy;
+                if (energyDiff + playerEnergy < 0)
+                {
+                    tpRoom = rm.playerRooms[pm.playerProperties[player].room];
+                    tpTransform = tpRoom.spawnTransform;
+                    Debug.Log("house alt set");
+                }
+                else
+                {
+                    tpTransform = tpRoom.spawnTransform;
+                }
             }
-            Debug.Log(tpTransform.position);
+            int fEnergyDiff = tpRoom.energyDiff;
+            if (tpRoom.roomCategory == RoomCategory.House) fEnergyDiff = rm.houseEnergyGain;
+            int fPlayerEnergy = pm.playerProperties[player].energy;
+
+            pm.playerProperties[player].SetEnergy(Mathf.Clamp(fPlayerEnergy + fEnergyDiff, 0, maxEnergy));
             pm.Teleport(pair.Key, tpTransform.position, tpTransform.rotation);
         }
         RPC_NightSkipEvent();
@@ -366,6 +404,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         foreach (PlayerRef player in alivePlayers)
         {
             chosenBuildings.Add(player, "house"); // Adds the player's home as the default building
+            RPC_SendEnergy(player, pm.playerProperties[player].energy);
         }
     }
 

@@ -47,6 +47,9 @@ public class PlayerManager : NetworkBehaviour
         public bool canJump = true;
     }
 
+    /// <summary>
+    /// Properties of players that are not constantly streamed or networked
+    /// </summary>
     public class PlayerProperties
     {
         public string nickname;
@@ -54,6 +57,7 @@ public class PlayerManager : NetworkBehaviour
         public int room;
         public int currency;
         public List<int> groups; // -1 = Cultist, -2 = Innocent, 0 and above are job indices
+        public int energy;
 
         public PlayerProperties(string nickname, bool isCultist, int room, int currency)
         {
@@ -76,6 +80,11 @@ public class PlayerManager : NetworkBehaviour
         public void SetCurrency(int newCurrency)
         {
             currency = newCurrency;
+        }
+
+        public void SetEnergy(int newEnergy)
+        {
+            energy = newEnergy;
         }
 
         /// <summary>
@@ -147,15 +156,6 @@ public class PlayerManager : NetworkBehaviour
 
     private void Update()
     {
-        if (networkRunner == null) return;
-        if (!networkRunner.IsServer)
-        {
-            if (Physics.simulationMode == SimulationMode.Script)
-            {
-                //Physics.simulationMode = SimulationMode.FixedUpdate;
-            }
-        }
-        
     }
 
     public void SetupMovementSettings(GameObject player)

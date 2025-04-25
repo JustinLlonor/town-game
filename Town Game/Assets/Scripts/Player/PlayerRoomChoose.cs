@@ -6,10 +6,12 @@ using Fusion;
 public class PlayerRoomChoose : NetworkBehaviour
 {
     GameManager gameManager;
+    PlayerManager playerManager;
 
     private void Awake()
     {
         gameManager = FindFirstObjectByType<GameManager>();
+        playerManager = FindAnyObjectByType<PlayerManager>();
     }
 
     /// <summary>
