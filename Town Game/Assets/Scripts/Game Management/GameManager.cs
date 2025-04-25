@@ -55,8 +55,10 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     public GameEvent OnDayStart;
     public GameEvent OnTimeStop;
     public GameEvent OnTimeResume;
+    public Timer onUpdateNightTimer;
     public delegate void GameEvent();
     public delegate void RevealRoles(bool isCultist);
+    public delegate void Timer(float timer);
     private TickTimer nightTimer;
     bool init = false;
 
@@ -172,12 +174,24 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         if (!init) return;
         CheckDay(); 
         UpdateGameTime();
+        ClientNightTimer();
         if (!Runner.IsServer) return;
         //if (Input.GetKeyDown(KeyCode.Backspace)) SetTime(testTime.x, testTime.y);
         PhaseProperties();
         CheckNightSkip();
         CheckNightTimer();
         CheckDayStart();
+    }
+
+    void ClientNightTimer()
+    {
+        if (!skippedNight) return;
+        float remainingTime = 0;
+        if (nightTimer.RemainingTime(Runner) != null)
+        {
+            remainingTime = (float)nightTimer.RemainingTime(Runner);
+        }
+        onUpdateNightTimer?.Invoke(remainingTime);
     }
 
     void CheckNightTimer()

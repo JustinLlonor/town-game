@@ -5,7 +5,8 @@ using TMPro;
 
 public class BuildingChooseUI : MonoBehaviour
 {
-    public RoomManager roomManager;
+    private RoomManager roomManager;
+    private GameManager gameManager;
     public TextMeshProUGUI selectionText;
     public GameObject selectedText;
     public GameObject selectionButton;
@@ -18,12 +19,19 @@ public class BuildingChooseUI : MonoBehaviour
 
     private void OnEnable()
     {
+        if (gameManager == null)
+        {
+            roomManager = FindFirstObjectByType<RoomManager>();
+            gameManager = FindFirstObjectByType<GameManager>();
+        }
         roomManager.onSelectionUpdate += ReceiveSelection;
+        gameManager.onUpdateNightTimer += RecieveTimer;
     }
 
     private void OnDisable()
     {
         roomManager.onSelectionUpdate -= ReceiveSelection;
+        gameManager.onUpdateNightTimer -= RecieveTimer;
     }
 
     private void ReceiveSelection(string roomName, int energyDiff, bool canAfford, bool selected)
@@ -53,5 +61,11 @@ public class BuildingChooseUI : MonoBehaviour
         if (roomName == "house") roomName = "Your house";
 
         selectionText.text = roomName;
+    }
+
+    private void RecieveTimer(float time)
+    {
+        int newTime = Mathf.CeilToInt(time);
+        timer.text = newTime.ToString();
     }
 }

@@ -103,7 +103,7 @@ MonoBehaviour:
   timeSpeed: 1
   startCurrency: 100
   startTime: {x: 7, y: 25}
-  buildingChooseTimer: 8
+  buildingChooseTimer: 10
   timeSkipPeriod: 21.25
   timeSkippedPeriod: 4.5
   dayStartPeriod: 6.75
@@ -209,6 +209,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78c7fe40fa4922046b2a7c67a3714b43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  meetingPeriodName: Meeting
   scheduleManager: {fileID: 5478285723541767041}
   votingManager: {fileID: 8649783803565719161}
 --- !u!1 &3648747623983838247

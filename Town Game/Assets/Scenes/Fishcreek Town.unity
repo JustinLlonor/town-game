@@ -1461,6 +1461,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7672904466477095405, guid: e4182a93f6f36da49902806272b5e851, type: 3}
   m_PrefabInstance: {fileID: 524385197}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &565675879 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1676236008550905741, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+  m_PrefabInstance: {fileID: 110649284601070364}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9f9def4262e76f4f8c1781626b806f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &598359534
 GameObject:
   m_ObjectHideFlags: 0
@@ -2869,7 +2880,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh54434
+  m_Name: pb_Mesh89806
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -3126,7 +3137,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh54568
+  m_Name: pb_Mesh89940
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -12282,6 +12293,10 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
+    - target: {fileID: 1348993473915672368, guid: 1fa47a0d2c75d064db631ff7a377ea5b, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 294
+      objectReference: {fileID: 0}
     - target: {fileID: 1538784561963882846, guid: 1fa47a0d2c75d064db631ff7a377ea5b, type: 3}
       propertyPath: m_Name
       value: Name
@@ -12320,7 +12335,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2887402252968634099, guid: 1fa47a0d2c75d064db631ff7a377ea5b, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2895376675158194164, guid: 1fa47a0d2c75d064db631ff7a377ea5b, type: 3}
       propertyPath: m_fontColor.b
@@ -12346,6 +12361,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Choose
       objectReference: {fileID: 0}
+    - target: {fileID: 6663593904796884198, guid: 1fa47a0d2c75d064db631ff7a377ea5b, type: 3}
+      propertyPath: gameManager
+      value: 
+      objectReference: {fileID: 565675879}
     - target: {fileID: 6663593904796884198, guid: 1fa47a0d2c75d064db631ff7a377ea5b, type: 3}
       propertyPath: roomManager
       value: 
