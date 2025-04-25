@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,4 +10,5 @@ public class MapRoom : MonoBehaviour
     public RoomCategory roomCategory = RoomCategory.House;
     public Transform spawnTransform;
     public Transform viewTransform; // The transform of the camera when the player selects this building
+    public int energyDiff = -1;
 }

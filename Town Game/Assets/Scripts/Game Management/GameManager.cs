@@ -313,8 +313,10 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
             {
                 Debug.Log("successfully set to " + buildingName);
                 if (chosenBuildings.ContainsKey(player)) chosenBuildings[player] = buildingName; // Set the chosen building
-            } 
+            }
+            return;
         }
+        if (chosenBuildings.ContainsKey(player)) chosenBuildings[player] = "house";
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]

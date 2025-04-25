@@ -20,6 +20,7 @@ public class PlayerRoomChoose : NetworkBehaviour
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
     public void RPC_ChooseBuilding(string buildingName, RpcInfo info = default)
     {
+        Debug.Log("Setting chosen building on server: " + buildingName);
         gameManager.SetChosenBuilding(buildingName, info.Source);
     }
 }
