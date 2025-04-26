@@ -40,6 +40,7 @@ public class RoomManager : MonoBehaviour
         cursorManager = FindFirstObjectByType<CursorManager>();
         foreach (Transform child in transform)
         {
+            if (!child.gameObject.activeSelf) continue;
             RoomCategory type = child.GetComponent<MapRoom>().roomCategory;
             if (type == RoomCategory.House)
             {
