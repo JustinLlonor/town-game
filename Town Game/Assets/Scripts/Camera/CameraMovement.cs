@@ -43,7 +43,7 @@ public class CameraMovement : MonoBehaviour
         cursorManager = FindFirstObjectByType<CursorManager>();
         runnerManager = FindFirstObjectByType<RunnerManager>();
         FindFirstObjectByType<PlayerManager>().OnInstantiatePlayer += AssignReferences;
-        cameraManager.OnSwitchCameraMode += OnCameraModeChange;
+        cameraManager.onSwitchCameraMode += OnCameraModeChange;
         GameManager gm = FindFirstObjectByType<GameManager>();
         InputManager inputManager = FindFirstObjectByType<InputManager>();
         inputManager.onCamera += GetCameraDelta;

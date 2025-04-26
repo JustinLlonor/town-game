@@ -20,7 +20,7 @@ public class InputManager : MonoBehaviour
     private void Awake()
     {
         SetCurrentToBase();
-        FindFirstObjectByType<CameraManager>().OnSwitchCameraMode += OnCameraChangeMode;
+        FindFirstObjectByType<CameraManager>().onSwitchCameraMode += OnCameraChangeMode;
     }
 
     private void Start()

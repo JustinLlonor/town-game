@@ -34,7 +34,7 @@ public class UIManager : MonoBehaviour
         OnUIOpen += SetOpenTrue;
         OnUIOpen += cm.Unlock;
         PlayerManager pm = FindFirstObjectByType<PlayerManager>();
-        FindFirstObjectByType<CameraManager>().OnSwitchCameraMode += OnCameraChangeMode;
+        FindFirstObjectByType<CameraManager>().onSwitchCameraMode += OnCameraChangeMode;
         InputManager inputManager = FindFirstObjectByType<InputManager>();
         inputManager.onExit += ExitUI;
     }

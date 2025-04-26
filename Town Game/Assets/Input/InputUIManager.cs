@@ -21,7 +21,7 @@ public class InputUIManager : MonoBehaviour
         }
         playerInput = gameObject.GetComponent<PlayerInput>();
         cameraManager = FindFirstObjectByType<CameraManager>();
-        cameraManager.OnSwitchCameraMode += OnCameraChangedMode;
+        cameraManager.onSwitchCameraMode += OnCameraChangedMode;
     }
 
     private void Start()

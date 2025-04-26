@@ -12,8 +12,15 @@ public class CameraManager : MonoBehaviour
     public Transform trackedObservableTransform;
     [SerializeField] private Observable currentObservable;
 
-    public SwitchCameraMode OnSwitchCameraMode;
-    public delegate void SwitchCameraMode(CameraMode mode);
+    /// <summary>
+    /// Called when the camera switches modes
+    /// </summary>
+    public CameraModeEvent onSwitchCameraMode;
+    /// <summary>
+    /// Called when a camera transition starts
+    /// </summary>
+    public CameraModeEvent onStartCameraTransition;
+    public delegate void CameraModeEvent(CameraMode mode);
 
     public bool isTransitioning = false;
 
@@ -53,7 +60,7 @@ public class CameraManager : MonoBehaviour
         {
             currentObservable = null;
         }
-        OnSwitchCameraMode?.Invoke(mode);
+        onSwitchCameraMode?.Invoke(mode);
     }
 
     /// <summary>
@@ -99,6 +106,7 @@ public class CameraManager : MonoBehaviour
     public void StartFPSTransition(float duration)
     {
         if (mode == CameraMode.FirstPerson) return;
+        onStartCameraTransition?.Invoke(CameraMode.FirstPerson);
         StopAllCoroutines();
         StartCoroutine(TransitionToMode(duration, CameraMode.FirstPerson));
     }
@@ -108,6 +116,7 @@ public class CameraManager : MonoBehaviour
     {
         if (mode == newMode) return;
         if (newMode != CameraMode.FirstPerson) trackedFPSTransform.rotation = transform.rotation;
+        onStartCameraTransition?.Invoke(newMode);
         StopAllCoroutines();
         StartCoroutine(TransitionToMode(duration, newMode));
     }

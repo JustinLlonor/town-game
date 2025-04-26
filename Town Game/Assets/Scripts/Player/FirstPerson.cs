@@ -26,7 +26,8 @@ public class FirstPerson : MonoBehaviour
         itemFilter = itemTransform.GetComponent<MeshFilter>();
         itemRenderer = itemTransform.GetComponent<MeshRenderer>();
         cameraManager = FindFirstObjectByType<CameraManager>();
-        cameraManager.OnSwitchCameraMode += OnCameraModeChange;
+        cameraManager.onSwitchCameraMode += OnCameraModeChange;
+        cameraManager.onStartCameraTransition += OnTransitionChange;
     }
 
     private void Update()
@@ -117,16 +118,27 @@ public class FirstPerson : MonoBehaviour
         Disable();
     }
 
+    /// <summary>
+    /// Disables first person stuff when transitioning
+    /// </summary>
+    /// <param name="mode"></param>
+    void OnTransitionChange(CameraManager.CameraMode mode)
+    {
+        Disable();
+    }
+
     public void Disable()
     {
         animator.SetBool("isRunning", false);
         visible = false;
         armsRenderer.enabled = false;
+        itemRenderer.enabled = false;
     }
 
     public void Enable()
     {
         visible = true;
         armsRenderer.enabled = true;
+        itemRenderer.enabled = true;
     }
 }
