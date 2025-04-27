@@ -32,21 +32,17 @@ public class MeetingManager : NetworkBehaviour
 
     private void CheckMeetingEnd(ScheduleBlock block)
     {
-        Debug.Log("Master block end called for " + block.periodName);
         if (block.periodName != meetingPeriodName) return;
         meetingStarted = false;
     }
 
     public void PlayerEnterMeeting(PlayerRef player)
     {
-        Debug.Log("this delegate works");
-        if (!meetingStarted) return;
-        Debug.Log("Player has entered meeting");
+        // No meeting started checks, just add player to meeting
     }
 
     public void PlayerLeaveMeeting(PlayerRef player)
     {
-        if (!meetingStarted) return;
-        Debug.Log("Player has left meeting");
+        
     }
 }

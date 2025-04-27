@@ -53,6 +53,9 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     bool startedDay = false;
     public GameEvent OnTimeChange;
     public RevealRoles OnRevealRoles;
+    /// <summary>
+    /// Invoked when the day changes. Also invoked at the start of the game
+    /// </summary>
     public GameEvent OnChangeDay;
     public GameEvent OnUpdatePositions;
     public GameEvent OnNightSkipStart;
