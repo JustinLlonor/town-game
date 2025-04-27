@@ -7,16 +7,17 @@ using UnityEngine.UI;
 
 public class DescriptionHover : MonoBehaviour
 {
+    [Header("Modifiables")]
     public float maxWidth = 400f;
     public float verticalPadding = 10f;
     public float horizontalPadding = 5f;
     public string description;
     public PivotPosition verticalPivot;
 
-    public GameObject descriptionObject;
-    public TextMeshProUGUI descriptionText;
-    public ContentSizeFitter fitter;
-    public RectTransform panelRT;
+    [HideInInspector] public GameObject descriptionObject;
+    [HideInInspector] public TextMeshProUGUI descriptionText;
+    [HideInInspector] public ContentSizeFitter fitter;
+    [HideInInspector] public RectTransform panelRT;
     RectTransform descRT;
     bool previousIsHovering;
 
