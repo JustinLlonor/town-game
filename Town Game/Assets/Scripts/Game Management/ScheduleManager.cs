@@ -65,6 +65,7 @@ public class ScheduleManager : NetworkBehaviour
         {
             playerSchedules.Add(player, new List<ScheduleBlock>());
         }
+        gm.OnChangeDay += AddDailyBlocksToMaster;
     }
 
     private void Update()
@@ -353,20 +354,12 @@ public class ScheduleManager : NetworkBehaviour
         }
 
         // If diffBlock is not empty, invoke change
-        CheckDelegate(addedBlocks, OnBlockStart);
-        CheckDelegate(removedBlocks, OnBlockEnd);
+        //CheckDelegate(addedBlocks, OnBlockStart);
+        foreach (ScheduleBlock block in addedBlocks) OnBlockStart?.Invoke(block);
+        //CheckDelegate(removedBlocks, OnBlockEnd);
+        foreach (ScheduleBlock block in removedBlocks) OnBlockEnd?.Invoke(block);
 
         currentBlocks = newBlocks; // Current block list becomes new block list
-    }
-
-    // Invokes the specified event for every block
-    void CheckDelegate(List<ScheduleBlock> blocks, BlockEvent bl)
-    {
-        if (blocks.Count == 0) return;
-        foreach (ScheduleBlock block in blocks)
-        {
-            bl?.Invoke(block);
-        }
     }
 
     void UpdateOrderedBlocks()
@@ -393,7 +386,17 @@ public class ScheduleManager : NetworkBehaviour
 
     void UpdateMasterOrdered()
     {
+        // Orders the master schedule by time
         orderedMasterBlocks = masterSchedule.OrderBy(o => o.time).ToList();
+    }
+
+    void AddDailyBlocksToMaster()
+    {
+        foreach (ScheduleBlock block in dailyBlocks)
+        {
+            masterSchedule.Add(new ScheduleBlock(block.periodName, block.room, block.length, gm.currentDay * 24 + block.time, block.color));
+        }
+        OnUpdateMasterSchedule?.Invoke();
     }
 
     void CheckMasterBlockChanges()
@@ -436,8 +439,10 @@ public class ScheduleManager : NetworkBehaviour
         }
 
         // If diffBlock is not empty, invoke change
-        CheckDelegate(addedBlocks, OnMasterBlockStart);
-        CheckDelegate(removedBlocks, OnMasterBlockEnd);
+        //CheckDelegate(addedBlocks, OnMasterBlockStart);
+        foreach (ScheduleBlock block in addedBlocks) OnMasterBlockStart?.Invoke(block);
+        //CheckDelegate(removedBlocks, OnMasterBlockEnd);
+        foreach (ScheduleBlock block in removedBlocks) OnMasterBlockEnd?.Invoke(block);
 
         currentMasterBlocks = newBlocks; // Current block list becomes new block list
     }

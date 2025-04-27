@@ -1,23 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Fusion;
+using static PlayerRoom;
 
-public class PlayerRoom : MonoBehaviour
+public class PlayerRoom : NetworkBehaviour
 {
     public MapRoom currentRoom;
     public LayerMask roomMask;
     public EnterRoom OnEnterRoom;
     public ExitRoom OnExitRoom;
+    PlayerRef player;
 
     public delegate void EnterRoom(MapRoom room);
     public delegate void ExitRoom(MapRoom room);
 
-    private void Awake()
+    public override void Spawned()
     {
-        //if (!gameObject.GetComponent<PhotonView>().IsMine)
-        //{
-        //    Destroy(this);
-        //}
+        player = gameObject.GetComponent<Player>().owner;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -32,6 +32,7 @@ public class PlayerRoom : MonoBehaviour
         }
         currentRoom = enteredRoom;
         OnEnterRoom?.Invoke(enteredRoom);
+        if (Runner.IsServer) enteredRoom.onPlayerEnter?.Invoke(player);
         Debug.Log("Entered room: " + enteredRoom.roomName);
     }
 
@@ -42,6 +43,7 @@ public class PlayerRoom : MonoBehaviour
         MapRoom exitedRoom = other.gameObject.GetComponent<MapRoom>();
         currentRoom = null;
         OnExitRoom?.Invoke(exitedRoom);
+        if (Runner.IsServer) exitedRoom.onPlayerExit?.Invoke(player);
         Debug.Log("Exited room: " + exitedRoom.roomName);
     }
 }
