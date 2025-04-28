@@ -1,5 +1,6 @@
 using Fusion;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class VotingManager : NetworkBehaviour
@@ -60,6 +61,11 @@ public class VotingManager : NetworkBehaviour
 
         public int GetId() { return id; }
 
+        /// <summary>
+        /// Adds a vote
+        /// </summary>
+        /// <param name="voter">The person who voted</param>
+        /// <param name="voted">The person who got voted for</param>
         public void AddVote(PlayerRef voter, PlayerRef voted)
         {
             if (voted == PlayerRef.None)
@@ -71,6 +77,28 @@ public class VotingManager : NetworkBehaviour
                 return;
             }
             playerVotes.Add(voter, voted);
+        }
+
+        /// <summary>
+        /// Adds a player to the voted whitelist
+        /// </summary>
+        /// <param name="voted"></param>
+        public void AddPlayerToVotedWhitelist(PlayerRef voted)
+        {
+            if (votedWhitelist == null) return;
+            if (votedWhitelist.Contains(voted)) return;
+            votedWhitelist.Add(voted);
+        }
+
+        /// <summary>
+        /// Adds a player to the voter whitelist
+        /// </summary>
+        /// <param name="voter"></param>
+        public void AddPlayerToVoterWhitelist(PlayerRef voter)
+        {
+            if (voterWhitelist == null) return;
+            if (voterWhitelist.Contains(voter)) return;
+            voterWhitelist.Add(voter);
         }
 
         private bool PlayerInVotedWhitelist(PlayerRef voted)
@@ -195,5 +223,15 @@ public class VotingManager : NetworkBehaviour
         if (!activeVotes.Contains(instance)) return;
         instance.EndVote();
         activeVotes.Remove(instance);
+    }
+
+    /// <summary>
+    /// Called when a vote is placed on a vote instance.
+    /// </summary>
+    /// <param name="instanceId"></param>
+    /// <param name="voter"></param>
+    public void ReceiveVote(int instanceId, PlayerRef voter)
+    {
+
     }
 }

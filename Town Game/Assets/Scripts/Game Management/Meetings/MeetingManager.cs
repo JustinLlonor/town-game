@@ -23,11 +23,9 @@ public class MeetingManager : NetworkBehaviour
 
     private void CheckMeetingStart(ScheduleBlock block)
     {
-        Debug.Log(meetingPeriodName);
-        Debug.Log(block.periodName);
         if (block.periodName != meetingPeriodName) return;
         meetingStarted = true;
-        // Meeting start code
+        StartVotes();
     }
 
     private void CheckMeetingEnd(ScheduleBlock block)
@@ -44,5 +42,10 @@ public class MeetingManager : NetworkBehaviour
     public void PlayerLeaveMeeting(PlayerRef player)
     {
         
+    }
+
+    void StartVotes()
+    {
+
     }
 }
