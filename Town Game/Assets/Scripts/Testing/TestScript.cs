@@ -4,15 +4,8 @@ using UnityEngine;
 
 public class TestScript : MonoBehaviour
 {
-    void Update()
+    private void Awake()
     {
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            GetComponent<Observable>().StartObservation();
-        }
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            GetComponent<Observable>().ExitObservation(true);
-        }
+        transform.GetChild(1).SetSiblingIndex(0);
     }
 }

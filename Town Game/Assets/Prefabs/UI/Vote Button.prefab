@@ -137,9 +137,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 005f9ac062978ce42b8c5be48831cc41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id: 0
   voteCount: {fileID: 8242593665192836202}
   voteIcon: {fileID: 4961863142259017368}
   dHover: {fileID: 2985676627363523430}
+  buttonImage: {fileID: 5297063160534810212}
+  button: {fileID: 9029842538276506017}
+  cantVoteColor: {r: 0.674, g: 0.674, b: 0.674, a: 1}
 --- !u!1 &3202874043006997699
 GameObject:
   m_ObjectHideFlags: 0

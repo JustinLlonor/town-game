@@ -21,6 +21,7 @@ public class TabPlayer : MonoBehaviour
     public Transform voteHolder;
     public GameObject voteButton;
     RunnerManager rm;
+    ObjectManager objectManager;
     float ogX;
 
     public enum Perception
@@ -43,6 +44,7 @@ public class TabPlayer : MonoBehaviour
     {
         rm = FindFirstObjectByType<RunnerManager>();
         ogX = gameObject.GetComponent<RectTransform>().anchoredPosition.x;
+        objectManager = FindFirstObjectByType<ObjectManager>();
     }
 
     private void OnEnable()
@@ -121,18 +123,58 @@ public class TabPlayer : MonoBehaviour
     }
 
     // Called if this player can be voted for
-    public void AddVoteButton(ClientVoteInstance vote, bool canVote)
+    public void AddVoteButton(ClientVoteInstance vote, bool canVote, UnityEngine.Events.UnityAction call)
     {
-
+        GameObject button = Instantiate(voteButton, voteHolder);
+        int siblingIndex = GetIdIndex(vote.id);
+        button.transform.SetSiblingIndex(siblingIndex);
+        PhysVoteButton vb = button.GetComponent<PhysVoteButton>();
+        vb.SetDescription(vote.voteAction.ToString());
+        vb.SetVoteIcon(objectManager.texSearch[vote.iconId.ToString()]);
+        vb.SetCanVote(canVote);
+        vb.button.onClick.AddListener(call);
     }
 
+    /// <summary>
+    /// Destroys all vote buttons on this tab player with the specified id
+    /// </summary>
+    /// <param name="id"></param>
     public void RemoveVoteButton(int id)
     {
-
+        foreach (Transform child in voteHolder)
+        {
+            PhysVoteButton vb = child.GetComponent<PhysVoteButton>();
+            if (vb.id == id) Destroy(child.gameObject);
+        }
     }
 
+    /// <summary>
+    /// Updates the vote count for all vote buttons in this player with the specified id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="voteCount"></param>
     public void UpdateVoteCount(int id, int voteCount)
     {
+        foreach (Transform child in voteHolder)
+        {
+            PhysVoteButton vb = child.GetComponent<PhysVoteButton>();
+            if (vb.id == id) vb.SetVoteCount(voteCount);
+        }
+    }
 
+    /// <summary>
+    /// Gets the sibling index for a vote button, given an id. Lower ids get a lower index
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    private int GetIdIndex(int id)
+    {
+        // Finds the sibling index between the id that is greater and the id that is less than it
+        foreach (Transform child in voteHolder)
+        {
+            PhysVoteButton vb = child.GetComponent<PhysVoteButton>();
+            if (id < vb.id) return child.GetSiblingIndex();
+        }
+        return voteHolder.childCount;
     }
 }

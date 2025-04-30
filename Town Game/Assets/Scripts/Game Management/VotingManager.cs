@@ -29,9 +29,9 @@ public class VotingManager : NetworkBehaviour
         /// </summary>
         public string voteAction;
         /// <summary>
-        /// The id of the icon in the object manager
+        /// The id of the icon in the object manager, the name of the texture
         /// </summary>
-        public int iconId;
+        public string iconId;
         /// <summary>
         /// The timer of this vote instance
         /// </summary>
@@ -57,7 +57,7 @@ public class VotingManager : NetworkBehaviour
         /// </summary>
         private int id;
 
-        public VoteInstance(string name, string voteAction, int iconId, float voteTimeEnd, List<PlayerRef> votedWhitelist, List<PlayerRef> voterWhitelist)
+        public VoteInstance(string name, string voteAction, string iconId, float voteTimeEnd, List<PlayerRef> votedWhitelist, List<PlayerRef> voterWhitelist)
         {
             this.name = name;
             this.voteAction = voteAction;
@@ -78,7 +78,7 @@ public class VotingManager : NetworkBehaviour
         /// <param name="voted">The person who got voted for</param>
         public void AddVote(PlayerRef voter, PlayerRef voted)
         {
-            if (voted == PlayerRef.None)
+            if (voted == PlayerRef.None) return;
             if (voter == voted) return;
             if (!PlayerInVotedWhitelist(voted) || !PlayerInVoterWhitelist(voter)) return; // If the voter can vote and if the voted can be voted for
             if (playerVotes.ContainsKey(voter))
@@ -218,10 +218,11 @@ public class VotingManager : NetworkBehaviour
     /// <param name="votedWhitelist">The players who are allowed to be voted for</param>
     /// <param name="voterWhitelist">The players who can participate in this vote</param>
     /// <returns>The vote instance. You can add listener functions to the instance's delegate</returns>
-    public VoteInstance StartVote(string name, string voteAction, int iconId, float duration, List<PlayerRef> votedWhitelist = null, List<PlayerRef> voterWhitelist = null)
+    public VoteInstance StartVote(string name, string voteAction, string iconId, float duration, List<PlayerRef> votedWhitelist = null, List<PlayerRef> voterWhitelist = null)
     {
         VoteInstance newInstance = new VoteInstance(name, voteAction, iconId, gameManager.gameTime + duration, votedWhitelist, voterWhitelist);
         activeVotes.Add(newInstance);
+        ShowVoteInstance(newInstance);
         return newInstance;
     }
 
@@ -244,7 +245,8 @@ public class VotingManager : NetworkBehaviour
     /// <param name="voted"></param>
     public void ReceiveVote(int instanceId, PlayerRef voter, PlayerRef voted)
     {
-
+        VoteInstance instance = GetInstance(instanceId);
+        instance.AddVote(voter, voted);
     }
 
     /// <summary>
@@ -274,5 +276,19 @@ public class VotingManager : NetworkBehaviour
     public void RPC_ReceiveInstance([RpcTarget] PlayerRef player, ClientVoteInstance nVote, NetworkBool canVote)
     {
         onReceiveVote?.Invoke(nVote, canVote);
+    }
+
+    /// <summary>
+    /// Gets the vote instance by its id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public VoteInstance GetInstance(int id)
+    {
+        foreach (VoteInstance vote in activeVotes)
+        {
+            if (vote.GetId() == id) return vote;
+        }
+        return null;
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 using Fusion;
 using System.Linq;
 using UnityEditor.Animations;
+using UnityEngine.UI;
 
 public class UIPlayerList : MonoBehaviour//PunCallbacks
 {
@@ -152,7 +153,7 @@ public class UIPlayerList : MonoBehaviour//PunCallbacks
             TabPlayer tabPlayer = child.GetComponent<TabPlayer>();
             if (votedPlayers.Contains(tabPlayer.player))
             {
-                tabPlayer.AddVoteButton(vote, canVote);
+                tabPlayer.AddVoteButton(vote, canVote, delegate { Vote(vote.id, tabPlayer.player); });
             }
         }
     }
@@ -192,5 +193,11 @@ public class UIPlayerList : MonoBehaviour//PunCallbacks
     private bool VoteExpired(ClientVoteInstance vote)
     {
         return vote.voteTimeEnd > gameManager.gameTime;
+    }
+
+    public void Vote(int id, PlayerRef voted)
+    {
+        Player player = playerManager.currentPlayer.GetComponent<Player>();
+        player.RPC_Vote(id, voted);
     }
 }

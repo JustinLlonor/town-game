@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Allows for reusable assets to be sent across the network
+/// </summary>
 public class ObjectManager : MonoBehaviour
 {
     public Item[] items;

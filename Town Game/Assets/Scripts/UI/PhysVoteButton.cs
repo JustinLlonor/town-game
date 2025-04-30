@@ -10,6 +10,9 @@ public class PhysVoteButton : MonoBehaviour
     public TextMeshProUGUI voteCount;
     public RawImage voteIcon;
     public DescriptionHover dHover;
+    public Image buttonImage;
+    public Button button;
+    public Color cantVoteColor;
 
     /// <summary>
     /// Sets the vote count text for the vote button
@@ -46,8 +49,23 @@ public class PhysVoteButton : MonoBehaviour
         voteIcon.color = Color.white;
     }
 
+    /// <summary>
+    /// Sets the text when hovered for this vote button
+    /// </summary>
+    /// <param name="description"></param>
     public void SetDescription(string description)
     {
         dHover.description = description;
+    }
+
+    public void SetCanVote(bool canVote)
+    {
+        button.enabled = canVote;
+        if (canVote)
+        {
+            buttonImage.color = Color.white;
+            return;
+        }
+        buttonImage.color = cantVoteColor;
     }
 }
