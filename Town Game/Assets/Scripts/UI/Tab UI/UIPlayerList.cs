@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
 using System.Linq;
+using UnityEditor.Animations;
 
 public class UIPlayerList : MonoBehaviour//PunCallbacks
 {
@@ -15,6 +16,7 @@ public class UIPlayerList : MonoBehaviour//PunCallbacks
     public Color primaryPanelColor;
     public Color secondaryPanelColor;
     List<string> containedPlayers = new List<string>();
+    private List<ClientVoteInstance> uiVotes = new List<ClientVoteInstance>();
 
     public ClickPlayer OnClickPlayer;
     public DeselectPlayer OnDeselectPlayer;
@@ -23,13 +25,23 @@ public class UIPlayerList : MonoBehaviour//PunCallbacks
 
     PlayerManager playerManager;
     RunnerManager rm;
+    VotingManager votingManager;
+    GameManager gameManager;
 
     private void Awake()
     {
         playerManager = FindFirstObjectByType<PlayerManager>();
+        gameManager = FindFirstObjectByType<GameManager>();
         rm = FindFirstObjectByType<RunnerManager>();
+        votingManager = FindFirstObjectByType<VotingManager>();
         rm.onPlayerJoin += PlayerEventUpdatePlayerList;
         rm.onPlayerLeave += PlayerEventUpdatePlayerList;
+        votingManager.onReceiveVote += AddVoteToPlayers;
+    }
+
+    private void Update()
+    {
+        CheckVotes();
     }
 
     void PlayerEventUpdatePlayerList(PlayerRef player)
@@ -49,6 +61,7 @@ public class UIPlayerList : MonoBehaviour//PunCallbacks
 
             // Disconnected behaviour
             bool disconnected = true;
+            // Iterate over every online palyer
             foreach (PlayerRef player in playerList)
             {
                 if (playerManager.GetPlayerNetworkObject(player).GetComponent<Player>().nickname == tp.nick)
@@ -125,5 +138,59 @@ public class UIPlayerList : MonoBehaviour//PunCallbacks
                 tp.SetPanelColor(secondaryPanelColor);
             }
         }
+    }
+
+    private void AddVoteToPlayers(ClientVoteInstance vote, NetworkBool canVote)
+    {
+        // Starts tracking the vote
+        uiVotes.Add(vote);
+
+        // Add the vote button to every player that is on the voted list
+        List<PlayerRef> votedPlayers = new List<PlayerRef>(vote.votedWhitelist);
+        foreach (Transform child in contentHolder.transform)
+        {
+            TabPlayer tabPlayer = child.GetComponent<TabPlayer>();
+            if (votedPlayers.Contains(tabPlayer.player))
+            {
+                tabPlayer.AddVoteButton(vote, canVote);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Iterates over every vote. If one of them is expired, delete it
+    /// </summary>
+    private void CheckVotes()
+    {
+        foreach (ClientVoteInstance vote in uiVotes)
+        {
+            if (VoteExpired(vote))
+            {
+                RemoveVoteFromPlayers(vote.id);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Removes the vote instance of the specified id from every element
+    /// </summary>
+    /// <param name="id"></param>
+    private void RemoveVoteFromPlayers(int id)
+    {
+        foreach (Transform child in contentHolder.transform)
+        {
+            TabPlayer tabPlayer = child.GetComponent<TabPlayer>();
+            tabPlayer.RemoveVoteButton(id);
+        }
+    }
+
+    /// <summary>
+    /// Uses game time to check if the vote has expired
+    /// </summary>
+    /// <param name="vote"></param>
+    /// <returns></returns>
+    private bool VoteExpired(ClientVoteInstance vote)
+    {
+        return vote.voteTimeEnd > gameManager.gameTime;
     }
 }

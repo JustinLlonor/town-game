@@ -18,6 +18,8 @@ public class TabPlayer : MonoBehaviour
     public bool selected = false;
     public PlayerRef player = PlayerRef.None;
     [HideInInspector] public UIPlayerList uPlayerList;
+    public Transform voteHolder;
+    public GameObject voteButton;
     RunnerManager rm;
     float ogX;
 
@@ -116,5 +118,21 @@ public class TabPlayer : MonoBehaviour
     {
         if (!rm.nRunner.ActivePlayers.Contains(player)) return;
         uPlayerList.OnClickPlayer?.Invoke(player);
+    }
+
+    // Called if this player can be voted for
+    public void AddVoteButton(ClientVoteInstance vote, bool canVote)
+    {
+
+    }
+
+    public void RemoveVoteButton(int id)
+    {
+
+    }
+
+    public void UpdateVoteCount(int id, int voteCount)
+    {
+
     }
 }

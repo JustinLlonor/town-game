@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class PhysVoteButton : MonoBehaviour
 {
+    public int id;
     public TextMeshProUGUI voteCount;
     public RawImage voteIcon;
     public DescriptionHover dHover;

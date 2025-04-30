@@ -2,7 +2,7 @@ using Fusion;
 using UnityEngine;
 using System.Collections.Generic;
 
-public struct NetworkedVoteInstance : INetworkStruct
+public struct ClientVoteInstance : INetworkStruct
 {
     public int id;
     public NetworkString<_128> voteAction;
@@ -10,7 +10,7 @@ public struct NetworkedVoteInstance : INetworkStruct
     public float voteTimeEnd;
     [Networked, Capacity(20)] public NetworkLinkedList<PlayerRef> votedWhitelist => default;
 
-    public NetworkedVoteInstance(int id, NetworkString<_128> voteAction, int iconId, float voteTimeEnd, List<PlayerRef> votedWhitelist)
+    public ClientVoteInstance(int id, NetworkString<_128> voteAction, int iconId, float voteTimeEnd, List<PlayerRef> votedWhitelist)
     {
         this.id = id;
         this.voteAction = voteAction;

@@ -32,7 +32,6 @@ public class InputManager : MonoBehaviour
     // Map switching logic
     private void OnUIOpen()
     {
-        Debug.Log("1");
         uiOpen = true;
         DisableMaps(currentMaps);
         EnableMaps(uiMaps);
@@ -108,7 +107,6 @@ public class InputManager : MonoBehaviour
         foreach (string map in maps)
         {
             input.actions.FindActionMap(map).Enable();
-            Debug.Log("Enabled " + map);
         }
     }
 

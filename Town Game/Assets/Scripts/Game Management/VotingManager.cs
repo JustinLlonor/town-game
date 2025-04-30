@@ -13,7 +13,7 @@ public class VotingManager : NetworkBehaviour
     public ReceiveVoteEvent onReceiveVote;
 
     public delegate void VoteEndEvent(PlayerRef winner);
-    public delegate void ReceiveVoteEvent(NetworkedVoteInstance instance, NetworkBool canVote);
+    public delegate void ReceiveVoteEvent(ClientVoteInstance instance, NetworkBool canVote);
 
     [System.Serializable]
     public class VoteInstance
@@ -257,7 +257,7 @@ public class VotingManager : NetworkBehaviour
         List<PlayerRef> votedWhitelist = new List<PlayerRef>();
         if (instance.votedWhitelist == null) votedWhitelist = new List<PlayerRef>(gameManager.alivePlayers);
         else votedWhitelist = new List<PlayerRef>(instance.votedWhitelist);
-        NetworkedVoteInstance nVote = new NetworkedVoteInstance(instance.GetId(), instance.voteAction, instance.iconId, instance.voteTimeEnd, votedWhitelist);
+        ClientVoteInstance nVote = new ClientVoteInstance(instance.GetId(), instance.voteAction, instance.iconId, instance.voteTimeEnd, votedWhitelist);
         
         // Finds the players to display the vote to (No customizability for now, displays for every alive player)
         List<PlayerRef> voteDisplay = new List<PlayerRef>(gameManager.alivePlayers);
@@ -271,7 +271,7 @@ public class VotingManager : NetworkBehaviour
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
-    public void RPC_ReceiveInstance([RpcTarget] PlayerRef player, NetworkedVoteInstance nVote, NetworkBool canVote)
+    public void RPC_ReceiveInstance([RpcTarget] PlayerRef player, ClientVoteInstance nVote, NetworkBool canVote)
     {
         onReceiveVote?.Invoke(nVote, canVote);
     }
