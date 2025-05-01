@@ -171,10 +171,11 @@ public class VotingManager : NetworkBehaviour
             int returnIndex = Random.Range(0, tiedPlayers.Count);
             return tiedPlayers[returnIndex];
         }
-
+            
         public void EndVote()
         {
             PlayerRef winner = GetCurrentVoteWinner();
+            Debug.Log(FindFirstObjectByType<PlayerManager>().playerProperties[winner].nickname + " is the winner");
             onVoteEnd?.Invoke(winner);
         }
     }
@@ -182,6 +183,9 @@ public class VotingManager : NetworkBehaviour
     public override void Spawned()
     {
         gameManager = FindFirstObjectByType<GameManager>();
+        UIPlayerList uip = FindFirstObjectByType<UIPlayerList>();
+        if (uip == null) return;
+        //onReceiveVote += uip.AddVoteToPlayers;
     }
 
     public override void FixedUpdateNetwork()
@@ -275,6 +279,7 @@ public class VotingManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
     public void RPC_ReceiveInstance([RpcTarget] PlayerRef player, ClientVoteInstance nVote, NetworkBool canVote)
     {
+        Debug.Log("Hey");
         onReceiveVote?.Invoke(nVote, canVote);
     }
 

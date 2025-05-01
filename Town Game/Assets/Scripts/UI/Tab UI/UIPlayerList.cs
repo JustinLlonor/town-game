@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
 using System.Linq;
-using UnityEditor.Animations;
-using UnityEngine.UI;
 
 public class UIPlayerList : MonoBehaviour//PunCallbacks
 {
@@ -29,7 +27,7 @@ public class UIPlayerList : MonoBehaviour//PunCallbacks
     VotingManager votingManager;
     GameManager gameManager;
 
-    private void Awake()
+    public void Init()
     {
         playerManager = FindFirstObjectByType<PlayerManager>();
         gameManager = FindFirstObjectByType<GameManager>();
@@ -38,6 +36,7 @@ public class UIPlayerList : MonoBehaviour//PunCallbacks
         rm.onPlayerJoin += PlayerEventUpdatePlayerList;
         rm.onPlayerLeave += PlayerEventUpdatePlayerList;
         votingManager.onReceiveVote += AddVoteToPlayers;
+        Debug.Log("delegaets");
     }
 
     private void Update()
@@ -141,18 +140,21 @@ public class UIPlayerList : MonoBehaviour//PunCallbacks
         }
     }
 
-    private void AddVoteToPlayers(ClientVoteInstance vote, NetworkBool canVote)
+    public void AddVoteToPlayers(ClientVoteInstance vote, NetworkBool canVote)
     {
+        Debug.Log("Adding vote to players");
         // Starts tracking the vote
         uiVotes.Add(vote);
 
         // Add the vote button to every player that is on the voted list
         List<PlayerRef> votedPlayers = new List<PlayerRef>(vote.votedWhitelist);
+        Debug.Log(vote.votedWhitelist.Count);
         foreach (Transform child in contentHolder.transform)
         {
             TabPlayer tabPlayer = child.GetComponent<TabPlayer>();
             if (votedPlayers.Contains(tabPlayer.player))
             {
+                Debug.Log("adding vote button");
                 tabPlayer.AddVoteButton(vote, canVote, delegate { Vote(vote.id, tabPlayer.player); });
             }
         }
@@ -163,13 +165,16 @@ public class UIPlayerList : MonoBehaviour//PunCallbacks
     /// </summary>
     private void CheckVotes()
     {
+        List<ClientVoteInstance> deletedVotes = new List<ClientVoteInstance>();
         foreach (ClientVoteInstance vote in uiVotes)
         {
             if (VoteExpired(vote))
             {
                 RemoveVoteFromPlayers(vote.id);
+                deletedVotes.Add(vote);
             }
         }
+        foreach (ClientVoteInstance vote in deletedVotes) uiVotes.Remove(vote);
     }
 
     /// <summary>
@@ -178,6 +183,7 @@ public class UIPlayerList : MonoBehaviour//PunCallbacks
     /// <param name="id"></param>
     private void RemoveVoteFromPlayers(int id)
     {
+        Debug.Log("Removing vote");
         foreach (Transform child in contentHolder.transform)
         {
             TabPlayer tabPlayer = child.GetComponent<TabPlayer>();
@@ -192,7 +198,7 @@ public class UIPlayerList : MonoBehaviour//PunCallbacks
     /// <returns></returns>
     private bool VoteExpired(ClientVoteInstance vote)
     {
-        return vote.voteTimeEnd > gameManager.gameTime;
+        return vote.voteTimeEnd < gameManager.gameTime;
     }
 
     public void Vote(int id, PlayerRef voted)

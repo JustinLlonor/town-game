@@ -16,6 +16,7 @@ public class UIManager : MonoBehaviour
     public TabUI tabUI;
     public GameObject glitchObject;
     public AttackQTE attackQTE;
+    public UIPlayerList uip;
 
     CursorManager cm;
     InteractableFinder iFinder;
@@ -37,6 +38,7 @@ public class UIManager : MonoBehaviour
         FindFirstObjectByType<CameraManager>().onSwitchCameraMode += OnCameraChangeMode;
         InputManager inputManager = FindFirstObjectByType<InputManager>();
         inputManager.onExit += ExitUI;
+        uip.Init();
     }
 
     /// <summary>

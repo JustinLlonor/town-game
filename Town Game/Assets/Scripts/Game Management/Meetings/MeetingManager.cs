@@ -46,6 +46,6 @@ public class MeetingManager : NetworkBehaviour
 
     void StartVotes()
     {
-
+        votingManager.StartVote("Judgement", "Vote to exile", "Crosshair_22", 30f);
     }
 }
