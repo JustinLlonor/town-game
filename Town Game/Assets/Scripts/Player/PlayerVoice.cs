@@ -2,33 +2,46 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 //using Photon.Voice;
-//using Photon.Voice.Unity;
+using Photon.Voice.Unity;
+using UnityEngine.InputSystem;
+using Fusion;
 
-public class PlayerVoice : MonoBehaviour
+public class PlayerVoice : NetworkBehaviour
 {
-    public KeyCode key;
     public Animator animator;
+    Recorder rec;
+    InputManager inputManager;
+    public Transform speakerT;
+    public Speaker speaker;
 
-    //Recorder rec;
-
-    private void Awake()
+    private void OnDestroy()
     {
-        //rec = FindObjectOfType<Recorder>();
-        //rec.RecordingEnabled = true;
-        //rec.TransmitEnabled = false;
+        if (rec != null) rec.TransmitEnabled = false;
+    }
+
+    public override void Spawned()
+    {
+        if (!HasInputAuthority) return;
+        inputManager = FindAnyObjectByType<InputManager>();
+        inputManager.onVoice += ToggleVoice;
+        rec = Runner.gameObject.GetComponent<Recorder>();
+        rec.TransmitEnabled = false;
+    }
+
+    private void ToggleVoice(InputValue value)
+    {
+        bool activated = value.Get<float>() == 1f;
+        rec.TransmitEnabled = activated;
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(key))
+        if (speaker == null)
         {
-            animator.SetBool("isTalking", true);
-            //rec.TransmitEnabled = true;
+            speaker = speakerT.GetComponent<Speaker>();
         }
-        if (Input.GetKeyUp(key))
-        {
-            animator.SetBool("isTalking", false);
-            //rec.TransmitEnabled = false;
-        }
+        animator.SetBool("isTalking", speaker.IsPlaying);
     }
+
+
 }

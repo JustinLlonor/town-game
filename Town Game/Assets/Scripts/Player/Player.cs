@@ -1,5 +1,5 @@
 using Fusion;
-using Fusion.Addons.Physics;
+using Photon.Voice.Unity;
 using Steamworks;
 using UnityEngine;
 using WebSocketSharp;
@@ -20,6 +20,7 @@ public class Player : NetworkBehaviour
     [HideInInspector] public InteractableFinder inf;
     [HideInInspector] public ItemUse itemUse;
     [HideInInspector] public PlayerClothing playerClothing;
+    public Speaker speaker;
     Transform playerGFX;
     Transform cameraPosition;
     PlayerManager playerManager;

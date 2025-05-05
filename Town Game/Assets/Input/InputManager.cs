@@ -137,6 +137,8 @@ public class InputManager : MonoBehaviour
     public InputEvent onScrollLeft;
     public InputEvent onScrollRight;
     public InputEvent onChooseBuilding;
+    // Voice
+    public InputValueEvent onVoice;
 
     private void OnJump() { onJump?.Invoke(); }
     private void OnMove(InputValue iv) { onMove?.Invoke(iv); }
@@ -158,4 +160,5 @@ public class InputManager : MonoBehaviour
     private void OnScrollLeft() { onScrollLeft?.Invoke(); }
     private void OnScrollRight() { Debug.Log("Hey"); onScrollRight?.Invoke(); }
     private void OnChooseBuilding() { onChooseBuilding?.Invoke(); }
+    private void OnVoice(InputValue iv) { onVoice?.Invoke(iv); }
 }

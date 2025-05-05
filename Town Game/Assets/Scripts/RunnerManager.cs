@@ -1,6 +1,8 @@
 using Fusion;
 using Fusion.Addons.Physics;
 using Fusion.Sockets;
+using Photon.Voice.Fusion;
+using Photon.Voice.Unity;
 using Steamworks;
 using System;
 using System.Collections.Generic;
@@ -32,6 +34,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
     [HideInInspector] public bool heldOnSI = false;
     [HideInInspector] public bool isHoldSI;
     public bool firstFrame = true;
+    public Recorder recorder;
 
     public PlayerEvent onPlayerJoin;
     public PlayerEvent onPlayerLeave;
@@ -83,7 +86,6 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
     public async void StartGame(GameMode mode, string name, int sceneIndex)
     {
         // Create the Fusion runner and let it know that we will be providing user input
-        nRunner = gameObject.AddComponent<NetworkRunner>();
         RunnerSimulatePhysics3D pSim = gameObject.AddComponent<RunnerSimulatePhysics3D>();
         pSim.ClientPhysicsSimulation = ClientPhysicsSimulation.SimulateAlways;
         nRunner.ProvideInput = true;
