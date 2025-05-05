@@ -16,7 +16,7 @@ public class UIManager : MonoBehaviour
     public TabUI tabUI;
     public GameObject glitchObject;
     public AttackQTE attackQTE;
-    public UIPlayerList uip;
+    UIPlayerList uip;
 
     CursorManager cm;
     InteractableFinder iFinder;
@@ -29,6 +29,8 @@ public class UIManager : MonoBehaviour
         instance = this;
         cm = FindFirstObjectByType<CursorManager>();
         iFinder = FindFirstObjectByType<InteractableFinder>();
+        tabUI.gameObject.SetActive(true);
+        uip = FindFirstObjectByType<UIPlayerList>();
         OnUIClose += CloseCorpse;
         OnUIClose += CloseTabMenu;
         OnUIClose += SetOpenFalse;
@@ -39,6 +41,7 @@ public class UIManager : MonoBehaviour
         InputManager inputManager = FindFirstObjectByType<InputManager>();
         inputManager.onExit += ExitUI;
         uip.Init();
+        tabUI.gameObject.SetActive(false);
     }
 
     /// <summary>

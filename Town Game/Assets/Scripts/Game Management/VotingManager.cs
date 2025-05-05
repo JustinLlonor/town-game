@@ -175,7 +175,7 @@ public class VotingManager : NetworkBehaviour
         public void EndVote()
         {
             PlayerRef winner = GetCurrentVoteWinner();
-            Debug.Log(FindFirstObjectByType<PlayerManager>().playerProperties[winner].nickname + " is the winner");
+            Debug.Log(winner + " is the winner");
             onVoteEnd?.Invoke(winner);
         }
     }
@@ -238,7 +238,6 @@ public class VotingManager : NetworkBehaviour
     {
         if (!activeVotes.Contains(instance)) return;
         instance.EndVote();
-        activeVotes.Remove(instance);
     }
 
     /// <summary>

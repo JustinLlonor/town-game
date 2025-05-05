@@ -26,7 +26,6 @@ public class UIPlayerList : MonoBehaviour//PunCallbacks
     RunnerManager rm;
     VotingManager votingManager;
     GameManager gameManager;
-
     public void Init()
     {
         playerManager = FindFirstObjectByType<PlayerManager>();
@@ -35,8 +34,7 @@ public class UIPlayerList : MonoBehaviour//PunCallbacks
         votingManager = FindFirstObjectByType<VotingManager>();
         rm.onPlayerJoin += PlayerEventUpdatePlayerList;
         rm.onPlayerLeave += PlayerEventUpdatePlayerList;
-        votingManager.onReceiveVote += AddVoteToPlayers;
-        Debug.Log("delegaets");
+        if (votingManager != null) votingManager.onReceiveVote += AddVoteToPlayers;
     }
 
     private void Update()
@@ -89,7 +87,10 @@ public class UIPlayerList : MonoBehaviour//PunCallbacks
         // Add missing players
         foreach (PlayerRef player in playerList)
         {
-            if (!containedPlayers.Contains(playerManager.GetPlayerNetworkObject(player).GetComponent<Player>().nickname))
+            NetworkObject foundObject = playerManager.GetPlayerNetworkObject(player);
+            if (foundObject == null) continue;
+            string nick = foundObject.GetComponent<Player>().nickname;
+            if (!containedPlayers.Contains(nick))
             {
                 AddPlayer(player);
             }
@@ -154,8 +155,9 @@ public class UIPlayerList : MonoBehaviour//PunCallbacks
             TabPlayer tabPlayer = child.GetComponent<TabPlayer>();
             if (votedPlayers.Contains(tabPlayer.player))
             {
-                Debug.Log("adding vote button");
-                tabPlayer.AddVoteButton(vote, canVote, delegate { Vote(vote.id, tabPlayer.player); });
+                bool sCanVote = canVote;
+                if (tabPlayer.player == playerManager.Runner.LocalPlayer) sCanVote = false;
+                tabPlayer.AddVoteButton(vote, sCanVote, delegate { Vote(vote.id, tabPlayer.player); });
             }
         }
     }

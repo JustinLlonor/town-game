@@ -20,6 +20,7 @@ public class DescriptionHover : MonoBehaviour
     [HideInInspector] public RectTransform panelRT;
     RectTransform descRT;
     bool previousIsHovering;
+    Transform parentTransform;
 
     public enum PivotPosition
     {
@@ -32,6 +33,22 @@ public class DescriptionHover : MonoBehaviour
     {
         descRT = ((RectTransform)descriptionText.transform);
         previousIsHovering = false;
+        if (parentTransform == null)
+        {
+            parentTransform = GetComponentInParent<Canvas>().transform;
+            panelRT.SetParent(parentTransform);
+        }
+        panelRT.SetSiblingIndex(parentTransform.childCount);
+    }
+
+    private void OnDisable()
+    {
+        descriptionObject.SetActive(false);
+    }
+
+    private void OnDestroy()
+    {
+        Destroy(panelRT.gameObject);
     }
 
     void SetPivots()
