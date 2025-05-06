@@ -1532,6 +1532,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a86f533fd9917dd4da8601e9eb542c96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  LogLevel: 2
 --- !u!4 &612210994
 Transform:
   m_ObjectHideFlags: 0
@@ -2820,7 +2821,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8418902249215997252, guid: 7dbfa4d599eeeb245babbe05a80a4aa3, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2891,7 +2892,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh40866
+  m_Name: pb_Mesh40796
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -3148,7 +3149,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh41442
+  m_Name: pb_Mesh40930
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
