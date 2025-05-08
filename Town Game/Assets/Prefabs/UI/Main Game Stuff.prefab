@@ -102,6 +102,8 @@ MonoBehaviour:
   hourLength: 30
   timeSpeed: 1
   startCurrency: 100
+  startEnergy: 2
+  maxEnergy: 2
   startTime: {x: 7, y: 25}
   buildingChooseTimer: 10
   timeSkipPeriod: 21.25
@@ -212,6 +214,8 @@ MonoBehaviour:
   meetingPeriodName: Meeting
   scheduleManager: {fileID: 5478285723541767041}
   votingManager: {fileID: 8649783803565719161}
+  meetingStarted: 0
+  meetingRoom: {fileID: 0}
 --- !u!1 &3648747623983838247
 GameObject:
   m_ObjectHideFlags: 0
@@ -327,67 +331,103 @@ MonoBehaviour:
     category: 2
     leadPositionName: Mayor
     jobs:
-    - name: Cook
+    - handler: {fileID: 0}
+      name: Cook
       description: Uses ingredients to cook food for the town.
-      handler: {fileID: 0}
+      buildingAccess: []
+      pay: 0
+      timeCommitment: 0
       assignedPlayers: []
-    - name: Power Worker
+    - handler: {fileID: 0}
+      name: Power Worker
       description: Operates the power plant to generate energy for the town.
-      handler: {fileID: 0}
+      buildingAccess: []
+      pay: 0
+      timeCommitment: 0
       assignedPlayers: []
-    - name: Supplier
+    - handler: {fileID: 0}
+      name: Supplier
       description: Delivers supplies to buildings, to keep operations running.
-      handler: {fileID: 0}
+      buildingAccess: []
+      pay: 0
+      timeCommitment: 0
       assignedPlayers: []
-    - name: Mail Carrier
+    - handler: {fileID: 0}
+      name: Mail Carrier
       description: Delivers mail to houses.
-      handler: {fileID: 0}
+      buildingAccess: []
+      pay: 0
+      timeCommitment: 0
       assignedPlayers: []
     players: []
   - name: Science
     category: 4
     leadPositionName: Head of Science
     jobs:
-    - name: Technology Designer
+    - handler: {fileID: 0}
+      name: Technology Designer
       description: Creates new devices and equipment for general use within the town.
-      handler: {fileID: 0}
+      buildingAccess: []
+      pay: 0
+      timeCommitment: 0
       assignedPlayers: []
-    - name: Anomaly Researcher
+    - handler: {fileID: 0}
+      name: Anomaly Researcher
       description: Researches supernatural phenomena for use against cultists.
-      handler: {fileID: 0}
+      buildingAccess: []
+      pay: 0
+      timeCommitment: 0
       assignedPlayers: []
-    - name: Forensics Scientist
+    - handler: {fileID: 0}
+      name: Forensics Scientist
       description: Analyzes evidence and people to help find suspects.
-      handler: {fileID: 0}
+      buildingAccess: []
+      pay: 0
+      timeCommitment: 0
       assignedPlayers: []
-    - name: Weapons Researcher
+    - handler: {fileID: 0}
+      name: Weapons Researcher
       description: Creates new weapons and devices dedicated to self-defense against
         cultists.
-      handler: {fileID: 0}
+      buildingAccess: []
+      pay: 0
+      timeCommitment: 0
       assignedPlayers: []
     players: []
   - name: Security
     category: 4
     leadPositionName: Head of Security
     jobs:
-    - name: Device Operator
+    - handler: {fileID: 0}
+      name: Device Operator
       description: Places security devices around town, to ensure the safety of civilians
         during the night.
-      handler: {fileID: 0}
+      buildingAccess: []
+      pay: 0
+      timeCommitment: 0
       assignedPlayers: []
-    - name: Investigator
+    - handler: {fileID: 0}
+      name: Investigator
       description: Pursues suspicious individuals with the help of specialized devices.
-      handler: {fileID: 0}
+      buildingAccess: []
+      pay: 0
+      timeCommitment: 0
       assignedPlayers: []
-    - name: Guard
+    - handler: {fileID: 0}
+      name: Guard
       description: Patrols certain areas of the map, looking for signs of tampering
         as well as suspicious activity. Can offer protection for civilians at night.
-      handler: {fileID: 0}
+      buildingAccess: []
+      pay: 0
+      timeCommitment: 0
       assignedPlayers: []
-    - name: Exorcist
+    - handler: {fileID: 0}
+      name: Exorcist
       description: Provides protection against supernatural threats using anomalous
         relics.
-      handler: {fileID: 0}
+      buildingAccess: []
+      pay: 0
+      timeCommitment: 0
       assignedPlayers: []
     players: []
 --- !u!1 &5129982233875511372
@@ -489,6 +529,7 @@ Transform:
   - {fileID: 1751323930205034389}
   - {fileID: 5669130914447257882}
   - {fileID: 1969580155241344749}
+  - {fileID: 3681454433896459048}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -516,7 +557,52 @@ MonoBehaviour:
   - {fileID: 5948805112163813116}
   - {fileID: 2146126489367553974}
   - {fileID: 1053691298493993009}
+  - {fileID: 4147978146374963560}
   ForceRemoteRenderTimeframe: 0
+--- !u!1 &7555040181656547813
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3681454433896459048}
+  - component: {fileID: 4147978146374963560}
+  m_Layer: 0
+  m_Name: Application Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3681454433896459048
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7555040181656547813}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 466519801941495353}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4147978146374963560
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7555040181656547813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90e6ed92af526304e896f44ef77796a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8397003756874805080
 GameObject:
   m_ObjectHideFlags: 0

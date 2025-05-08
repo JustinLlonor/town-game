@@ -115,50 +115,8 @@ public class PositionManager : NetworkBehaviour
         }
     }
 
-    [System.Serializable]
-    public class Job
-    {
-        public string name;
-        public string description;
-        public JobHandler handler;
-        public List<PlayerRef> assignedPlayers = new List<PlayerRef>();
-        
-        /// <summary>
-        /// Adds the player to this job
-        /// </summary>
-        /// <param name="player"></param>
-        public void AddPlayer(PlayerRef player)
-        {
-            if (assignedPlayers.Contains(player)) return;
-            assignedPlayers.Add(player);
-            handler.HirePlayer(player);
-        }
-
-        /// <summary>
-        /// Removes the player from this job.
-        /// </summary>
-        /// <param name="player"></param>
-        public void RemovePlayer(PlayerRef player)
-        {
-            if (!assignedPlayers.Contains(player)) return;
-            handler.FirePlayer(player);
-            assignedPlayers.Remove(player);
-        }
-
-        /// <summary>
-        /// If the player is hired to this job
-        /// </summary>
-        /// <param name="player"></param>
-        /// <returns></returns>
-        public bool IsHired(PlayerRef player)
-        {
-            return assignedPlayers.Contains(player);
-        }
-    }
-
     public override void Spawned()
     {
-
         runnerManager = FindFirstObjectByType<RunnerManager>();
         playerManager = FindFirstObjectByType<PlayerManager>();
         if (!Runner.IsServer) return;
@@ -251,4 +209,28 @@ public class PositionManager : NetworkBehaviour
         }
         return null;
     }
+
+    /// <summary>
+    /// Gets the vector 2 job reference from the position manager
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <returns>The job reference. The x coordinate is the branch index, and the y coordinate is the job index</returns>
+    public Vector2Int GetJobReference(JobHandler handler)
+    {
+        int branchRef = 0;
+        foreach (Branch branch in branches)
+        {
+            int jobRef = 0;
+            foreach (Job job in branch.jobs)
+            {
+                if (job.handler == handler) return new Vector2Int(branchRef, jobRef);
+                jobRef++;
+            }
+            branchRef++;
+        }
+        Debug.LogError("Job reference not found!");
+        return new Vector2Int(-1, -1);
+    }
+
+
 }

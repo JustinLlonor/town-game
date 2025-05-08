@@ -10634,6 +10634,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7672904466477095405, guid: e4182a93f6f36da49902806272b5e851, type: 3}
   m_PrefabInstance: {fileID: 1850880201}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1864085216 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4147978146374963560, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+  m_PrefabInstance: {fileID: 110649284601070364}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90e6ed92af526304e896f44ef77796a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1914701654
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11661,8 +11672,60 @@ PrefabInstance:
       value: Dinner
       objectReference: {fileID: 0}
     - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: branches.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: branches.Array.data[1].name
+      value: Security
+      objectReference: {fileID: 0}
+    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: branches.Array.data[0].jobs.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: branches.Array.data[1].jobs.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: branches.Array.data[1].leadPositionName
+      value: Head of Security
+      objectReference: {fileID: 0}
+    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: branches.Array.data[1].jobs.Array.data[0].name
+      value: Exorcist
+      objectReference: {fileID: 0}
+    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: branches.Array.data[1].jobs.Array.data[1].name
+      value: Exorcist
+      objectReference: {fileID: 0}
+    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: branches.Array.data[1].jobs.Array.data[2].name
+      value: Exorcist
+      objectReference: {fileID: 0}
+    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: branches.Array.data[1].jobs.Array.data[3].name
+      value: Exorcist
+      objectReference: {fileID: 0}
+    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: branches.Array.data[1].jobs.Array.data[4].name
       value: Forensics Scientist
+      objectReference: {fileID: 0}
+    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: branches.Array.data[1].jobs.Array.data[0].description
+      value: Provides protection against supernatural threats using anomalous relics.
+      objectReference: {fileID: 0}
+    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: branches.Array.data[1].jobs.Array.data[1].description
+      value: Provides protection against supernatural threats using anomalous relics.
+      objectReference: {fileID: 0}
+    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: branches.Array.data[1].jobs.Array.data[2].description
+      value: Provides protection against supernatural threats using anomalous relics.
+      objectReference: {fileID: 0}
+    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: branches.Array.data[1].jobs.Array.data[3].description
+      value: Provides protection against supernatural threats using anomalous relics.
       objectReference: {fileID: 0}
     - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: branches.Array.data[1].jobs.Array.data[4].description
@@ -11678,7 +11741,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7710707397463329135, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: NetworkedBehaviours.Array.size
-      value: 8
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 7710707397463329135, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[3]'
@@ -11700,6 +11763,10 @@ PrefabInstance:
       propertyPath: 'NetworkedBehaviours.Array.data[7]'
       value: 
       objectReference: {fileID: 110649284601070369}
+    - target: {fileID: 7710707397463329135, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: 'NetworkedBehaviours.Array.data[8]'
+      value: 
+      objectReference: {fileID: 1864085216}
     - target: {fileID: 8939135918072450520, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: sceneViewId
       value: 8
