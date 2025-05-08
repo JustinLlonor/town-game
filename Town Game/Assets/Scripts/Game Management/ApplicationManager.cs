@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
+using System.Linq;
+using Palmmedia.ReportGenerator.Core.Parser.Analysis;
 
 public class ApplicationManager : NetworkBehaviour
 {
@@ -11,13 +13,18 @@ public class ApplicationManager : NetworkBehaviour
     public Dictionary<JobApplication, List<PlayerRef>> applicants = new Dictionary<JobApplication, List<PlayerRef>>();
     PositionManager positionManager;
     GameManager gameManager;
+    PlayerManager playerManager;
+    RunnerManager runnerManager;
 
     public delegate void ApplicationEvent(JobApplication application);
 
-    private void Awake()
+    public override void Spawned()
     {
         positionManager = FindAnyObjectByType<PositionManager>();
         gameManager = FindAnyObjectByType<GameManager>();
+        playerManager = FindAnyObjectByType<PlayerManager>();
+        runnerManager = FindAnyObjectByType<RunnerManager>();
+        runnerManager.onPlayerLeave += ClearApplicant;
     }
 
     public override void FixedUpdateNetwork()
@@ -34,7 +41,16 @@ public class ApplicationManager : NetworkBehaviour
     public void AddApplication(JobHandler handler, float duration)
     {
         Vector2Int jobRef = positionManager.GetJobReference(handler);
-        if (jobRef.Equals(new Vector2(-1, -1))) return;
+        if (jobRef.Equals(new Vector2Int(-1, -1))) return;
+        if (ApplicationExists(jobRef)) return;
+        JobApplication newApp = new JobApplication(gameManager.gameTime + duration, jobRef.x, jobRef.y);
+        applications.Add(newApp);
+    }
+
+    public void AddBranchApplication(int index, float duration)
+    {
+        if (index >= positionManager.branches.Length) return;
+        Vector2Int appRef = new Vector2Int(index, -1);
         if (ApplicationExists(jobRef)) return;
         JobApplication newApp = new JobApplication(gameManager.gameTime + duration, jobRef.x, jobRef.y);
         applications.Add(newApp);
@@ -59,12 +75,14 @@ public class ApplicationManager : NetworkBehaviour
     /// <param name="player"></param>
     public void SubmitApplication(JobApplication job, PlayerRef player)
     {
+        // If player is in different branch from the job, return
+        int playerBranch = playerManager.playerProperties[player].branch;
+        if (playerBranch != job.branchReference) return;
         if (!applicants.ContainsKey(job))
         {
             applicants.Add(job, new List<PlayerRef>() { player });
             return;
         }
-        // TODO: Check if player is qualified to submit an application for this job, check the branches, etc.
         applicants[job].Add(player);
     }
 
@@ -106,18 +124,65 @@ public class ApplicationManager : NetworkBehaviour
         }
     }
 
-    public void AddBranchApplication(int index, float duration)
-    {
-
-    }
-
     /// <summary>
     /// Selects and hires a player who applied to the specified job application
     /// </summary>
     /// <param name="application"></param>
-    public void HireAppliedPlayers(JobApplication application)
+    public void ProcessApplication(JobApplication application)
     {
-        // TODO: Make this prioritize players who have less jobs/employment
+        if (application.jobReference == -1)
+        {
+            ProcessBranchApplication(application);
+            return;
+        }
+        List<PlayerRef> candidates = applicants[application];
+        // Every index in this list is a list of player refs with that amount of employment.
+        List<List<PlayerRef>> selectionList = new List<List<PlayerRef>>();
+        foreach (PlayerRef player in candidates)
+        {
+            int jobCount = playerManager.playerProperties[player].jobs.Count;
+            // repeat until selection list count is greater than job count by 1
+            while (jobCount >= selectionList.Count)
+            {
+                selectionList.Add(new List<PlayerRef>());
+            }
+            selectionList[jobCount].Add(player);
+        }
+
+        // Select a specified number of players from selectionList, prioritizing those with lower employment first
+        Job job = positionManager.GetJobFromRef(new Vector2Int(application.branchReference, application.jobReference));
+        // The amount of players the job needs
+        int numberSelected = job.maxPlayers - job.assignedPlayers.Count;
+        if (numberSelected <= 0) return;
+        List<PlayerRef> selectedPlayers = new List<PlayerRef>();
+        int employmentLevel = 0;
+        // Stops when the selected players count is equal to the number that we want to select, and when the job count index is equal to the selection list count
+        while (numberSelected > selectedPlayers.Count && employmentLevel < selectionList.Count)
+        {
+            List<PlayerRef> employedPlayers = selectionList[employmentLevel];
+            // If there are no more employed players to select at this level, then go to the next level
+            if (employedPlayers.Count == 0)
+            {
+                employmentLevel++;
+                continue;
+            }
+            // Select a random player from employedPlayers, then add it to the selected players list
+            int selectedIndex = Random.Range(0, employedPlayers.Count);
+            PlayerRef selectedPlayer = employedPlayers[selectedIndex];
+            selectedPlayers.Add(selectedPlayer);
+            // Lowest employed list index removed, number selected decremented
+            selectionList[employmentLevel].RemoveAt(selectedIndex);
+        }
+
+        // Hire the selected players
+        foreach (PlayerRef player in selectedPlayers) job.AddPlayer(player);
+    }
+
+    public void ProcessBranchApplication(JobApplication application)
+    {
+        List<PlayerRef> candidates = applicants[application];
+        PositionManager.Branch branch = positionManager.branches[application.branchReference];
+
     }
 
     /// <summary>
@@ -129,7 +194,7 @@ public class ApplicationManager : NetworkBehaviour
         {
             if (gameManager.gameTime > application.deadline)
             {
-                HireAppliedPlayers(application);
+                ProcessApplication(application);
                 // invokes the event
                 onApplicationEnd?.Invoke(application);
                 // removes from applications

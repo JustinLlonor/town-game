@@ -6,6 +6,9 @@ using Fusion;
 
 public class JobHandler : NetworkBehaviour
 {
+    [Header("Set this to false if this job handler is not associated with a job. Make the Job.cs class automatically remove the job ref from player properties later.")]
+    public bool associatedWithJob = true;
+    [Header("Settings")]
     // All tasks
     public Dictionary<Task, TaskState> activeTasks = new Dictionary<Task, TaskState>();
     // The amount of tasks assigned to a category it takes to create a new state
@@ -46,6 +49,7 @@ public class JobHandler : NetworkBehaviour
     PlayerManager playerManager;
     AnnouncementManager announcementManager;
     ScheduleUI scheduleUI;
+    PositionManager positionManager;
 
     // Test
     public Task testTask = new Task("Serve Food", 0, 20f, "Cafeteria");
@@ -175,6 +179,7 @@ public class JobHandler : NetworkBehaviour
         playerManager = FindFirstObjectByType<PlayerManager>();
         scheduleUI = FindFirstObjectByType<ScheduleUI>();
         announcementManager = FindFirstObjectByType<AnnouncementManager>();
+        positionManager = FindAnyObjectByType<PositionManager>();
         if (!Runner.IsServer) return;
         scheduleManager.OnMasterBlockStart += CheckActiveBlock;
         runnerManager.onPlayerLeave += FirePlayer;
@@ -198,6 +203,10 @@ public class JobHandler : NetworkBehaviour
         hiredPlayers.Add(player);
         playerManager.AddPlayerToGroup(player, groupIndex);
         CheckOverflowStates();
+        if (associatedWithJob)
+        {
+            playerManager.playerProperties[player].AddJob(positionManager.GetJobReference(this));
+        }
     }
 
     /// <summary>
@@ -206,6 +215,10 @@ public class JobHandler : NetworkBehaviour
     /// <param name="player"></param>
     public void FirePlayer(PlayerRef player)
     {
+        if (associatedWithJob)
+        {
+            playerManager.playerProperties[player].RemoveJob(positionManager.GetJobReference(this));
+        }
         Debug.Log("Firing player");
         if (!hiredPlayers.Contains(player)) return;
         hiredPlayers.Remove(player);

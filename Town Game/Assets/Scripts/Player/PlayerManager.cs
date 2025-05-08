@@ -13,7 +13,7 @@ public class PlayerManager : NetworkBehaviour
     [Networked, Capacity(20)] public NetworkDictionary<PlayerRef, NetworkId> playerObjects => default;
     public Dictionary<PlayerRef, Observable> playerObservables = new Dictionary<PlayerRef, Observable>();
     public Dictionary<PlayerRef, PlayerProperties> playerProperties = new Dictionary<PlayerRef, PlayerProperties>();
-    public PlayerProperties currentPlayerProperties = new PlayerProperties("", false, 0, 0);
+    public PlayerProperties currentPlayerProperties = new PlayerProperties("", false, 0, 0, 0);
     private Dictionary<PlayerRef, TeleportInfo> teleportQueue = new Dictionary<PlayerRef, TeleportInfo>();
     
     public GameObject currentPlayer;
@@ -58,18 +58,26 @@ public class PlayerManager : NetworkBehaviour
         public int currency;
         public List<int> groups; // -1 = Cultist, -2 = Innocent, 0 and above are job indices
         public int energy;
+        public int branch; // Index of the branch
+        public List<Vector2Int> jobs = new List<Vector2Int>(); // List of job refs
 
-        public PlayerProperties(string nickname, bool isCultist, int room, int currency)
+        public PlayerProperties(string nickname, bool isCultist, int room, int currency, int branch)
         {
             this.nickname = nickname;
             this.isCultist = isCultist;
             this.room = room;
             this.currency = currency;
+            this.branch = branch;
         }
 
         public void SetIsCultist(bool newIsCultist)
         {
             isCultist = newIsCultist;
+        }
+
+        public void SetBranch(int branch)
+        {
+            this.branch = branch;
         }
 
         public void SetRoom(int newRoom)
@@ -85,6 +93,18 @@ public class PlayerManager : NetworkBehaviour
         public void SetEnergy(int newEnergy)
         {
             energy = newEnergy;
+        }
+
+        public void AddJob(Vector2Int jobRef)
+        {
+            if (jobs.Contains(jobRef)) return;
+            jobs.Add(jobRef);
+        }
+
+        public void RemoveJob(Vector2Int jobRef)
+        {
+            if (!jobs.Contains(jobRef)) return;
+            jobs.Remove(jobRef);
         }
 
         /// <summary>

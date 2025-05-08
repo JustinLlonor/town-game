@@ -13,6 +13,7 @@ public class Job
     public string[] buildingAccess = new string[] { };
     public Level pay;
     public Level timeCommitment;
+    public int maxPlayers = 2;
     public List<PlayerRef> assignedPlayers = new List<PlayerRef>();
 
     public enum Level
@@ -29,6 +30,7 @@ public class Job
     public void AddPlayer(PlayerRef player)
     {
         if (assignedPlayers.Contains(player)) return;
+        if (assignedPlayers.Count >= maxPlayers) return;
         assignedPlayers.Add(player);
         handler.HirePlayer(player);
     }

@@ -262,7 +262,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     {
         foreach (PlayerRef player in Runner.ActivePlayers)
         {
-            pm.playerProperties.Add(player, new PlayerProperties("", false, -1, 0));
+            pm.playerProperties.Add(player, new PlayerProperties("", false, -1, 0, 0));
         }
     }
 
@@ -283,6 +283,12 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     public void RPC_SendRoom([RpcTarget] PlayerRef player, int room)
     {
         pm.currentPlayerProperties.SetRoom(room);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_SendBranch([RpcTarget] PlayerRef player, int branch)
+    {
+        pm.currentPlayerProperties.SetBranch(branch);
     }
 
     void CheckDayStart()

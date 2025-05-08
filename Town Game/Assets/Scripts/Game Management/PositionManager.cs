@@ -18,6 +18,8 @@ public class PositionManager : NetworkBehaviour
     {
         [Header("Static info")]
         public string name;
+        [Tooltip("The max number of players. If this is set to -1, then this branch has no maximum")]
+        public int maxPlayers = -1;
         [Tooltip("The name of the category of rooms involved with this branch")]
         public RoomCategory category;
         [Tooltip("The name of the lead position of this branch ex. Head of Science")]
@@ -145,8 +147,6 @@ public class PositionManager : NetworkBehaviour
         branch.players.Add(player);
     }
 
-
-
     public void RemovePlayerFromBranch(PlayerRef player, string branchName)
     {
         Branch branch = GetBranch(branchName);
@@ -232,5 +232,17 @@ public class PositionManager : NetworkBehaviour
         return new Vector2Int(-1, -1);
     }
 
-
+    /// <summary>
+    /// Gets the job object from the job reference
+    /// </summary>
+    /// <param name="jobRef"></param>
+    /// <returns></returns>
+    public Job GetJobFromRef(Vector2Int jobRef)
+    {
+        if (jobRef.x == -1 || jobRef.y == -1) return null;
+        if (jobRef.x >= branches.Length) return null;
+        Branch branch = branches[jobRef.x];
+        if (jobRef.y >= branch.jobs.Length) return null;
+        return branch.jobs[jobRef.y];
+    }
 }
