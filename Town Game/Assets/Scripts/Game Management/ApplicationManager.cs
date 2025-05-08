@@ -50,8 +50,8 @@ public class ApplicationManager : NetworkBehaviour
     {
         if (index >= positionManager.branches.Length) return;
         Vector2Int appRef = new Vector2Int(index, -1);
-        if (ApplicationExists(jobRef)) return;
-        JobApplication newApp = new JobApplication(gameManager.gameTime + duration, jobRef.x, jobRef.y);
+        if (ApplicationExists(appRef)) return;
+        JobApplication newApp = new JobApplication(gameManager.gameTime + duration, appRef.x, appRef.y);
         applications.Add(newApp);
     }
 
@@ -117,6 +117,7 @@ public class ApplicationManager : NetworkBehaviour
     /// <param name="player"></param>
     public void ClearApplicant(PlayerRef player)
     {
+        // Remove player from all applicants
         foreach (JobApplication job in applications)
         {
             if (applicants[job].Contains(player)) applicants[job].Remove(player);
@@ -184,7 +185,7 @@ public class ApplicationManager : NetworkBehaviour
     public void ProcessBranchApplication(JobApplication application)
     {
         List<PlayerRef> candidates = new List<PlayerRef>(applicants[application]);
-        PositionManager.Branch branch = positionManager.branches[application.bran]chReference];
+        PositionManager.Branch branch = positionManager.branches[application.branchReference];
         // # of players to select
         int numberSelected = branch.maxPlayers - branch.players.Count;
         List<PlayerRef> selectedPlayers = new List<PlayerRef>();

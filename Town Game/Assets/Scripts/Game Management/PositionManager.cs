@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
+using System;
 
 public class PositionManager : NetworkBehaviour
 {
@@ -144,6 +145,12 @@ public class PositionManager : NetworkBehaviour
 
     public void AddPlayerToBranch(PlayerRef player, Branch branch)
     {
+        int branchIndex = Array.IndexOf(branches, branch);
+        int playerBranch = playerManager.playerProperties[player].branch;
+        if (branchIndex == playerBranch) return;
+        Branch previousBranch = GetBranchFromIndex(playerBranch);
+        if (previousBranch == null) return;
+        RemovePlayerFromBranch(player, previousBranch);
         branch.players.Add(player);
     }
 
@@ -244,5 +251,11 @@ public class PositionManager : NetworkBehaviour
         Branch branch = branches[jobRef.x];
         if (jobRef.y >= branch.jobs.Length) return null;
         return branch.jobs[jobRef.y];
+    }
+
+    public Branch GetBranchFromIndex(int index)
+    {
+        if (index >= branches.Length) return null;
+        return branches[index];
     }
 }
