@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
 using System.Linq;
-using Palmmedia.ReportGenerator.Core.Parser.Analysis;
 
 public class ApplicationManager : NetworkBehaviour
 {
@@ -178,11 +177,27 @@ public class ApplicationManager : NetworkBehaviour
         foreach (PlayerRef player in selectedPlayers) job.AddPlayer(player);
     }
 
+    /// <summary>
+    /// Selects randomly and indiscriminantly from every applicant to a branch to be enrolled into that branch.
+    /// </summary>
+    /// <param name="application"></param>
     public void ProcessBranchApplication(JobApplication application)
     {
-        List<PlayerRef> candidates = applicants[application];
-        PositionManager.Branch branch = positionManager.branches[application.branchReference];
+        List<PlayerRef> candidates = new List<PlayerRef>(applicants[application]);
+        PositionManager.Branch branch = positionManager.branches[application.bran]chReference];
+        // # of players to select
+        int numberSelected = branch.maxPlayers - branch.players.Count;
+        List<PlayerRef> selectedPlayers = new List<PlayerRef>();
+        while (numberSelected > selectedPlayers.Count && candidates.Count > 0)
+        {
+            int selectedIndex = Random.Range(0, candidates.Count);
+            PlayerRef selectedPlayer = candidates[selectedIndex];
+            selectedPlayers.Add(selectedPlayer);
+            candidates.RemoveAt(selectedIndex);
+        }
 
+        // TODO: Make a player branch swithcing function in position manager
+        foreach (PlayerRef player in selectedPlayers) positionManager.AddPlayerToBranch(player, branch);
     }
 
     /// <summary>
