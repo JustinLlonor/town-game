@@ -591,6 +591,25 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         return $"{clockTimeStart.x}:{startMins} {startMeridiem}";
     }
 
+    /// <summary>
+    /// Converts local day time to total game time
+    /// </summary>
+    /// <param name="localTime"></param>
+    /// <returns></returns>
+    public float GetGameTimeFromLocalTime(float localTime)
+    {
+        return localTime + (currentDay * 24f);
+    }
+
+    /// <summary>
+    /// Returns the local time of the current game time
+    /// </summary>
+    /// <returns></returns>
+    public float GetLocalTimeFromGameTime()
+    {
+        return gameTime - (currentDay * 24f);
+    }
+     
     public string GetDay(int day)
     {
         if (day < 0)

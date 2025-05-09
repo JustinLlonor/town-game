@@ -328,6 +328,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   branches:
   - name: Town
+    maxPlayers: -1
     category: 2
     leadPositionName: Mayor
     jobs:
@@ -337,6 +338,7 @@ MonoBehaviour:
       buildingAccess: []
       pay: 0
       timeCommitment: 0
+      maxPlayers: 2
       assignedPlayers: []
     - handler: {fileID: 0}
       name: Power Worker
@@ -344,6 +346,7 @@ MonoBehaviour:
       buildingAccess: []
       pay: 0
       timeCommitment: 0
+      maxPlayers: 2
       assignedPlayers: []
     - handler: {fileID: 0}
       name: Supplier
@@ -351,6 +354,7 @@ MonoBehaviour:
       buildingAccess: []
       pay: 0
       timeCommitment: 0
+      maxPlayers: 2
       assignedPlayers: []
     - handler: {fileID: 0}
       name: Mail Carrier
@@ -358,9 +362,11 @@ MonoBehaviour:
       buildingAccess: []
       pay: 0
       timeCommitment: 0
+      maxPlayers: 2
       assignedPlayers: []
     players: []
   - name: Science
+    maxPlayers: -1
     category: 4
     leadPositionName: Head of Science
     jobs:
@@ -370,6 +376,7 @@ MonoBehaviour:
       buildingAccess: []
       pay: 0
       timeCommitment: 0
+      maxPlayers: 2
       assignedPlayers: []
     - handler: {fileID: 0}
       name: Anomaly Researcher
@@ -377,6 +384,7 @@ MonoBehaviour:
       buildingAccess: []
       pay: 0
       timeCommitment: 0
+      maxPlayers: 2
       assignedPlayers: []
     - handler: {fileID: 0}
       name: Forensics Scientist
@@ -384,6 +392,7 @@ MonoBehaviour:
       buildingAccess: []
       pay: 0
       timeCommitment: 0
+      maxPlayers: 2
       assignedPlayers: []
     - handler: {fileID: 0}
       name: Weapons Researcher
@@ -392,9 +401,11 @@ MonoBehaviour:
       buildingAccess: []
       pay: 0
       timeCommitment: 0
+      maxPlayers: 2
       assignedPlayers: []
     players: []
   - name: Security
+    maxPlayers: -1
     category: 4
     leadPositionName: Head of Security
     jobs:
@@ -405,6 +416,7 @@ MonoBehaviour:
       buildingAccess: []
       pay: 0
       timeCommitment: 0
+      maxPlayers: 2
       assignedPlayers: []
     - handler: {fileID: 0}
       name: Investigator
@@ -412,6 +424,7 @@ MonoBehaviour:
       buildingAccess: []
       pay: 0
       timeCommitment: 0
+      maxPlayers: 2
       assignedPlayers: []
     - handler: {fileID: 0}
       name: Guard
@@ -420,6 +433,7 @@ MonoBehaviour:
       buildingAccess: []
       pay: 0
       timeCommitment: 0
+      maxPlayers: 2
       assignedPlayers: []
     - handler: {fileID: 0}
       name: Exorcist
@@ -428,6 +442,7 @@ MonoBehaviour:
       buildingAccess: []
       pay: 0
       timeCommitment: 0
+      maxPlayers: 2
       assignedPlayers: []
     players: []
 --- !u!1 &5129982233875511372
@@ -474,6 +489,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de452253259a0eb4aa019398f4edffd2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  associatedWithJob: 1
   stateCreationThreshold: 2
   hiredPlayers: []
   groupIndex: 0
@@ -487,13 +503,6 @@ MonoBehaviour:
   - Work in Cafeteria
   generalPeriodName: General Job Stuff
   jobIconIndex: 0
-  testTask:
-    name: Serve
-    category: 0
-    secondsTaken: 20
-    room: Cafeteria
-    isCompleted: 0
-    id: -1
 --- !u!1 &5211516756420375758
 GameObject:
   m_ObjectHideFlags: 0
@@ -558,6 +567,7 @@ MonoBehaviour:
   - {fileID: 2146126489367553974}
   - {fileID: 1053691298493993009}
   - {fileID: 4147978146374963560}
+  - {fileID: 7417685722815587393}
   ForceRemoteRenderTimeframe: 0
 --- !u!1 &7555040181656547813
 GameObject:
@@ -569,6 +579,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3681454433896459048}
   - component: {fileID: 4147978146374963560}
+  - component: {fileID: 7417685722815587393}
   m_Layer: 0
   m_Name: Application Manager
   m_TagString: Untagged
@@ -603,6 +614,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90e6ed92af526304e896f44ef77796a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &7417685722815587393
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7555040181656547813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52fc8d2405ba22448960dd5b6399ede4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  applicationPeriods:
+  - 7
+  - 9
+  - 11
+  - 13
+  - 15
+  - 17
+  - 19
+  appLength: 1.8333334
 --- !u!1 &8397003756874805080
 GameObject:
   m_ObjectHideFlags: 0

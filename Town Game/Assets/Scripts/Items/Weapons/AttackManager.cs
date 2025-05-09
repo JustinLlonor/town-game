@@ -222,15 +222,10 @@ public class AttackManager : NetworkBehaviour
     void EngagementQTE()
     {
         if (!HasInputAuthority) return;
-        Debug.Log("Engaging");
         if (!isEngaged) return;
-        Debug.Log("1");
         if (isAttacker) return;
-        Debug.Log("2");
         if (!attackQTE.enabled) return;
-        Debug.Log("3");
         if (!attackQTE.GetSliderSuccess()) return;
-        Debug.Log("4");
         RPC_WonQTE();
     }
 

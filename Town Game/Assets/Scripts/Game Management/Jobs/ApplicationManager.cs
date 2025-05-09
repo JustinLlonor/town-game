@@ -36,22 +36,22 @@ public class ApplicationManager : NetworkBehaviour
     /// Adds the application to the application manager
     /// </summary>
     /// <param name="handler">The job handler for the job</param>
-    /// <param name="duration"></param>
-    public void AddApplication(JobHandler handler, float duration)
+    /// <param name="startTime"></param>
+    public void AddApplication(JobHandler handler, float startTime)
     {
         Vector2Int jobRef = positionManager.GetJobHandlerFromRef(handler);
         if (jobRef.Equals(new Vector2Int(-1, -1))) return;
         if (ApplicationExists(jobRef)) return;
-        JobApplication newApp = new JobApplication(gameManager.gameTime + duration, jobRef.x, jobRef.y);
+        JobApplication newApp = new JobApplication(startTime, jobRef.x, jobRef.y);
         applications.Add(newApp);
     }
 
-    public void AddBranchApplication(int index, float duration)
+    public void AddBranchApplication(int index, float startTime)
     {
         if (index >= positionManager.branches.Length) return;
         Vector2Int appRef = new Vector2Int(index, -1);
         if (ApplicationExists(appRef)) return;
-        JobApplication newApp = new JobApplication(gameManager.gameTime + duration, appRef.x, appRef.y);
+        JobApplication newApp = new JobApplication(startTime, appRef.x, appRef.y);
         applications.Add(newApp);
     }
 
@@ -184,8 +184,12 @@ public class ApplicationManager : NetworkBehaviour
     /// <param name="application"></param>
     public void ProcessBranchApplication(JobApplication application)
     {
-        List<PlayerRef> candidates = new List<PlayerRef>(applicants[application]);
-        PositionManager.Branch branch = positionManager.branches[application.branchReference];
+        List<PlayerRef> candidates = new List<PlayerRef>();
+        if (applicants.ContainsKey(application))
+        {
+            candidates = new List<PlayerRef>(applicants[application]);
+        }
+        Branch branch = positionManager.branches[application.branchReference];
         // # of players to select
         int numberSelected = branch.maxPlayers - branch.players.Count;
         List<PlayerRef> selectedPlayers = new List<PlayerRef>();
