@@ -158,7 +158,8 @@ public class ApplicationManager : NetworkBehaviour
             ProcessBranchApplication(application);
             return;
         }
-        List<PlayerRef> candidates = applicants[application];
+        List<PlayerRef> candidates = new List<PlayerRef>();
+        if (applicants.ContainsKey(application)) candidates = applicants[application];
         // Every index in this list is a list of player refs with that amount of employment.
         List<List<PlayerRef>> selectionList = new List<List<PlayerRef>>();
         foreach (PlayerRef player in candidates)
@@ -284,6 +285,7 @@ public class ApplicationManager : NetworkBehaviour
             if (!previousApplications.Contains(app))
             {
                 previousApplications.Add(app);
+                Debug.Log("Adding");
                 onApplicationAdd?.Invoke(app);
             }
         }
@@ -294,9 +296,16 @@ public class ApplicationManager : NetworkBehaviour
             if (!applications.Contains(app))
             {
                 removalList.Add(app);
+                Debug.Log("Branch ref: " + app.branchReference.ToString() + " Job ref: " + app.jobReference.ToString() + " Deadline: " + app.deadline);
                 onApplicationRemove?.Invoke(app);
             }
         }
-        foreach (JobApplication app in removalList) previousApplications.Remove(app);
+        foreach (JobApplication app in removalList)
+        {
+            Debug.Log("removing with removal list");
+            Debug.Log("len before " + previousApplications.Count);
+            previousApplications.Remove(app);
+            Debug.Log("len after " + previousApplications.Count);
+        }
     }
 }

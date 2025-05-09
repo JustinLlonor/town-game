@@ -17,6 +17,7 @@ public class PositionUI : MonoBehaviour
     PositionManager positionManager;
     ApplicationManager applicationManager;
     GameManager gameManager;
+    PositionButtonUI selectedButton;
 
     // TODO: Make Init get called on start
     public void Init()
@@ -42,13 +43,13 @@ public class PositionUI : MonoBehaviour
         jobObjects.Add(jobRef, newButton);
         pbui.button.onClick.AddListener(delegate
         {
-            if (pbui.isSelected)
+            if (selectedButton == pbui)
             {
-                pbui.isSelected = false;
+                selectedButton = null;
                 jobDescriptionUI.ToggleDescription(false);
                 return;
             }
-            pbui.isSelected = true;
+            selectedButton = pbui;
             jobDescriptionUI.ToggleDescription(true);
             jobDescriptionUI.ToggleExtraInfo(true);
             jobDescriptionUI.SetTitle(ownedJob.name);
@@ -74,11 +75,12 @@ public class PositionUI : MonoBehaviour
     /// <param name="job"></param>
     public void AddToApplyList(JobApplication application)
     {
+        if (application.branchReference != positionManager.GetBranch(FindAnyObjectByType<RunnerManager>().nRunner.LocalPlayer)) return;
         // Adds the button and inserts it in the correct place
+        GameObject newButton = Instantiate(positionButton, positionHolder);
         int applyIndex = GetApplyIndex(application);
         applyList.Insert(applyIndex, application);
-        GameObject newButton = Instantiate(positionButton, positionHolder);
-        newButton.transform.SetSiblingIndex(jobObjects.Count + 1 + applyIndex);
+        newButton.transform.SetSiblingIndex(applyHeader.GetSiblingIndex() + applyIndex + 1);
         appObjects.Add(application, newButton);
 
         // Button properties
@@ -92,13 +94,13 @@ public class PositionUI : MonoBehaviour
             pbui.SetIcon(appJob.icon);
             pbui.button.onClick.AddListener(delegate
             {
-                if (pbui.isSelected)
+                if (selectedButton == pbui)
                 {
-                    pbui.isSelected = false;
+                    selectedButton = null;
                     jobDescriptionUI.ToggleDescription(false);
                     return;
                 }
-                pbui.isSelected = true;
+                selectedButton = pbui;
                 jobDescriptionUI.ToggleDescription(true);
                 jobDescriptionUI.ToggleExtraInfo(true);
                 jobDescriptionUI.SetTitle(appJob.name);
@@ -114,21 +116,21 @@ public class PositionUI : MonoBehaviour
         else
         {
             Branch appBranch = positionManager.GetBranchFromIndex(application.branchReference);
-            pbui.SetColor(appBranch.color);
+            pbui.SetColor(appBranch.color, false);
             pbui.SetText(appBranch.name);
             pbui.SetIcon(appBranch.icon);
             pbui.button.onClick.AddListener(delegate
             {
-                if (pbui.isSelected)
+                if (selectedButton == pbui)
                 {
-                    pbui.isSelected = false;
+                    selectedButton = null;
                     jobDescriptionUI.ToggleDescription(false);
                     return;
                 }
-                pbui.isSelected = true;
+                selectedButton = pbui;
                 jobDescriptionUI.ToggleDescription(true);
                 jobDescriptionUI.SetTitle(appBranch.name);
-                jobDescriptionUI.UpdatePlayerCount(positionManager.GetJobPlayerCount(appRef), appBranch.maxPlayers);
+                jobDescriptionUI.UpdatePlayerCount(positionManager.GetBranchPlayerCount(application.branchReference), appBranch.maxPlayers);
                 jobDescriptionUI.SetDescription(appBranch.description);
                 jobDescriptionUI.SetDeadline(gameManager.PeriodToClockString(application.deadline / gameManager.hourLength));
                 jobDescriptionUI.ToggleExtraInfo(false);
@@ -140,7 +142,7 @@ public class PositionUI : MonoBehaviour
     public void RemoveFromApplyList(JobApplication application)
     {
         applyList.Remove(application);
-        Destroy(appObjects[application]);
+        if (appObjects.ContainsKey(application)) Destroy(appObjects[application]);
         appObjects.Remove(application);
     }
 

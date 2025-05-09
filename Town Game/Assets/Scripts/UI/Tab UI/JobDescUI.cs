@@ -32,7 +32,8 @@ public class JobDescUI : MonoBehaviour
     {
         if (playerCount < 0 || maxPlayers < 0)
         {
-            jobPlayerCount.text = "(-/-)";
+            jobPlayerCount.text = "";
+            return;
         }
         jobPlayerCount.text = "(" + playerCount + "/" + maxPlayers + ")";
     }
@@ -59,6 +60,11 @@ public class JobDescUI : MonoBehaviour
 
     public void SetAccess(string[] accessList)
     {
+        if (accessList.Length == 0)
+        {
+            accessText.text = "No new room access";
+            return;
+        }
         string accessString = "Access to ";
         for (int i = 0; i  < accessList.Length; i++)
         {
@@ -82,7 +88,7 @@ public class JobDescUI : MonoBehaviour
     public void ShowButton(string text = "APPLY")
     {
         button.gameObject.SetActive(true);
-        errorText.gameObject.SetActive(true);
+        errorText.gameObject.SetActive(false);
         buttonText.text = text;
     }
 

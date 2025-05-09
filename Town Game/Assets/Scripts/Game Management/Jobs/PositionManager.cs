@@ -56,8 +56,7 @@ public class PositionManager : NetworkBehaviour
         int playerBranch = GetBranch(player);
         if (branchIndex == playerBranch) return;
         Branch previousBranch = GetBranchFromIndex(playerBranch);
-        if (previousBranch == null) return;
-        RemovePlayerFromBranch(player, previousBranch);
+        if (previousBranch != null) RemovePlayerFromBranch(player, previousBranch);
         branch.players.Add(player);
         SetBranchProperty(player, branchIndex);
     }
@@ -168,7 +167,8 @@ public class PositionManager : NetworkBehaviour
 
     public Branch GetBranchFromIndex(int index)
     {
-        if (index >= branches.Length) return null;
+        if (index >= branches.Length || index < 0) return null;
+        Debug.Log(index);
         return branches[index];
     }
 

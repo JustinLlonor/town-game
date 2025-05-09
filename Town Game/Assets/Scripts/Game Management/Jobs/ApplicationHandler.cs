@@ -10,7 +10,7 @@ public class ApplicationHandler : NetworkBehaviour
 {
     public float[] applicationPeriods = new float[] { };
     [Header("The application length, in periods")]
-    public float appLength = 1.83333333f;
+    public float appLength = 1.833334f;
     int periodsPassed = 0;
     PositionManager positionManager;
     ApplicationManager applicationManager;

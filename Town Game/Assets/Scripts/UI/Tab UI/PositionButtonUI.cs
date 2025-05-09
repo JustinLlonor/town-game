@@ -15,18 +15,17 @@ public class PositionButtonUI : MonoBehaviour
     public RawImage iconImage;
     public Image borderImage;
     public Button button;
-    public bool isSelected;
 
     /// <summary>
     /// Sets the button color based on the schedule block color given
     /// </summary>
     /// <param name="color"></param>
-    public void SetColor(Color color)
+    public void SetColor(Color color, bool capSaturation = true)
     {
         float H, S, V;
         // Creates the desaturated button color
         Color.RGBToHSV(color, out H, out S, out V);
-        S = Mathf.Clamp(S, 0f, saturationLevel / 100f);
+        if (capSaturation) S = Mathf.Clamp(S, 0f, saturationLevel / 100f);
         Color buttonColor = Color.HSVToRGB(H, S, V);
         // Creates the darker border color
         V = Mathf.Clamp01(V -  (borderValueOffset/100f));
