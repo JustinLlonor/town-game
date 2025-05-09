@@ -11,16 +11,23 @@ public class Job
     public string name;
     public string description;
     public string[] buildingAccess = new string[] { };
-    public Level pay;
-    public Level timeCommitment;
+    public PayLevel pay;
+    public TimeLevel timeCommitment;
     public int maxPlayers = 2;
     public List<PlayerRef> assignedPlayers = new List<PlayerRef>();
 
-    public enum Level
+    public enum PayLevel
     {
         Low = 0,
         Moderate = 1,
         High = 2
+    }
+
+    public enum TimeLevel
+    {
+        Shorter = 0,
+        Moderate = 1,
+        Longer = 2
     }
 
     /// <summary>
