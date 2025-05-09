@@ -10,7 +10,8 @@ public class PositionManager : NetworkBehaviour
     public Branch[] branches;
     public BranchEvent OnLeaderAdd;
     public BranchEvent OnLeaderRemove;
-    [Networked, Capacity(20)] public NetworkDictionary<PlayerRef, NetworkString<_64>> playerJobs => default;
+    [Networked, Capacity(20)] NetworkDictionary<PlayerRef, NetworkString<_64>> playerJobs => default;
+    [Networked, Capacity(20)] NetworkDictionary<PlayerRef, int> playerBranches => default;
     RunnerManager runnerManager;
     PlayerManager playerManager;
 
@@ -42,15 +43,23 @@ public class PositionManager : NetworkBehaviour
         AddPlayerToBranch(player, branch);
     }
 
+    public void AddPlayerToBranch(PlayerRef player, int branchIndex)
+    {
+        Branch branch = GetBranch(branchIndex);
+        if (branch == null) return;
+        AddPlayerToBranch(player, branch);
+    }
+
     public void AddPlayerToBranch(PlayerRef player, Branch branch)
     {
         int branchIndex = Array.IndexOf(branches, branch);
-        int playerBranch = playerManager.playerProperties[player].branch;
+        int playerBranch = GetBranch(player);
         if (branchIndex == playerBranch) return;
         Branch previousBranch = GetBranchFromIndex(playerBranch);
         if (previousBranch == null) return;
         RemovePlayerFromBranch(player, previousBranch);
         branch.players.Add(player);
+        SetBranchProperty(player, branchIndex);
     }
 
     public void RemovePlayerFromBranch(PlayerRef player, string branchName)
@@ -114,6 +123,11 @@ public class PositionManager : NetworkBehaviour
             if (branch.name == name) return branch;
         }
         return null;
+    }
+
+    private Branch GetBranch(int index)
+    {
+        return branches[index];
     }
 
     /// <summary>
@@ -249,5 +263,47 @@ public class PositionManager : NetworkBehaviour
             if (checkedJob.Equals(iJob)) return true;
         }
         return false;
+    }
+
+    public void SetBranchProperty(PlayerRef player, int branchIndex)
+    {
+        playerBranches.Set(player, branchIndex);
+    }
+
+    /// <summary>
+    /// Gets the branch index of the specified player
+    /// </summary>
+    /// <param name="player"></param>
+    /// <returns></returns>
+    public int GetBranch(PlayerRef player)
+    {
+        if (!playerBranches.ContainsKey(player)) return -1;
+        return playerBranches[player];
+    }
+
+    /// <summary>
+    /// Gets the number of players hired for a certain job
+    /// </summary>
+    /// <param name="jobRef"></param>
+    /// <returns></returns>
+    public int GetJobPlayerCount(Vector2Int jobRef)
+    {
+        if (jobRef.y < 0) return -1;
+        int count = 0;
+        foreach (KeyValuePair<PlayerRef, NetworkString <_64>> kvp in playerJobs)
+        {
+            if (PlayerHasJob(kvp.Key, jobRef)) count++;
+        }
+        return count;
+    }
+
+    public int GetBranchPlayerCount(int branch)
+    {
+        int count = 0;
+        foreach (KeyValuePair<PlayerRef, int> kvp in playerBranches)
+        {
+            if (kvp.Value == branch) count++;
+        }
+        return count;
     }
 }

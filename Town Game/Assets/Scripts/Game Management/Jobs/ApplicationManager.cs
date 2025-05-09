@@ -89,7 +89,7 @@ public class ApplicationManager : NetworkBehaviour
     public void SubmitApplication(JobApplication job, PlayerRef player)
     {
         // If player is in different branch from the job, return
-        int playerBranch = playerManager.playerProperties[player].branch;
+        int playerBranch = positionManager.GetBranch(player);
         if (playerBranch != job.branchReference) return;
         if (!applicants.ContainsKey(job))
         {

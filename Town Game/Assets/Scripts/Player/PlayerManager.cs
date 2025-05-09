@@ -13,7 +13,7 @@ public class PlayerManager : NetworkBehaviour
     [Networked, Capacity(20)] public NetworkDictionary<PlayerRef, NetworkId> playerObjects => default;
     public Dictionary<PlayerRef, Observable> playerObservables = new Dictionary<PlayerRef, Observable>();
     public Dictionary<PlayerRef, PlayerProperties> playerProperties = new Dictionary<PlayerRef, PlayerProperties>();
-    public PlayerProperties currentPlayerProperties = new PlayerProperties("", false, 0, 0, 0);
+    public PlayerProperties currentPlayerProperties = new PlayerProperties("", false, 0, 0);
     private Dictionary<PlayerRef, TeleportInfo> teleportQueue = new Dictionary<PlayerRef, TeleportInfo>();
     
     public GameObject currentPlayer;
@@ -48,7 +48,7 @@ public class PlayerManager : NetworkBehaviour
     }
 
     /// <summary>
-    /// Properties of players that are not constantly streamed or networked
+    /// Properties of players that are not constantly streamed or networked, properties that are mainly private
     /// </summary>
     public class PlayerProperties
     {
@@ -58,27 +58,19 @@ public class PlayerManager : NetworkBehaviour
         public int currency;
         public List<int> groups; // -1 = Cultist, -2 = Innocent, 0 and above are job indices
         public int energy;
-        public int branch; // Index of the branch
 
-        public PlayerProperties(string nickname, bool isCultist, int room, int currency, int branch)
+        public PlayerProperties(string nickname, bool isCultist, int room, int currency)
         {
             this.nickname = nickname;
             this.isCultist = isCultist;
             this.room = room;
             this.currency = currency;
-            this.branch = branch;
         }
 
         public void SetIsCultist(bool newIsCultist)
         {
             isCultist = newIsCultist;
         }
-
-        public void SetBranch(int branch)
-        {
-            this.branch = branch;
-        }
-
         public void SetRoom(int newRoom)
         {
             this.room = newRoom;

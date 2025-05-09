@@ -15,6 +15,7 @@ public class PositionButtonUI : MonoBehaviour
     public RawImage iconImage;
     public Image borderImage;
     public Button button;
+    public bool isSelected;
 
     /// <summary>
     /// Sets the button color based on the schedule block color given

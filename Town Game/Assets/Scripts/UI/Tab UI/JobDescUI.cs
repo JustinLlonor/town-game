@@ -76,7 +76,7 @@ public class JobDescUI : MonoBehaviour
 
     public void SetHours(Job.TimeLevel hours)
     {
-        moneyText.text = hours.ToString() + " Hours";
+        timeText.text = hours.ToString() + " Hours";
     }
 
     public void ShowButton(string text = "APPLY")
@@ -84,6 +84,13 @@ public class JobDescUI : MonoBehaviour
         button.gameObject.SetActive(true);
         errorText.gameObject.SetActive(true);
         buttonText.text = text;
+    }
+
+    public void ToggleExtraInfo(bool enabled)
+    {
+        accessText.gameObject.SetActive(enabled);
+        moneyText.gameObject.SetActive(enabled);
+        timeText.gameObject.SetActive(enabled);
     }
 
     public void ShowErrorText(string text, Color color)

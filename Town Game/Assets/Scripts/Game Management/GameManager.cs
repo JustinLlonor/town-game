@@ -49,6 +49,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     PlayerManager pm;
     ScheduleManager sm;
     RunnerManager runnerManager;
+    PositionManager positionManager;
     bool skippedNight = false;
     bool startedDay = false;
     public GameEvent OnTimeChange;
@@ -103,6 +104,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         rm = FindFirstObjectByType<RoomManager>();
         pm = FindFirstObjectByType<PlayerManager>();
         sm = FindFirstObjectByType<ScheduleManager>();
+        positionManager = FindAnyObjectByType<PositionManager>();
         runnerManager = FindFirstObjectByType<RunnerManager>();
         runnerManager.onPlayerLeave += RemoveAlivePlayer;
         //cm = FindFirstObjectByType<CameraManager>();
@@ -262,7 +264,8 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     {
         foreach (PlayerRef player in Runner.ActivePlayers)
         {
-            pm.playerProperties.Add(player, new PlayerProperties("", false, -1, 0, 0));
+            pm.playerProperties.Add(player, new PlayerProperties("", false, -1, 0));
+            positionManager.AddPlayerToBranch(player, 0);
         }
     }
 
@@ -283,12 +286,6 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     public void RPC_SendRoom([RpcTarget] PlayerRef player, int room)
     {
         pm.currentPlayerProperties.SetRoom(room);
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
-    public void RPC_SendBranch([RpcTarget] PlayerRef player, int branch)
-    {
-        pm.currentPlayerProperties.SetBranch(branch);
     }
 
     void CheckDayStart()

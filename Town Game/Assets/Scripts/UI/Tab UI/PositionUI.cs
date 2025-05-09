@@ -10,18 +10,20 @@ public class PositionUI : MonoBehaviour
     public GameObject positionButton;
     public JobDescUI jobDescriptionUI;
     // Keeping track of job objects
-    private Dictionary<JobApplication, GameObject> jobObjects = new Dictionary<JobApplication, GameObject>();
+    private Dictionary<Vector2Int, GameObject> jobObjects = new Dictionary<Vector2Int, GameObject>();
     // Keeping track of apply objects and order
     private Dictionary<JobApplication, GameObject> appObjects = new Dictionary<JobApplication, GameObject>();
     private List<JobApplication> applyList = new List<JobApplication>();
     PositionManager positionManager;
     ApplicationManager applicationManager;
+    GameManager gameManager;
 
     // TODO: Make Init get called on start
     public void Init()
     {
         positionManager = FindAnyObjectByType<PositionManager>();
         applicationManager = FindAnyObjectByType<ApplicationManager>();
+        gameManager = FindAnyObjectByType<GameManager>();
         applicationManager.onApplicationAdd += AddToApplyList;
         applicationManager.onApplicationRemove += RemoveFromApplyList;
     }
@@ -32,12 +34,38 @@ public class PositionUI : MonoBehaviour
     /// <param name="job"></param>
     public void AddToJobsList(Vector2Int jobRef)
     {
-        
+        Job ownedJob = positionManager.GetJobFromRef(jobRef);
+        int index = jobObjects.Count + 1;
+        GameObject newButton = Instantiate(positionButton, positionHolder);
+        PositionButtonUI pbui = newButton.GetComponent<PositionButtonUI>();
+        newButton.transform.SetSiblingIndex(index);
+        jobObjects.Add(jobRef, newButton);
+        pbui.button.onClick.AddListener(delegate
+        {
+            if (pbui.isSelected)
+            {
+                pbui.isSelected = false;
+                jobDescriptionUI.ToggleDescription(false);
+                return;
+            }
+            pbui.isSelected = true;
+            jobDescriptionUI.ToggleDescription(true);
+            jobDescriptionUI.ToggleExtraInfo(true);
+            jobDescriptionUI.SetTitle(ownedJob.name);
+            jobDescriptionUI.UpdatePlayerCount(positionManager.GetJobPlayerCount(jobRef), ownedJob.maxPlayers);
+            jobDescriptionUI.SetDescription(ownedJob.description);
+            jobDescriptionUI.HideDeadline();
+            jobDescriptionUI.SetAccess(ownedJob.buildingAccess);
+            jobDescriptionUI.SetPay(ownedJob.pay);
+            jobDescriptionUI.SetHours(ownedJob.timeCommitment);
+            jobDescriptionUI.ShowButton("RESIGN");
+        });
     }
 
     public void RemoveFromJobsList(Vector2Int jobRef)
     {
-
+        Destroy(jobObjects[jobRef].gameObject);
+        jobObjects.Remove(jobRef);
     }
 
     /// <summary>
@@ -55,12 +83,33 @@ public class PositionUI : MonoBehaviour
 
         // Button properties
         PositionButtonUI pbui = newButton.GetComponent<PositionButtonUI>();
+        Vector2Int appRef = new Vector2Int(application.branchReference, application.jobReference);
         if (application.jobReference >= 0)
         {
-            Job appJob = positionManager.GetJobFromRef(new Vector2Int(application.branchReference, application.jobReference));
+            Job appJob = positionManager.GetJobFromRef(appRef);
             pbui.SetColor(appJob.handler.jobColor);
             pbui.SetText(appJob.name);
             pbui.SetIcon(appJob.icon);
+            pbui.button.onClick.AddListener(delegate
+            {
+                if (pbui.isSelected)
+                {
+                    pbui.isSelected = false;
+                    jobDescriptionUI.ToggleDescription(false);
+                    return;
+                }
+                pbui.isSelected = true;
+                jobDescriptionUI.ToggleDescription(true);
+                jobDescriptionUI.ToggleExtraInfo(true);
+                jobDescriptionUI.SetTitle(appJob.name);
+                jobDescriptionUI.UpdatePlayerCount(positionManager.GetJobPlayerCount(appRef), appJob.maxPlayers);
+                jobDescriptionUI.SetDescription(appJob.description);
+                jobDescriptionUI.SetDeadline(gameManager.PeriodToClockString(application.deadline / gameManager.hourLength));
+                jobDescriptionUI.SetAccess(appJob.buildingAccess);
+                jobDescriptionUI.SetPay(appJob.pay);
+                jobDescriptionUI.SetHours(appJob.timeCommitment);
+                jobDescriptionUI.ShowButton("APPLY");
+            });
         }
         else
         {
@@ -68,6 +117,23 @@ public class PositionUI : MonoBehaviour
             pbui.SetColor(appBranch.color);
             pbui.SetText(appBranch.name);
             pbui.SetIcon(appBranch.icon);
+            pbui.button.onClick.AddListener(delegate
+            {
+                if (pbui.isSelected)
+                {
+                    pbui.isSelected = false;
+                    jobDescriptionUI.ToggleDescription(false);
+                    return;
+                }
+                pbui.isSelected = true;
+                jobDescriptionUI.ToggleDescription(true);
+                jobDescriptionUI.SetTitle(appBranch.name);
+                jobDescriptionUI.UpdatePlayerCount(positionManager.GetJobPlayerCount(appRef), appBranch.maxPlayers);
+                jobDescriptionUI.SetDescription(appBranch.description);
+                jobDescriptionUI.SetDeadline(gameManager.PeriodToClockString(application.deadline / gameManager.hourLength));
+                jobDescriptionUI.ToggleExtraInfo(false);
+                jobDescriptionUI.ShowButton("APPLY");
+            });
         }
     }
 
