@@ -5260,6 +5260,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6760696799499886035}
+  - component: {fileID: 3775903315634654262}
   m_Layer: 5
   m_Name: Description
   m_TagString: Untagged
@@ -5294,6 +5295,26 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &3775903315634654262
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6683683522202361589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2da358e605b509f408796e6a45163cee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jobTitle: {fileID: 447759647986871166}
+  jobPlayerCount: {fileID: 3907677330232837680}
+  jobDescription: {fileID: 4532532787442638305}
+  deadlineText: {fileID: 8773173557367888517}
+  accessText: {fileID: 5909512834697891172}
+  moneyText: {fileID: 8757984760686803168}
+  timeText: {fileID: 1226057581793489069}
+  buttonText: {fileID: 808459875999874378}
 --- !u!1 &6708195129095184746
 GameObject:
   m_ObjectHideFlags: 0
