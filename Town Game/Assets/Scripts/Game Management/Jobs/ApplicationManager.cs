@@ -39,7 +39,7 @@ public class ApplicationManager : NetworkBehaviour
     /// <param name="duration"></param>
     public void AddApplication(JobHandler handler, float duration)
     {
-        Vector2Int jobRef = positionManager.GetJobReference(handler);
+        Vector2Int jobRef = positionManager.GetJobHandlerFromRef(handler);
         if (jobRef.Equals(new Vector2Int(-1, -1))) return;
         if (ApplicationExists(jobRef)) return;
         JobApplication newApp = new JobApplication(gameManager.gameTime + duration, jobRef.x, jobRef.y);
@@ -197,7 +197,6 @@ public class ApplicationManager : NetworkBehaviour
             candidates.RemoveAt(selectedIndex);
         }
 
-        // TODO: Make a player branch swithcing function in position manager
         foreach (PlayerRef player in selectedPlayers) positionManager.AddPlayerToBranch(player, branch);
     }
 

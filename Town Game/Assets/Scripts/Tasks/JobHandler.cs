@@ -52,12 +52,14 @@ public class JobHandler : NetworkBehaviour
     PositionManager positionManager;
 
     // Test
-    public Task testTask = new Task("Serve Food", 0, 20f, "Cafeteria");
-    Task recentTask;
-    TaskState recentState;
+    //public Task testTask = new Task("Serve Food", 0, 20f, "Cafeteria");
+    //Task recentTask;
+    //TaskState recentState;
 
     private void Update()
     {
+        // Test code for reference
+        /**
         if (Input.GetKeyDown(KeyCode.U))
         {
             Task newTask = new Task(testTask.name, testTask.category, testTask.secondsTaken, testTask.room);
@@ -82,6 +84,7 @@ public class JobHandler : NetworkBehaviour
             recentTask = newTask;
             AddTaskToState(newTask, recentState);
         }
+        **/
     }
 
     /// <summary>
@@ -205,7 +208,7 @@ public class JobHandler : NetworkBehaviour
         CheckOverflowStates();
         if (associatedWithJob)
         {
-            playerManager.playerProperties[player].AddJob(positionManager.GetJobReference(this));
+            playerManager.playerProperties[player].AddJob(positionManager.GetJobHandlerFromRef(this));
         }
     }
 
@@ -217,7 +220,7 @@ public class JobHandler : NetworkBehaviour
     {
         if (associatedWithJob)
         {
-            playerManager.playerProperties[player].RemoveJob(positionManager.GetJobReference(this));
+            playerManager.playerProperties[player].RemoveJob(positionManager.GetJobHandlerFromRef(this));
         }
         Debug.Log("Firing player");
         if (!hiredPlayers.Contains(player)) return;

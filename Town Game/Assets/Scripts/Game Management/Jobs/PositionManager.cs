@@ -222,7 +222,7 @@ public class PositionManager : NetworkBehaviour
     /// </summary>
     /// <param name="handler"></param>
     /// <returns>The job reference. The x coordinate is the branch index, and the y coordinate is the job index</returns>
-    public Vector2Int GetJobReference(JobHandler handler)
+    public Vector2Int GetJobHandlerFromRef(JobHandler handler)
     {
         int branchRef = 0;
         foreach (Branch branch in branches)
