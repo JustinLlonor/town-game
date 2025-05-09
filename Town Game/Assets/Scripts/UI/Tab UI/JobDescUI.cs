@@ -48,7 +48,13 @@ public class JobDescUI : MonoBehaviour
     /// <param name="deadlineTime"></param>
     public void SetDeadline(string deadlineTime)
     {
+        deadlineText.gameObject.SetActive(true);
         deadlineText.text = "Application Closes " + deadlineTime;
+    }
+
+    public void HideDeadline()
+    {
+        deadlineText.gameObject.SetActive(false);
     }
 
     public void SetAccess(string[] accessList)

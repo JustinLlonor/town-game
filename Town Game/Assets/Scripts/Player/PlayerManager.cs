@@ -59,7 +59,6 @@ public class PlayerManager : NetworkBehaviour
         public List<int> groups; // -1 = Cultist, -2 = Innocent, 0 and above are job indices
         public int energy;
         public int branch; // Index of the branch
-        public List<Vector2Int> jobs = new List<Vector2Int>(); // List of job refs
 
         public PlayerProperties(string nickname, bool isCultist, int room, int currency, int branch)
         {
@@ -93,18 +92,6 @@ public class PlayerManager : NetworkBehaviour
         public void SetEnergy(int newEnergy)
         {
             energy = newEnergy;
-        }
-
-        public void AddJob(Vector2Int jobRef)
-        {
-            if (jobs.Contains(jobRef)) return;
-            jobs.Add(jobRef);
-        }
-
-        public void RemoveJob(Vector2Int jobRef)
-        {
-            if (!jobs.Contains(jobRef)) return;
-            jobs.Remove(jobRef);
         }
 
         /// <summary>

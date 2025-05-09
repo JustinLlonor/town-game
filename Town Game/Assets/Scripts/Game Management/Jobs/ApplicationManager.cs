@@ -8,12 +8,17 @@ public class ApplicationManager : NetworkBehaviour
 {
     [Networked, Capacity(30)]
     public NetworkLinkedList<JobApplication> applications => default;
-    public ApplicationEvent onApplicationEnd;
+    [Networked, Capacity(30)]
+    public NetworkDictionary<JobApplication, int> playerCounts => default;
+    public ApplicationEvent onApplicationAdd;
+    public ApplicationEvent onApplicationRemove;
     public Dictionary<JobApplication, List<PlayerRef>> applicants = new Dictionary<JobApplication, List<PlayerRef>>();
     PositionManager positionManager;
     GameManager gameManager;
     PlayerManager playerManager;
     RunnerManager runnerManager;
+    List<JobApplication> previousApplications = new List<JobApplication>();
+    bool init = false;
 
     public delegate void ApplicationEvent(JobApplication application);
 
@@ -24,12 +29,19 @@ public class ApplicationManager : NetworkBehaviour
         playerManager = FindAnyObjectByType<PlayerManager>();
         runnerManager = FindAnyObjectByType<RunnerManager>();
         runnerManager.onPlayerLeave += ClearApplicant;
+        init = true;
     }
 
     public override void FixedUpdateNetwork()
     {
         if (!Runner.IsServer) return;
         CheckApplications();
+    }
+
+    private void FixedUpdate()
+    {
+        if (!init) return;
+        CheckAppChanges();
     }
 
     /// <summary>
@@ -44,6 +56,7 @@ public class ApplicationManager : NetworkBehaviour
         if (ApplicationExists(jobRef)) return;
         JobApplication newApp = new JobApplication(startTime, jobRef.x, jobRef.y);
         applications.Add(newApp);
+        playerCounts.Add(newApp, 1);
     }
 
     public void AddBranchApplication(int index, float startTime)
@@ -53,6 +66,7 @@ public class ApplicationManager : NetworkBehaviour
         if (ApplicationExists(appRef)) return;
         JobApplication newApp = new JobApplication(startTime, appRef.x, appRef.y);
         applications.Add(newApp);
+        playerCounts.Add(newApp, 1);
     }
 
     /// <summary>
@@ -83,6 +97,7 @@ public class ApplicationManager : NetworkBehaviour
             return;
         }
         applicants[job].Add(player);
+        playerCounts.Set(job, playerCounts[job] + 1);
     }
 
     /// <summary>
@@ -108,7 +123,11 @@ public class ApplicationManager : NetworkBehaviour
         {
             return;
         }
-        if (applicants[job].Contains(player)) applicants[job].Remove(player);
+        if (applicants[job].Contains(player))
+        {
+            applicants[job].Remove(player);
+            playerCounts.Set(job, playerCounts[job] - 1);
+        }
     }
 
     /// <summary>
@@ -120,7 +139,11 @@ public class ApplicationManager : NetworkBehaviour
         // Remove player from all applicants
         foreach (JobApplication job in applications)
         {
-            if (applicants[job].Contains(player)) applicants[job].Remove(player);
+            if (applicants[job].Contains(player))
+            {
+                applicants[job].Remove(player);
+                playerCounts.Set(job, playerCounts[job] - 1);
+            }
         }
     }
 
@@ -140,7 +163,7 @@ public class ApplicationManager : NetworkBehaviour
         List<List<PlayerRef>> selectionList = new List<List<PlayerRef>>();
         foreach (PlayerRef player in candidates)
         {
-            int jobCount = playerManager.playerProperties[player].jobs.Count;
+            int jobCount = positionManager.GetJobCount(player);
             // repeat until selection list count is greater than job count by 1
             while (jobCount >= selectionList.Count)
             {
@@ -214,10 +237,9 @@ public class ApplicationManager : NetworkBehaviour
             if (gameManager.gameTime > application.deadline)
             {
                 ProcessApplication(application);
-                // invokes the event
-                onApplicationEnd?.Invoke(application);
                 // removes from applications
                 applications.Remove(application);
+                playerCounts.Remove(application);
                 // removes from applicant listings
                 if (applicants.ContainsKey(application)) applicants.Remove(application);
             }
@@ -252,5 +274,29 @@ public class ApplicationManager : NetworkBehaviour
             }
         }
         return JobApplication.None;
+    }
+
+    private void CheckAppChanges()
+    {
+        // Adding check
+        foreach (JobApplication app in applications)
+        {
+            if (!previousApplications.Contains(app))
+            {
+                previousApplications.Add(app);
+                onApplicationAdd?.Invoke(app);
+            }
+        }
+        // Removal check
+        List<JobApplication> removalList = new List<JobApplication>();
+        foreach (JobApplication app in previousApplications)
+        {
+            if (!applications.Contains(app))
+            {
+                removalList.Add(app);
+                onApplicationRemove?.Invoke(app);
+            }
+        }
+        foreach (JobApplication app in removalList) previousApplications.Remove(app);
     }
 }

@@ -9,6 +9,8 @@ public class Branch
 {
     [Header("Static info")]
     public string name;
+    public Texture icon;
+    public Color color;
     [Tooltip("The max number of players. If this is set to -1, then this branch has no maximum")]
     public int maxPlayers = -1;
     [Tooltip("The name of the category of rooms involved with this branch")]

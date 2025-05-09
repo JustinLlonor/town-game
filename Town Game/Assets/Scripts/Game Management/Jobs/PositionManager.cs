@@ -6,13 +6,16 @@ using System;
 
 public class PositionManager : NetworkBehaviour
 {
+    [Header("If jobs exceed 10 in a branch, change the job property code.")]
     public Branch[] branches;
     public BranchEvent OnLeaderAdd;
     public BranchEvent OnLeaderRemove;
+    [Networked, Capacity(20)] public NetworkDictionary<PlayerRef, NetworkString<_64>> playerJobs => default;
     RunnerManager runnerManager;
     PlayerManager playerManager;
 
     public delegate void BranchEvent(PlayerRef player, string branch);
+    public delegate void PlayerEvent(PlayerRef player);
 
     public override void Spawned()
     {
@@ -153,5 +156,98 @@ public class PositionManager : NetworkBehaviour
     {
         if (index >= branches.Length) return null;
         return branches[index];
+    }
+
+    // Job property stuff
+
+    /// <summary>
+    /// Stores the job ref within PositionManager
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="jobRef"></param>
+    public void AddJobProperty(PlayerRef player, Vector2Int jobRef)
+    {
+        string jobString = jobRef.x.ToString() + jobRef.y.ToString();
+        if (!playerJobs.ContainsKey(player))
+        {
+            playerJobs.Add(player, jobString);
+            return;
+        }
+        string newJobString = playerJobs[player].ToString();
+        newJobString += jobString;
+        playerJobs.Set(player, newJobString);
+    }
+
+    /// <summary>
+    /// Removes the job ref from from this player
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="checkedJob"></param>
+    public void RemoveJobProperty(PlayerRef player, Vector2Int checkedJob)
+    {
+        if (!playerJobs.ContainsKey(player)) return;
+        string jobString = playerJobs[player].ToString();
+        for (int i = 0; i < jobString.Length; i += 2)
+        {
+            int branchRef = jobString[i] - '0';
+            int jobRef = jobString[i + 1] - '0';
+            Vector2Int iJob = new Vector2Int(branchRef, jobRef);
+            if (checkedJob.Equals(iJob))
+            {
+                jobString = jobString.Remove(i, 2);
+                break;
+            }
+        }
+        playerJobs.Set(player, jobString);
+    }
+
+    /// <summary>
+    /// Gets the job count for this player
+    /// </summary>
+    /// <param name="player"></param>
+    /// <returns></returns>
+    public int GetJobCount(PlayerRef player)
+    {
+        if (!playerJobs.ContainsKey(player)) return 0;
+        return playerJobs[player].ToString().Length / 2;
+    }
+
+    /// <summary>
+    /// Returns a list of job refs associated with this player
+    /// </summary>
+    /// <param name="player"></param>
+    /// <returns></returns>
+    public Vector2Int[] GetJobRefs(PlayerRef player)
+    {
+        if (!playerJobs.ContainsKey(player)) return new Vector2Int[0];
+        List<Vector2Int> output = new List<Vector2Int>();
+        string jobString = playerJobs[player].ToString();
+        for (int i = 0; i < jobString.Length; i += 2)
+        {
+            int branchRef = jobString[i] - '0';
+            int jobRef = jobString[i + 1] - '0';
+            output.Add(new Vector2Int(branchRef, jobRef));
+        }
+        return output.ToArray();
+    }
+
+    /// <summary>
+    /// Checks if a player has a certain job
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="checkedJob"></param>
+    /// <returns></returns>
+    public bool PlayerHasJob(PlayerRef player, Vector2Int checkedJob)
+    {
+        if (!playerJobs.ContainsKey(player)) return false;
+        string jobString = playerJobs[player].ToString();
+        for (int i = 0; i < jobString.Length; i += 2)
+        {
+            int branchRef = jobString[i] - '0';
+            int jobRef = jobString[i + 1] - '0';
+            Vector2Int iJob = new Vector2Int(branchRef, jobRef);
+            if (checkedJob.Equals(iJob)) return true;
+        }
+        return false;
     }
 }

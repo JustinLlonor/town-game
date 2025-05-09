@@ -10,6 +10,7 @@ public class Job
     [Header("Info")]
     public string name;
     public string description;
+    public Texture icon;
     public string[] buildingAccess = new string[] { };
     public PayLevel pay;
     public TimeLevel timeCommitment;

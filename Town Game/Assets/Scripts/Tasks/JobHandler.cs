@@ -208,7 +208,7 @@ public class JobHandler : NetworkBehaviour
         CheckOverflowStates();
         if (associatedWithJob)
         {
-            playerManager.playerProperties[player].AddJob(positionManager.GetJobHandlerFromRef(this));
+            positionManager.AddJobProperty(player, positionManager.GetJobHandlerFromRef(this));
         }
     }
 
@@ -220,7 +220,7 @@ public class JobHandler : NetworkBehaviour
     {
         if (associatedWithJob)
         {
-            playerManager.playerProperties[player].RemoveJob(positionManager.GetJobHandlerFromRef(this));
+            positionManager.RemoveJobProperty(player, positionManager.GetJobHandlerFromRef(this));
         }
         Debug.Log("Firing player");
         if (!hiredPlayers.Contains(player)) return;
