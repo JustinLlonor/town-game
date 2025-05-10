@@ -37,7 +37,6 @@ public class ApplicationHandler : NetworkBehaviour
 
     private void ResetPeriodsTracker()
     {
-        Debug.LogError("Reset periods passed");
         periodsPassed = 0;
     }
 

@@ -52,11 +52,6 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     public delegate void InventoryEvent();
     ChangeDetector changeDetector;
 
-    private void Awake()
-    {
-        Init();
-    }
-
     public void Init()
     {
         runnerManager = FindFirstObjectByType<RunnerManager>();

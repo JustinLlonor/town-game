@@ -36,12 +36,13 @@ public class AttackManager : NetworkBehaviour
 
     Transform camTransform;
 
-    private void Awake()
+    public void Init()
     {
         uiManager = FindFirstObjectByType<UIManager>();
         attackQTE = FindFirstObjectByType<AttackQTE>();
         attackQTE = uiManager.attackQTE;
         inputManager = FindFirstObjectByType<InputManager>();
+        inputManager.onJump += EngagementQTE;
         playerManager = FindFirstObjectByType<PlayerManager>();
         cShake = FindFirstObjectByType<CameraShake>();
         fps = FindFirstObjectByType<FirstPerson>();
@@ -58,14 +59,13 @@ public class AttackManager : NetworkBehaviour
         }
     }
 
-    private void OnEnable()
+    public override void Spawned()
     {
-        inputManager.onJump += EngagementQTE;
+        Init();
     }
 
     private void OnDisable()
     {
-        inputManager.onJump -= EngagementQTE;
         if (HasInputAuthority)
         {
             if (uiGlitch != null) uiGlitch.SetActive(false);

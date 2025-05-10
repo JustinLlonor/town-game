@@ -19,6 +19,7 @@ public class PositionManager : NetworkBehaviour
     RunnerManager runnerManager;
     PlayerManager playerManager;
     PlayerRef trackedPlayer;
+    bool init = false;
 
 
     public delegate void BranchEvent(PlayerRef player, string branch);
@@ -27,6 +28,7 @@ public class PositionManager : NetworkBehaviour
 
     public override void Spawned()
     {
+        init = true;
         runnerManager = FindFirstObjectByType<RunnerManager>();
         playerManager = FindFirstObjectByType<PlayerManager>();
         if (!Runner.IsServer) return;
@@ -35,6 +37,7 @@ public class PositionManager : NetworkBehaviour
 
     private void FixedUpdate()
     {
+        if (!init) return;
         trackedPlayer = runnerManager.nRunner.LocalPlayer;
         if (trackedPlayer.Equals(PlayerRef.None)) return;
         CheckPositionChange();
