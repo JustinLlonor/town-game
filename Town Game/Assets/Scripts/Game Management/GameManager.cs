@@ -595,7 +595,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     /// <returns></returns>
     public float GetGameTimeFromLocalTime(float localTime)
     {
-        return localTime + (currentDay * 24f);
+        return localTime + (currentDay * 24f * hourLength);
     }
 
     /// <summary>
@@ -604,7 +604,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     /// <returns></returns>
     public float GetLocalTimeFromGameTime()
     {
-        return gameTime - (currentDay * 24f);
+        return gameTime - (currentDay * 24f * hourLength);
     }
      
     public string GetDay(int day)

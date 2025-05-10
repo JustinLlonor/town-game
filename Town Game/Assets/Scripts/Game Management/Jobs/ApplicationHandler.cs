@@ -37,25 +37,35 @@ public class ApplicationHandler : NetworkBehaviour
 
     private void ResetPeriodsTracker()
     {
+        Debug.LogError("Reset periods passed");
         periodsPassed = 0;
     }
 
     private void CheckApplicationPeriod()
     {
-        if (periodsPassed >= applicationPeriods.Length) return;
+        if (periodsPassed >= applicationPeriods.Length)
+        {
+            Debug.Log("returning, periodsPassed = " + periodsPassed + ", applicationPeriods length = " + applicationPeriods.Length);
+            return;
+        }
         float localTime = gameManager.GetLocalTimeFromGameTime();
+        Debug.Log(localTime);
         if (applicationPeriods[periodsPassed] < localTime)
         {
             Debug.Log(applicationPeriods[periodsPassed] + " got passed by " + localTime);
             CreateApplications(applicationPeriods[periodsPassed]);
             periodsPassed++;
+            Debug.LogWarning("periods passed increment");
         }
     }
 
-    // Adds to every application that can be applied to
+    /// <summary>
+    /// Adds to every application that can be applied to
+    /// </summary>
+    /// <param name="startTime">The start time, in local time</param>
     private void CreateApplications(float startTime)
     {
-        startTime += gameManager.currentDay * 24f;
+        startTime = gameManager.GetGameTimeFromLocalTime(startTime);
         int branchIndex = 0;
         foreach (Branch branch in positionManager.branches)
         {
