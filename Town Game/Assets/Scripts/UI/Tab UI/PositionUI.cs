@@ -66,17 +66,24 @@ public class PositionUI : MonoBehaviour
             jobDescriptionUI.SetAccess(ownedJob.buildingAccess);
             jobDescriptionUI.SetPay(ownedJob.pay);
             jobDescriptionUI.SetHours(ownedJob.timeCommitment);
-            jobDescriptionUI.ShowButton("RESIGN");
-            jobDescriptionUI.button.onClick.RemoveAllListeners();
-            // TODO: Add resignation code
+            LoadResigned(pbui, jobRef);
         });
     }
 
     public void RemoveFromJobsList(Vector2Int jobRef)
     {
-        Destroy(jobObjects[jobRef].gameObject);
-        jobObjects.Remove(jobRef);
+        if (jobObjects.ContainsKey(jobRef))
+        {
+            if (selectedButton == jobObjects[jobRef].gameObject.GetComponent<PositionButtonUI>())
+            {
+                jobDescriptionUI.ToggleDescription(false);
+            }
+            Destroy(jobObjects[jobRef].gameObject);
+            jobObjects.Remove(jobRef);
+        }
     }
+
+    // TODO: Make so that the application for a certain job shows when you resign from it
 
     /// <summary>
     /// Adds this job application to the apply list, only if the player is in the same branch
@@ -164,6 +171,20 @@ public class PositionUI : MonoBehaviour
         }
     }
 
+    private void SetResignationDelegate(Vector2Int appRef, PositionButtonUI pbui)
+    {
+        jobDescriptionUI.button.onClick.RemoveAllListeners();
+        if (playerManager.currentPlayer != null)
+        {
+            Player player = playerManager.currentPlayer.GetComponent<Player>();
+            jobDescriptionUI.button.onClick.AddListener(delegate {
+                player.RPC_SubmitResignation(appRef);
+                jobDescriptionUI.ShowErrorText("Resignation submitted", Color.white);
+                pbui.applied = true;
+            });
+        }
+    }
+
     private void LoadApplied(PositionButtonUI pbui, Vector2Int appRef)
     {
         if (!pbui.applied)
@@ -173,6 +194,17 @@ public class PositionUI : MonoBehaviour
             return;
         }
         jobDescriptionUI.ShowErrorText("Successfully applied", Color.white);
+    }
+
+    private void LoadResigned(PositionButtonUI pbui, Vector2Int appRef)
+    {
+        if (!pbui.applied)
+        {
+            jobDescriptionUI.ShowButton("RESIGN");
+            SetResignationDelegate(appRef, pbui);
+            return;
+        }
+        jobDescriptionUI.ShowErrorText("Resignation submitted", Color.white);
     }
 
     public void RemoveFromApplyList(JobApplication application)
