@@ -75,7 +75,8 @@ public class PositionUI : MonoBehaviour
     /// <param name="job"></param>
     public void AddToApplyList(JobApplication application)
     {
-        if (application.branchReference != positionManager.GetBranch(FindAnyObjectByType<RunnerManager>().nRunner.LocalPlayer)) return;
+        int localBranch = positionManager.GetBranch(FindAnyObjectByType<RunnerManager>().nRunner.LocalPlayer); // do this differently in the future probably
+        if ((application.branchReference == localBranch) ^ (application.jobReference >= 0)) return;
         // Adds the button and inserts it in the correct place
         GameObject newButton = Instantiate(positionButton, positionHolder);
         int applyIndex = GetApplyIndex(application);
@@ -117,7 +118,7 @@ public class PositionUI : MonoBehaviour
         {
             Branch appBranch = positionManager.GetBranchFromIndex(application.branchReference);
             pbui.SetColor(appBranch.color, false);
-            pbui.SetText(appBranch.name);
+            pbui.SetText(appBranch.name + " Branch");
             pbui.SetIcon(appBranch.icon);
             pbui.button.onClick.AddListener(delegate
             {
@@ -129,7 +130,7 @@ public class PositionUI : MonoBehaviour
                 }
                 selectedButton = pbui;
                 jobDescriptionUI.ToggleDescription(true);
-                jobDescriptionUI.SetTitle(appBranch.name);
+                jobDescriptionUI.SetTitle(appBranch.name + " Branch");
                 jobDescriptionUI.UpdatePlayerCount(positionManager.GetBranchPlayerCount(application.branchReference), appBranch.maxPlayers);
                 jobDescriptionUI.SetDescription(appBranch.description);
                 jobDescriptionUI.SetDeadline(gameManager.PeriodToClockString(application.deadline / gameManager.hourLength));
@@ -142,7 +143,15 @@ public class PositionUI : MonoBehaviour
     public void RemoveFromApplyList(JobApplication application)
     {
         applyList.Remove(application);
-        if (appObjects.ContainsKey(application)) Destroy(appObjects[application]);
+        if (appObjects.ContainsKey(application))
+        {
+            PositionButtonUI pbui = appObjects[application].GetComponent<PositionButtonUI>();
+            if (selectedButton == pbui)
+            {
+                jobDescriptionUI.ToggleDescription(false);
+            }
+            Destroy(appObjects[application]);
+        }
         appObjects.Remove(application);
     }
 
