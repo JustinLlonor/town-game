@@ -328,143 +328,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   branches:
   - name: Town
-    description: 
+    description: Do town things
     icon: {fileID: 0}
-    color: {r: 0, g: 0, b: 0, a: 0}
+    color: {r: 0.27020293, g: 0.8301887, b: 0.30541313, a: 1}
     maxPlayers: -1
     category: 2
     leadPositionName: Mayor
     jobs:
-    - handler: {fileID: 0}
-      name: Cook
-      description: Uses ingredients to cook food for the town.
-      icon: {fileID: 0}
-      buildingAccess: []
-      pay: 0
-      timeCommitment: 0
-      maxPlayers: 2
-      assignedPlayers: []
-    - handler: {fileID: 0}
-      name: Power Worker
-      description: Operates the power plant to generate energy for the town.
-      icon: {fileID: 0}
-      buildingAccess: []
-      pay: 0
-      timeCommitment: 0
-      maxPlayers: 2
-      assignedPlayers: []
-    - handler: {fileID: 0}
-      name: Supplier
-      description: Delivers supplies to buildings, to keep operations running.
-      icon: {fileID: 0}
-      buildingAccess: []
-      pay: 0
-      timeCommitment: 0
-      maxPlayers: 2
-      assignedPlayers: []
-    - handler: {fileID: 0}
-      name: Mail Carrier
-      description: Delivers mail to houses.
-      icon: {fileID: 0}
-      buildingAccess: []
-      pay: 0
+    - handler: {fileID: 2146126489367553974}
+      name: Chef
+      description: Cook stuff
+      icon: {fileID: 2800000, guid: 669f02f136d943e4a954daad8bbcbeac, type: 3}
+      buildingAccess:
+      - Cafeteria
+      - Kitchen
+      pay: 1
       timeCommitment: 0
       maxPlayers: 2
       assignedPlayers: []
     players: []
-  - name: Science
-    description: 
+  - name: Police
+    description: The police force
     icon: {fileID: 0}
-    color: {r: 0, g: 0, b: 0, a: 0}
-    maxPlayers: -1
+    color: {r: 0.18431371, g: 0.6103698, b: 1, a: 1}
+    maxPlayers: 5
     category: 4
-    leadPositionName: Head of Science
-    jobs:
-    - handler: {fileID: 0}
-      name: Technology Designer
-      description: Creates new devices and equipment for general use within the town.
-      icon: {fileID: 0}
-      buildingAccess: []
-      pay: 0
-      timeCommitment: 0
-      maxPlayers: 2
-      assignedPlayers: []
-    - handler: {fileID: 0}
-      name: Anomaly Researcher
-      description: Researches supernatural phenomena for use against cultists.
-      icon: {fileID: 0}
-      buildingAccess: []
-      pay: 0
-      timeCommitment: 0
-      maxPlayers: 2
-      assignedPlayers: []
-    - handler: {fileID: 0}
-      name: Forensics Scientist
-      description: Analyzes evidence and people to help find suspects.
-      icon: {fileID: 0}
-      buildingAccess: []
-      pay: 0
-      timeCommitment: 0
-      maxPlayers: 2
-      assignedPlayers: []
-    - handler: {fileID: 0}
-      name: Weapons Researcher
-      description: Creates new weapons and devices dedicated to self-defense against
-        cultists.
-      icon: {fileID: 0}
-      buildingAccess: []
-      pay: 0
-      timeCommitment: 0
-      maxPlayers: 2
-      assignedPlayers: []
-    players: []
-  - name: Security
-    description: 
-    icon: {fileID: 0}
-    color: {r: 0, g: 0, b: 0, a: 0}
-    maxPlayers: -1
-    category: 4
-    leadPositionName: Head of Security
-    jobs:
-    - handler: {fileID: 0}
-      name: Device Operator
-      description: Places security devices around town, to ensure the safety of civilians
-        during the night.
-      icon: {fileID: 0}
-      buildingAccess: []
-      pay: 0
-      timeCommitment: 0
-      maxPlayers: 2
-      assignedPlayers: []
-    - handler: {fileID: 0}
-      name: Investigator
-      description: Pursues suspicious individuals with the help of specialized devices.
-      icon: {fileID: 0}
-      buildingAccess: []
-      pay: 0
-      timeCommitment: 0
-      maxPlayers: 2
-      assignedPlayers: []
-    - handler: {fileID: 0}
-      name: Guard
-      description: Patrols certain areas of the map, looking for signs of tampering
-        as well as suspicious activity. Can offer protection for civilians at night.
-      icon: {fileID: 0}
-      buildingAccess: []
-      pay: 0
-      timeCommitment: 0
-      maxPlayers: 2
-      assignedPlayers: []
-    - handler: {fileID: 0}
-      name: Exorcist
-      description: Provides protection against supernatural threats using anomalous
-        relics.
-      icon: {fileID: 0}
-      buildingAccess: []
-      pay: 0
-      timeCommitment: 0
-      maxPlayers: 2
-      assignedPlayers: []
+    leadPositionName: Chief of Police
+    jobs: []
     players: []
 --- !u!1 &5129982233875511372
 GameObject:

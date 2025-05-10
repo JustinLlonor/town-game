@@ -15,7 +15,9 @@ public class PositionManager : NetworkBehaviour
     [Networked, Capacity(20)] NetworkDictionary<PlayerRef, int> playerBranches => default;
     public JobEvent onJobAdd;
     public JobEvent onJobRemove;
+    public IntEvent onBranchSwitch;
     List<Vector2Int> previousJobs = new List<Vector2Int>();
+    int previousBranch = -1;
     RunnerManager runnerManager;
     PlayerManager playerManager;
     PlayerRef trackedPlayer;
@@ -25,6 +27,7 @@ public class PositionManager : NetworkBehaviour
     public delegate void BranchEvent(PlayerRef player, string branch);
     public delegate void PlayerEvent(PlayerRef player);
     public delegate void JobEvent(Vector2Int jobRef);
+    public delegate void IntEvent(int integer);
 
     public override void Spawned()
     {
@@ -41,6 +44,7 @@ public class PositionManager : NetworkBehaviour
         trackedPlayer = runnerManager.nRunner.LocalPlayer;
         if (trackedPlayer.Equals(PlayerRef.None)) return;
         CheckPositionChange();
+        CheckBranchChange();
     }
 
     void PlayerLeave(PlayerRef player)
@@ -62,7 +66,7 @@ public class PositionManager : NetworkBehaviour
 
     public void AddPlayerToBranch(PlayerRef player, int branchIndex)
     {
-        Branch branch = GetBranch(branchIndex);
+        Branch branch = GetBranchFromIndex(branchIndex);
         if (branch == null) return;
         AddPlayerToBranch(player, branch);
     }
@@ -139,11 +143,6 @@ public class PositionManager : NetworkBehaviour
             if (branch.name == name) return branch;
         }
         return null;
-    }
-
-    private Branch GetBranch(int index)
-    {
-        return branches[index];
     }
 
     /// <summary>
@@ -352,6 +351,16 @@ public class PositionManager : NetworkBehaviour
         foreach (Vector2Int job in removalList)
         {
             previousJobs.Remove(job);
+        }
+    }
+
+    private void CheckBranchChange()
+    {
+        int currentBranch = GetBranch(trackedPlayer);
+        if (currentBranch != previousBranch)
+        {
+            previousBranch = currentBranch;
+            onBranchSwitch?.Invoke(currentBranch);
         }
     }
 }

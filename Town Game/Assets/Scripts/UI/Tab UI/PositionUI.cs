@@ -2,6 +2,7 @@ using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 // TODO: make applying for a branch and a job at the same time impossible
 public class PositionUI : MonoBehaviour
@@ -11,6 +12,7 @@ public class PositionUI : MonoBehaviour
     public Transform applyHeader;
     public GameObject positionButton;
     public JobDescUI jobDescriptionUI;
+    public TextMeshProUGUI branchText;
     // Keeping track of job objects
     private Dictionary<Vector2Int, GameObject> jobObjects = new Dictionary<Vector2Int, GameObject>();
     // Keeping track of apply objects and order
@@ -32,6 +34,7 @@ public class PositionUI : MonoBehaviour
         applicationManager.onApplicationRemove += RemoveFromApplyList;
         positionManager.onJobAdd += AddToJobsList;
         positionManager.onJobRemove += RemoveFromJobsList;
+        positionManager.onBranchSwitch += SetBranchText;
     }
 
     /// <summary>
@@ -261,5 +264,13 @@ public class PositionUI : MonoBehaviour
             break;
         }
         return i;
+    }
+
+    private void SetBranchText(int branchIndex)
+    {
+        if (branchIndex < 0) return;
+        Branch branch = positionManager.GetBranchFromIndex(branchIndex);
+        branchText.text = branch.name;
+        branchText.color = branch.color;
     }
 }
