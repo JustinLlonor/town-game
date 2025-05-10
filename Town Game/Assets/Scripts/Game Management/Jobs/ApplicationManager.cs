@@ -176,7 +176,7 @@ public class ApplicationManager : NetworkBehaviour
         }
 
         // Select a specified number of players from selectionList, prioritizing those with lower employment first
-        Job job = positionManager.GetJobFromRef(new Vector2Int(application.branchReference, application.jobReference));
+        Job job = positionManager.GetJobFromRef(application.GetJobRef());
         // The amount of players the job needs
         int numberSelected = job.maxPlayers - job.assignedPlayers.Count;
         if (numberSelected <= 0) return;

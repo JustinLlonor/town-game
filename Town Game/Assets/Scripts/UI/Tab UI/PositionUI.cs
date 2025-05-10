@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// TODO: make applying for a branch and a job at the same time impossible
 public class PositionUI : MonoBehaviour
 {
     public Transform positionHolder;
@@ -80,10 +81,25 @@ public class PositionUI : MonoBehaviour
             }
             Destroy(jobObjects[jobRef].gameObject);
             jobObjects.Remove(jobRef);
+            CheckApplication(jobRef);
         }
     }
 
-    // TODO: Make so that the application for a certain job shows when you resign from it
+    /// <summary>
+    /// Checks for an application of the specified job. If it exists, then add it to the ui.
+    /// </summary>
+    /// <param name="jobRef"></param>
+    private void CheckApplication(Vector2Int jobRef)
+    {
+        foreach (JobApplication application in applicationManager.applications)
+        {
+            if (application.GetJobRef().Equals(jobRef))
+            {
+                AddToApplyList(application);
+                break;
+            }
+        }
+    }
 
     /// <summary>
     /// Adds this job application to the apply list, only if the player is in the same branch
@@ -104,7 +120,7 @@ public class PositionUI : MonoBehaviour
 
         // Button properties
         PositionButtonUI pbui = newButton.GetComponent<PositionButtonUI>();
-        Vector2Int appRef = new Vector2Int(application.branchReference, application.jobReference);
+        Vector2Int appRef = application.GetJobRef();
         if (application.jobReference >= 0)
         {
             Job appJob = positionManager.GetJobFromRef(appRef);
@@ -158,6 +174,21 @@ public class PositionUI : MonoBehaviour
         }
     }
 
+    public void RemoveFromApplyList(JobApplication application)
+    {
+        applyList.Remove(application);
+        if (appObjects.ContainsKey(application))
+        {
+            PositionButtonUI pbui = appObjects[application].GetComponent<PositionButtonUI>();
+            if (selectedButton == pbui)
+            {
+                jobDescriptionUI.ToggleDescription(false);
+            }
+            Destroy(appObjects[application]);
+        }
+        appObjects.Remove(application);
+    }
+
     private void SetApplicationDelegate(Vector2Int appRef, PositionButtonUI pbui) {
         jobDescriptionUI.button.onClick.RemoveAllListeners();
         if (playerManager.currentPlayer != null)
@@ -179,7 +210,7 @@ public class PositionUI : MonoBehaviour
             Player player = playerManager.currentPlayer.GetComponent<Player>();
             jobDescriptionUI.button.onClick.AddListener(delegate {
                 player.RPC_SubmitResignation(appRef);
-                jobDescriptionUI.ShowErrorText("Resignation submitted", Color.white);
+                jobDescriptionUI.ShowErrorText("", Color.white);
                 pbui.applied = true;
             });
         }
@@ -204,22 +235,7 @@ public class PositionUI : MonoBehaviour
             SetResignationDelegate(appRef, pbui);
             return;
         }
-        jobDescriptionUI.ShowErrorText("Resignation submitted", Color.white);
-    }
-
-    public void RemoveFromApplyList(JobApplication application)
-    {
-        applyList.Remove(application);
-        if (appObjects.ContainsKey(application))
-        {
-            PositionButtonUI pbui = appObjects[application].GetComponent<PositionButtonUI>();
-            if (selectedButton == pbui)
-            {
-                jobDescriptionUI.ToggleDescription(false);
-            }
-            Destroy(appObjects[application]);
-        }
-        appObjects.Remove(application);
+        jobDescriptionUI.ShowErrorText("", Color.white);
     }
 
     /// <summary>
@@ -230,7 +246,7 @@ public class PositionUI : MonoBehaviour
     private int GetApplyIndex(JobApplication application) {
         if (application.jobReference < 0) return applyList.Count;
         // Gets the player count of the to-be-inserted application
-        Job appJob = positionManager.GetJobFromRef(new Vector2Int(application.branchReference, application.jobReference));
+        Job appJob = positionManager.GetJobFromRef(application.GetJobRef());
         int appPlayerCount = appJob.assignedPlayers.Count;
         // Finds an index to insert the application into
         int i = 0;
@@ -238,7 +254,7 @@ public class PositionUI : MonoBehaviour
         {
             // Append right before the branch application
             if (applyList[i].jobReference < 0) break;
-            Job compJob = positionManager.GetJobFromRef(new Vector2Int(applyList[i].branchReference, applyList[i].jobReference));
+            Job compJob = positionManager.GetJobFromRef(applyList[i].GetJobRef());
             int compPlayerCount = compJob.assignedPlayers.Count;
             // If greater, continue, the moment we are less than or equal to something, append right there
             if (appPlayerCount > compPlayerCount) continue;
