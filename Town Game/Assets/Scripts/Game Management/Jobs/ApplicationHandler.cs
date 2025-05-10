@@ -55,9 +55,7 @@ public class ApplicationHandler : NetworkBehaviour
     // Adds to every application that can be applied to
     private void CreateApplications(float startTime)
     {
-        Debug.Log("before: " + startTime);
         startTime += gameManager.currentDay * 24f;
-        Debug.Log("after: " + startTime);
         int branchIndex = 0;
         foreach (Branch branch in positionManager.branches)
         {

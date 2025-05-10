@@ -328,6 +328,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   branches:
   - name: Town
+    description: 
+    icon: {fileID: 0}
+    color: {r: 0, g: 0, b: 0, a: 0}
     maxPlayers: -1
     category: 2
     leadPositionName: Mayor
@@ -335,6 +338,7 @@ MonoBehaviour:
     - handler: {fileID: 0}
       name: Cook
       description: Uses ingredients to cook food for the town.
+      icon: {fileID: 0}
       buildingAccess: []
       pay: 0
       timeCommitment: 0
@@ -343,6 +347,7 @@ MonoBehaviour:
     - handler: {fileID: 0}
       name: Power Worker
       description: Operates the power plant to generate energy for the town.
+      icon: {fileID: 0}
       buildingAccess: []
       pay: 0
       timeCommitment: 0
@@ -351,6 +356,7 @@ MonoBehaviour:
     - handler: {fileID: 0}
       name: Supplier
       description: Delivers supplies to buildings, to keep operations running.
+      icon: {fileID: 0}
       buildingAccess: []
       pay: 0
       timeCommitment: 0
@@ -359,6 +365,7 @@ MonoBehaviour:
     - handler: {fileID: 0}
       name: Mail Carrier
       description: Delivers mail to houses.
+      icon: {fileID: 0}
       buildingAccess: []
       pay: 0
       timeCommitment: 0
@@ -366,6 +373,9 @@ MonoBehaviour:
       assignedPlayers: []
     players: []
   - name: Science
+    description: 
+    icon: {fileID: 0}
+    color: {r: 0, g: 0, b: 0, a: 0}
     maxPlayers: -1
     category: 4
     leadPositionName: Head of Science
@@ -373,6 +383,7 @@ MonoBehaviour:
     - handler: {fileID: 0}
       name: Technology Designer
       description: Creates new devices and equipment for general use within the town.
+      icon: {fileID: 0}
       buildingAccess: []
       pay: 0
       timeCommitment: 0
@@ -381,6 +392,7 @@ MonoBehaviour:
     - handler: {fileID: 0}
       name: Anomaly Researcher
       description: Researches supernatural phenomena for use against cultists.
+      icon: {fileID: 0}
       buildingAccess: []
       pay: 0
       timeCommitment: 0
@@ -389,6 +401,7 @@ MonoBehaviour:
     - handler: {fileID: 0}
       name: Forensics Scientist
       description: Analyzes evidence and people to help find suspects.
+      icon: {fileID: 0}
       buildingAccess: []
       pay: 0
       timeCommitment: 0
@@ -398,6 +411,7 @@ MonoBehaviour:
       name: Weapons Researcher
       description: Creates new weapons and devices dedicated to self-defense against
         cultists.
+      icon: {fileID: 0}
       buildingAccess: []
       pay: 0
       timeCommitment: 0
@@ -405,6 +419,9 @@ MonoBehaviour:
       assignedPlayers: []
     players: []
   - name: Security
+    description: 
+    icon: {fileID: 0}
+    color: {r: 0, g: 0, b: 0, a: 0}
     maxPlayers: -1
     category: 4
     leadPositionName: Head of Security
@@ -413,6 +430,7 @@ MonoBehaviour:
       name: Device Operator
       description: Places security devices around town, to ensure the safety of civilians
         during the night.
+      icon: {fileID: 0}
       buildingAccess: []
       pay: 0
       timeCommitment: 0
@@ -421,6 +439,7 @@ MonoBehaviour:
     - handler: {fileID: 0}
       name: Investigator
       description: Pursues suspicious individuals with the help of specialized devices.
+      icon: {fileID: 0}
       buildingAccess: []
       pay: 0
       timeCommitment: 0
@@ -430,6 +449,7 @@ MonoBehaviour:
       name: Guard
       description: Patrols certain areas of the map, looking for signs of tampering
         as well as suspicious activity. Can offer protection for civilians at night.
+      icon: {fileID: 0}
       buildingAccess: []
       pay: 0
       timeCommitment: 0
@@ -439,6 +459,7 @@ MonoBehaviour:
       name: Exorcist
       description: Provides protection against supernatural threats using anomalous
         relics.
+      icon: {fileID: 0}
       buildingAccess: []
       pay: 0
       timeCommitment: 0
@@ -614,6 +635,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90e6ed92af526304e896f44ef77796a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerCounts:
+    _items: []
 --- !u!114 &7417685722815587393
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -628,13 +651,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   applicationPeriods:
   - 7
-  - 9
   - 11
-  - 13
   - 15
-  - 17
   - 19
-  appLength: 1.8333334
+  appLength: 3.834
 --- !u!1 &8397003756874805080
 GameObject:
   m_ObjectHideFlags: 0

@@ -25,6 +25,7 @@ public class Player : NetworkBehaviour
     Transform cameraPosition;
     PlayerManager playerManager;
     VotingManager votingManager;
+    ApplicationManager applicationManager;
     RunnerManager rm;
     CameraManager cm;
     CameraMovement camMovement;
@@ -55,6 +56,7 @@ public class Player : NetworkBehaviour
         camMovement = FindFirstObjectByType<CameraMovement>();
         rm = FindFirstObjectByType<RunnerManager>();
         votingManager = FindFirstObjectByType<VotingManager>();
+        applicationManager = FindAnyObjectByType<ApplicationManager>();
         Init?.Invoke();
         if (!HasInputAuthority) return;
         if (SteamManager.Initialized) RPC_SendNickname(SteamFriends.GetPersonaName());
@@ -275,5 +277,11 @@ public class Player : NetworkBehaviour
     public void RPC_Vote(int id, PlayerRef voted, RpcInfo info = default)
     {
         votingManager.ReceiveVote(id, info.Source, voted);
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
+    public void RPC_SubmitApplication(Vector2Int jobRef, RpcInfo info = default)
+    {
+        applicationManager.SubmitApplication(jobRef, info.Source);
     }
 }

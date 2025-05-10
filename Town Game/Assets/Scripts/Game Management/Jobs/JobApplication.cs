@@ -53,6 +53,11 @@ public struct JobApplication : INetworkStruct, IEquatable<JobApplication>
         return !(left == right);
     }
 
+    public Vector2Int GetJobRef()
+    {
+        return new Vector2Int(branchReference, jobReference);
+    }
+
     public static JobApplication None
     {
         get

@@ -1,3 +1,4 @@
+using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,15 +19,18 @@ public class PositionUI : MonoBehaviour
     ApplicationManager applicationManager;
     GameManager gameManager;
     PositionButtonUI selectedButton;
+    PlayerManager playerManager;
 
-    // TODO: Make Init get called on start
     public void Init()
     {
         positionManager = FindAnyObjectByType<PositionManager>();
         applicationManager = FindAnyObjectByType<ApplicationManager>();
         gameManager = FindAnyObjectByType<GameManager>();
+        playerManager = FindAnyObjectByType<PlayerManager>();
         applicationManager.onApplicationAdd += AddToApplyList;
         applicationManager.onApplicationRemove += RemoveFromApplyList;
+        positionManager.onJobAdd += AddToJobsList;
+        positionManager.onJobRemove += RemoveFromJobsList;
     }
 
     /// <summary>
@@ -39,6 +43,9 @@ public class PositionUI : MonoBehaviour
         int index = jobObjects.Count + 1;
         GameObject newButton = Instantiate(positionButton, positionHolder);
         PositionButtonUI pbui = newButton.GetComponent<PositionButtonUI>();
+        pbui.SetColor(ownedJob.handler.jobColor);
+        pbui.SetText(ownedJob.name);
+        pbui.SetIcon(ownedJob.icon);
         newButton.transform.SetSiblingIndex(index);
         jobObjects.Add(jobRef, newButton);
         pbui.button.onClick.AddListener(delegate
@@ -60,6 +67,8 @@ public class PositionUI : MonoBehaviour
             jobDescriptionUI.SetPay(ownedJob.pay);
             jobDescriptionUI.SetHours(ownedJob.timeCommitment);
             jobDescriptionUI.ShowButton("RESIGN");
+            jobDescriptionUI.button.onClick.RemoveAllListeners();
+            // TODO: Add resignation code
         });
     }
 
@@ -75,8 +84,10 @@ public class PositionUI : MonoBehaviour
     /// <param name="job"></param>
     public void AddToApplyList(JobApplication application)
     {
-        int localBranch = positionManager.GetBranch(FindAnyObjectByType<RunnerManager>().nRunner.LocalPlayer); // do this differently in the future probably
+        PlayerRef localPlayer = FindAnyObjectByType<RunnerManager>().nRunner.LocalPlayer;// do this differently in the future probably
+        int localBranch = positionManager.GetBranch(localPlayer);
         if ((application.branchReference == localBranch) ^ (application.jobReference >= 0)) return;
+        if (positionManager.PlayerHasJob(localPlayer, application.GetJobRef())) return; // If the player has the job, then don't add the element
         // Adds the button and inserts it in the correct place
         GameObject newButton = Instantiate(positionButton, positionHolder);
         int applyIndex = GetApplyIndex(application);
@@ -111,7 +122,7 @@ public class PositionUI : MonoBehaviour
                 jobDescriptionUI.SetAccess(appJob.buildingAccess);
                 jobDescriptionUI.SetPay(appJob.pay);
                 jobDescriptionUI.SetHours(appJob.timeCommitment);
-                jobDescriptionUI.ShowButton("APPLY");
+                LoadApplied(pbui, appRef);
             });
         }
         else
@@ -135,9 +146,33 @@ public class PositionUI : MonoBehaviour
                 jobDescriptionUI.SetDescription(appBranch.description);
                 jobDescriptionUI.SetDeadline(gameManager.PeriodToClockString(application.deadline / gameManager.hourLength));
                 jobDescriptionUI.ToggleExtraInfo(false);
-                jobDescriptionUI.ShowButton("APPLY");
+                LoadApplied(pbui, appRef);
             });
         }
+    }
+
+    private void SetApplicationDelegate(Vector2Int appRef, PositionButtonUI pbui) {
+        jobDescriptionUI.button.onClick.RemoveAllListeners();
+        if (playerManager.currentPlayer != null)
+        {
+            Player player = playerManager.currentPlayer.GetComponent<Player>();
+            jobDescriptionUI.button.onClick.AddListener(delegate { 
+                player.RPC_SubmitApplication(appRef); 
+                jobDescriptionUI.ShowErrorText("Successfully applied", Color.white);
+                pbui.applied = true;
+            });
+        }
+    }
+
+    private void LoadApplied(PositionButtonUI pbui, Vector2Int appRef)
+    {
+        if (!pbui.applied)
+        {
+            jobDescriptionUI.ShowButton("APPLY");
+            SetApplicationDelegate(appRef, pbui);
+            return;
+        }
+        jobDescriptionUI.ShowErrorText("Successfully applied", Color.white);
     }
 
     public void RemoveFromApplyList(JobApplication application)

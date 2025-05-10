@@ -90,9 +90,11 @@ public class ApplicationManager : NetworkBehaviour
     {
         // If player is in different branch from the job, return
         int playerBranch = positionManager.GetBranch(player);
-        if (playerBranch != job.branchReference) return;
+        if ((playerBranch == job.branchReference) ^ (job.jobReference >= 0)) return;
+        if (positionManager.PlayerHasJob(player, job.GetJobRef())) return;
         if (!applicants.ContainsKey(job))
         {
+            Debug.Log("Added application for " + job.GetJobRef());
             applicants.Add(job, new List<PlayerRef>() { player });
             return;
         }
@@ -200,6 +202,8 @@ public class ApplicationManager : NetworkBehaviour
 
         // Hire the selected players
         foreach (PlayerRef player in selectedPlayers) job.AddPlayer(player);
+
+        RemoveApplication(application);
     }
 
     /// <summary>
@@ -208,24 +212,39 @@ public class ApplicationManager : NetworkBehaviour
     /// <param name="application"></param>
     public void ProcessBranchApplication(JobApplication application)
     {
+        Debug.Log("processing branch app of index " + application.branchReference);
         List<PlayerRef> candidates = new List<PlayerRef>();
         if (applicants.ContainsKey(application))
         {
+            Debug.Log("candidates list created");
             candidates = new List<PlayerRef>(applicants[application]);
         }
         Branch branch = positionManager.branches[application.branchReference];
         // # of players to select
         int numberSelected = branch.maxPlayers - branch.players.Count;
+        if (branch.maxPlayers < 0) numberSelected = 20;
+        Debug.Log("number selected: " + numberSelected);
         List<PlayerRef> selectedPlayers = new List<PlayerRef>();
         while (numberSelected > selectedPlayers.Count && candidates.Count > 0)
         {
             int selectedIndex = Random.Range(0, candidates.Count);
             PlayerRef selectedPlayer = candidates[selectedIndex];
+            Debug.Log("adding selected player");
             selectedPlayers.Add(selectedPlayer);
             candidates.RemoveAt(selectedIndex);
         }
 
         foreach (PlayerRef player in selectedPlayers) positionManager.AddPlayerToBranch(player, branch);
+
+        RemoveApplication(application);
+    }
+
+    private void RemoveApplication(JobApplication application)
+    {
+        if (applicants.ContainsKey(application))
+        {
+            applicants.Remove(application);
+        }
     }
 
     /// <summary>
@@ -285,7 +304,6 @@ public class ApplicationManager : NetworkBehaviour
             if (!previousApplications.Contains(app))
             {
                 previousApplications.Add(app);
-                Debug.Log("Adding");
                 onApplicationAdd?.Invoke(app);
             }
         }
@@ -296,16 +314,12 @@ public class ApplicationManager : NetworkBehaviour
             if (!applications.Contains(app))
             {
                 removalList.Add(app);
-                Debug.Log("Branch ref: " + app.branchReference.ToString() + " Job ref: " + app.jobReference.ToString() + " Deadline: " + app.deadline);
                 onApplicationRemove?.Invoke(app);
             }
         }
         foreach (JobApplication app in removalList)
         {
-            Debug.Log("removing with removal list");
-            Debug.Log("len before " + previousApplications.Count);
             previousApplications.Remove(app);
-            Debug.Log("len after " + previousApplications.Count);
         }
     }
 }

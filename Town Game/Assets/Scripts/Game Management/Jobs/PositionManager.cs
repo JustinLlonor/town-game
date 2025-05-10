@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
 using System;
+using System.Linq;
 
 public class PositionManager : NetworkBehaviour
 {
@@ -12,11 +13,17 @@ public class PositionManager : NetworkBehaviour
     public BranchEvent OnLeaderRemove;
     [Networked, Capacity(20)] NetworkDictionary<PlayerRef, NetworkString<_64>> playerJobs => default;
     [Networked, Capacity(20)] NetworkDictionary<PlayerRef, int> playerBranches => default;
+    public JobEvent onJobAdd;
+    public JobEvent onJobRemove;
+    List<Vector2Int> previousJobs = new List<Vector2Int>();
     RunnerManager runnerManager;
     PlayerManager playerManager;
+    PlayerRef trackedPlayer;
+
 
     public delegate void BranchEvent(PlayerRef player, string branch);
     public delegate void PlayerEvent(PlayerRef player);
+    public delegate void JobEvent(Vector2Int jobRef);
 
     public override void Spawned()
     {
@@ -24,6 +31,13 @@ public class PositionManager : NetworkBehaviour
         playerManager = FindFirstObjectByType<PlayerManager>();
         if (!Runner.IsServer) return;
         runnerManager.onPlayerLeave += PlayerLeave;
+    }
+
+    private void FixedUpdate()
+    {
+        trackedPlayer = runnerManager.nRunner.LocalPlayer;
+        if (trackedPlayer.Equals(PlayerRef.None)) return;
+        CheckPositionChange();
     }
 
     void PlayerLeave(PlayerRef player)
@@ -168,7 +182,6 @@ public class PositionManager : NetworkBehaviour
     public Branch GetBranchFromIndex(int index)
     {
         if (index >= branches.Length || index < 0) return null;
-        Debug.Log(index);
         return branches[index];
     }
 
@@ -253,6 +266,10 @@ public class PositionManager : NetworkBehaviour
     /// <returns></returns>
     public bool PlayerHasJob(PlayerRef player, Vector2Int checkedJob)
     {
+        if (checkedJob.y < 0)
+        {
+            return GetBranch(player) == checkedJob.x;
+        }
         if (!playerJobs.ContainsKey(player)) return false;
         string jobString = playerJobs[player].ToString();
         for (int i = 0; i < jobString.Length; i += 2)
@@ -305,5 +322,33 @@ public class PositionManager : NetworkBehaviour
             if (kvp.Value == branch) count++;
         }
         return count;
+    }
+
+    private void CheckPositionChange()
+    {
+        // Add check
+        Vector2Int[] currentJobs = GetJobRefs(trackedPlayer);
+        foreach (Vector2Int job in currentJobs)
+        {
+            if (!previousJobs.Contains(job))
+            {
+                previousJobs.Add(job);
+                onJobAdd?.Invoke(job);
+            }
+        }
+        // Remove check
+        List<Vector2Int> removalList = new List<Vector2Int>();
+        foreach (Vector2Int job in previousJobs)
+        {
+            if (!currentJobs.Contains(job))
+            {
+                removalList.Add(job);
+                onJobRemove?.Invoke(job);
+            }
+        }
+        foreach (Vector2Int job in removalList)
+        {
+            previousJobs.Remove(job);
+        }
     }
 }
