@@ -7,7 +7,6 @@ public class Corpse : NetworkBehaviour//PunCallbacks
 {
     public string nickname { get; set; }
     public bool isCultist { get; set; }
-    public List<Evidence> evidence;
     public Rigidbody rootRb;
     //[Networked, Capacity(0)] public NetworkLinkedList<Evidence> evidences { get; }
 
@@ -18,11 +17,10 @@ public class Corpse : NetworkBehaviour//PunCallbacks
         ui = FindFirstObjectByType<UIManager>();
     }
 
-    public void Init(PlayerEvidence playerEvidence, Vector3 velocity, bool isMale)
+    public void Init(Vector3 velocity, bool isMale)
     {
         rootRb.velocity = velocity;
         GetComponent<PlayerClothing>().isMale = isMale;
-        playerEvidence.ApplyEvidence(gameObject);
     }
 
     public void AddEvidence(string[] icons, string[] descriptions, float time)

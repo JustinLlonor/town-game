@@ -49,7 +49,6 @@ public class PlayerStats : NetworkBehaviour
 
     CameraShake shake;
     //PhotonView view;
-    PlayerEvidence pe;
     [HideInInspector] public PlayerMovement pm;
     [HideInInspector] public Animator anim;
     [HideInInspector] public PlayerInfoView piv;
@@ -61,7 +60,6 @@ public class PlayerStats : NetworkBehaviour
         //pm = gameObject.GetComponent<PlayerMovement>();
         hLayer = anim.GetLayerIndex(hurtLayer);
         //view = gameObject.GetComponent<PhotonView>();
-        pe = gameObject.GetComponent<PlayerEvidence>();
         //if (!view.IsMine) return;
         shake = FindFirstObjectByType<CameraShake>();
         //if (FindObjectOfType<GameManager>() != null)AddAffector(hungerAffecter);
@@ -207,7 +205,7 @@ public class PlayerStats : NetworkBehaviour
     {
         if (HP <= 0f)
         {
-            //Kill();
+            Kill();
         }
     }
 
@@ -229,7 +227,7 @@ public class PlayerStats : NetworkBehaviour
         Quaternion newRot = Quaternion.Euler(0f, GetComponent<Player>().camDirection, 0f);
         NetworkObject corpse = Runner.Spawn(corpsePrefab, rb.position, newRot, null, (runner, o) =>
         {
-            o.GetComponent<Corpse>().Init(pe, rb.velocity, pc.isMale);
+            o.GetComponent<Corpse>().Init(rb.velocity, pc.isMale);
         });
 
         PlayerClothing cpc = corpse.GetComponent<PlayerClothing>(); // Corpse player clothing

@@ -48,7 +48,6 @@ public class ApplicationHandler : NetworkBehaviour
             return;
         }
         float localTime = gameManager.GetLocalTimeFromGameTime();
-        Debug.Log(localTime);
         if (applicationPeriods[periodsPassed] < localTime)
         {
             Debug.Log(applicationPeriods[periodsPassed] + " got passed by " + localTime);
