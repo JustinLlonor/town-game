@@ -40,6 +40,8 @@ public class PlayerManager : NetworkBehaviour
 
     public bool removePlayers = false;
 
+    public static PlayerManager i;
+
     [System.Serializable]
     public class PlayerSettings
     {
@@ -119,26 +121,30 @@ public class PlayerManager : NetworkBehaviour
         }
     }
 
-    private void Start()
+    private void Awake()
     {
-        //if (!PhotonNetwork.IsConnected) return;
-        //if (PhotonNetwork.CurrentRoom == null) return;
-        //GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawn.position, spawn.rotation);
-        //OnInstantiatePlayer?.Invoke(player);
-        //PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
-        //PlayerInventory playerInventory = player.GetComponent<PlayerInventory>();
-        //playerInventory.camTransform = camTransform;
-        //playerInventory.hotbarUI = hotbar;
-        //playerInventory.largeUI = largeUI;
-        //playerMovement.speed = playerSettings.speed;
-        //playerMovement.canJump = playerSettings.canJump;
-
-        //currentPlayer = player;
+        i = this;
     }
+
+    //private void Start()
+    //{
+    //if (!PhotonNetwork.IsConnected) return;
+    //if (PhotonNetwork.CurrentRoom == null) return;
+    //GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawn.position, spawn.rotation);
+    //OnInstantiatePlayer?.Invoke(player);
+    //PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
+    //PlayerInventory playerInventory = player.GetComponent<PlayerInventory>();
+    //playerInventory.camTransform = camTransform;
+    //playerInventory.hotbarUI = hotbar;
+    //playerInventory.largeUI = largeUI;
+    //playerMovement.speed = playerSettings.speed;
+    //playerMovement.canJump = playerSettings.canJump;
+
+    //currentPlayer = player;
+    //}
 
     public override void Spawned()
     {
-        Debug.Log("Spawned");
         networkRunner = FindFirstObjectByType<NetworkRunner>();
     }
 

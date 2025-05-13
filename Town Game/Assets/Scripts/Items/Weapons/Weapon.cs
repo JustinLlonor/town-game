@@ -18,11 +18,10 @@ public class Weapon : Item
     public string deathScreenAnimationState;
     public Shake shake;
     [Header("Sounds")]
-    public string[] attackSounds = new string[] { };
     public string[] damageSounds = new string[] { };
-    [Header("Evidence")]
-    public string[] evidenceDescriptions = new string[] { };
-    public string[] evidenceIcons = new string[] { };
+    //[Header("Evidence")]
+    //public string[] evidenceDescriptions = new string[] { };
+    //public string[] evidenceIcons = new string[] { };
 //    public float headMultiplier = 1.2f;
 //    public bool disablesLegs = false;
 //    public bool concussesHead = false;

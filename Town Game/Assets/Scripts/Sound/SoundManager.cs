@@ -24,12 +24,12 @@ public class SoundManager : MonoBehaviour
 
     public SoundGroup[] soundGroups;
     public GameObject soundInstance;
-    public static SoundManager instance;
+    public static SoundManager i;
     //public PhotonView view;
 
     private void Awake()
     {
-        instance = this;
+        i = this;
 //        if (instance == null)
 //        {
 //            instance = this;

@@ -29,6 +29,13 @@ public class PositionManager : NetworkBehaviour
     public delegate void JobEvent(Vector2Int jobRef);
     public delegate void IntEvent(int integer);
 
+    public static PositionManager i;
+
+    private void Awake()
+    {
+        i = this;
+    }
+
     public override void Spawned()
     {
         init = true;

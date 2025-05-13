@@ -25,7 +25,7 @@ public class Corpse : NetworkBehaviour//PunCallbacks
 
     public void AddEvidence(string[] icons, string[] descriptions, float time)
     {
-        evidence.Add(new Evidence(icons, descriptions, time));
+        //evidence.Add(new Evidence(icons, descriptions, time));
     }
 
     //[PunRPC]
@@ -40,7 +40,7 @@ public class Corpse : NetworkBehaviour//PunCallbacks
     public void InspectCorpse() // Make corpses ask for information from the server, and make locations interest
     {
         return;
-        ui.OpenCorpse(evidence, nickname, isCultist);
+        //ui.OpenCorpse(evidence, nickname, isCultist);
     }
 
     public void SetVelocity(Vector3 velocity)

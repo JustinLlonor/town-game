@@ -5,6 +5,9 @@ using WebSocketSharp;
 using UnityEngine.EventSystems;
 using Fusion;
 
+/// <summary>
+/// Item use code
+/// </summary>
 public class ItemUse : NetworkBehaviour
 {
     [HideInInspector] public Animator animator;

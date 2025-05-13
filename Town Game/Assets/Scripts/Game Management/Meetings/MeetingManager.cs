@@ -14,7 +14,6 @@ public class MeetingManager : NetworkBehaviour
 
     public override void Spawned()
     {
-        Debug.Log("spawned called");
         scheduleManager.OnMasterBlockStart += CheckMeetingStart;
         scheduleManager.OnMasterBlockEnd += CheckMeetingEnd;
         meetingRoom.onPlayerEnter += PlayerEnterMeeting;

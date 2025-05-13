@@ -11654,86 +11654,6 @@ PrefabInstance:
       value: Dinner
       objectReference: {fileID: 0}
     - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[0].icon
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[1].name
-      value: Police
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[0].color.a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[0].color.b
-      value: 0.30541313
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[0].color.g
-      value: 0.8301887
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[0].color.r
-      value: 0.27020293
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[1].color.a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[1].color.b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[1].color.g
-      value: 0.40245447
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[1].color.r
-      value: 0.18396229
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[1].maxPlayers
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[0].description
-      value: Do town things
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[1].description
-      value: The police force
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[0].jobs.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[1].jobs.Array.size
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[1].leadPositionName
-      value: Chief of Police
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[0].jobs.Array.data[0].pay
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[0].jobs.Array.data[0].icon
-      value: 
-      objectReference: {fileID: 2800000, guid: 669f02f136d943e4a954daad8bbcbeac, type: 3}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[0].jobs.Array.data[0].name
-      value: Chef
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: branches.Array.data[1].jobs.Array.data[0].name
       value: Exorcist
       objectReference: {fileID: 0}
@@ -11754,18 +11674,6 @@ PrefabInstance:
       value: Forensics Scientist
       objectReference: {fileID: 0}
     - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[0].jobs.Array.data[0].handler
-      value: 
-      objectReference: {fileID: 110649284601070368}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[0].jobs.Array.data[0].maxPlayers
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[0].jobs.Array.data[0].description
-      value: Cook stuff
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: branches.Array.data[1].jobs.Array.data[0].description
       value: Provides protection against supernatural threats using anomalous relics.
       objectReference: {fileID: 0}
@@ -11784,18 +11692,6 @@ PrefabInstance:
     - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: branches.Array.data[1].jobs.Array.data[4].description
       value: Analyzes evidence and people to help find suspects.
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: branches.Array.data[0].jobs.Array.data[0].buildingAccess.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: 'branches.Array.data[0].jobs.Array.data[0].buildingAccess.Array.data[0]'
-      value: Cafeteria
-      objectReference: {fileID: 0}
-    - target: {fileID: 5948805112163813116, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      propertyPath: 'branches.Array.data[0].jobs.Array.data[0].buildingAccess.Array.data[1]'
-      value: Kitchen
       objectReference: {fileID: 0}
     - target: {fileID: 7710707397463329135, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: Flags

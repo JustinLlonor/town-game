@@ -179,7 +179,7 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
             if (!isCrouching)
             {
                 animator.Play("Jump");
-                if (!HasInputAuthority) SoundManager.instance.Play3D("Jump", groundCheck.position);
+                if (!HasInputAuthority) SoundManager.i.Play3D("Jump", groundCheck.position);
             }
             lastJump = jumpCount;
         }
@@ -293,7 +293,7 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
 
     public void ClientJump()
     {
-        SoundManager.instance.Play3D("Jump", groundCheck.position);
+        SoundManager.i.Play3D("Jump", groundCheck.position);
         shake.StartShake(jumpShake.shakeProperties);
         OnLeap?.Invoke();
     }
@@ -462,7 +462,7 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
                 SoundMaterial sma = hit.transform.GetComponent<SoundMaterial>();
                 if (sma == null) return;
                 string mat = sma.GetSMat(hit.textureCoord);
-                SoundManager.instance.Play3D(mat + "LandHard", transform.position);
+                SoundManager.i.Play3D(mat + "LandHard", transform.position);
             }
         }
         else
@@ -474,7 +474,7 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
                 SoundMaterial sma = hit.transform.GetComponent<SoundMaterial>();
                 if (sma == null) return;
                 string mat = sma.GetSMat(hit.textureCoord);
-                SoundManager.instance.Play3D(mat + "LandSoft", groundCheck.position);
+                SoundManager.i.Play3D(mat + "LandSoft", groundCheck.position);
             }
         }
     }
