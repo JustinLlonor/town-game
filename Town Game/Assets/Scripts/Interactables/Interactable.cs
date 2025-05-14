@@ -9,11 +9,23 @@ public class Interactable : MonoBehaviour
     public bool canInteract = true;
     public Hover[] hovers;
     [Header("Glow")]
+    [Tooltip("If this item glows when hovered on")]
     public bool glow = false;
     public Renderer[] renderers;
     public float glowAmount = 1f;
+    /// <summary>
+    /// Called when the player looks at this interactable on the client
+    /// </summary>
+    public InteractableEvent onLook;
+    /// <summary>
+    /// Called when the player looks away from this interactable on the client
+    /// </summary>
+    public InteractableEvent onLookAway;
+
+    public delegate void InteractableEvent();
 
     bool isGlowing = false;
+    bool isLooking = false;
 
     [Serializable]
     public class Hover
@@ -72,8 +84,36 @@ public class Interactable : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// When player looks at this interactable, called on the client
+    /// </summary>
+    public void Look()
+    {
+        GlowMaterials();
+        InvokeLookEvent();
+    }
 
-    public void GlowMaterials()
+    public void Unlook()
+    {
+        UnglowMaterials();
+        InvokeLookAwayEvent();
+    }
+
+    private void InvokeLookEvent()
+    {
+        if (isLooking) return;
+        isLooking = true;
+        onLook?.Invoke();
+    }
+
+    private void InvokeLookAwayEvent()
+    {
+        if (!isLooking) return;
+        isLooking = false;
+        onLookAway?.Invoke();
+    }
+
+    private void GlowMaterials()
     {
         if (!glow) return;
         foreach (Renderer r in renderers)

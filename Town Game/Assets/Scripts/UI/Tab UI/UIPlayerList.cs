@@ -149,7 +149,6 @@ public class UIPlayerList : MonoBehaviour//PunCallbacks
 
         // Add the vote button to every player that is on the voted list
         List<PlayerRef> votedPlayers = new List<PlayerRef>(vote.votedWhitelist);
-        Debug.Log(vote.votedWhitelist.Count);
         foreach (Transform child in contentHolder.transform)
         {
             TabPlayer tabPlayer = child.GetComponent<TabPlayer>();

@@ -8,6 +8,7 @@ public class Item : ScriptableObject
     [Header("Info")]
     public Texture2D icon;
     public string description = "";
+    public string customType = "";
     public Vector3 placedRotation = Vector3.zero;
     public GameObject itemBehaviourObject;
     public Mesh mesh; // Mesh of the item
@@ -30,5 +31,10 @@ public class Item : ScriptableObject
     {
         public string animation;
         public string layer;
+    }
+
+    public string GetType()
+    {
+        return "Item";
     }
 }

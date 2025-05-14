@@ -173,14 +173,14 @@ public class InteractableFinder : NetworkBehaviour
             if (hit.collider.gameObject != currentInteractable) // Executes if we are looking at an interactable
             {
                 if (!hit.collider.gameObject.GetComponent<Interactable>().canInteract) return; // Can't interact, return
-                if (currentInteraction != null && HasInputAuthority) currentInteraction.UnglowMaterials(); // Stop making the materials glow
+                if (currentInteraction != null && HasInputAuthority) currentInteraction.Unlook(); // Stop making the materials glow
                 currentInteractable = hit.collider.gameObject;
                 currentInteraction = currentInteractable.GetComponent<Interactable>();
                 DisplayInteraction(currentInteraction);
                 if (HasInputAuthority)
                 {
                     CrosshairManager.instance.AddCrosshair(0, 0);
-                    currentInteraction.GlowMaterials();
+                    currentInteraction.Look();
                 }
                 return;
             }
@@ -191,7 +191,7 @@ public class InteractableFinder : NetworkBehaviour
 
     public void ResetInteractions()
     {
-        if (currentInteraction != null && HasInputAuthority) currentInteraction.UnglowMaterials();
+        if (currentInteraction != null && HasInputAuthority) currentInteraction.Unlook();
         currentInteractable = null;
         currentInteraction = null;
         timerRunning = false;

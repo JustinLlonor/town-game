@@ -15,6 +15,7 @@ public class ItemPhys : NetworkBehaviour
     public Color inspectionColor;
     [Networked] public bool pickedUp { get; set; }
     [Networked] public PlayerRef pickedPlayer { get; set; }
+    public ItemUIInfo iuii;
 
     PlayerManager playerManager;
     //PhotonView view;
@@ -22,6 +23,7 @@ public class ItemPhys : NetworkBehaviour
     InteractableFinder finder;
     Interactable interactable;
     Item item;
+    bool inspecting = false;
 
     ChangeDetector changeDetector;
 
@@ -32,6 +34,7 @@ public class ItemPhys : NetworkBehaviour
         //view = gameObject.GetComponent<PhotonView>();
         om = FindFirstObjectByType<ObjectManager>();
         interactable = gameObject.GetComponent<Interactable>();
+        interactable.onLook += SetInspect;
     }
     
     private void Update()
@@ -76,8 +79,28 @@ public class ItemPhys : NetworkBehaviour
         }
     }
 
+    public string GetOwnership()
+    {
+        return "";
+    }
+
+    private void SetInspect()
+    {
+        interactable.hovers[1].lore = "Inspect";
+    }
+
     public void InspectItem()
     {
+        iuii.DescriptionReveal();
+        if (iuii.descriptionRevealed)
+        {
+            interactable.hovers[1].lore = "Hide";
+        }
+        else
+        {
+            interactable.hovers[1].lore = "Inspect";
+        }
+        /**
         interactable.hovers[1].interactKey = Interactable.InteractKey.None;
         interactable.hovers[1].color = inspectionColor;
         StartCoroutine(RollText(1, item.description));
@@ -95,6 +118,7 @@ public class ItemPhys : NetworkBehaviour
         //    fingerprintText = "There seem to be many different smudges and scratches on the object.";
         //}
         //StartCoroutine(RollText(2, fingerprintText));
+        **/
 
     }
 
