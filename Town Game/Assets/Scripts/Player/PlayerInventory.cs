@@ -232,7 +232,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         if (equippedItem.itemBehaviourObject != null)
         {
             itemComponentObject = Instantiate(equippedItem.itemBehaviourObject, itemComponentHolder);
-            object[] data = new object[] { gameObject, itemData[equippedSlot].metadata };
+            object[] data = new object[] { gameObject, itemData[equippedSlot].metadata, hotbar[equippedSlot].ToString() };
             itemComponentObject.SendMessage("Initialize", data, SendMessageOptions.DontRequireReceiver); // Gives metadata information to any listeners
         }
 
