@@ -44,16 +44,13 @@ public class ApplicationHandler : NetworkBehaviour
     {
         if (periodsPassed >= applicationPeriods.Length)
         {
-            Debug.Log("returning, periodsPassed = " + periodsPassed + ", applicationPeriods length = " + applicationPeriods.Length);
             return;
         }
         float localTime = gameManager.GetLocalTimeFromGameTime();
         if (applicationPeriods[periodsPassed] < localTime)
         {
-            Debug.Log(applicationPeriods[periodsPassed] + " got passed by " + localTime);
             CreateApplications(applicationPeriods[periodsPassed]);
             periodsPassed++;
-            Debug.LogWarning("periods passed increment");
         }
     }
 
