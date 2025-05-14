@@ -212,7 +212,11 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
             CrosshairManager.instance.RemoveCrosshair(1);
             if (largeUI != null) largeUI.SetActive(false);
         }
-        if (itemComponentObject != null) Destroy(itemComponentObject);
+        if (itemComponentObject != null)
+        {
+            itemComponentObject.SendMessage("Deinitialize", SendMessageOptions.DontRequireReceiver);
+            Destroy(itemComponentObject);
+        }
         itemComponentObject = null;
 
         equippedSlot = slot;
@@ -225,14 +229,11 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         }
 
         equippedItem = itemManager.itemSearch[hotbar[equippedSlot].ToString()];
-        itemComponentObject = Instantiate(equippedItem.itemComponentHolder, itemComponentHolder);
-        itemComponentObject.SendMessage("OnReceiveMetadata", itemData[equippedSlot].metadata, SendMessageOptions.DontRequireReceiver); // Gives metadata information to any listeners
-
-        if (equippedItem as Weapon)
+        if (equippedItem.itemBehaviourObject != null)
         {
-            //Weapon weapon = (Weapon)equippedItem;
-            //attackManager.SetAttackCooldown(weapon.attackCooldown);
-            //CrosshairManager.instance.AddCrosshair(1, 1);
+            itemComponentObject = Instantiate(equippedItem.itemBehaviourObject, itemComponentHolder);
+            object[] data = new object[] { gameObject, itemData[equippedSlot].metadata };
+            itemComponentObject.SendMessage("Initialize", data, SendMessageOptions.DontRequireReceiver); // Gives metadata information to any listeners
         }
 
         ShowItem(hotbar[equippedSlot].ToString()); // Sync with change detector

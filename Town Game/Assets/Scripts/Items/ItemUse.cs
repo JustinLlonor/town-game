@@ -62,7 +62,7 @@ public class ItemUse : NetworkBehaviour
             return;
         }
         if (item == null) return; // If item doesn't exist
-
+        if (inventory.itemComponentObject == null) return;
         inventory.itemComponentObject.SendMessage("OnPrimaryUse", SendMessageOptions.DontRequireReceiver); // Sends the message OnPrimaryUse to every component in the item component holder
     }
 
@@ -71,7 +71,7 @@ public class ItemUse : NetworkBehaviour
         if (inventory.hotbar[inventory.equippedSlot].ToString().IsNullOrEmpty()) return;
         Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
         if (item == null) return;
-
+        if (inventory.itemComponentObject == null) return;
         inventory.itemComponentObject.SendMessage("OnSecondaryUse", SendMessageOptions.DontRequireReceiver);
     }
 }

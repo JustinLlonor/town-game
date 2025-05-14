@@ -107,11 +107,13 @@ public class ItemPhys : NetworkBehaviour
         if (!eName.IsNullOrEmpty())
         {
             Item item = om.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
+            /**
             if (item.large)
             {
                 finder.iValid = false;
                 return;
             }
+            **/
         }
         int givenSlot = inventory.GiveItem(itemName.ToString(), true);
         if (givenSlot == -1) return; // If inventory is full, return
