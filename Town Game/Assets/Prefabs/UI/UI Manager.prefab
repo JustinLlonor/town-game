@@ -528,6 +528,8 @@ MonoBehaviour:
   tabUI: {fileID: 0}
   glitchObject: {fileID: 6933423066389320224}
   attackQTE: {fileID: 5361299768802958010}
+  uip: {fileID: 0}
+  pui: {fileID: 0}
 --- !u!114 &1050493808116937831
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1491,14 +1493,14 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5887835303439878748}
+  - {fileID: 2570567390726626440}
   m_Father: {fileID: 1833982224847337329}
   m_RootOrder: -2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -47.7}
-  m_SizeDelta: {x: 966.25, y: 50}
+  m_AnchoredPosition: {x: 0, y: -48.7}
+  m_SizeDelta: {x: 362.88, y: 47.9736}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &8278759271113626478
 MonoBehaviour:
@@ -1517,7 +1519,7 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 0
+  m_ChildAlignment: 1
   m_Spacing: 0
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
@@ -1538,11 +1540,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d6a22ee15a15114c96de937514f2e9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fillHeight: 37
+  fillHeight: 21.06
   returnLerp: 20
   alphaLerp: 30
-  interactPrefab: {fileID: 6243351654328185861, guid: 5cb3680d59f4c214c84ed71a9deb855f, type: 3}
-  maxAlpha: 0.65
+  interactPrefab: {fileID: 4696979987020189785, guid: 5cb3680d59f4c214c84ed71a9deb855f, type: 3}
+  maxAlpha: 1
 --- !u!1 &2812546786122978288
 GameObject:
   m_ObjectHideFlags: 0
@@ -6406,14 +6408,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8066145952184584228, guid: 5cb3680d59f4c214c84ed71a9deb855f, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -15.200012
+      objectReference: {fileID: 0}
+    - target: {fileID: 8066145952184584228, guid: 5cb3680d59f4c214c84ed71a9deb855f, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5cb3680d59f4c214c84ed71a9deb855f, type: 3}
---- !u!224 &5887835303439878748 stripped
+--- !u!224 &2570567390726626440 stripped
 RectTransform:
-  m_CorrespondingSourceObject: {fileID: 7619787096213558504, guid: 5cb3680d59f4c214c84ed71a9deb855f, type: 3}
+  m_CorrespondingSourceObject: {fileID: 1992664238880277052, guid: 5cb3680d59f4c214c84ed71a9deb855f, type: 3}
   m_PrefabInstance: {fileID: 4038357763752189620}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7792745600997073667

@@ -460,6 +460,8 @@ MonoBehaviour:
       methodName: PickUpItem
       passPlayerRef: 1
     color: {r: 1, g: 1, b: 1, a: 1}
+    fillColor: {r: 0, g: 0, b: 0, a: 0.5607843}
+    keyColor: {r: 0, g: 0, b: 0, a: 1}
     delay: 0.25
     trackLore: 0
     trackColor: 0
@@ -475,6 +477,8 @@ MonoBehaviour:
       methodName: InspectItem
       passPlayerRef: 0
     color: {r: 1, g: 1, b: 1, a: 1}
+    fillColor: {r: 0, g: 0, b: 0, a: 0.5607843}
+    keyColor: {r: 0, g: 0, b: 0, a: 1}
     delay: 0
     trackLore: 1
     trackColor: 1
@@ -483,10 +487,12 @@ MonoBehaviour:
       clientAction:
         m_PersistentCalls:
           m_Calls: []
-  - lore: 
+  - lore: Test text
     interactKey: 0
     actions: []
-    color: {r: 0.77254903, g: 0.77254903, b: 0.77254903, a: 1}
+    color: {r: 1, g: 0, b: 0, a: 1}
+    fillColor: {r: 0, g: 0, b: 0, a: 0.5607843}
+    keyColor: {r: 1, g: 0, b: 0, a: 1}
     delay: 0.1
     trackLore: 1
     trackColor: 0
@@ -1239,7 +1245,7 @@ MonoBehaviour:
   descriptionText: {fileID: 1766105611126586997}
   panelAnimator: {fileID: 8087953089567049405}
   billboard: {fileID: 3276509499928819380}
-  closeTime: 0.334
+  yOffset: 0.35
   descriptionRevealed: 0
 --- !u!114 &3276509499928819380
 MonoBehaviour:

@@ -34,6 +34,8 @@ public class Interactable : MonoBehaviour
         public InteractKey interactKey;
         public Action[] actions;
         public Color color = Color.white;
+        public Color fillColor = new Color(0, 0, 0, 0.5607843f);
+        public Color keyColor = Color.black;
         public float delay;
         public bool trackLore = false;
         public bool trackColor = false;

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using WebSocketSharp;
+using UnityEngine.InputSystem;
 
 public class InteractableUI : MonoBehaviour
 {
@@ -21,6 +23,7 @@ public class InteractableUI : MonoBehaviour
 
     private void Update()
     {
+        return;
         if (interacted != null)
         {
             if (iAlpha == 0f) return;
@@ -41,30 +44,77 @@ public class InteractableUI : MonoBehaviour
         {
             if (child != interacted)
             {
-                TextMeshProUGUI text = child.GetComponent<TextMeshProUGUI>();
+                TextMeshProUGUI text = child.GetChild(1).GetComponent<TextMeshProUGUI>();
                 text.color = new Color(text.color.r, text.color.g, text.color.b, alpha);
+                KeyUI keyUI = GetComponentInChildren<KeyUI>();
+                Color keyTextColor = keyUI.keyText.color;
+                keyUI.SetKeyColor(new Color(keyTextColor.r, keyTextColor.g, keyTextColor.b, alpha));
+                keyUI.SetKeyAlpha(alpha);
             }
         }
     }
 
-    public void AddInteraction(string text, Color color)
+    public void AddInteraction(string key, string text, Color color, Color fillColor)
     {
         GameObject interaction = Instantiate(interactPrefab, transform);
-        TextMeshProUGUI tex = interaction.GetComponent<TextMeshProUGUI>();
+        TextMeshProUGUI tex = interaction.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
         tex.text = text;
         tex.color = new Color(color.r, color.g, color.b, maxAlpha);
-        interaction.transform.GetChild(0).GetComponent<Image>().color = new Color(color.r, color.g, color.b, 0.3f);
-    }
-    public void SetInteractionLore(int index, string lore)
-    {
-        transform.GetChild(index).GetComponent<TextMeshProUGUI>().text = lore;
+        interaction.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = fillColor;
+        KeyUI keyUI = interaction.GetComponentInChildren<KeyUI>();
+        if (!key.IsNullOrEmpty())
+        {
+            keyUI.SetKey(key);
+            keyUI.gameObject.SetActive(true);
+        }
+        else
+        {
+            keyUI.gameObject.SetActive(false);
+        }
+        Canvas.ForceUpdateCanvases();
     }
 
-    public void SetInteractionColor(int index, Color color)
+
+    public void SetInteractionLore(string key, int index, string lore)
     {
-        TextMeshProUGUI tmp = transform.GetChild(index).GetComponent<TextMeshProUGUI>();
+        bool refreshCanvas = false;
+        Transform interaction = transform.GetChild(index);
+        TextMeshProUGUI iText = interaction.GetChild(1).GetComponent<TextMeshProUGUI>();
+        if (iText.text != lore)
+        {
+            iText.text = lore;
+            refreshCanvas = true;
+        }
+        KeyUI keyUI = interaction.GetChild(0).GetComponent<KeyUI>();
+        Debug.Log(keyUI);
+        if (!key.IsNullOrEmpty())
+        {
+            if (!keyUI.gameObject.activeSelf) refreshCanvas = true;
+            keyUI.SetKey(key);
+            keyUI.gameObject.SetActive(true);
+        }
+        else
+        {
+            if (keyUI.gameObject.activeSelf) refreshCanvas = true;
+            keyUI.gameObject.SetActive(false);
+        }
+        if (refreshCanvas)
+        {
+            keyUI.gameObject.SetActive(!keyUI.gameObject.activeSelf);
+            Canvas.ForceUpdateCanvases();
+            keyUI.gameObject.SetActive(!keyUI.gameObject.activeSelf);
+            Canvas.ForceUpdateCanvases();
+        }
+    }
+
+    public void SetInteractionColor(int index, Color color, Color keyColor)
+    {
+        Transform interaction = transform.GetChild(index);
+        TextMeshProUGUI tmp = interaction.GetChild(1).GetComponent<TextMeshProUGUI>();
         color.a = tmp.color.a;
-        transform.GetChild(index).GetComponent<TextMeshProUGUI>().color = color;
+        tmp.color = color;
+        KeyUI keyUI = interaction.GetComponentInChildren<KeyUI>();
+        keyUI.SetKeyColor(keyColor);
     }
 
 
@@ -86,7 +136,7 @@ public class InteractableUI : MonoBehaviour
 
     public void StopHighlight()
     {
-        if (interacted != null) ((RectTransform)interacted.GetChild(0)).sizeDelta = new Vector2(1700f, 0f);
+        if (interacted != null) ((RectTransform)interacted.GetChild(0).GetChild(0)).sizeDelta = new Vector2(1700f, 0f);
         interacted = null;
         StopAllCoroutines();
     }
@@ -94,14 +144,14 @@ public class InteractableUI : MonoBehaviour
     public void SetHighlight(Transform interaction, float percent)
     {
         if (interacted != interaction) interacted = interaction;
-        RectTransform img = (RectTransform)interaction.GetChild(0);
+        RectTransform img = (RectTransform)interaction.GetChild(0).GetChild(0);
         img.sizeDelta = new Vector2(img.sizeDelta.x, percent * fillHeight);
     }
 
     IEnumerator HighlightAnimation(Transform interaction, float interactionTime)
     {
         float timer = 0f;
-        RectTransform img = (RectTransform)interaction.GetChild(0);
+        RectTransform img = (RectTransform)interaction.GetChild(0).GetChild(0);
         while (timer < interactionTime)
         {
             timer += Time.deltaTime;

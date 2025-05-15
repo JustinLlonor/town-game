@@ -366,12 +366,12 @@ public class InteractableFinder : NetworkBehaviour
                 string interactText = InputControlPath.ToHumanReadableString(
                     interactAction.bindings[bindingIndex].effectivePath,
                     InputControlPath.HumanReadableStringOptions.OmitDevice);
-                iui.AddInteraction($"[{interactText}] {h.lore}\n", h.color);
+                iui.AddInteraction(interactText, $"{h.lore}\n", h.color, h.fillColor);
                 if (h.trackColor || h.trackLore) trackedIndexes.Add(i);
                 i++;
                 continue;
             }
-            iui.AddInteraction($"{h.lore}\n", h.color);
+            iui.AddInteraction("", $"{h.lore}\n", h.color, h.fillColor);
             if (h.trackColor || h.trackLore) trackedIndexes.Add(i);
             i++;
         }
@@ -387,12 +387,12 @@ public class InteractableFinder : NetworkBehaviour
         Interactable.Hover[] hovers = currentInteraction.hovers;
         foreach (int i in trackedIndexes)
         {
-            if (hovers[i].trackColor) iui.SetInteractionColor(i, hovers[i].color);
+            if (hovers[i].trackColor) iui.SetInteractionColor(i, hovers[i].color, hovers[i].keyColor);
             if (hovers[i].trackLore)
             {
                 if (hovers[i].interactKey == Interactable.InteractKey.None)
                 {
-                    iui.SetInteractionLore(i, hovers[i].lore);
+                    iui.SetInteractionLore("", i, hovers[i].lore);
                 } else
                 {
                     InputAction interactAction = ToInteractAction(hovers[i].interactKey).action;
@@ -400,7 +400,7 @@ public class InteractableFinder : NetworkBehaviour
                     string interactText = InputControlPath.ToHumanReadableString(
                         interactAction.bindings[bindingIndex].effectivePath,
                         InputControlPath.HumanReadableStringOptions.OmitDevice);
-                    iui.SetInteractionLore(i, $"[{interactText}] {hovers[i].lore}\n");
+                    iui.SetInteractionLore(interactText, i, $"{hovers[i].lore}\n");
                 }
             }
         }

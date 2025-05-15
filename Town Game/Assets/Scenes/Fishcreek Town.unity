@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.14712575, g: 0.17876674, b: 0.11010596, a: 1}
+  m_IndirectSpecularColor: {r: 0.14712596, g: 0.17876688, b: 0.11010601, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3246,7 +3246,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh47930
+  m_Name: pb_Mesh104600
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -3503,7 +3503,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh48064
+  m_Name: pb_Mesh104734
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -11982,6 +11982,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 57268786583739488, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 57268786583739488, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 57268786583739488, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 388.13
+      objectReference: {fileID: 0}
+    - target: {fileID: 57268786583739488, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 238.84296
+      objectReference: {fileID: 0}
+    - target: {fileID: 57268786583739488, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -22.8
+      objectReference: {fileID: 0}
     - target: {fileID: 922143092667609872, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
       propertyPath: m_Name
       value: UI Manager
@@ -12004,7 +12024,7 @@ PrefabInstance:
       objectReference: {fileID: 7453756831835282216}
     - target: {fileID: 1391788393242172441, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
       propertyPath: m_Color.a
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1668631641761126480, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
       propertyPath: m_IsActive
@@ -12102,17 +12122,53 @@ PrefabInstance:
       propertyPath: text
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 2570567390726626440, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2570567390726626440, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2570567390726626440, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2570567390726626440, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2570567390726626440, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 432.90796
+      objectReference: {fileID: 0}
+    - target: {fileID: 2570567390726626440, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 181.44
+      objectReference: {fileID: 0}
+    - target: {fileID: 2570567390726626440, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -22.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2682829777922981998, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2682829777922981998, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2682829777922981998, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 17.38898
+      objectReference: {fileID: 0}
+    - target: {fileID: 2682829777922981998, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -22.8
+      objectReference: {fileID: 0}
     - target: {fileID: 3831975536681494021, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
       propertyPath: m_IsActive
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5338607314313202047, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 47.9736
-      objectReference: {fileID: 0}
-    - target: {fileID: 5338607314313202047, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -48.713215
       objectReference: {fileID: 0}
     - target: {fileID: 5887835303439878748, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
       propertyPath: m_AnchorMax.y
@@ -12178,6 +12234,10 @@ PrefabInstance:
       propertyPath: m_fontColor32.rgba
       value: 16777215
       objectReference: {fileID: 0}
+    - target: {fileID: 8729144398792019693, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9103112413594993547, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -12186,6 +12246,7 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 7494334294667390774, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
     - {fileID: 7975865857500244657, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
+    - {fileID: 8729144398792019693, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 1833982224847337329, guid: 530f2235f00802d4393dd0ade84f1445, type: 3}
       insertIndex: 6
