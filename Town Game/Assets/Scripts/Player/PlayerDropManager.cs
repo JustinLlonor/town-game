@@ -115,7 +115,7 @@ public class PlayerDropManager : NetworkBehaviour
         ItemPhys pItem = itemObj.GetComponent<ItemPhys>();
         pItem.itemName = item.name;
         pItem.gameObject.name = item.name;
-        pItem.property = iSurface.property;
+        pItem.room = iSurface.property.roomName;
         TransferItemData(inventory.itemData[inventory.equippedSlot], pItem);
 
         inventory.RemoveItem(inventory.equippedSlot);

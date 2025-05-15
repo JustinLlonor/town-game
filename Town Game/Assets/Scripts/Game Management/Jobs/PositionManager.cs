@@ -371,6 +371,12 @@ public class PositionManager : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Returns true if a player has access to the specified room
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="room"></param>
+    /// <returns></returns>
     public bool PlayerHasAccessToRoom(PlayerRef player, string room)
     {
         Vector2Int[] jobRefs = GetJobRefs(player);

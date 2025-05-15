@@ -15,11 +15,15 @@ public class ItemPhys : NetworkBehaviour
     public Color inspectionColor;
     [Networked] public bool pickedUp { get; set; }
     [Networked] public PlayerRef pickedPlayer { get; set; }
-    public MapRoom property;
+    [Networked] public NetworkString<_32> room { get; set; } // The name of the MapRoom this item belongs to
     public ItemUIInfo iuii;
+    public InteractableSettings pickUpSettings = new InteractableSettings();
+    public InteractableSettings notOwnedSettings = new InteractableSettings();
+    public InteractableSettings stealSettings = new InteractableSettings();
 
+    PositionManager positionManager;
+    RoomManager roomManager;
     PlayerManager playerManager;
-    //PhotonView view;
     ObjectManager om;
     InteractableFinder finder;
     Interactable interactable;
@@ -27,6 +31,16 @@ public class ItemPhys : NetworkBehaviour
     bool inspecting = false;
 
     ChangeDetector changeDetector;
+
+    [System.Serializable]
+    public struct InteractableSettings
+    {
+        public string text;
+        public bool enableKey;
+        public Color textColor;
+        public Color keyColor;
+        public Color fillColor;
+    }
 
     private void Awake()
     {
@@ -36,6 +50,8 @@ public class ItemPhys : NetworkBehaviour
         om = FindFirstObjectByType<ObjectManager>();
         interactable = gameObject.GetComponent<Interactable>();
         interactable.onLook += SetInspect;
+        positionManager = FindAnyObjectByType<PositionManager>();
+        roomManager = FindAnyObjectByType<RoomManager>();
     }
     
     private void Update()
@@ -62,6 +78,7 @@ public class ItemPhys : NetworkBehaviour
 
     public override void Render()
     {
+        // Change detector for itme property here, then execute local
         foreach (var change in changeDetector.DetectChanges(this))
         {
             switch (change)
@@ -82,11 +99,7 @@ public class ItemPhys : NetworkBehaviour
 
     public string GetOwnership()
     {
-        if (property != null)
-        {
-            return property.roomName;
-        }
-        return "";
+        return room.ToString();
     }
 
     private void SetInspect()
@@ -173,6 +186,49 @@ public class ItemPhys : NetworkBehaviour
         gameObject.GetComponent<MeshFilter>().mesh = item.mesh;
         gameObject.GetComponent<MeshRenderer>().material.SetTexture("_MainTex", item.texture);
         SetColliderBounds();
+    }
+
+    public void GetLocalOwnership()
+    {
+        bool isCultist = playerManager.currentPlayerProperties.isCultist;
+        bool ownsProperty = positionManager.PlayerHasAccessToRoom(Runner.LocalPlayer, room.ToString());
+        if (!isCultist)
+        {
+            if (ownsProperty)
+            {
+                SetPickupHover(pickUpSettings);
+            }
+            else
+            {
+                SetPickupHover(notOwnedSettings);
+            }
+        }
+        else
+        {
+            if (ownsProperty)
+            {
+                SetPickupHover(pickUpSettings);
+            }
+            else
+            {
+                SetPickupHover(stealSettings);
+            }
+        }
+    }
+
+    void SetPickupHover(InteractableSettings settings)
+    {
+        Interactable.Hover hover = interactable.hovers[0];
+        hover.lore = settings.text;
+        hover.color = settings.textColor;
+        hover.fillColor = settings.fillColor;
+        hover.keyColor = settings.keyColor;
+        if (settings.enableKey)
+        {
+            hover.interactKey = Interactable.InteractKey.Interact1;
+            return;
+        }
+        hover.interactKey = Interactable.InteractKey.None;
     }
 
     void SetColliderBounds()
