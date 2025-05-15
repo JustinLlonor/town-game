@@ -1,11 +1,30 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ItemSurface : MonoBehaviour
 {
-    public Collider innerBounds;
-    public Collider outerBounds;
+    public MapRoom property;
+    public BoxCollider innerBounds;
+    [Tooltip("Doesn't need to be assigned, if this is left to null then it takes from innerBounds")]
+    public BoxCollider outerBounds;
+    public float outerExtent = 0.025f;
+
+    private void OnEnable()
+    {
+        if (outerBounds == null)
+        {
+            CreateOuterBounds();
+        }
+    }
+
+    void CreateOuterBounds()
+    {
+        outerBounds = transform.GetChild(0).AddComponent<BoxCollider>();
+        outerBounds.size = innerBounds.size + Vector3.one * outerExtent;
+        outerBounds.center = innerBounds.center;
+    }
 
     /// <summary>
     /// Returns true if a box collider is within this item surface's bounds

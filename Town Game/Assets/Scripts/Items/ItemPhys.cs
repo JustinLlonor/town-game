@@ -15,6 +15,7 @@ public class ItemPhys : NetworkBehaviour
     public Color inspectionColor;
     [Networked] public bool pickedUp { get; set; }
     [Networked] public PlayerRef pickedPlayer { get; set; }
+    public MapRoom property;
     public ItemUIInfo iuii;
 
     PlayerManager playerManager;
@@ -81,6 +82,10 @@ public class ItemPhys : NetworkBehaviour
 
     public string GetOwnership()
     {
+        if (property != null)
+        {
+            return property.roomName;
+        }
         return "";
     }
 

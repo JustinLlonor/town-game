@@ -45,7 +45,7 @@ public class ItemGizmo : NetworkBehaviour
         playerManager.GetPlayerNetworkObject(Object.InputAuthority).GetComponent<PlayerDropManager>().gizmo = this;
     }
 
-    public bool CheckPlaceable()
+    public ItemSurface GetItemSurface()
     {
         foreach (GameObject collision  in currentCollisions)
         {
@@ -54,11 +54,11 @@ public class ItemGizmo : NetworkBehaviour
             {
                 if (iSurface.WithinSurface(bCollider, currentCollisions)) // If this item gizmo is within the box collider's surface, return true
                 {
-                    return true;
+                    return iSurface;
                 }
             }
         }
-        return false; // Returns false if the item is within no item surface
+        return null; // Returns false if the item is within no item surface
     }
 
     public void SetMaterial(bool allowedPlace)

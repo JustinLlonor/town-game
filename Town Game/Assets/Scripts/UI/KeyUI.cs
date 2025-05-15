@@ -16,7 +16,6 @@ public class KeyUI : MonoBehaviour
 
     public void SetKeyColor(Color color)
     {
-        Debug.Log("set key color");
         keyText.color = color;
     }
 

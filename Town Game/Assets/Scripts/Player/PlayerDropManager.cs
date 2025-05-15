@@ -94,15 +94,17 @@ public class PlayerDropManager : NetworkBehaviour
 
     void VerifyPlacement() // Places the item if the item placement is valid
     {
-        if (gizmo.CheckPlaceable() && isPlace)
+        ItemSurface iSurface = gizmo.GetItemSurface();
+        Debug.LogError(iSurface);
+        if (iSurface != null && isPlace)
         {
-            PlaceItem();
+            PlaceItem(iSurface);
             return;
         }
         // Play an error sfx
     }
 
-    void PlaceItem()
+    void PlaceItem(ItemSurface iSurface)
     {
         Item item = GetCurrentItem();
         if (item == null) return;
@@ -113,6 +115,7 @@ public class PlayerDropManager : NetworkBehaviour
         ItemPhys pItem = itemObj.GetComponent<ItemPhys>();
         pItem.itemName = item.name;
         pItem.gameObject.name = item.name;
+        pItem.property = iSurface.property;
         TransferItemData(inventory.itemData[inventory.equippedSlot], pItem);
 
         inventory.RemoveItem(inventory.equippedSlot);
@@ -152,7 +155,7 @@ public class PlayerDropManager : NetworkBehaviour
             }
             isPlace = true;
             gizmo.checkForCollisions = true;
-            gizmo.SetMaterial(gizmo.CheckPlaceable());
+            gizmo.SetMaterial(gizmo.GetItemSurface() != null);
         } 
         else
         {

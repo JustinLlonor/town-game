@@ -72,9 +72,11 @@ public class InteractableUI : MonoBehaviour
         {
             keyUI.gameObject.SetActive(false);
         }
+        keyUI.gameObject.SetActive(!keyUI.gameObject.activeSelf);
+        Canvas.ForceUpdateCanvases();
+        keyUI.gameObject.SetActive(!keyUI.gameObject.activeSelf);
         Canvas.ForceUpdateCanvases();
     }
-
 
     public void SetInteractionLore(string key, int index, string lore)
     {
