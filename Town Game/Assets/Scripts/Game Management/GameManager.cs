@@ -341,7 +341,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
 
     public void SetChosenBuilding(string buildingName, PlayerRef player)//, PhotonMessageInfo info) 
     {
-        if (buildingName != "house")
+        if (buildingName != "house" && positionManager.PlayerHasAccessToRoom(player, buildingName))
         {
             MapRoom foundRoom = Array.Find(rm.workRooms.ToArray(), room => room.roomName == buildingName);
             if (foundRoom != null) // if the room is found

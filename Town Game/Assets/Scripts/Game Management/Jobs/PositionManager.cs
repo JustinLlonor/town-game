@@ -370,4 +370,15 @@ public class PositionManager : NetworkBehaviour
             onBranchSwitch?.Invoke(currentBranch);
         }
     }
+
+    public bool PlayerHasAccessToRoom(PlayerRef player, string room)
+    {
+        Vector2Int[] jobRefs = GetJobRefs(player);
+        foreach (Vector2Int jobRef in jobRefs)
+        {
+            Job job = GetJobFromRef(jobRef);
+            if (job.buildingAccess.Contains(room)) return true;
+        }
+        return false;
+    }
 }

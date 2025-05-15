@@ -4,11 +4,13 @@ using UnityEngine;
 using System;
 using System.Linq;
 using Steamworks;
+using Fusion;
 
 public class RoomManager : MonoBehaviour
 {
     public string testRoom;
     public List<MapRoom> playerRooms = new List<MapRoom>();
+    [Header("Make this auto-add work rooms later")]
     public List<MapRoom> workRooms = new List<MapRoom>();
     [Header("Building Choosing Sequence")]
     public Transform buildingCameraTransform;
@@ -26,6 +28,7 @@ public class RoomManager : MonoBehaviour
     PlayerManager pm;
     InputManager inputManager;
     CursorManager cursorManager;
+    PositionManager positionManager;
     bool buildingsChosen = false; // If the building choosing sequence is happening
     int chosenBuilding = 0;
 
@@ -38,6 +41,7 @@ public class RoomManager : MonoBehaviour
         pm = FindFirstObjectByType<PlayerManager>();
         inputManager = FindFirstObjectByType<InputManager>();
         cursorManager = FindFirstObjectByType<CursorManager>();
+        positionManager = FindAnyObjectByType<PositionManager>();
         foreach (Transform child in transform)
         {
             if (!child.gameObject.activeSelf) continue;
@@ -71,13 +75,17 @@ public class RoomManager : MonoBehaviour
     /// </summary>
     void BuildingChooseStart()
     {
+        PlayerRef localPlayer = positionManager.Runner.LocalPlayer;
         Debug.Log("starting");
         //if (!gm.alivePlayers.Contains(PhotonNetwork.LocalPlayer)) return;
         ownedRooms = new List<MapRoom>() { playerRooms[pm.currentPlayerProperties.room] }; // Creates new owned rooms list
         foreach (MapRoom room in workRooms)
         {
-            ownedRooms.Add(room);
-            Debug.Log("Added " + room.roomName);
+            if (positionManager.PlayerHasAccessToRoom(localPlayer, room.roomName))
+            {
+                ownedRooms.Add(room);
+                Debug.Log("Added " + room.roomName);
+            }
             //if (room.workers.Contains(PhotonNetwork.LocalPlayer)) ownedRooms.Add(room);
         }
         // Sets the default hovered/selected building to the player's house

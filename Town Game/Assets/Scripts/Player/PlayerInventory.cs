@@ -242,7 +242,6 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     // Shows the item on both client and server side
     public void ShowItem(string itemName)
     {
-        Debug.Log("Showing");
         if (itemName.IsNullOrEmpty()) return;
         Item equippedItem = itemManager.itemSearch[itemName];
         sFilter.mesh = equippedItem.mesh;
