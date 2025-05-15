@@ -87,6 +87,13 @@ public class ItemPhys : NetworkBehaviour
                     CreateItem();
                     RenderItem();
                     break;
+                case (nameof(room)):
+                    if (!room.ToString().IsNullOrEmpty())
+                    {
+                        roomManager.GetWorkBuilding(room.ToString()).onAccessUpdate += GetLocalOwnership;
+                    }
+                    GetLocalOwnership();
+                    break;
             }
                 
         }
@@ -186,6 +193,11 @@ public class ItemPhys : NetworkBehaviour
         gameObject.GetComponent<MeshFilter>().mesh = item.mesh;
         gameObject.GetComponent<MeshRenderer>().material.SetTexture("_MainTex", item.texture);
         SetColliderBounds();
+    }
+
+    private void GetLocalOwnership(PlayerRef player)
+    {
+        GetLocalOwnership();
     }
 
     public void GetLocalOwnership()

@@ -42,6 +42,8 @@ public class RoomManager : MonoBehaviour
         inputManager = FindFirstObjectByType<InputManager>();
         cursorManager = FindFirstObjectByType<CursorManager>();
         positionManager = FindAnyObjectByType<PositionManager>();
+        positionManager.onJobAdd += InvokeAccessChangeEvent;
+        positionManager.onJobRemove += InvokeAccessChangeEvent;
         foreach (Transform child in transform)
         {
             if (!child.gameObject.activeSelf) continue;
@@ -214,4 +216,16 @@ public class RoomManager : MonoBehaviour
     {
         buildingChooseUI.SetActive(false);
     }
+
+    private void InvokeAccessChangeEvent(Vector2Int addedJob)
+    {
+        // Get player access rooms and invoke the access change event
+        string[] accessRooms = positionManager.GetJobFromRef(addedJob).buildingAccess;
+
+        foreach (string accessRoom in accessRooms)
+        {
+            GetWorkBuilding(accessRoom).onAccessUpdate?.Invoke(positionManager.Runner.LocalPlayer);
+        }
+    }
+
 }

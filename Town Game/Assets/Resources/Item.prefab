@@ -438,7 +438,29 @@ MonoBehaviour:
   interactTimer: 0
   inspectionColor: {r: 0.7735849, g: 0.7735849, b: 0.7735849, a: 1}
   _pickedUp: 0
+  _room:
+    _length: 0
+    _data:
+      Data: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   iuii: {fileID: 68000415256877264}
+  pickUpSettings:
+    text: Pick up
+    enableKey: 1
+    textColor: {r: 1, g: 1, b: 1, a: 1}
+    keyColor: {r: 0, g: 0, b: 0, a: 1}
+    fillColor: {r: 0, g: 0, b: 0, a: 0.56078434}
+  notOwnedSettings:
+    text: Pick up
+    enableKey: 0
+    textColor: {r: 0.44, g: 0.44, b: 0.44, a: 1}
+    keyColor: {r: 0, g: 0, b: 0, a: 0}
+    fillColor: {r: 0, g: 0, b: 0, a: 0}
+  stealSettings:
+    text: Steal
+    enableKey: 1
+    textColor: {r: 0.7735849, g: 0.30943394, b: 0.30943394, a: 1}
+    keyColor: {r: 0.77254903, g: 0.30980393, b: 0.30980393, a: 1}
+    fillColor: {r: 0.77254903, g: 0.30980393, b: 0.30980393, a: 0.5058824}
 --- !u!114 &5799700709153586727
 MonoBehaviour:
   m_ObjectHideFlags: 0
