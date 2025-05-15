@@ -13,6 +13,7 @@ public class InteractableUI : MonoBehaviour
     public float alphaLerp = 40f;
     public GameObject interactPrefab;
     public float maxAlpha = .6f;
+    public AnimationCurve fillCurve;
     Transform interacted = null;
     float iAlpha = 1f;
 
@@ -145,7 +146,8 @@ public class InteractableUI : MonoBehaviour
     {
         if (interacted != interaction) interacted = interaction;
         RectTransform img = (RectTransform)interaction.GetChild(0).GetChild(0);
-        img.sizeDelta = new Vector2(img.sizeDelta.x, percent * fillHeight);
+        float eval = fillCurve.Evaluate(percent);
+        img.sizeDelta = new Vector2(img.sizeDelta.x, eval * fillHeight);
     }
 
     IEnumerator HighlightAnimation(Transform interaction, float interactionTime)
@@ -156,7 +158,8 @@ public class InteractableUI : MonoBehaviour
         {
             timer += Time.deltaTime;
             float percent = timer / interactionTime;
-            img.sizeDelta = new Vector2(img.sizeDelta.x, percent * fillHeight);
+            float eval = fillCurve.Evaluate(percent);
+            img.sizeDelta = new Vector2(img.sizeDelta.x, eval * fillHeight);
             yield return null;
         }
     }
