@@ -95,7 +95,6 @@ public class PlayerDropManager : NetworkBehaviour
     void VerifyPlacement() // Places the item if the item placement is valid
     {
         ItemSurface iSurface = gizmo.GetItemSurface();
-        Debug.LogError(iSurface);
         if (iSurface != null && isPlace)
         {
             PlaceItem(iSurface);

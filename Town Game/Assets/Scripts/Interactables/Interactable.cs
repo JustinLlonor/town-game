@@ -46,6 +46,8 @@ public class Interactable : MonoBehaviour
         {
             public bool networked = false;
             public UnityEvent clientAction;
+            [Tooltip("If this is set to a key, then this hover action will trigger always with this key, even if the key is different on the server.")]
+            public InteractKey indiffKey = InteractKey.None;
         }
     }
 

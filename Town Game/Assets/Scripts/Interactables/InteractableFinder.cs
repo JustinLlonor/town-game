@@ -215,8 +215,8 @@ public class InteractableFinder : NetworkBehaviour
         int i = 0;
         foreach (Interactable.Hover h in currentInteraction.hovers)
         {
-            if (h.interactKey == Interactable.InteractKey.None) continue;
-            if (h.interactKey == key)
+            if (h.interactKey == Interactable.InteractKey.None && h.networkSettings.indiffKey == Interactable.InteractKey.None) continue;
+            if (h.interactKey == key || (h.networkSettings.indiffKey == key && h.networkSettings.indiffKey != Interactable.InteractKey.None))
             {
                 if (!h.networkSettings.networked)
                 {
@@ -366,12 +366,12 @@ public class InteractableFinder : NetworkBehaviour
                 string interactText = InputControlPath.ToHumanReadableString(
                     interactAction.bindings[bindingIndex].effectivePath,
                     InputControlPath.HumanReadableStringOptions.OmitDevice);
-                iui.AddInteraction(interactText, $"{h.lore}\n", h.color, h.fillColor);
+                iui.AddInteraction(interactText, $"{h.lore}\n", h.color, h.fillColor, h.keyColor);
                 if (h.trackColor || h.trackLore) trackedIndexes.Add(i);
                 i++;
                 continue;
             }
-            iui.AddInteraction("", $"{h.lore}\n", h.color, h.fillColor);
+            iui.AddInteraction("", $"{h.lore}\n", h.color, h.fillColor, h.keyColor);
             if (h.trackColor || h.trackLore) trackedIndexes.Add(i);
             i++;
         }
@@ -387,13 +387,17 @@ public class InteractableFinder : NetworkBehaviour
         Interactable.Hover[] hovers = currentInteraction.hovers;
         foreach (int i in trackedIndexes)
         {
-            if (hovers[i].trackColor) iui.SetInteractionColor(i, hovers[i].color, hovers[i].keyColor);
+            if (hovers[i].trackColor)
+            { 
+                iui.SetInteractionColor(i, hovers[i].color, hovers[i].keyColor);
+            }
             if (hovers[i].trackLore)
             {
                 if (hovers[i].interactKey == Interactable.InteractKey.None)
                 {
                     iui.SetInteractionLore("", i, hovers[i].lore);
-                } else
+                } 
+                else
                 {
                     InputAction interactAction = ToInteractAction(hovers[i].interactKey).action;
                     int bindingIndex = interactAction.GetBindingIndexForControl(interactAction.controls[0]);

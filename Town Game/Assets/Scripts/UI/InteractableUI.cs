@@ -55,7 +55,7 @@ public class InteractableUI : MonoBehaviour
         }
     }
 
-    public void AddInteraction(string key, string text, Color color, Color fillColor)
+    public void AddInteraction(string key, string text, Color color, Color fillColor, Color keyColor)
     {
         GameObject interaction = Instantiate(interactPrefab, transform);
         TextMeshProUGUI tex = interaction.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
@@ -65,6 +65,7 @@ public class InteractableUI : MonoBehaviour
         KeyUI keyUI = interaction.GetComponentInChildren<KeyUI>();
         if (!key.IsNullOrEmpty())
         {
+            keyUI.SetKeyColor(keyColor);
             keyUI.SetKey(key);
             keyUI.gameObject.SetActive(true);
         }
@@ -117,9 +118,8 @@ public class InteractableUI : MonoBehaviour
         color.a = tmp.color.a;
         tmp.color = color;
         KeyUI keyUI = interaction.GetComponentInChildren<KeyUI>();
-        keyUI.SetKeyColor(keyColor);
+        if (keyUI != null) keyUI.SetKeyColor(keyColor);
     }
-
 
     public void ClearInteractions()
     {

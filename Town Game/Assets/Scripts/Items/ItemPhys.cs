@@ -3,6 +3,7 @@
 using Fusion;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using WebSocketSharp;
@@ -27,10 +28,15 @@ public class ItemPhys : NetworkBehaviour
     ObjectManager om;
     InteractableFinder finder;
     Interactable interactable;
+    GameManager gameManager;
     Item item;
+    bool init = false;
     bool inspecting = false;
+    bool ownershipFound = false;
+    bool rolesRevealed = false;
 
     ChangeDetector changeDetector;
+    MapRoom mapRoom;
 
     [System.Serializable]
     public struct InteractableSettings
@@ -52,6 +58,8 @@ public class ItemPhys : NetworkBehaviour
         interactable.onLook += SetInspect;
         positionManager = FindAnyObjectByType<PositionManager>();
         roomManager = FindAnyObjectByType<RoomManager>();
+        gameManager = FindAnyObjectByType<GameManager>();
+        gameManager.OnRevealRoles += SetRevealRoles;
     }
     
     private void Update()
@@ -64,6 +72,21 @@ public class ItemPhys : NetworkBehaviour
                 gameObject.GetComponent<Interactable>().canInteract = true;
             }
         }
+        if (init && !room.ToString().IsNullOrEmpty() && !ownershipFound && rolesRevealed)
+        {
+            mapRoom = roomManager.GetWorkBuilding(room.ToString());
+            ownershipFound = true;
+            mapRoom.onAccessUpdate += GetLocalOwnership;
+            GetLocalOwnership();
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (ownershipFound)
+        {
+            if (mapRoom != null) mapRoom.onAccessUpdate -= GetLocalOwnership;
+        }
     }
 
     public override void Spawned()
@@ -74,6 +97,7 @@ public class ItemPhys : NetworkBehaviour
             CreateItem();
             RenderItem();
         }
+        init = true;
     }
 
     public override void Render()
@@ -86,13 +110,6 @@ public class ItemPhys : NetworkBehaviour
                 case (nameof(itemName)):
                     CreateItem();
                     RenderItem();
-                    break;
-                case (nameof(room)):
-                    if (!room.ToString().IsNullOrEmpty())
-                    {
-                        roomManager.GetWorkBuilding(room.ToString()).onAccessUpdate += GetLocalOwnership;
-                    }
-                    GetLocalOwnership();
                     break;
             }
                 
@@ -126,23 +143,9 @@ public class ItemPhys : NetworkBehaviour
             interactable.hovers[1].lore = "Inspect";
         }
         /**
-        interactable.hovers[1].interactKey = Interactable.InteractKey.None;
-        interactable.hovers[1].color = inspectionColor;
-        StartCoroutine(RollText(1, item.description));
-        string fingerprintText = "";
-        //if (itemData.fingerprints.Count == 0)
-        //{
         //    fingerprintText = "Judging from the cleanliness, no one seems to have used it.";
-        //} 
-        //if (itemData.fingerprints.Count == 1)
-        //{
         //    fingerprintText = "There are a visible set of fingerprints on the object.";
-        //}
-        //if (itemData.fingerprints.Count > 1)
-        //{
         //    fingerprintText = "There seem to be many different smudges and scratches on the object.";
-        //}
-        //StartCoroutine(RollText(2, fingerprintText));
         **/
 
     }
@@ -150,6 +153,7 @@ public class ItemPhys : NetworkBehaviour
     public void PickUpItem(PlayerRef player)
     {
         if (pickedUp) return;
+        if (!PlayerCanPickUpItem(player)) return;
         PlayerInventory inventory = playerManager.GetPlayerNetworkObject(player).GetComponent<PlayerInventory>();
         if (inventory == null) return;
         string eName = inventory.hotbar[inventory.equippedSlot].ToString();
@@ -172,6 +176,16 @@ public class ItemPhys : NetworkBehaviour
         gameObject.GetComponent<MeshRenderer>().enabled = false;
         gameObject.GetComponent<Interactable>().canInteract = false;
         if (HasStateAuthority) Runner.Despawn(Object);
+    }
+
+    private bool PlayerCanPickUpItem(PlayerRef player)
+    {
+        // If the player is a cultist they can always pick up an item
+        bool isCultist = playerManager.playerProperties[player].isCultist;
+        if (isCultist) return true;
+        // If not a cultist, they need access to a room to be able to pick up the item
+        if (positionManager.PlayerHasAccessToRoom(player, room.ToString())) return true;
+        return false;
     }
 
     //[PunRPC]
@@ -202,6 +216,7 @@ public class ItemPhys : NetworkBehaviour
 
     public void GetLocalOwnership()
     {
+        Debug.Log("Getting local ownership");
         bool isCultist = playerManager.currentPlayerProperties.isCultist;
         bool ownsProperty = positionManager.PlayerHasAccessToRoom(Runner.LocalPlayer, room.ToString());
         if (!isCultist)
@@ -292,5 +307,10 @@ public class ItemPhys : NetworkBehaviour
                 yield return new WaitForSeconds(characterDelay);
             }
         }
+    }
+
+    public void SetRevealRoles(bool role)
+    {
+        rolesRevealed = true;
     }
 }

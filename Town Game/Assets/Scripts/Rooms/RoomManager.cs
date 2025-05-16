@@ -224,7 +224,9 @@ public class RoomManager : MonoBehaviour
 
         foreach (string accessRoom in accessRooms)
         {
-            GetWorkBuilding(accessRoom).onAccessUpdate?.Invoke(positionManager.Runner.LocalPlayer);
+            MapRoom workBuilding = GetWorkBuilding(accessRoom);
+            if (workBuilding != null) workBuilding.onAccessUpdate?.Invoke(positionManager.Runner.LocalPlayer);
+            else Debug.LogWarning(accessRoom + " does not exist.");
         }
     }
 
