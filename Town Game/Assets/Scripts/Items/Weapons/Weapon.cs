@@ -22,7 +22,12 @@ public class Weapon : Item
     //[Header("Evidence")]
     //public string[] evidenceDescriptions = new string[] { };
     //public string[] evidenceIcons = new string[] { };
-//    public float headMultiplier = 1.2f;
-//    public bool disablesLegs = false;
-//    public bool concussesHead = false;
+    //    public float headMultiplier = 1.2f;
+    //    public bool disablesLegs = false;
+    //    public bool concussesHead = false;
+
+    public override string GetType()
+    {
+        return "Weapon";
+    }
 }

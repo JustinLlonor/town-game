@@ -117,6 +117,7 @@ public class PlayerDropManager : NetworkBehaviour
         pItem.itemName = item.name;
         pItem.gameObject.name = item.name;
         pItem.room = iSurface.property.roomName;
+        pItem.rolesRevealed = true;
         TransferItemData(inventory.itemData[inventory.equippedSlot], pItem);
 
         inventory.RemoveItem(inventory.equippedSlot);

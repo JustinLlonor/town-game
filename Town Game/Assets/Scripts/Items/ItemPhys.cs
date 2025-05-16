@@ -33,10 +33,10 @@ public class ItemPhys : NetworkBehaviour
     bool init = false;
     bool inspecting = false;
     bool ownershipFound = false;
-    bool rolesRevealed = false;
+    [HideInInspector] public bool rolesRevealed = false;
 
     ChangeDetector changeDetector;
-    MapRoom mapRoom;
+    public MapRoom mapRoom;
 
     [System.Serializable]
     public struct InteractableSettings
@@ -216,7 +216,6 @@ public class ItemPhys : NetworkBehaviour
 
     public void GetLocalOwnership()
     {
-        Debug.Log("Getting local ownership");
         bool isCultist = playerManager.currentPlayerProperties.isCultist;
         bool ownsProperty = positionManager.PlayerHasAccessToRoom(Runner.LocalPlayer, room.ToString());
         if (!isCultist)
@@ -312,5 +311,6 @@ public class ItemPhys : NetworkBehaviour
     public void SetRevealRoles(bool role)
     {
         rolesRevealed = true;
+        gameManager.OnRevealRoles -= SetRevealRoles;
     }
 }

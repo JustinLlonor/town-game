@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using WebSocketSharp;
 
 [CreateAssetMenu(fileName = "New Item", menuName = "Items/Item")]
 public class Item : ScriptableObject
@@ -33,8 +34,9 @@ public class Item : ScriptableObject
         public string layer;
     }
 
-    public string GetType()
+    public virtual string GetType()
     {
-        return "Item";
+        if (customType.IsNullOrEmpty()) return "Item";
+        return customType;
     }
 }
