@@ -1,7 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Fusion;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using WebSocketSharp;
 
@@ -25,15 +23,19 @@ public class PlayerDropManager : NetworkBehaviour
     bool isPlacing = false;
     bool isPlace = false;
     RunnerManager rm;
+    PositionManager positionManager;
 
     public override void Spawned()
     {
         if (Runner.IsServer) Runner.Spawn(itemGizmo, Vector3.zero, Quaternion.identity, Object.InputAuthority);
         rm = FindFirstObjectByType<RunnerManager>();
+        positionManager = FindAnyObjectByType<PositionManager>();
         inventory.OnSwitchSlot += CancelDrop;
         if (!HasInputAuthority) return;
         InputManager inputManager = FindFirstObjectByType<InputManager>();
         inputManager.onDropItem += OnDropItem;
+        positionManager.onJobAdd += UpdateGizmo;
+        positionManager.onJobRemove += UpdateGizmo;
     }
 
     private void Update()
@@ -95,7 +97,7 @@ public class PlayerDropManager : NetworkBehaviour
     void VerifyPlacement() // Places the item if the item placement is valid
     {
         ItemSurface iSurface = gizmo.GetItemSurface();
-        if (iSurface != null && isPlace)
+        if (iSurface != null && isPlace && positionManager.PlayerHasAccessToRoom(Runner.LocalPlayer, iSurface.property.roomName))
         {
             PlaceItem(iSurface);
             return;
@@ -126,6 +128,11 @@ public class PlayerDropManager : NetworkBehaviour
         physItem.itemData = new ItemData(data.metadata, data.fingerprints);
     }
 
+    private void UpdateGizmo(Vector2Int jobRef)
+    {
+        UpdateGizmo();
+    }
+
     void UpdateGizmo()
     {
         Item currentItem = GetCurrentItem();
@@ -154,7 +161,8 @@ public class PlayerDropManager : NetworkBehaviour
             }
             isPlace = true;
             gizmo.checkForCollisions = true;
-            gizmo.SetMaterial(gizmo.GetItemSurface() != null);
+            ItemSurface iSurface = gizmo.GetItemSurface();
+            gizmo.SetMaterial(iSurface != null && positionManager.PlayerHasAccessToRoom(Runner.LocalPlayer, iSurface.property.roomName));
         } 
         else
         {
