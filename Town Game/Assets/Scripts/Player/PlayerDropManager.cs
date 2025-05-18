@@ -34,8 +34,11 @@ public class PlayerDropManager : NetworkBehaviour
         if (!HasInputAuthority) return;
         InputManager inputManager = FindFirstObjectByType<InputManager>();
         inputManager.onDropItem += OnDropItem;
-        positionManager.onJobAdd += UpdateGizmo;
-        positionManager.onJobRemove += UpdateGizmo;
+        if (positionManager != null)
+        {
+            positionManager.onJobAdd += UpdateGizmo;
+            positionManager.onJobRemove += UpdateGizmo;
+        }
     }
 
     private void Update()

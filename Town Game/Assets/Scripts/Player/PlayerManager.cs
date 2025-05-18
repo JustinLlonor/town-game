@@ -30,7 +30,9 @@ public class PlayerManager : NetworkBehaviour
     public CleanupMaster cm;
     public FirstPerson fps;
 
-    // Delegate for when the player gets spawned
+    /// <summary>
+    /// Called when the player is spawned on the client
+    /// </summary>
     public InstantiatePlayer OnInstantiatePlayer;
     public PlayerEvent OnTeleportPlayer;
     public delegate void InstantiatePlayer(GameObject player);

@@ -58,8 +58,13 @@ public class MinimapManager : MonoBehaviour
 
     }
 
-    public void RenderMinimapBase(Minimap minimap)
+    public float GetCanvasX()
     {
+        return ((RectTransform)minimapBase).sizeDelta.x;
+    }
 
+    public Vector3 GetBasePosition()
+    {
+        return minimapBase.position;
     }
 }
