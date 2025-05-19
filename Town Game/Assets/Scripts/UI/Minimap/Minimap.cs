@@ -25,10 +25,6 @@ public class Minimap : MonoBehaviour
     private Dictionary<MinimapIcon, RectTransform> activeIcons = new Dictionary<MinimapIcon, RectTransform>();
     private List<MinimapIcon> fixedRotationIcons = new List<MinimapIcon>();
     /// <summary>
-    /// While disabled, a list of minimap icons that need to be rotated or repositioned
-    /// </summary>
-    private List<MinimapIcon> positionBuffer = new List<MinimapIcon>();
-    /// <summary>
     /// The scale of the minimap such that the x axis fits the minimap holder
     /// </summary>
     private float minimapMax;
@@ -90,14 +86,6 @@ public class Minimap : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKey(KeyCode.DownArrow))
-        {
-            SetZoom(zoomRadius - Time.deltaTime);
-        }
-        if (Input.GetKey(KeyCode.UpArrow))
-        {
-            SetZoom(zoomRadius + Time.deltaTime);
-        }
         foreach (var icon in fixedRotationIcons)
         {
             activeIcons[icon].eulerAngles = new Vector3(0f, 0f, icon.rotation);

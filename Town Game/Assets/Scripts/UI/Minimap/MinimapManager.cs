@@ -14,12 +14,17 @@ public class MinimapManager : MonoBehaviour
     public Transform minimapBase;
     public MapElement[] mapElements = new MapElement[0];
     public Dictionary<string, MinimapIcon> icons = new Dictionary<string, MinimapIcon>();
+    public Dictionary<string, MinimapPointer> pointers = new Dictionary<string, MinimapPointer>(); 
     public IconEvent onIconAdd;
     public IconEvent onIconRemove;
     public IconEvent onIconMove;
     public IconEvent onIconRotate;
+    public PointerEvent onPointerAdd;
+    public PointerEvent onPointerRemove;
+    public PointerEvent onPointerMove;
 
     public delegate void IconEvent(MinimapIcon icon);
+    public delegate void PointerEvent(MinimapPointer pointer);
 
     /// <summary>
     /// When the player is in the referenced room, the enter color shows for the associated graphics.
@@ -102,6 +107,30 @@ public class MinimapManager : MonoBehaviour
             output[i] = icon.Value;
         }
         return output;
+    }
+
+    public void AddPointer(string name, Vector3 pointLocation, Color color, bool disappearOnSight = false)
+    {
+        if (pointers.ContainsKey(name)) return;
+        MinimapPointer newPointer = new MinimapPointer(name, pointLocation, color, disappearOnSight);
+        pointers.Add(name, newPointer);
+        onPointerAdd?.Invoke(newPointer);
+    }
+
+    public void RemovePointer(string name)
+    {
+        if (!pointers.ContainsKey(name)) return;
+        MinimapPointer removedPointer = pointers[name];
+        pointers.Remove(name);
+        onPointerRemove?.Invoke(removedPointer);
+    }
+
+    public void MovePointer(string name, Vector3 position)
+    {
+        if (!pointers.ContainsKey(name)) return;
+        MinimapPointer movedPointer = pointers[name];
+        movedPointer.position = position;
+        onPointerMove?.Invoke(movedPointer);
     }
 
     public float GetCanvasX()
