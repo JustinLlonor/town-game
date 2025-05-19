@@ -1,8 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Minimap : MonoBehaviour
 {
@@ -18,9 +17,14 @@ public class Minimap : MonoBehaviour
     public float minZoomRadius;
     public float maxZoomRadius;
     [Header("References")]
+    public GameObject iconObject;
     public Transform elementHolder;
+    public Transform[] rotationPivots;
     public Transform rotationPivot;
+    public Transform iconHolder;
 
+    private Dictionary<MinimapIcon, RectTransform> activeIcons = new Dictionary<MinimapIcon, RectTransform>();
+    private List<MinimapIcon> fixedRotationIcons = new List<MinimapIcon>();
     private float lerpZoomRadius;
     private Vector3 lerpPosition;
     /// <summary>
@@ -36,15 +40,34 @@ public class Minimap : MonoBehaviour
     /// </summary>
     private float maxDistance;
     Vector3 canvasLocation;
+    MinimapManager minimapManager;
+    bool init = false;
 
     private void OnEnable()
     {
-        Init();
+        if (!init)
+        {
+            init = true;
+            Init();
+        }
+        minimapManager.onIconAdd += AddIcon;
+        minimapManager.onIconRemove += RemoveIcon;
+        minimapManager.onIconMove += MoveIcon;
+        minimapManager.onIconRotate += RotateIcon;
+        CheckUnaddedIcons();
+    }
+
+    private void OnDisable()
+    {
+        minimapManager.onIconAdd -= AddIcon;
+        minimapManager.onIconRemove -= RemoveIcon;
+        minimapManager.onIconMove -= MoveIcon;
+        minimapManager.onIconRotate -= RotateIcon;
     }
 
     public void Init()
     {
-        MinimapManager minimapManager = FindAnyObjectByType<MinimapManager>();
+        minimapManager = FindAnyObjectByType<MinimapManager>();
         float canvasX = minimapManager.GetCanvasX();
         Vector3 canvasLocation = minimapManager.GetBasePosition();
         ClearElements();
@@ -57,9 +80,17 @@ public class Minimap : MonoBehaviour
 
         minimapMax = rectTransform.sizeDelta.x / elementTransform.sizeDelta.x;
         minimapWorldSize = canvasX;
-        maxDistance = ((RectTransform)elementHolder).sizeDelta.x / 2f;
+        maxDistance = rectTransform.sizeDelta.x / 2f;
         this.canvasLocation = canvasLocation;
         DisplayZoom();
+    }
+
+    private void Update()
+    {
+        foreach (var icon in fixedRotationIcons)
+        {
+            activeIcons[icon].eulerAngles = new Vector3(0f, 0f, icon.rotation);
+        }
     }
 
     public void SetPosition(Vector3 position)
@@ -75,14 +106,18 @@ public class Minimap : MonoBehaviour
 
     private void DisplayPosition()
     {
-        Vector2 viewPos = new Vector2(canvasLocation.x - viewPosition.x, canvasLocation.z - viewPosition.z);
-        elementHolder.localPosition = viewPos * (maxDistance/zoomRadius);
+        Vector2 viewPos = new Vector2(canvasLocation.x - viewPosition.x, canvasLocation.z - viewPosition.z) * (maxDistance / zoomRadius);
+        elementHolder.localPosition = viewPos;
+        iconHolder.localPosition = viewPos;
     }
 
     public void SetRotation(float rotation)
     {
         viewRotation = rotation;
-        rotationPivot.rotation = Quaternion.Euler(0f, 0f, viewRotation);
+        foreach (Transform pivot in rotationPivots)
+        {
+            pivot.rotation = Quaternion.Euler(0f, 0f, viewRotation);
+        }
     }
 
     public void SetZoom(float zoomRadius, bool resetLerp = true)
@@ -100,8 +135,80 @@ public class Minimap : MonoBehaviour
     private void DisplayZoom()
     {
         float newScale = minimapMax/((zoomRadius * 2f)/minimapWorldSize);
-        elementHolder.localScale = Vector3.one * newScale;
+        Vector2 scale = Vector3.one * newScale;
+        elementHolder.localScale = scale;
+        iconHolder.localScale = scale;
         DisplayPosition();
+    }
+
+    private void AddIcon(MinimapIcon icon)
+    {
+        if (activeIcons.ContainsKey(icon)) return;
+        GameObject newIcon = Instantiate(iconObject, iconHolder);
+        RectTransform iconTransform = (RectTransform)newIcon.transform;
+        // Position and size
+        Vector2 iconPos = new Vector2(canvasLocation.x - icon.position.x, canvasLocation.z - icon.position.z) * (maxDistance / zoomRadius);
+        iconTransform.localPosition = iconPos;
+        iconTransform.sizeDelta = icon.size;
+        // Texture
+        Texture2D iconTexture = icon.texture;
+        newIcon.GetComponent<RawImage>().texture = iconTexture;
+        // Rotation
+        if (icon.usesWorldRotation)
+        {
+            iconTransform.localEulerAngles = new Vector3(0, 0, icon.rotation);
+        }
+        else
+        {
+            iconTransform.eulerAngles = new Vector3(0, 0, icon.rotation);
+            fixedRotationIcons.Add(icon);
+        }
+        activeIcons.Add(icon, iconTransform);
+    }
+
+    private void MoveIcon(MinimapIcon icon)
+    {
+        if (!activeIcons.ContainsKey(icon))
+        {
+            AddIcon(icon);
+            return;
+        }
+        Vector2 newPos = new Vector2(icon.position.x - canvasLocation.x, icon.position.z - canvasLocation.z) * ((maxDistance / zoomRadius)/iconHolder.localScale.x);
+        activeIcons[icon].localPosition = newPos;
+    }
+
+    private void RotateIcon(MinimapIcon icon)
+    {
+        if (!activeIcons.ContainsKey(icon))
+        {
+            AddIcon(icon);
+            return;
+        }
+        if (icon.usesWorldRotation)
+        {
+            activeIcons[icon].localEulerAngles = new Vector3(0, 0, icon.rotation);
+            return;
+        }
+        activeIcons[icon].eulerAngles = new Vector3(0, 0, icon.rotation);
+    }
+
+    private void RemoveIcon(MinimapIcon icon)
+    {
+        if (!activeIcons.ContainsKey(icon)) return;
+        Destroy(activeIcons[icon].gameObject);
+        if (fixedRotationIcons.Contains(icon)) fixedRotationIcons.Remove(icon);
+        activeIcons.Remove(icon);
+    }
+
+    private void CheckUnaddedIcons()
+    {
+        foreach (var kvp in minimapManager.icons)
+        {
+            if (!activeIcons.ContainsKey(kvp.Value))
+            {
+                AddIcon(kvp.Value);
+            }
+        }
     }
 
     /// <summary>

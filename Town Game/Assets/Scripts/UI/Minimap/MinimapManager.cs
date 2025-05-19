@@ -13,12 +13,13 @@ public class MinimapManager : MonoBehaviour
     /// </summary>
     public Transform minimapBase;
     public MapElement[] mapElements = new MapElement[0];
+    public Dictionary<string, MinimapIcon> icons = new Dictionary<string, MinimapIcon>();
     public IconEvent onIconAdd;
     public IconEvent onIconRemove;
-    public IconMoveEvent onIconMove;
+    public IconEvent onIconMove;
+    public IconEvent onIconRotate;
 
-    public delegate void IconEvent(string iconName);
-    public delegate void IconMoveEvent(string iconName, Vector3 newPosition);
+    public delegate void IconEvent(MinimapIcon icon);
 
     /// <summary>
     /// When the player is in the referenced room, the enter color shows for the associated graphics.
@@ -35,27 +36,66 @@ public class MinimapManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    /// Adds a new icon to the minimap
     /// </summary>
     /// <param name="name">The name of the icon</param>
     /// <param name="texture">The image the icon uses</param>
     /// <param name="position">The position, in world space, of the icon</param>
     /// <param name="rotation">The rotation, in world space, of the icon</param>
     /// <param name="usesWorldRotation">If this is true, then the icon will have a defined rotation</param>
+    /// <param name="sizeX">The sizeDelta x of the RectTransform of this icon</param>
+    /// <param name="sizeY">The sizeDelta x of the RectTransform of this icon</param>
     /// <param name="hoverText"></param>
-    public void AddIcon(string name, Texture2D texture, Vector3 position, float rotation, bool usesWorldRotation = true, string hoverText = "")
+    public void AddIcon(string name, Texture2D texture, Vector3 position, float rotation = 0f, bool usesWorldRotation = true, float sizeX = 2f, float sizeY = 2f, string hoverText = "")
     {
-
+        if (icons.ContainsKey(name)) return;
+        MinimapIcon newIcon = new MinimapIcon(name, texture, position, rotation, new Vector2(sizeX, sizeY), usesWorldRotation, hoverText);
+        icons.Add(name, newIcon);
+        onIconAdd?.Invoke(newIcon);
     }
 
+    /// <summary>
+    /// Removes the icon of the specified name
+    /// </summary>
+    /// <param name="name"></param>
     public void RemoveIcon(string name)
     {
-
+        if (!icons.ContainsKey(name)) return;
+        MinimapIcon removedIcon = icons[name];
+        icons.Remove(name);
+        onIconRemove?.Invoke(removedIcon);
     }
 
     public void SetIconPosition(string name, Vector3 position)
     {
+        if (!icons.ContainsKey(name)) return;
+        MinimapIcon icon = icons[name];
+        icon.position = position;
+        onIconMove?.Invoke(icon);
+    }
 
+    public void SetIconRotation(string name, float rotation)
+    {
+        if (!icons.ContainsKey(name)) return;
+        MinimapIcon icon = icons[name];
+        icon.rotation = rotation;
+        onIconRotate?.Invoke(icon);
+    }
+
+    public MinimapIcon GetIcon(string name)
+    {
+        return icons[name];
+    }
+
+    public MinimapIcon[] GetAllIcons()
+    {
+        MinimapIcon[] output = new MinimapIcon[icons.Count];
+        int i = 0;
+        foreach (var icon in icons)
+        {
+            output[i] = icon.Value;
+        }
+        return output;
     }
 
     public float GetCanvasX()
