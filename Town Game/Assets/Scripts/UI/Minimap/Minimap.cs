@@ -11,8 +11,8 @@ public class Minimap : MonoBehaviour
     public float zoomRadius = 5f;
     public MapRoom viewRoom;
     public string trackedIcon;
-    [Header("Interaction settings")]
-    public bool isPannable;
+    [Header("Interaction settings")] // Make a separate component for interactions like panning and zooming, lerping is dealt with there as well
+    public bool isPannable; // To be removed
     public bool isZoomable;
     public float minZoomRadius;
     public float maxZoomRadius;
@@ -25,8 +25,6 @@ public class Minimap : MonoBehaviour
 
     private Dictionary<MinimapIcon, RectTransform> activeIcons = new Dictionary<MinimapIcon, RectTransform>();
     private List<MinimapIcon> fixedRotationIcons = new List<MinimapIcon>();
-    private float lerpZoomRadius;
-    private Vector3 lerpPosition;
     /// <summary>
     /// The scale of the minimap such that the x axis fits the minimap holder
     /// </summary>
@@ -99,11 +97,6 @@ public class Minimap : MonoBehaviour
         DisplayPosition();
     }
 
-    public void SetLerpPosition(Vector3 position)
-    {
-        lerpPosition = position;
-    }
-
     private void DisplayPosition()
     {
         Vector2 viewPos = new Vector2(canvasLocation.x - viewPosition.x, canvasLocation.z - viewPosition.z) * (maxDistance / zoomRadius);
@@ -120,16 +113,10 @@ public class Minimap : MonoBehaviour
         }
     }
 
-    public void SetZoom(float zoomRadius, bool resetLerp = true)
+    public void SetZoom(float zoomRadius)
     {
-        if (resetLerp) lerpZoomRadius = zoomRadius;
         this.zoomRadius = zoomRadius;
         DisplayZoom();
-    }
-
-    public void SetLerpZoom(float zoomRadius)
-    {
-        lerpZoomRadius = zoomRadius;
     }
 
     private void DisplayZoom()

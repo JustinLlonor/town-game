@@ -10,16 +10,16 @@ public class IconTest : MonoBehaviour
     private void OnEnable()
     {
         mm = FindAnyObjectByType<MinimapManager>();
-        mm.AddIcon("Barry", tex, transform.position, 0f, false);
+        mm.AddIcon(gameObject.name, tex, transform.position, 0f, false);
     }
 
     private void Update()
     {
-        mm.SetIconPosition("Barry", transform.position);
+        mm.SetIconPosition(gameObject.name, transform.position);
     }
 
     private void OnDisable()
     {
-        mm.RemoveIcon("Barry");
+        mm.RemoveIcon(gameObject.name);
     }
 }
