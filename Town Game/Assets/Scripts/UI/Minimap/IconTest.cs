@@ -11,12 +11,14 @@ public class IconTest : MonoBehaviour
     {
         mm = FindAnyObjectByType<MinimapManager>();
         mm.AddIcon(gameObject.name, tex, transform.position, transform.eulerAngles.y);
+        mm.AddPointer(gameObject.name, transform.position, Color.red);
     }
 
     private void Update()
     {
         mm.SetIconPosition(gameObject.name, transform.position);
         mm.SetIconRotation(gameObject.name, transform.eulerAngles.y);
+
     }
 
     private void OnDisable()

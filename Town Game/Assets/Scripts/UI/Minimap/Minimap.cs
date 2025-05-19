@@ -1,6 +1,8 @@
+using Fusion;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static Fusion.Editor.FusionHubWindow;
 
 public class Minimap : MonoBehaviour
 {
@@ -10,6 +12,7 @@ public class Minimap : MonoBehaviour
     public float zoomRadius = 5f;
     public MapRoom viewRoom;
     public string trackedIcon;
+    public float pointViewPadding = .2f;
     [Header("Interaction settings")] // Make a separate component for interactions like panning and zooming, lerping is dealt with there as well
     public bool isPannable; // To be removed
     public bool isZoomable;
@@ -17,13 +20,18 @@ public class Minimap : MonoBehaviour
     public float maxZoomRadius;
     [Header("References")]
     public GameObject iconObject;
+    public GameObject pointerObject;
     public Transform elementHolder;
     public Transform[] rotationPivots;
     public Transform rotationPivot;
     public Transform iconHolder;
+    public Transform pointerHolder;
 
     private Dictionary<MinimapIcon, RectTransform> activeIcons = new Dictionary<MinimapIcon, RectTransform>();
     private List<MinimapIcon> fixedRotationIcons = new List<MinimapIcon>();
+
+    private Dictionary<MinimapPointer, RectTransform> activePointers = new Dictionary<MinimapPointer, RectTransform>();
+
     /// <summary>
     /// The scale of the minimap such that the x axis fits the minimap holder
     /// </summary>
@@ -51,6 +59,8 @@ public class Minimap : MonoBehaviour
         minimapManager.onIconRemove += RemoveIcon;
         minimapManager.onIconMove += MoveIcon;
         minimapManager.onIconRotate += RotateIcon;
+        minimapManager.onPointerAdd += AddPointer;
+        minimapManager.onPointerRemove += RemovePointer;
         CheckUnaddedIcons();
         CheckUnremovedIcons();
         SetPositions();
@@ -62,6 +72,8 @@ public class Minimap : MonoBehaviour
         minimapManager.onIconRemove -= RemoveIcon;
         minimapManager.onIconMove -= MoveIcon;
         minimapManager.onIconRotate -= RotateIcon;
+        minimapManager.onPointerAdd -= AddPointer;
+        minimapManager.onPointerRemove -= RemovePointer;
     }
 
     public void Init()
@@ -90,6 +102,10 @@ public class Minimap : MonoBehaviour
         {
             activeIcons[icon].eulerAngles = new Vector3(0f, 0f, icon.rotation);
         }
+        foreach (var pointer in activePointers.Keys)
+        {
+            MovePointer(pointer);
+        }
     }
 
     public void SetPosition(Vector3 position)
@@ -103,6 +119,7 @@ public class Minimap : MonoBehaviour
         Vector2 viewPos = new Vector2(canvasLocation.x - viewPosition.x, canvasLocation.z - viewPosition.z) * (maxDistance / zoomRadius);
         elementHolder.localPosition = viewPos;
         iconHolder.localPosition = viewPos;
+        pointerHolder.localPosition = viewPos;
     }
 
     public void SetRotation(float rotation)
@@ -126,6 +143,7 @@ public class Minimap : MonoBehaviour
         Vector2 scale = Vector3.one * newScale;
         elementHolder.localScale = scale;
         iconHolder.localScale = scale;
+        pointerHolder.localScale = scale;
         DisplayPosition();
     }
 
@@ -135,8 +153,6 @@ public class Minimap : MonoBehaviour
         GameObject newIcon = Instantiate(iconObject, iconHolder);
         RectTransform iconTransform = (RectTransform)newIcon.transform;
         // Position and size
-        Vector2 iconPos = new Vector2(canvasLocation.x - icon.position.x, canvasLocation.z - icon.position.z) * (maxDistance / zoomRadius);
-        iconTransform.localPosition = iconPos;
         iconTransform.sizeDelta = icon.size;
         // Texture
         Texture2D iconTexture = icon.texture;
@@ -152,6 +168,7 @@ public class Minimap : MonoBehaviour
             fixedRotationIcons.Add(icon);
         }
         activeIcons.Add(icon, iconTransform);
+        MoveIcon(icon);
     }
 
     private void MoveIcon(MinimapIcon icon)
@@ -226,14 +243,37 @@ public class Minimap : MonoBehaviour
     /// </summary>
     /// <param name="pointLocation"></param>
     /// <param name="color"></param>
-    public void AddPointer(string name, Vector3 pointLocation, Color color)
+    public void AddPointer(MinimapPointer pointer)
     {
-
+        if (activePointers.ContainsKey(pointer)) return;
+        GameObject newPointer = Instantiate(pointerObject, pointerHolder);
+        RectTransform pointerTransform = (RectTransform)newPointer.transform;
+        pointerTransform.GetComponentInChildren<RawImage>().color = pointer.color;
+        activePointers.Add(pointer, pointerTransform);
+        MovePointer(pointer);
     }
 
-    public void RemovePointer(string name)
+    public void RemovePointer(MinimapPointer pointer)
     {
+        if (!activePointers.ContainsKey(pointer)) return;
+        Destroy(activePointers[pointer].gameObject);
+        activePointers.Remove(pointer);
+    }
 
+    public void MovePointer(MinimapPointer pointer)
+    {
+        if (!activePointers.ContainsKey(pointer))
+        {
+            AddPointer(pointer);
+            return;
+        }
+        float sightDistance = zoomRadius - pointViewPadding;
+        Vector2 pointPos = new Vector2(pointer.position.x, pointer.position.z);
+        Vector2 viewPos = new Vector2(viewPosition.x, viewPosition.z);
+        Vector2 placedPosition = Vector2.ClampMagnitude(pointPos - viewPos, sightDistance) + viewPos;
+        RectTransform activePointer = activePointers[pointer];
+        Vector2 newPos = new Vector2(placedPosition.x - canvasLocation.x, placedPosition.y - canvasLocation.z) * ((maxDistance / zoomRadius) / pointerHolder.localScale.x);
+        activePointer.localPosition = newPos;
     }
 
     public void ClearElements()
