@@ -70,16 +70,22 @@ public class MinimapManager : MonoBehaviour
     {
         if (!icons.ContainsKey(name)) return;
         MinimapIcon icon = icons[name];
-        icon.position = position;
-        onIconMove?.Invoke(icon);
+        if (icon.position != position)
+        {
+            icon.position = position;
+            onIconMove?.Invoke(icon);
+        }
     }
 
     public void SetIconRotation(string name, float rotation)
     {
         if (!icons.ContainsKey(name)) return;
         MinimapIcon icon = icons[name];
-        icon.rotation = rotation;
-        onIconRotate?.Invoke(icon);
+        if (icon.rotation != rotation)
+        {
+            icon.rotation = rotation;
+            onIconRotate?.Invoke(icon);
+        }
     }
 
     public MinimapIcon GetIcon(string name)

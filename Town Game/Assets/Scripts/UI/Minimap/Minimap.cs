@@ -26,6 +26,10 @@ public class Minimap : MonoBehaviour
     private Dictionary<MinimapIcon, RectTransform> activeIcons = new Dictionary<MinimapIcon, RectTransform>();
     private List<MinimapIcon> fixedRotationIcons = new List<MinimapIcon>();
     /// <summary>
+    /// While disabled, a list of minimap icons that need to be rotated or repositioned
+    /// </summary>
+    private List<MinimapIcon> positionBuffer = new List<MinimapIcon>();
+    /// <summary>
     /// The scale of the minimap such that the x axis fits the minimap holder
     /// </summary>
     private float minimapMax;
@@ -53,6 +57,11 @@ public class Minimap : MonoBehaviour
         minimapManager.onIconMove += MoveIcon;
         minimapManager.onIconRotate += RotateIcon;
         CheckUnaddedIcons();
+        CheckUnremovedIcons();
+        // Position buffer stuff
+        minimapManager.onIconMove -= AddToPositionBuffer;
+        minimapManager.onIconRotate -= AddToPositionBuffer;
+        CheckPositionBuffer();
     }
 
     private void OnDisable()
@@ -61,6 +70,9 @@ public class Minimap : MonoBehaviour
         minimapManager.onIconRemove -= RemoveIcon;
         minimapManager.onIconMove -= MoveIcon;
         minimapManager.onIconRotate -= RotateIcon;
+        // Position buffer stuff
+        minimapManager.onIconMove += AddToPositionBuffer;
+        minimapManager.onIconRotate += AddToPositionBuffer;
     }
 
     public void Init()
@@ -194,6 +206,34 @@ public class Minimap : MonoBehaviour
             if (!activeIcons.ContainsKey(kvp.Value))
             {
                 AddIcon(kvp.Value);
+            }
+        }
+    }
+
+    private void CheckUnremovedIcons()
+    {
+        foreach (var kvp in activeIcons)
+        {
+            if (!minimapManager.icons.ContainsKey(kvp.Key.name))
+            {
+                RemoveIcon(kvp.Key);
+            }
+        }
+    }
+
+    private void AddToPositionBuffer(MinimapIcon icon)
+    {
+        if (!positionBuffer.Contains(icon)) positionBuffer.Add(icon);
+    }
+
+    private void CheckPositionBuffer()
+    {
+        foreach (MinimapIcon icon in positionBuffer)
+        {
+            if (activeIcons.ContainsKey(icon))
+            {
+                MoveIcon(icon);
+                RotateIcon(icon);
             }
         }
     }
