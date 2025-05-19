@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -58,10 +57,7 @@ public class Minimap : MonoBehaviour
         minimapManager.onIconRotate += RotateIcon;
         CheckUnaddedIcons();
         CheckUnremovedIcons();
-        // Position buffer stuff
-        minimapManager.onIconMove -= AddToPositionBuffer;
-        minimapManager.onIconRotate -= AddToPositionBuffer;
-        CheckPositionBuffer();
+        SetPositions();
     }
 
     private void OnDisable()
@@ -70,9 +66,6 @@ public class Minimap : MonoBehaviour
         minimapManager.onIconRemove -= RemoveIcon;
         minimapManager.onIconMove -= MoveIcon;
         minimapManager.onIconRotate -= RotateIcon;
-        // Position buffer stuff
-        minimapManager.onIconMove += AddToPositionBuffer;
-        minimapManager.onIconRotate += AddToPositionBuffer;
     }
 
     public void Init()
@@ -97,6 +90,14 @@ public class Minimap : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKey(KeyCode.DownArrow))
+        {
+            SetZoom(zoomRadius - Time.deltaTime);
+        }
+        if (Input.GetKey(KeyCode.UpArrow))
+        {
+            SetZoom(zoomRadius + Time.deltaTime);
+        }
         foreach (var icon in fixedRotationIcons)
         {
             activeIcons[icon].eulerAngles = new Vector3(0f, 0f, icon.rotation);
@@ -185,7 +186,7 @@ public class Minimap : MonoBehaviour
         }
         if (icon.usesWorldRotation)
         {
-            activeIcons[icon].localEulerAngles = new Vector3(0, 0, icon.rotation);
+            activeIcons[icon].localEulerAngles = new Vector3(0, 0, -icon.rotation);
             return;
         }
         activeIcons[icon].eulerAngles = new Vector3(0, 0, icon.rotation);
@@ -221,20 +222,13 @@ public class Minimap : MonoBehaviour
         }
     }
 
-    private void AddToPositionBuffer(MinimapIcon icon)
+    private void SetPositions()
     {
-        if (!positionBuffer.Contains(icon)) positionBuffer.Add(icon);
-    }
-
-    private void CheckPositionBuffer()
-    {
-        foreach (MinimapIcon icon in positionBuffer)
+        foreach (var kvp in minimapManager.icons)
         {
-            if (activeIcons.ContainsKey(icon))
-            {
-                MoveIcon(icon);
-                RotateIcon(icon);
-            }
+            MinimapIcon icon = kvp.Value;
+            MoveIcon(icon);
+            RotateIcon(icon);
         }
     }
 
