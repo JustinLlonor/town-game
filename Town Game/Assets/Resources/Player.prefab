@@ -1002,9 +1002,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentRoom: {fileID: 0}
-  roomMask:
-    serializedVersion: 2
-    m_Bits: 16384
+  roomTag: Room
 --- !u!114 &8777106030094182887
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3154,6 +3152,8 @@ MonoBehaviour:
     interactKey: 0
     actions: []
     color: {r: 1, g: 1, b: 1, a: 0}
+    fillColor: {r: 0, g: 0, b: 0, a: 0.5607843}
+    keyColor: {r: 0, g: 0, b: 0, a: 1}
     delay: 0
     trackLore: 0
     trackColor: 0
@@ -3162,10 +3162,13 @@ MonoBehaviour:
       clientAction:
         m_PersistentCalls:
           m_Calls: []
+      indiffKey: 0
   - lore: Healthy
     interactKey: 0
     actions: []
     color: {r: 0.30865914, g: 1, b: 0.28773582, a: 0}
+    fillColor: {r: 0, g: 0, b: 0, a: 0.5607843}
+    keyColor: {r: 0, g: 0, b: 0, a: 1}
     delay: 0
     trackLore: 1
     trackColor: 1
@@ -3174,10 +3177,13 @@ MonoBehaviour:
       clientAction:
         m_PersistentCalls:
           m_Calls: []
+      indiffKey: 0
   - lore: Sane
     interactKey: 0
     actions: []
     color: {r: 0.29045033, g: 0.37188497, b: 0.5754717, a: 1}
+    fillColor: {r: 0, g: 0, b: 0, a: 0.5607843}
+    keyColor: {r: 0, g: 0, b: 0, a: 1}
     delay: 0
     trackLore: 1
     trackColor: 1
@@ -3186,6 +3192,7 @@ MonoBehaviour:
       clientAction:
         m_PersistentCalls:
           m_Calls: []
+      indiffKey: 0
   glow: 0
   renderers: []
   glowAmount: 1

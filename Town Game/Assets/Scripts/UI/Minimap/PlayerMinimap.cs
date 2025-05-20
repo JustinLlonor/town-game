@@ -25,7 +25,7 @@ public class PlayerMinimap : MonoBehaviour
     private void Update()
     {
         if (trackedRigidbody == null) return;
-        minimap.SetPosition(trackedRigidbody.position);
+        minimap.SetPosition(trackedRigidbody.position + Vector3.up);
         minimap.SetRotation(runnerManager.orientation);
     }
 }

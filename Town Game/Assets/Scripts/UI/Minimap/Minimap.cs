@@ -2,7 +2,6 @@ using Fusion;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using static Fusion.Editor.FusionHubWindow;
 
 public class Minimap : MonoBehaviour
 {
@@ -19,6 +18,7 @@ public class Minimap : MonoBehaviour
     public float minZoomRadius;
     public float maxZoomRadius;
     [Header("References")]
+    public LayerMask mapVolumeMask;
     public GameObject iconObject;
     public GameObject pointerObject;
     public Transform elementHolder;
@@ -31,6 +31,9 @@ public class Minimap : MonoBehaviour
     private List<MinimapIcon> fixedRotationIcons = new List<MinimapIcon>();
 
     private Dictionary<MinimapPointer, RectTransform> activePointers = new Dictionary<MinimapPointer, RectTransform>();
+
+    MapVolume currentMapVolume;
+    private Dictionary<MapVolume, MaskableGraphic[]> localMaskables = new Dictionary<MapVolume, MaskableGraphic[]>();
 
     /// <summary>
     /// The scale of the minimap such that the x axis fits the minimap holder
@@ -64,6 +67,7 @@ public class Minimap : MonoBehaviour
         CheckUnaddedElements();
         CheckUnremovedElements();
         SetPositions();
+        CheckMapVolume();
     }
 
     private void OnDisable()
@@ -124,6 +128,7 @@ public class Minimap : MonoBehaviour
         elementHolder.localPosition = viewPos;
         iconHolder.localPosition = viewPos;
         pointerHolder.localPosition = viewPos;
+        CheckMapVolume();
     }
 
     public void SetRotation(float rotation)
@@ -302,5 +307,37 @@ public class Minimap : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
+    }
+
+    private void CheckMapVolume()
+    {
+        MapVolume newVolume = GetCurrentVolume();
+        if (newVolume == currentMapVolume) return;
+        currentMapVolume = newVolume;
+    }
+
+    private MapVolume GetCurrentVolume()
+    {
+        foreach (MapVolume volume in minimapManager.mapVolumes)
+        {
+            foreach (Collider collider in volume.volumeColliders)
+            {
+                if (ColliderContainsPoint(collider, viewPosition))
+                {
+                    return volume;
+                }
+            }
+        }
+        return null;
+    }
+
+    private bool ColliderContainsPoint(Collider collider, Vector3 worldPosition)
+    {
+        var direction = collider.bounds.center - worldPosition;
+        var ray = new Ray(worldPosition, direction);
+
+        var contains = collider.Raycast(ray, out var hit, direction.magnitude);
+
+        return !contains;
     }
 }

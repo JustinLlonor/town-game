@@ -2,12 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
-using static PlayerRoom;
 
 public class PlayerRoom : NetworkBehaviour
 {
     public MapRoom currentRoom;
-    public LayerMask roomMask;
+    public string roomTag;
     public EnterRoom OnEnterRoom;
     public ExitRoom OnExitRoom;
     PlayerRef player;
@@ -22,7 +21,7 @@ public class PlayerRoom : NetworkBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.layer != Mathf.Log(roomMask.value, 2)) return;
+        if (other.gameObject.tag != roomTag) return;
         MapRoom enteredRoom = other.gameObject.GetComponent<MapRoom>();
         if (enteredRoom == currentRoom) return;
         if (enteredRoom == null)
@@ -38,7 +37,7 @@ public class PlayerRoom : NetworkBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.layer != Mathf.Log(roomMask.value, 2)) return;
+        if (other.gameObject.tag != roomTag) return;
         if (currentRoom == null) return;
         MapRoom exitedRoom = other.gameObject.GetComponent<MapRoom>();
         currentRoom = null;

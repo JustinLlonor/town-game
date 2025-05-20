@@ -28,19 +28,6 @@ public class MinimapManager : MonoBehaviour
     public delegate void PointerEvent(MinimapPointer pointer);
 
     /// <summary>
-    /// Describes UI elements that display certain colors when the map view is inside of the volume
-    /// </summary>
-    [System.Serializable]
-    public struct MapVolume
-    {
-        public BoxCollider[] volumeColliders;
-        public MaskableGraphic[] associatedGraphics;
-        public Color enterColor;
-        public Color exitColor;
-        public bool fadeOtherElements;
-    }
-
-    /// <summary>
     /// Adds a new icon to the minimap
     /// </summary>
     /// <param name="name">The name of the icon</param>

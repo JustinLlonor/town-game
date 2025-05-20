@@ -721,6 +721,9 @@ MonoBehaviour:
   isZoomable: 0
   minZoomRadius: 0
   maxZoomRadius: 0
+  mapVolumeMask:
+    serializedVersion: 2
+    m_Bits: 16384
   iconObject: {fileID: 3892475539721035677, guid: e02375be33cae4d4da02483aaedd1a92, type: 3}
   pointerObject: {fileID: 8519529278166490903, guid: 7736adf7eceb99840abb8bdce8e8a5ee, type: 3}
   elementHolder: {fileID: 5258530332203026929}
