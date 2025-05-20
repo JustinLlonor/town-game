@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,7 +13,7 @@ public class MinimapManager : MonoBehaviour
     /// Any elevation that the viewed location is above or not on is faded into the background of the minimap.
     /// </summary>
     public Transform minimapBase;
-    public MapElement[] mapElements = new MapElement[0];
+    public MapVolume[] mapVolumes = new MapVolume[0];
     public Dictionary<string, MinimapIcon> icons = new Dictionary<string, MinimapIcon>();
     public Dictionary<string, MinimapPointer> pointers = new Dictionary<string, MinimapPointer>(); 
     public IconEvent onIconAdd;
@@ -27,17 +28,16 @@ public class MinimapManager : MonoBehaviour
     public delegate void PointerEvent(MinimapPointer pointer);
 
     /// <summary>
-    /// When the player is in the referenced room, the enter color shows for the associated graphics.
-    /// When the player is not in the room, the exit color shows.
-    /// This does not apply when the player is viewing a different elevation.
+    /// Describes UI elements that display certain colors when the map view is inside of the volume
     /// </summary>
     [System.Serializable]
-    public struct MapElement
+    public struct MapVolume
     {
-        public MapRoom room;
+        public BoxCollider[] volumeColliders;
         public MaskableGraphic[] associatedGraphics;
         public Color enterColor;
         public Color exitColor;
+        public bool fadeOtherElements;
     }
 
     /// <summary>
