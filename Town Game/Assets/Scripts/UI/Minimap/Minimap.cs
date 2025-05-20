@@ -61,8 +61,8 @@ public class Minimap : MonoBehaviour
         minimapManager.onIconRotate += RotateIcon;
         minimapManager.onPointerAdd += AddPointer;
         minimapManager.onPointerRemove += RemovePointer;
-        CheckUnaddedIcons();
-        CheckUnremovedIcons();
+        CheckUnaddedElements();
+        CheckUnremovedElements();
         SetPositions();
     }
 
@@ -102,6 +102,10 @@ public class Minimap : MonoBehaviour
         {
             activeIcons[icon].eulerAngles = new Vector3(0f, 0f, icon.rotation);
         }
+    }
+
+    private void LateUpdate()
+    {
         foreach (var pointer in activePointers.Keys)
         {
             MovePointer(pointer);
@@ -205,7 +209,7 @@ public class Minimap : MonoBehaviour
         activeIcons.Remove(icon);
     }
 
-    private void CheckUnaddedIcons()
+    private void CheckUnaddedElements()
     {
         foreach (var kvp in minimapManager.icons)
         {
@@ -214,15 +218,29 @@ public class Minimap : MonoBehaviour
                 AddIcon(kvp.Value);
             }
         }
+        foreach (var kvp in minimapManager.pointers)
+        {
+            if (!activePointers.ContainsKey(kvp.Value))
+            {
+                AddPointer(kvp.Value);
+            }
+        }
     }
 
-    private void CheckUnremovedIcons()
+    private void CheckUnremovedElements()
     {
         foreach (var kvp in activeIcons)
         {
             if (!minimapManager.icons.ContainsKey(kvp.Key.name))
             {
                 RemoveIcon(kvp.Key);
+            }
+        }
+        foreach (var kvp in activePointers)
+        {
+            if (!minimapManager.pointers.ContainsKey(kvp.Key.name))
+            {
+                RemovePointer(kvp.Key);
             }
         }
     }
@@ -270,10 +288,12 @@ public class Minimap : MonoBehaviour
         float sightDistance = zoomRadius - pointViewPadding;
         Vector2 pointPos = new Vector2(pointer.position.x, pointer.position.z);
         Vector2 viewPos = new Vector2(viewPosition.x, viewPosition.z);
-        Vector2 placedPosition = Vector2.ClampMagnitude(pointPos - viewPos, sightDistance) + viewPos;
+        Vector2 viewToPoint = pointPos - viewPos;
+        Vector2 placedPosition = Vector2.ClampMagnitude(viewToPoint, sightDistance) + viewPos;
         RectTransform activePointer = activePointers[pointer];
         Vector2 newPos = new Vector2(placedPosition.x - canvasLocation.x, placedPosition.y - canvasLocation.z) * ((maxDistance / zoomRadius) / pointerHolder.localScale.x);
         activePointer.localPosition = newPos;
+        activePointer.eulerAngles = new Vector3(0f, 0f, Mathf.Atan2(viewToPoint.y, viewToPoint.x) * Mathf.Rad2Deg + viewRotation - 90f);
     }
 
     public void ClearElements()

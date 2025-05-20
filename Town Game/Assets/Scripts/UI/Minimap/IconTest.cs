@@ -24,5 +24,6 @@ public class IconTest : MonoBehaviour
     private void OnDisable()
     {
         mm.RemoveIcon(gameObject.name);
+        mm.RemovePointer(gameObject.name);
     }
 }
