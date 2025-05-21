@@ -33,7 +33,8 @@ public class Minimap : MonoBehaviour
     private Dictionary<MinimapPointer, RectTransform> activePointers = new Dictionary<MinimapPointer, RectTransform>();
 
     MapVolume currentMapVolume;
-    private Dictionary<MapVolume, MaskableGraphic[]> localMaskables = new Dictionary<MapVolume, MaskableGraphic[]>();
+    private Dictionary<MapVolume, List<MaskableGraphic>> localMaskables = new Dictionary<MapVolume, List<MaskableGraphic>>();
+    private Dictionary<MaskableGraphic, MapVolume> maskableVolumes = new Dictionary<MaskableGraphic, MapVolume>();
 
     /// <summary>
     /// The scale of the minimap such that the x axis fits the minimap holder
@@ -97,6 +98,7 @@ public class Minimap : MonoBehaviour
         minimapWorldSize = canvasX;
         maxDistance = rectTransform.sizeDelta.x / 2f;
         this.canvasLocation = canvasLocation;
+        GetReferences();
         DisplayZoom();
     }
 
@@ -339,5 +341,72 @@ public class Minimap : MonoBehaviour
         var contains = collider.Raycast(ray, out var hit, direction.magnitude);
 
         return !contains;
+    }
+
+    private void GetReferences()
+    {
+        maskableVolumes.Clear();
+        localMaskables.Clear();
+        // Create maskable volumes
+        foreach (MapVolume volume in minimapManager.mapVolumes)
+        {
+            foreach (MaskableGraphic graphic in volume.associatedGraphics)
+            {
+                maskableVolumes.Add(graphic, volume);
+            }
+        }
+        SearchDepth(minimapManager.minimapBase, new List<int>() { });
+    }
+
+    /// <summary>
+    /// Empty integer array is the transform at the base, an integer array with length one is the child of the base and so on
+    /// </summary>
+    /// <param name="transform"></param>
+    /// <param name="coords"></param>
+    private void SearchDepth(Transform transformSearch, List<int> coords)
+    {
+        MaskableGraphic transformGraphic = transformSearch.GetComponent<MaskableGraphic>();
+        if (transformGraphic != null)
+        {
+            // If maskable volumes contains some corresponding map volume, add this maskable to that map volume
+            if (maskableVolumes.ContainsKey(transformGraphic))
+            {
+                Transform localMaskableTransform = GetTransformFromCoords(coords);
+                MaskableGraphic localGraphic = localMaskableTransform.GetComponent<MaskableGraphic>();
+                if (localGraphic != null)
+                {
+                    AddLocalGraphicToVolume(maskableVolumes[transformGraphic], localGraphic);
+                }
+            }
+        }
+
+        int childIndex = 0;
+        foreach (Transform child in transformSearch)
+        {
+            List<int> newList = new List<int>(coords);
+            newList.Add(childIndex);
+            SearchDepth(child, newList);
+            childIndex++;
+        }
+    }
+
+    private Transform GetTransformFromCoords(List<int> coords)
+    {
+        Transform pointerTransform = elementHolder;
+        for (int i = 0; i < coords.Count; i++)
+        {
+            pointerTransform = pointerTransform.GetChild(coords[i]);
+        }
+        return pointerTransform;
+    }
+
+    private void AddLocalGraphicToVolume(MapVolume volume, MaskableGraphic graphic)
+    {
+        if (localMaskables.ContainsKey(volume))
+        {
+            localMaskables[volume].Add(graphic);
+            return;
+        }
+        localMaskables.Add(volume, new List<MaskableGraphic>() { graphic });
     }
 }
