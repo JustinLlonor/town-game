@@ -15,7 +15,9 @@ public class MinimapManager : MonoBehaviour
     public Transform minimapBase;
     public MapVolume[] mapVolumes = new MapVolume[0];
     public Dictionary<string, MinimapIcon> icons = new Dictionary<string, MinimapIcon>();
-    public Dictionary<string, MinimapPointer> pointers = new Dictionary<string, MinimapPointer>(); 
+    public Dictionary<string, MinimapPointer> pointers = new Dictionary<string, MinimapPointer>();
+    public Color normalColor = Color.white;
+    public Color backgroundColor;
     public IconEvent onIconAdd;
     public IconEvent onIconRemove;
     public IconEvent onIconMove;

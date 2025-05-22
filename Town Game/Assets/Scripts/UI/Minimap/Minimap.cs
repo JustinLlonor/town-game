@@ -1,5 +1,6 @@
 using Fusion;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,8 +18,11 @@ public class Minimap : MonoBehaviour
     public bool isZoomable;
     public float minZoomRadius;
     public float maxZoomRadius;
-    [Header("References")]
+    [Header("Settings")]
+    public float colorTransitionSpeed = 3f;
+    public AnimationCurve transitionCurve;
     public LayerMask mapVolumeMask;
+    [Header("References")]
     public GameObject iconObject;
     public GameObject pointerObject;
     public Transform elementHolder;
@@ -32,9 +36,42 @@ public class Minimap : MonoBehaviour
 
     private Dictionary<MinimapPointer, RectTransform> activePointers = new Dictionary<MinimapPointer, RectTransform>();
 
+    // yeah it's spaghetti. but i do not care because i like having my game finished
     MapVolume currentMapVolume;
     private Dictionary<MapVolume, List<MaskableGraphic>> localMaskables = new Dictionary<MapVolume, List<MaskableGraphic>>();
     private Dictionary<MaskableGraphic, MapVolume> maskableVolumes = new Dictionary<MaskableGraphic, MapVolume>();
+    private List<DefaultGraphic> allGraphics = new List<DefaultGraphic>();
+    private List<ColorTransition> colorTransitions = new List<ColorTransition>();
+
+    private class ColorTransition
+    {
+        public MaskableGraphic graphic;
+        public Color fromColor;
+        public Color toColor;
+        public float progress;
+
+        public ColorTransition(MaskableGraphic graphic, Color fromColor, Color toColor)
+        {
+            this.graphic = graphic;
+            this.fromColor = fromColor;
+            this.toColor = toColor;
+            progress = 0f;
+        }
+    }
+
+    private class DefaultGraphic
+    {
+        public MaskableGraphic graphic;
+        public Color originalColor;
+        public Color enterColor;
+
+        public DefaultGraphic(MaskableGraphic graphic, Color originalColor, Color enterColor)
+        {
+            this.graphic = graphic;
+            this.originalColor = originalColor;
+            this.enterColor = enterColor;
+        }
+    }
 
     /// <summary>
     /// The scale of the minimap such that the x axis fits the minimap holder
@@ -104,14 +141,12 @@ public class Minimap : MonoBehaviour
 
     private void Update()
     {
-        foreach (var icon in fixedRotationIcons)
-        {
-            activeIcons[icon].eulerAngles = new Vector3(0f, 0f, icon.rotation);
-        }
+        CheckTransitions();
     }
 
     private void LateUpdate()
     {
+        FixIconRotation(); // if this glitches, put htis in regular Update method
         foreach (var pointer in activePointers.Keys)
         {
             MovePointer(pointer);
@@ -316,6 +351,7 @@ public class Minimap : MonoBehaviour
         MapVolume newVolume = GetCurrentVolume();
         if (newVolume == currentMapVolume) return;
         currentMapVolume = newVolume;
+        RecalculateTransitions();
     }
 
     private MapVolume GetCurrentVolume()
@@ -350,16 +386,16 @@ public class Minimap : MonoBehaviour
         // Create maskable volumes
         foreach (MapVolume volume in minimapManager.mapVolumes)
         {
-            foreach (MaskableGraphic graphic in volume.associatedGraphics)
+            foreach (MapVolume.AssociatedGraphic aGraphic in volume.associatedGraphics)
             {
-                maskableVolumes.Add(graphic, volume);
+                maskableVolumes.Add(aGraphic.graphic, volume);
             }
         }
         SearchDepth(minimapManager.minimapBase, new List<int>() { });
     }
 
     /// <summary>
-    /// Empty integer array is the transform at the base, an integer array with length one is the child of the base and so on
+    /// Searches the transform and its children recursively for a MapVolume corresponding to its MaskableGraphic component (if it has one).
     /// </summary>
     /// <param name="transform"></param>
     /// <param name="coords"></param>
@@ -369,13 +405,25 @@ public class Minimap : MonoBehaviour
         if (transformGraphic != null)
         {
             // If maskable volumes contains some corresponding map volume, add this maskable to that map volume
+            Transform localMaskableTransform = GetTransformFromCoords(coords);
+            MaskableGraphic localGraphic = localMaskableTransform.GetComponent<MaskableGraphic>();
             if (maskableVolumes.ContainsKey(transformGraphic))
             {
-                Transform localMaskableTransform = GetTransformFromCoords(coords);
-                MaskableGraphic localGraphic = localMaskableTransform.GetComponent<MaskableGraphic>();
                 if (localGraphic != null)
                 {
+                    allGraphics.Add(new DefaultGraphic(localGraphic, localGraphic.color, maskableVolumes[transformGraphic].GetEnterColor(transformGraphic)));
                     AddLocalGraphicToVolume(maskableVolumes[transformGraphic], localGraphic);
+                }
+                else
+                {
+                    Debug.LogError("Something went wrong when trying to add a local graphic to a MapVolume!");
+                }
+            }
+            else
+            {
+                if (localGraphic != null)
+                {
+                    allGraphics.Add(new DefaultGraphic(localGraphic, localGraphic.color, Color.clear));
                 }
             }
         }
@@ -408,5 +456,74 @@ public class Minimap : MonoBehaviour
             return;
         }
         localMaskables.Add(volume, new List<MaskableGraphic>() { graphic });
+    }
+
+    private void FixIconRotation()
+    {
+        foreach (var icon in fixedRotationIcons)
+        {
+            activeIcons[icon].eulerAngles = new Vector3(0f, 0f, icon.rotation);
+        }
+    }
+
+    private void CheckTransitions()
+    {
+        for (int i = 0; i < colorTransitions.Count; i++)
+        {
+            ColorTransition transition = colorTransitions[i];
+            transition.progress += Time.deltaTime * colorTransitionSpeed;
+            Color newColor = Color.Lerp(transition.fromColor, transition.toColor, transition.progress);
+            transition.graphic.color = newColor;
+            if (transition.progress >= 1f)
+            {
+                colorTransitions.Remove(transition);
+                i--;
+            }
+        }
+    }
+
+    private void RecalculateTransitions()
+    {
+        colorTransitions.Clear();
+        if (currentMapVolume == null)
+        {
+            foreach (DefaultGraphic dGraphic in allGraphics)
+            {
+                // If we are not our original color, transition back to it
+                if (!dGraphic.originalColor.Equals(dGraphic.graphic.color))
+                {
+                    colorTransitions.Add(new ColorTransition(dGraphic.graphic, dGraphic.graphic.color, dGraphic.originalColor));
+                }
+            }
+            return;
+        }
+
+        // Find the color to transition background elements that are not in the map volume
+        Color otherColorTransition;
+        if (currentMapVolume.fadeOtherElements)
+        {
+            otherColorTransition = minimapManager.backgroundColor;
+        }
+        else
+        {
+            otherColorTransition = minimapManager.normalColor;
+        }
+
+        // Maskables associated with this map volume
+        List<MaskableGraphic> locals = localMaskables[currentMapVolume];
+
+        // Background graphics
+        foreach (DefaultGraphic dGraphic in allGraphics)
+        {
+            if (locals.Contains(dGraphic.graphic))
+            {
+                colorTransitions.Add(new ColorTransition(dGraphic.graphic, dGraphic.graphic.color, dGraphic.enterColor));
+                continue;
+            }
+            if (!dGraphic.originalColor.Equals(otherColorTransition))
+            {
+                colorTransitions.Add(new ColorTransition(dGraphic.graphic, dGraphic.graphic.color, otherColorTransition));
+            }
+        }
     }
 }
