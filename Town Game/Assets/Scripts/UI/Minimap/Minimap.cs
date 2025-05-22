@@ -118,7 +118,7 @@ public class Minimap : MonoBehaviour
         minimapManager.onPointerRemove -= RemovePointer;
     }
 
-    public void Init()
+    private void Init()
     {
         minimapManager = FindAnyObjectByType<MinimapManager>();
         float canvasX = minimapManager.GetCanvasX();
@@ -472,7 +472,7 @@ public class Minimap : MonoBehaviour
         {
             ColorTransition transition = colorTransitions[i];
             transition.progress += Time.deltaTime * colorTransitionSpeed;
-            Color newColor = Color.Lerp(transition.fromColor, transition.toColor, transition.progress);
+            Color newColor = Color.Lerp(transition.fromColor, transition.toColor, transitionCurve.Evaluate(transition.progress));
             transition.graphic.color = newColor;
             if (transition.progress >= 1f)
             {
@@ -498,17 +498,6 @@ public class Minimap : MonoBehaviour
             return;
         }
 
-        // Find the color to transition background elements that are not in the map volume
-        Color otherColorTransition;
-        if (currentMapVolume.fadeOtherElements)
-        {
-            otherColorTransition = minimapManager.backgroundColor;
-        }
-        else
-        {
-            otherColorTransition = minimapManager.normalColor;
-        }
-
         // Maskables associated with this map volume
         List<MaskableGraphic> locals = localMaskables[currentMapVolume];
 
@@ -520,9 +509,17 @@ public class Minimap : MonoBehaviour
                 colorTransitions.Add(new ColorTransition(dGraphic.graphic, dGraphic.graphic.color, dGraphic.enterColor));
                 continue;
             }
-            if (!dGraphic.originalColor.Equals(otherColorTransition))
+            if (currentMapVolume.fadeOtherElements)
             {
-                colorTransitions.Add(new ColorTransition(dGraphic.graphic, dGraphic.graphic.color, otherColorTransition));
+                if (!dGraphic.graphic.color.Equals(minimapManager.backgroundColor))
+                {
+                    colorTransitions.Add(new ColorTransition(dGraphic.graphic, dGraphic.graphic.color, minimapManager.backgroundColor));
+                }
+                continue;
+            }
+            if (!dGraphic.originalColor.Equals(dGraphic.graphic.color))
+            {
+                colorTransitions.Add(new ColorTransition(dGraphic.graphic, dGraphic.graphic.color, dGraphic.originalColor));
             }
         }
     }

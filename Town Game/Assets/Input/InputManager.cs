@@ -158,7 +158,7 @@ public class InputManager : MonoBehaviour
     private void OnPlayerMenu() { onPlayerMenu?.Invoke(); }
     private void OnExitObserve() { onExitObserve?.Invoke(); }
     private void OnScrollLeft() { onScrollLeft?.Invoke(); }
-    private void OnScrollRight() { Debug.Log("Hey"); onScrollRight?.Invoke(); }
+    private void OnScrollRight() { onScrollRight?.Invoke(); }
     private void OnChooseBuilding() { onChooseBuilding?.Invoke(); }
     private void OnVoice(InputValue iv) { onVoice?.Invoke(iv); }
 }

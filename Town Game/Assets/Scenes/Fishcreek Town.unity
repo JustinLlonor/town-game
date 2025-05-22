@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.14712596, g: 0.17876688, b: 0.11010601, a: 1}
+  m_IndirectSpecularColor: {r: 0.14712575, g: 0.17876674, b: 0.11010596, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3880,6 +3880,22 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7798800375318563746, guid: 7dbfa4d599eeeb245babbe05a80a4aa3, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7798800375318563746, guid: 7dbfa4d599eeeb245babbe05a80a4aa3, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7798800375318563746, guid: 7dbfa4d599eeeb245babbe05a80a4aa3, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7798800375318563746, guid: 7dbfa4d599eeeb245babbe05a80a4aa3, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8286808696324652897, guid: 7dbfa4d599eeeb245babbe05a80a4aa3, type: 3}
       propertyPath: m_text
       value: '...
@@ -4094,7 +4110,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh59292
+  m_Name: pb_Mesh39716
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -11747,7 +11763,6 @@ MonoBehaviour:
     - graphic: {fileID: 1103850347}
       enterColor: {r: 1, g: 1, b: 1, a: 0}
     fadeOtherElements: 1
-  normalColor: {r: 1, g: 1, b: 1, a: 1}
   backgroundColor: {r: 0.27450982, g: 0.27450982, b: 0.27450982, a: 1}
 --- !u!4 &1783807104
 Transform:
@@ -14242,7 +14257,7 @@ GameObject:
   - component: {fileID: 4124489102490290461}
   m_Layer: 14
   m_Name: Cafeteria
-  m_TagString: Untagged
+  m_TagString: Room
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14415,10 +14430,6 @@ PrefabInstance:
     - target: {fileID: 4393661128077201535, guid: 510253d1d4f227543af658125b506bb6, type: 3}
       propertyPath: spawnPlayersOnStart
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4854093095659709370, guid: 510253d1d4f227543af658125b506bb6, type: 3}
-      propertyPath: buildingChooseMaps.Array.size
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5674810268018765361, guid: 510253d1d4f227543af658125b506bb6, type: 3}
       propertyPath: SortKey
