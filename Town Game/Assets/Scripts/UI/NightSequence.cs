@@ -14,6 +14,7 @@ public class NightSequence : MonoBehaviour
     PlayerManager pm;
     PlayerRoom pr;
     RoomManager rm;
+    bool nightScreen = false;
 
     private void Awake()
     {
@@ -22,10 +23,25 @@ public class NightSequence : MonoBehaviour
         pm = FindFirstObjectByType<PlayerManager>();
         rm = FindFirstObjectByType<RoomManager>();
 
-        //gm.OnNightSkip += NightStuff;
+        gm.OnNightSkipStart += AllowNightScreen;
         gm.OnDayStart += DayStuff;
         pm.OnInstantiatePlayer += GetReferences;
+    }
 
+    private void AllowNightScreen()
+    {
+        nightScreen = true;
+    }
+
+    private void Update()
+    {
+        if (!gm.init) return;
+        if ((!gm.skippedNight) || (!nightScreen)) return;
+        if (gm.nightTimer.RemainingTime(gm.Runner) <= 2.75f)
+        {
+            nightScreen = false;
+            NightStuff();
+        }
     }
 
     void GetReferences(GameObject player)
@@ -47,7 +63,6 @@ public class NightSequence : MonoBehaviour
         bs.SetAlpha(0);
         StartCoroutine(Sequence("Night "));
     }
-
     IEnumerator Sequence(string cycleText, bool teleport = true, bool blackScreen = true, bool waitForTransition = true)
     {
         nightText.text = cycleText + (gm.currentDay + 1);
@@ -65,11 +80,12 @@ public class NightSequence : MonoBehaviour
 
     void SetCultistText()
     {
-        //if (gm.cultists.Length == 1)
-        //{
-        //    cultistText.text = gm.cultists.Length + " cultist remains.";
-        //    return;
-        //}
-        //cultistText.text = gm.cultists.Length + " cultists remain.";
+        int cultistsLeft = gm.cultistsLeft;
+        if (cultistsLeft == 1)
+        {
+            cultistText.text = cultistsLeft + " cultist remains.";
+            return;
+        }
+        cultistText.text = cultistsLeft + " cultists remain.";
     }
 }

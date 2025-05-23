@@ -183,7 +183,8 @@ public class RoomManager : MonoBehaviour
     void BuildingChooseEnd()
     {
         buildingsChosen = false;
-        cm.StartModeTransition(1f, CameraManager.CameraMode.FirstPerson);
+        cm.ChangeCameraMode(CameraManager.CameraMode.FirstPerson);
+        //cm.StartModeTransition(1f, CameraManager.CameraMode.FirstPerson);
     }
 
     private bool GetCanAfford(int energyDiff)

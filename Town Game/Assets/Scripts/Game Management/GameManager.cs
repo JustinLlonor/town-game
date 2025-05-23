@@ -16,6 +16,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     [Header("Game Variables")]
     public PlayerRef leader;
     public PlayerRef[] cultists = new PlayerRef[] { };
+    [Networked] public int cultistsLeft { get; set; }
     public List<PlayerRef> alivePlayers = new List<PlayerRef>(); // doesn't update with alive players yet
     public Dictionary<string, Position> playerPositions = new Dictionary<string, Position>();
     public Dictionary<PlayerRef, string> chosenBuildings = new Dictionary<PlayerRef, string>();
@@ -50,7 +51,8 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     ScheduleManager sm;
     RunnerManager runnerManager;
     PositionManager positionManager;
-    bool skippedNight = false;
+    [Networked] public bool skippedNight { get; set; } = false;
+    bool previousSkippedNight = false;
     bool startedDay = false;
     public GameEvent OnTimeChange;
     public RevealRoles OnRevealRoles;
@@ -68,8 +70,8 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
     public delegate void GameEvent();
     public delegate void RevealRoles(bool isCultist);
     public delegate void Timer(float timer);
-    private TickTimer nightTimer;
-    bool init = false;
+    [Networked] public TickTimer nightTimer { get; set; }
+    public bool init = false;
 
     public enum Position
     {
@@ -189,12 +191,23 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         CheckDay(); 
         UpdateGameTime();
         ClientNightTimer();
+        ClientNightSkip();
+        CheckDayStart();
         if (!Runner.IsServer) return;
         //if (Input.GetKeyDown(KeyCode.Backspace)) SetTime(testTime.x, testTime.y);
         PhaseProperties();
         CheckNightSkip();
         CheckNightTimer();
-        CheckDayStart();
+    }
+
+    void ClientNightSkip()
+    {
+        if (previousSkippedNight != skippedNight)
+        {
+            previousSkippedNight = skippedNight;
+            if (skippedNight) NightSkipSequence();
+            else NightSkipEvent();
+        }
     }
 
     void ClientNightTimer()
@@ -294,7 +307,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         if (currentPeriod - (currentDay * 24f) > dayStartPeriod)
         {
             startedDay = true;
-            //view.RPC("DayStartSequence", RpcTarget.All);
+            DayStartSequence();
         }
     }
 
@@ -319,11 +332,9 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         nightTimer = TickTimer.CreateFromSeconds(Runner, buildingChooseTimer + 1f);
         StopTime();
         ResetChosenBuildings();
-        RPC_NightSkipSequence();
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
-    public void RPC_NightSkipSequence()
+    public void NightSkipSequence()
     {
         OnNightSkipStart?.Invoke();
     }
@@ -334,7 +345,6 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         skippedNight = false;
         Vector2Int newTime = PeriodToClockTime(timeSkippedPeriod);
         SetTime(newTime.x, newTime.y);
-        startedDay = false;
         ResumeTime();
         TeleportToBuildings();
     }
@@ -357,11 +367,15 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         if (chosenBuildings.ContainsKey(player)) chosenBuildings[player] = "house";
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
-    public void RPC_NightSkipEvent()
+    /// <summary>
+    /// When the building choose sequence ends on the client
+    /// </summary>
+    public void NightSkipEvent()
     {
+        startedDay = false;
         OnNightSkipEnd?.Invoke();
     }
+
     /// <summary>
     /// Teleports players to their chosen building from the chosen building list
     /// </summary>
@@ -401,7 +415,6 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
             pm.playerProperties[player].SetEnergy(Mathf.Clamp(fPlayerEnergy + fEnergyDiff, 0, maxEnergy));
             pm.Teleport(pair.Key, tpTransform.position, tpTransform.rotation);
         }
-        RPC_NightSkipEvent();
     }
 
     void ResetChosenBuildings()
@@ -475,6 +488,7 @@ public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
         }
 
         cultists = assignedCultists.ToArray();
+        cultistsLeft = cultists.Length;
 
         if (!SessionData.isTesting) StartCoroutine(UnfreezeAll(8f));
         foreach (PlayerRef player in Runner.ActivePlayers)
