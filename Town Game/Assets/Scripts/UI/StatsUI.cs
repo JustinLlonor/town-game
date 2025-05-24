@@ -63,9 +63,9 @@ public class StatsUI : MonoBehaviour
     {
         Debug.Log("assignign plaginyoer");
         trackedStats = player.GetComponent<PlayerStats>();
-        trackedStats.OnTakeDamage += ShakeBlob;
-        trackedStats.OnDeath += Splatter;
-        trackedStats.OnDeath += HideBlob;
+        //trackedStats.onHPChange += ShakeBlob;
+        trackedStats.onDeath += Splatter;
+        trackedStats.onDeath += HideBlob;
     }
 
     void UpdateBlobSpeed()

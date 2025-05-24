@@ -455,7 +455,7 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         if (fallDistance > mercyDistance)
         {
             shake?.StartShake(hardFall.shakeProperties);
-            stats.Damage(fallDistance * fallDamageMultiplier, false);
+            stats.Damage(1);
             RaycastHit hit;
             if (Physics.Raycast(groundCheck.position, groundCheck.up * -1f, out hit, Mathf.Infinity, (int)environmentMask))
             {

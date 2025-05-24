@@ -20,8 +20,8 @@ public class AffecterHolder : MonoBehaviour
     void GetReferences(GameObject player)
     {
         trackedStats = player.GetComponent<PlayerStats>();
-        trackedStats.OnAddAffecter += AddAffecter;
-        trackedStats.OnRemoveAffecter += RemoveAffecter;
+        //trackedStats.OnAddAffecter += AddAffecter;
+        //trackedStats.OnRemoveAffecter += RemoveAffecter;
     }
 
     void AddAffecter(StatAffecter affecter)

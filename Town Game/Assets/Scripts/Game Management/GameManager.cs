@@ -9,7 +9,7 @@ using System;
 using WebSocketSharp;
 using static PlayerManager;
 
-public class GameManager : NetworkBehaviour//PunCallbacks, IPunObservable
+public class GameManager : NetworkBehaviour
 {
     // gamePhase 0 = initialize game/assign roles 1 = main game 2 = results screen, not part
     public int gamePhase = 0;

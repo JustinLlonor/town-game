@@ -75,8 +75,8 @@ public class PlayerStatsUI : MonoBehaviour
     void SetBarLengths()
     {
         healthTransform.localScale = new Vector3(healthTransform.localScale.x, barMax * Mathf.Clamp(trackedStats.HP / trackedStats.maxHP, 0f, 1f));
-        nutritionTransform.localScale = new Vector3(sanityTransform.localScale.x, barMax * Mathf.Clamp(trackedStats.nutrition / trackedStats.maxNutrition, 0f, 1f));
-        sanityTransform.localScale = new Vector3(sanityTransform.localScale.x, barMax * Mathf.Clamp(trackedStats.sanity / trackedStats.maxSanity, 0f, 1f));
+        nutritionTransform.localScale = new Vector3(sanityTransform.localScale.x, barMax * Mathf.Clamp(trackedStats.hunger / trackedStats.maxHunger, 0f, 1f));
+        //sanityTransform.localScale = new Vector3(sanityTransform.localScale.x, barMax * Mathf.Clamp(trackedStats.sanity / trackedStats.maxSanity, 0f, 1f));
         staminaTransform.localScale = new Vector3(staminaTransform.localScale.x, staminaBarMax * Mathf.Clamp(trackedStats.stamina / trackedStats.maxStamina, 0f, 1f));
     }
 }

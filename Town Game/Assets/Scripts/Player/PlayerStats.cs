@@ -8,16 +8,20 @@ using UnityEngine.SceneManagement;
 public class PlayerStats : NetworkBehaviour
 {
     [Header("HP")]
-    public float maxHP = 100f;
-    [Networked] public float HP { get; set; } = 100f;
-    [SerializeField] float HPRegenSpeed = 5f;
-    [Header("Nutrition")]
-    public float maxNutrition = 100f;
-    public float nutrition = 100f;
-    [Header("Sanity")]
-    public float maxSanity = 100f;
-    public float sanity = 100f;
-    [Header("Stamina")] // Networking
+    public int maxHP = 3;
+    [Networked] public int HP { get; set; } = 3;
+    private int previousHP = 3;
+    [Header("Hunger")]
+    public int maxHunger = 3;
+    [Networked] public int hunger { get; set; } = 3;
+    [Tooltip("The amount of periods in between each hunger tick")]
+    public float hungerTickDelay = 6f;
+    private int previousHunger = 3;
+    /// <summary>
+    /// The next period for the hunger check to occur
+    /// </summary>
+    private float hungerTickPeriod = 0f;
+    [Header("Stamina")]
     public float maxStamina = 100f;
     [Networked] public float stamina { get; set; } = 100f;
     [SerializeField] float staminaRegenSpeed = 20f;
@@ -35,54 +39,67 @@ public class PlayerStats : NetworkBehaviour
     public Shake softHurt;
     public Shake hardHurt;
     public float softThreshold = 30f;
-    [Header("Affecter Stuff")]
-    public StatAffecter hungerAffecter;
-    public List<StatAffecter> affecters = new List<StatAffecter>();
+    private ChangeDetector changeDetector;
 
-    public delegate void OnDamage(float damage);
-    public OnDamage OnTakeDamage;
-    public delegate void Death();
-    public Death OnDeath;
-    public delegate void AffecterChange(StatAffecter affecter);
-    public AffecterChange OnRemoveAffecter;
-    public AffecterChange OnAddAffecter;
+    public delegate void IntEvent(int value);
+    public delegate void StatsEvent();
+    // Server events, executed on the server
+    public IntEvent onHPChange;
+    public IntEvent onHungerChange;
+    public StatsEvent onDeath;
+    // Client events
+    public IntEvent onHPChangeClient;
+    public IntEvent onHungerChangeClient;
+    public StatsEvent onDeathClient;
 
     CameraShake shake;
     //PhotonView view;
     [HideInInspector] public PlayerMovement pm;
     [HideInInspector] public Animator anim;
     [HideInInspector] public PlayerInfoView piv;
-    int hLayer;
-    float hWeight;
+    GameManager gameManager;
 
     private void Start()
     {
+        shake = FindFirstObjectByType<CameraShake>();
         //pm = gameObject.GetComponent<PlayerMovement>();
-        hLayer = anim.GetLayerIndex(hurtLayer);
         //view = gameObject.GetComponent<PhotonView>();
         //if (!view.IsMine) return;
-        shake = FindFirstObjectByType<CameraShake>();
         //if (FindObjectOfType<GameManager>() != null)AddAffector(hungerAffecter);
-    }
-
-    private void Update()
-    {
-        FixDmg(); //Dmg animation
-        /**
-        if (Input.GetKeyDown(KeyCode.K))
-        {
-            Kill();
-        }
-        **/
-        //if (!view.IsMine) return;
-        //CheckAffecters();
     }
 
     public override void Spawned()
     {
+        gameManager = FindAnyObjectByType<GameManager>();
+        changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
         pm.SetGrounded();
         stamina = 100f;
         staminaCooldown = 0f;
+        previousHP = HP;
+        previousHunger = hunger;
+    }
+
+    public override void Render()
+    {
+        foreach (var change in changeDetector.DetectChanges(this))
+        {
+            switch (change)
+            {
+                case nameof(HP):
+                    onHPChangeClient?.Invoke(HP - previousHP);
+                    previousHP = HP;
+                    break;
+                case nameof(hunger):
+                    onHungerChangeClient?.Invoke(hunger - previousHunger);
+                    previousHunger = hunger;
+                    break;
+            }
+        }
+    }
+
+    public override void Despawned(NetworkRunner runner, bool hasState)
+    {
+        if (HasInputAuthority) ClientDeath();
     }
 
     public override void FixedUpdateNetwork()
@@ -94,94 +111,33 @@ public class PlayerStats : NetworkBehaviour
         {
             RegenStamina();
         }
-        if (HP < maxHP)
-        {
-            RegenHP();
-        }
+        HungerCheck();
     }
 
-    // Stat affecters
-    public void AddAffector(StatAffecter affecter)
+    // Health
+    #region
+    /// <summary>
+    /// Sets the health of this player
+    /// </summary>
+    /// <param name="health"></param>
+    public void SetHealth(int health)
     {
-        StatAffecter foundAffecter = affecters.FirstOrDefault(i => i.name == affecter.name);
-        if (foundAffecter != null) return;
-        affecters.Add(new StatAffecter(affecter.name, affecter.description, affecter.stat, affecter.changeRate, affecter.timeLeft, affecter.isInfinite, affecter.display));
-        OnAddAffecter?.Invoke(affecter);
+        int previousHealth = HP;
+        HP = health;
+        onHPChange?.Invoke(HP - previousHealth);
     }
 
-    public void RemoveAffecter(string name)
+    /// <summary>
+    /// Damages the player by the specified amount
+    /// </summary>
+    /// <param name="amount"></param>
+    public void Damage(int amount)
     {
-        for (int i = 0; i < affecters.Count; i++)
-        {
-            if (affecters[i].name == name)
-            {
-                OnRemoveAffecter?.Invoke(affecters[i]);
-                affecters.RemoveAt(i);
-                break;
-            }
-        }
-    }
-
-    void CheckAffecters()
-    {
-        List<StatAffecter> destroyed = new List<StatAffecter>();
-        for (int i = 0; i < affecters.Count; i++)
-        {
-            if (affecters[i].timeLeft <= 0f && !affecters[i].isInfinite)
-            {
-                destroyed.Add(affecters[i]);
-                break;
-            }
-
-            StatAffecter affecter = affecters[i];
-            float changeAmount = affecter.changeRate * Time.deltaTime;
-
-            switch (affecter.stat)
-            {
-                // Changes the stat with change amount
-                case StatAffecter.Stat.Health:
-                    HP = Mathf.Clamp(HP + changeAmount, 0f, maxHP);
-                    CheckDeath();
-                    break;
-                case StatAffecter.Stat.Nutrition:
-                    nutrition = Mathf.Clamp(nutrition + changeAmount, 0f, maxNutrition);
-                    break;
-                case StatAffecter.Stat.Sanity:
-                    sanity = Mathf.Clamp(sanity + changeAmount, 0f, maxSanity);
-                    break;
-            }
-
-            if (!affecter.isInfinite)
-            {
-                affecter.timeLeft -= Time.deltaTime;
-                if (affecter.timeLeft <= 0f)
-                {
-                    destroyed.Add(affecters[i]);
-                }
-            }
-        }
-
-        foreach (StatAffecter i in destroyed)
-        {
-            RemoveAffecter(i.name);
-        }
-    }
-
-    void RegenHP()
-    {
-        HP += HPRegenSpeed * Runner.DeltaTime;
-        if (HP > maxHP)
-        {
-            HP = maxHP; 
-        }
-    }
-
-    public void Damage(float amount, bool playShake = true)
-    {
+        if (!Runner.IsServer) return;
         HP -= amount;
-        OnTakeDamage?.Invoke(amount);
+        onHPChange?.Invoke(-amount);
         CheckDeath();
-        //view.RPC("DamageAnimation", RpcTarget.All);
+        /**
         if (playShake)
         {
             if (amount < softThreshold)
@@ -193,35 +149,26 @@ public class PlayerStats : NetworkBehaviour
                 shake.StartShake(hardHurt.shakeProperties);
             }
         }
+        **/
     }
 
-    public void DamageAnimation()
+    /// <summary>
+    /// Heals the player by the specified amount
+    /// </summary>
+    /// <param name="amount"></param>
+    public void Heal(int amount)
     {
-        hWeight = hurtWeight;
-        anim.SetLayerWeight(hLayer, hWeight);
+        HP += amount;
+        if (HP > maxHP) HP = maxHP;
+        onHPChange?.Invoke(amount);
     }
 
-    void CheckDeath()
-    {
-        if (HP <= 0f)
-        {
-            Kill();
-        }
-    }
-
-    void FixDmg()
-    {
-        if (hWeight == 0f) return;
-        hWeight = Mathf.Lerp(hWeight, 0f, Time.deltaTime * hurtLerp);
-        anim.SetLayerWeight(hLayer, hWeight);
-        if (hWeight < 0.001f) hWeight = 0f;
-    }
-
+    /// <summary>
+    /// Kills the player and destroys the NetworkObject
+    /// </summary>
     public void Kill()
     {
-        if (HasInputAuthority) ClientDeath();
         if (!HasStateAuthority) return;
-
         PlayerClothing pc = gameObject.GetComponent<PlayerClothing>();
         Rigidbody rb = GetComponent<Rigidbody>();
         Quaternion newRot = Quaternion.Euler(0f, GetComponent<Player>().camDirection, 0f);
@@ -245,19 +192,94 @@ public class PlayerStats : NetworkBehaviour
         //corpseView.RPC("SetCorpseData", RpcTarget.OthersBuffered, view.Owner);
 
         // Sets corpse clothing to this player's clothing
+        onDeath?.Invoke();
         Runner.Despawn(Object); // Destroy player object
     }
 
+    /// <summary>
+    /// Checks if the player is qualified for death
+    /// </summary>
+    void CheckDeath()
+    {
+        if (HP <= 0)
+        {
+            Kill();
+        }
+    }
+
+    /// <summary>
+    /// Called on the client when there is death. Only called on this object's input authority.
+    /// </summary>
     public void ClientDeath()
     {
         CameraBobbing cb = FindFirstObjectByType<CameraBobbing>();
         cb.isBobbing = false;
         cb.isSprinting = false;
-        OnDeath?.Invoke();
+        onDeathClient?.Invoke();
+    }
+    #endregion
+
+    // Hunger
+    #region
+    /// <summary>
+    /// Sets the hunger of this player
+    /// </summary>
+    /// <param name="amount"></param>
+    public void SetHunger(int amount)
+    {
+        amount = Mathf.Clamp(amount, 0, maxHunger);
+        int previousHunger = hunger;
+        hunger = amount;
+        onHungerChange?.Invoke(hunger - previousHunger);
     }
 
+    /// <summary>
+    /// Adds hunger by the specified amount
+    /// </summary>
+    /// <param name="amount"></param>
+    public void AddHunger(int amount)
+    {
+        SetHunger(hunger + amount);
+    }
+
+    /// <summary>
+    /// Removes hunger by the specified amount
+    /// </summary>
+    /// <param name="amount"></param>
+    public void RemoveHunger(int amount)
+    {
+        SetHunger(hunger - amount);
+    }
+
+    /// <summary>
+    /// To be called at specified periods of the day. 
+    /// Removes 1 hunger from the player. If the player's hunger is already 0, then removes 1 HP from the player
+    /// </summary>
+    public void TickHunger()
+    {
+        if (hunger <= 0)
+        {
+            Damage(1);
+            return;
+        }
+        RemoveHunger(1);
+    }
+
+    private void HungerCheck()
+    {
+        if (!HasStateAuthority) return;
+        if (gameManager == null) return;
+        if (gameManager.currentPeriod > hungerTickPeriod)
+        {
+            hungerTickPeriod += hungerTickDelay;
+            TickHunger();
+        }
+    }
+    #endregion
+
     // Stamina
-    void RegenStamina()
+    #region
+    private void RegenStamina()
     {
         if (stamina == maxStamina) return;
         if (stamina <= maxStamina)
@@ -294,32 +316,8 @@ public class PlayerStats : NetworkBehaviour
         
         return true;
     }
+    #endregion
 
-    //public override void OnLeftRoom()
-    //{
-    //    SceneManager.LoadScene(0);
-    //}
 
-    //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    //{
-    //    if (stream.IsWriting)
-    //    {
-    //        stream.SendNext(HP);
-    //        stream.SendNext(maxHP);
-    //        stream.SendNext(nutrition);
-    //        stream.SendNext(maxNutrition);
-    //        stream.SendNext(sanity);
-    //        stream.SendNext(maxSanity);
-    //    }
-    //    else
-    //    {
-    //        HP = (float)stream.ReceiveNext();
-    //        maxHP = (float)stream.ReceiveNext();
-    //        nutrition = (float)stream.ReceiveNext();
-    //        maxNutrition = (float)stream.ReceiveNext();
-    //        sanity = (float)stream.ReceiveNext();
-    //        maxSanity = (float)stream.ReceiveNext();
-    //    }
-    //}
 }
 

@@ -7,6 +7,9 @@ using WebSocketSharp;
 //using Photon.Realtime;
 //using WebSocketSharp;
 
+/// <summary>
+/// The player stats that other players can see
+/// </summary>
 public class PlayerInfoView : NetworkBehaviour
 {
     public Gradient healthGradient = new Gradient();
@@ -15,7 +18,7 @@ public class PlayerInfoView : NetworkBehaviour
     public string[] sanityTextGradient = new string[] { };
     [HideInInspector] public PlayerStats stats;
     [HideInInspector] public Player player;
-    public float recievedHP = 100f;
+    [Networked] public float recievedHP { get; set; } = 100f;
     Interactable vi;
     [HideInInspector] public NetworkObject no;
     int previousIndex = -1;

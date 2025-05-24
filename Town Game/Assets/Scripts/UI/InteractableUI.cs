@@ -90,7 +90,6 @@ public class InteractableUI : MonoBehaviour
             refreshCanvas = true;
         }
         KeyUI keyUI = interaction.GetChild(0).GetComponent<KeyUI>();
-        Debug.Log(keyUI);
         if (!key.IsNullOrEmpty())
         {
             if (!keyUI.gameObject.activeSelf) refreshCanvas = true;
