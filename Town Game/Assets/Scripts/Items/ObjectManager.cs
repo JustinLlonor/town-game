@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Allows for reusable assets to be sent across the network
+/// Associates strings with objects. Allows for reusable assets to be sent across the network
 /// </summary>
 public class ObjectManager : MonoBehaviour
 {
@@ -16,6 +16,8 @@ public class ObjectManager : MonoBehaviour
     public Dictionary<string, Clothing> clothingSearch = new Dictionary<string, Clothing>();
     public GameObject[] prefabs;
     public Dictionary<string, GameObject> prefabSearch = new Dictionary<string, GameObject>();
+    public Odour[] odours;
+    public Dictionary<string, Odour> odourSearch = new Dictionary<string, Odour>();
 
     private void Awake()
     {
@@ -24,5 +26,6 @@ public class ObjectManager : MonoBehaviour
         foreach (Texture2D tex in textures) texSearch.Add(tex.name, tex);
         foreach (Clothing clothing in clothings) clothingSearch.Add(clothing.name, clothing);
         foreach (GameObject prefab in prefabs) prefabSearch.Add(prefab.name, prefab);
+        foreach (Odour odour in odours) odourSearch.Add(odour.name, odour);
     }
 }

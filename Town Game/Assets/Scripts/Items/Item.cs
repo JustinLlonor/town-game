@@ -34,7 +34,7 @@ public class Item : ScriptableObject
         public string layer;
     }
 
-    public virtual string GetType()
+    public virtual string GetItemType()
     {
         if (customType.IsNullOrEmpty()) return "Item";
         return customType;

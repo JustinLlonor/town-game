@@ -71,7 +71,7 @@ public class ItemUIInfo : MonoBehaviour
     void UpdateData()
     {
         nameText.text = item.name;
-        typeText.text = item.GetType();
+        typeText.text = item.GetItemType();
         icon.texture = item.icon;
         string ownership = itemPhys.GetOwnership();
         if (ownership.IsNullOrEmpty())

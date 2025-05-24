@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "New Item", menuName = "Items/Item")]
 public class Device : Item
 {
-    public override string GetType()
+    public override string GetItemType()
     {
         return "Device";
     }

@@ -26,7 +26,7 @@ public class Weapon : Item
     //    public bool disablesLegs = false;
     //    public bool concussesHead = false;
 
-    public override string GetType()
+    public override string GetItemType()
     {
         return "Weapon";
     }
