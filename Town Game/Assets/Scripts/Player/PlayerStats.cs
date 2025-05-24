@@ -413,7 +413,13 @@ public class PlayerStats : NetworkBehaviour
             if (prescence.odour == excludedOdour) continue;
             prescence.amount -= decreasedAmount;
         }
-        CheckOdourRemoval();
+        // Deleting a prescence will also delete its negative amount.
+        // This will re-add this negative amount to the excluded odour to get the cap back to the max odour level
+        float leftovers = CheckOdourRemoval();
+        if (leftovers < 0f)
+        {
+            GetOdourPrescence(excludedOdour).amount += leftovers;
+        }
     }
 
     /// <summary>
@@ -432,18 +438,22 @@ public class PlayerStats : NetworkBehaviour
     }
 
     /// <summary>
-    /// Removes all odour prescences less than 0.
+    /// Removes all odour prescences less than 0
     /// </summary>
-    private void CheckOdourRemoval()
+    /// <returns>The amount leftover from the odour removal</returns>
+    private float CheckOdourRemoval()
     {
+        float output = 0f;
         for (int i = 0; i < odourPrescences.Count; i++)
         {
             if (odourPrescences[i].amount <= 0f)
             {
+                output += odourPrescences[i].amount;
                 odourPrescences.RemoveAt(i);
                 i--;
             }
         }
+        return output;
     }
 
     private OdourPresence GetOdourPrescence(string odour)
