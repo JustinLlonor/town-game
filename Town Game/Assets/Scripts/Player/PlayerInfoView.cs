@@ -70,6 +70,7 @@ public class PlayerInfoView : NetworkBehaviour
 
     void UpdateHP(float eval)
     {
+        if (!init) return;
         //if (view.IsMine) return;
         int newIndex = Mathf.FloorToInt(healthTextGradient.Length*(1-eval));
         if (newIndex != previousIndex)
