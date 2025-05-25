@@ -1,5 +1,6 @@
 using Fusion;
 using Fusion.Sockets;
+using Photon.Realtime;
 using Steamworks;
 using System;
 using System.Collections;
@@ -12,12 +13,14 @@ public class PlayerManager : NetworkBehaviour
     public bool spawnPlayersOnJoin = true;
     [Networked, Capacity(20)] public NetworkDictionary<PlayerRef, NetworkId> playerObjects => default;
     public Dictionary<PlayerRef, Observable> playerObservables = new Dictionary<PlayerRef, Observable>();
-    public Dictionary<PlayerRef, PlayerProperties> playerProperties = new Dictionary<PlayerRef, PlayerProperties>();
-    public PlayerProperties currentPlayerProperties = new PlayerProperties("", false, 0, 0);
+    //public Dictionary<PlayerRef, PlayerProperties> playerProperties = new Dictionary<PlayerRef, PlayerProperties>();
+    [Networked, Capacity(20)] public NetworkDictionary<PlayerRef, NetworkId> properties => default;
+    //public PlayerProperties currentPlayerProperties = new PlayerProperties("", false, 0, 0);
     private Dictionary<PlayerRef, TeleportInfo> teleportQueue = new Dictionary<PlayerRef, TeleportInfo>();
     
     public GameObject currentPlayer;
     public NetworkPrefabRef playerPrefab;
+    public NetworkPrefabRef propertyHolderPrefab;
     public Transform spawn;
 
     public PlayerSettings playerSettings;
@@ -61,7 +64,7 @@ public class PlayerManager : NetworkBehaviour
         public int room;
         public int currency;
         public List<int> groups; // -1 = Cultist, -2 = Innocent, 0 and above are job indices
-        public int energy;
+        public int energy; // More private, attach to property holder
 
         public PlayerProperties(string nickname, bool isCultist, int room, int currency)
         {
@@ -165,6 +168,7 @@ public class PlayerManager : NetworkBehaviour
     {
     }
 
+    #region
     public void SetupMovementSettings(GameObject player)
     {
         PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
@@ -297,33 +301,6 @@ public class PlayerManager : NetworkBehaviour
         OnTeleportPlayer?.Invoke();
     }
 
-    public void AddPlayerToGroup(PlayerRef player, int group)
-    {
-        if (playerProperties[player].groups == null) playerProperties[player].groups = new List<int>();
-        if (playerProperties[player].groups.Contains(group)) return;
-        playerProperties[player].groups.Add(group);
-    }
-
-    public void RemovePlayerFromGroup(PlayerRef player, int group)
-    {
-        if (playerProperties[player].groups == null) playerProperties[player].groups = new List<int>();
-        if (!playerProperties[player].groups.Contains(group)) return;
-        playerProperties[player].groups.RemoveAt(playerProperties[player].groups.IndexOf(group));
-    }
-
-    public List<PlayerRef> GetPlayersInGroup(int group)
-    {
-        List<PlayerRef> output = new List<PlayerRef>();
-        foreach (KeyValuePair<PlayerRef, PlayerProperties> kvp in playerProperties)
-        {
-            if (kvp.Value.IsPartOfGroup(group))
-            {
-                output.Add(kvp.Key);
-            }
-        }
-        return output;
-    }
-
     public GameObject GetPlayerObject(PlayerRef player)
     {
         if (!playerObjects.ContainsKey(player)) return null;
@@ -341,4 +318,118 @@ public class PlayerManager : NetworkBehaviour
         if (!foundObject) return null;
         return nObj;
     }
+
+    public PlayerPropertyHolder GetPlayerPropertyHolder(NetworkId id)
+    {
+        NetworkObject nObj;
+        bool foundObject = Runner.TryFindObject(id, out nObj);
+        if (!foundObject) return null;
+        return nObj.GetComponent<PlayerPropertyHolder>();
+    }
+    #endregion
+
+    // Properties
+    #region
+    public void CreatePlayerProperties()
+    {
+        foreach (PlayerRef player in Runner.ActivePlayers)
+        {
+            NetworkObject propertyHolder = Runner.Spawn(propertyHolderPrefab);
+            properties.Add(player, propertyHolder);
+            propertyHolder.SetPlayerAlwaysInterested(player, true);
+        }
+    }
+    
+    public string GetNickname(PlayerRef player)
+    {
+        if (properties.ContainsKey(player)) return GetPlayerPropertyHolder(properties[player]).nickname.ToString();
+        return null;
+    }
+
+    public bool GetIsCultist(PlayerRef player)
+    {
+        if (properties.ContainsKey(player)) return GetPlayerPropertyHolder(properties[player]).isCultist;
+        return false;
+    }
+
+    public int GetRoom(PlayerRef player)
+    {
+        if (properties.ContainsKey(player)) return GetPlayerPropertyHolder(properties[player]).room;
+        return -1;
+    }
+
+    public int GetMoney(PlayerRef player)
+    {
+        if (properties.ContainsKey(player)) return GetPlayerPropertyHolder(properties[player]).money;
+        return -1;
+    }
+
+    public NetworkLinkedList<int>? GetGroups(PlayerRef player)
+    {
+        if (properties.ContainsKey(player)) return GetPlayerPropertyHolder(properties[player]).groups;
+        return null;
+    }
+
+    public int GetEnergy(PlayerRef player)
+    {
+        if (properties.ContainsKey(player)) return GetPlayerPropertyHolder(properties[player]).energy;
+        return -1;
+    }
+
+    public void SetNickname(PlayerRef player, string name)
+    {
+        GetPlayerPropertyHolder(properties[player]).nickname = name;
+    }
+
+    public void SetIsCultist(PlayerRef player, bool isCultist)
+    {
+        GetPlayerPropertyHolder(properties[player]).isCultist = isCultist;
+    }
+
+    public void SetRoom(PlayerRef player, int room)
+    {
+        GetPlayerPropertyHolder(properties[player]).room = room;
+    }
+
+    public void SetMoney(PlayerRef player, int money)
+    {
+        GetPlayerPropertyHolder(properties[player]).money = money;
+    }
+
+    public void AddPlayerToGroup(PlayerRef player, int group)
+    {
+        if (GetPlayerPropertyHolder(properties[player]).groups.Contains(group)) return;
+        GetPlayerPropertyHolder(properties[player]).groups.Add(group);
+    }
+
+    public void RemovePlayerFromGroup(PlayerRef player, int group)
+    {
+        if (!GetPlayerPropertyHolder(properties[player]).groups.Contains(group)) return;
+        GetPlayerPropertyHolder(properties[player]).groups.Remove(group);
+    }
+
+    public bool PlayerIsPartOfGroup(PlayerRef player, int group)
+    {
+        return GetPlayerPropertyHolder(properties[player]).groups.Contains(group);
+    }
+
+    public List<PlayerRef> GetPlayersInGroup(int group)
+    {
+        List<PlayerRef> output = new List<PlayerRef>();
+        foreach (var kvp in properties)
+        {
+            if (GetPlayerPropertyHolder(kvp.Value).groups.Contains(group))
+            {
+                output.Add(kvp.Key);
+            }
+        }
+        return output;
+    }
+    // ^^
+
+    public void SetEnergy(PlayerRef player, int energy)
+    {
+        GetPlayerPropertyHolder(properties[player]).energy = energy;
+    }
+    #endregion
 }

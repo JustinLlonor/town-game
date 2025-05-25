@@ -131,7 +131,7 @@ public class ScheduleManager : NetworkBehaviour
     void SendAddBlockData(ScheduleBlock block)
     {
         // Send the schedule block to individual players
-        foreach (KeyValuePair<PlayerRef, PlayerManager.PlayerProperties> player in playerManager.playerProperties)
+        foreach (var player in playerManager.properties)
         {
             if (block.assignedPlayers.Contains(player.Key)) // Iterates over every player who is assigned to this block
             {
@@ -145,7 +145,7 @@ public class ScheduleManager : NetworkBehaviour
 
     void SendRemoveBlockData(ScheduleBlock block)
     {
-        foreach (KeyValuePair<PlayerRef, PlayerManager.PlayerProperties> player in playerManager.playerProperties)
+        foreach (var player in playerManager.properties)
         {
             if (block.assignedPlayers.Contains(player.Key)) // Iterates over every player who is assigned to this block
             {

@@ -181,7 +181,7 @@ public class ItemPhys : NetworkBehaviour
     private bool PlayerCanPickUpItem(PlayerRef player)
     {
         // If the player is a cultist they can always pick up an item
-        bool isCultist = playerManager.playerProperties[player].isCultist;
+        bool isCultist = playerManager.GetIsCultist(player);
         if (isCultist) return true;
         // If not a cultist, they need access to a room to be able to pick up the item
         if (positionManager.PlayerHasAccessToRoom(player, room.ToString())) return true;
@@ -216,7 +216,7 @@ public class ItemPhys : NetworkBehaviour
 
     public void GetLocalOwnership()
     {
-        bool isCultist = playerManager.currentPlayerProperties.isCultist;
+        bool isCultist = playerManager.GetIsCultist(Runner.LocalPlayer);
         bool ownsProperty = positionManager.PlayerHasAccessToRoom(Runner.LocalPlayer, room.ToString());
         if (!isCultist)
         {

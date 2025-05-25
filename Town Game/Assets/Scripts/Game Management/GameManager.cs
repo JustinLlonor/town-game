@@ -167,8 +167,7 @@ public class GameManager : NetworkBehaviour
         for (int i = 0; i < roomAssignment.Length; i++)
         {
             PlayerRef rPlayer = new List<PlayerRef>(Runner.ActivePlayers)[i];
-            pm.playerProperties[rPlayer].SetRoom(roomAssignment[i]);
-            RPC_SendRoom(rPlayer, roomAssignment[i]);
+            pm.SetRoom(rPlayer, roomAssignment[i]);
         }
     }
 
@@ -180,8 +179,10 @@ public class GameManager : NetworkBehaviour
         // Sets  the currency to the start currency for every player in the lobby
         foreach (PlayerRef player in  Runner.ActivePlayers)
         {
-            pm.playerProperties[player].SetCurrency(startCurrency);
-            pm.playerProperties[player].SetEnergy(startEnergy);
+            pm.SetMoney(player, startCurrency);
+            //pm.playerProperties[player].SetCurrency(startCurrency);
+            pm.SetEnergy(player, startEnergy);
+            //pm.playerProperties[player].SetEnergy(startEnergy);
         }
     }
 
@@ -265,7 +266,8 @@ public class GameManager : NetworkBehaviour
 
     void Phase0()
     {
-        CreatePlayerProperties(); // Initialize player properties
+        pm.CreatePlayerProperties(); // Initialize player properties
+        AssignPlayerPositions(); // Add to player positions
         AssignRooms(); // Sets the room properties of each player
         SetProperties(); // Sets the default currency of each player
         SpawnPositions(); // Spawns each player
@@ -273,11 +275,11 @@ public class GameManager : NetworkBehaviour
         SetTime(startTime.x, startTime.y);
     }
 
-    void CreatePlayerProperties()
+    void AssignPlayerPositions()
     {
         foreach (PlayerRef player in Runner.ActivePlayers)
         {
-            pm.playerProperties.Add(player, new PlayerProperties("", false, -1, 0));
+            //pm.playerProperties.Add(player, new PlayerProperties("", false, -1, 0));
             positionManager.AddPlayerToBranch(player, 0);
         }
     }
@@ -285,20 +287,8 @@ public class GameManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
     public void RPC_SendRole([RpcTarget] PlayerRef player, bool isCultist)
     {
-        pm.currentPlayerProperties.SetIsCultist(isCultist);
+        //pm.currentPlayerProperties.SetIsCultist(isCultist);
         OnRevealRoles?.Invoke(isCultist);
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
-    public void RPC_SendEnergy([RpcTarget] PlayerRef player, int energy)
-    {
-        pm.currentPlayerProperties.SetEnergy(energy);
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
-    public void RPC_SendRoom([RpcTarget] PlayerRef player, int room)
-    {
-        pm.currentPlayerProperties.SetRoom(room);
     }
 
     void CheckDayStart()
@@ -357,7 +347,8 @@ public class GameManager : NetworkBehaviour
             if (foundRoom != null) // if the room is found
             {
                 int energyDiff = foundRoom.energyDiff;
-                int playerEnergy = pm.playerProperties[player].energy;
+                //int playerEnergy = pm.playerProperties[player].energy;
+                int playerEnergy = pm.GetEnergy(player);
                 if (playerEnergy + energyDiff < 0) return; // If the energy is invalid
                 Debug.Log("successfully set to " + buildingName);
                 if (chosenBuildings.ContainsKey(player)) chosenBuildings[player] = buildingName; // Set the chosen building
@@ -388,7 +379,8 @@ public class GameManager : NetworkBehaviour
             MapRoom tpRoom = null;
             if (pair.Value == "house" || pair.Value.IsNullOrEmpty())
             {
-                tpRoom = rm.playerRooms[pm.playerProperties[player].room];
+                //tpRoom = rm.playerRooms[pm.playerProperties[player].room];
+                tpRoom = rm.playerRooms[pm.GetRoom(player)];
                 tpTransform = tpRoom.spawnTransform;
                 Debug.Log("house set");
             }
@@ -396,10 +388,12 @@ public class GameManager : NetworkBehaviour
             {
                 tpRoom = rm.GetWorkBuilding(pair.Value);
                 int energyDiff = tpRoom.energyDiff;
-                int playerEnergy = pm.playerProperties[player].energy;
+                //int playerEnergy = pm.playerProperties[player].energy;
+                int playerEnergy = pm.GetEnergy(player);
                 if (energyDiff + playerEnergy < 0)
                 {
-                    tpRoom = rm.playerRooms[pm.playerProperties[player].room];
+                    //tpRoom = rm.playerRooms[pm.playerProperties[player].room];
+                    tpRoom = rm.playerRooms[pm.GetRoom(player)];
                     tpTransform = tpRoom.spawnTransform;
                     Debug.Log("house alt set");
                 }
@@ -410,9 +404,10 @@ public class GameManager : NetworkBehaviour
             }
             int fEnergyDiff = tpRoom.energyDiff;
             if (tpRoom.roomCategory == RoomCategory.House) fEnergyDiff = rm.houseEnergyGain;
-            int fPlayerEnergy = pm.playerProperties[player].energy;
+            //int fPlayerEnergy = pm.playerProperties[player].energy;
+            int fPlayerEnergy = pm.GetEnergy(player);
 
-            pm.playerProperties[player].SetEnergy(Mathf.Clamp(fPlayerEnergy + fEnergyDiff, 0, maxEnergy));
+            pm.SetEnergy(player, Mathf.Clamp(fPlayerEnergy + fEnergyDiff, 0, maxEnergy));
             pm.Teleport(pair.Key, tpTransform.position, tpTransform.rotation);
         }
     }
@@ -423,7 +418,7 @@ public class GameManager : NetworkBehaviour
         foreach (PlayerRef player in alivePlayers)
         {
             chosenBuildings.Add(player, "house"); // Adds the player's home as the default building
-            RPC_SendEnergy(player, pm.playerProperties[player].energy);
+            //RPC_SendEnergy(player, pm.playerProperties[player].energy);
         }
     }
 
@@ -493,13 +488,13 @@ public class GameManager : NetworkBehaviour
         if (!SessionData.isTesting) StartCoroutine(UnfreezeAll(8f));
         foreach (PlayerRef player in Runner.ActivePlayers)
         {
-            RPC_SendRole(player, pm.playerProperties[player].isCultist);
+            RPC_SendRole(player, pm.GetIsCultist(player));
         }
     }
 
     void AssignRole(PlayerRef player, bool isCultist)
     {
-        pm.playerProperties[player].SetIsCultist(isCultist);
+        pm.SetIsCultist(player, isCultist);
     }
 
     public void SpawnPositions()
@@ -507,7 +502,7 @@ public class GameManager : NetworkBehaviour
         // Invokes reveal roles delegate for the role reveal sequence
         foreach (PlayerRef player in Runner.ActivePlayers)
         {
-            Transform roomT = rm.playerRooms[pm.playerProperties[player].room].spawnTransform;
+            Transform roomT = rm.playerRooms[pm.GetRoom(player)].spawnTransform;
             GameObject playerObject = pm.SpawnPlayerAtTransform(Runner, player, roomT);
             if (!SessionData.isTesting) playerObject.GetComponent<PlayerMovement>().Freeze();
         }

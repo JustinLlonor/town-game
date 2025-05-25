@@ -78,7 +78,7 @@ public class RoomManager : MonoBehaviour
         PlayerRef localPlayer = positionManager.Runner.LocalPlayer;
         Debug.Log("starting");
         //if (!gm.alivePlayers.Contains(PhotonNetwork.LocalPlayer)) return;
-        ownedRooms = new List<MapRoom>() { playerRooms[pm.currentPlayerProperties.room] }; // Creates new owned rooms list
+        ownedRooms = new List<MapRoom>() { playerRooms[pm.GetRoom(localPlayer)] }; // Creates new owned rooms list
         foreach (MapRoom room in workRooms)
         {
             if (positionManager.PlayerHasAccessToRoom(localPlayer, room.roomName))
@@ -159,7 +159,7 @@ public class RoomManager : MonoBehaviour
         int nEnergyDiff = energyDiff;
         bool canAfford = GetCanAfford(energyDiff);
         if (!canAfford) return;
-        if ((pm.currentPlayerProperties.energy == gm.maxEnergy) && energyDiff > 0) nEnergyDiff = 0;
+        if ((pm.GetEnergy(positionManager.Runner.LocalPlayer) == gm.maxEnergy) && energyDiff > 0) nEnergyDiff = 0;
         onSelectionUpdate?.Invoke(sentBuilding, nEnergyDiff, canAfford, true);
         // Sends the chosen building to the server
         chosenBuilding = currentBuilding;
@@ -176,7 +176,7 @@ public class RoomManager : MonoBehaviour
             energyDiff = ownedRooms[currentBuilding].energyDiff;
         }
         int nEnergyDiff = energyDiff;
-        if ((pm.currentPlayerProperties.energy == gm.maxEnergy) && energyDiff > 0) nEnergyDiff = 0;
+        if ((pm.GetEnergy(positionManager.Runner.LocalPlayer) == gm.maxEnergy) && energyDiff > 0) nEnergyDiff = 0;
         onSelectionUpdate?.Invoke(sentBuilding, nEnergyDiff, GetCanAfford(energyDiff), chosenBuilding == currentBuilding); // selected if the hovered building is the current
     }
 
@@ -189,7 +189,7 @@ public class RoomManager : MonoBehaviour
 
     private bool GetCanAfford(int energyDiff)
     {
-        int newEnergy = energyDiff + pm.currentPlayerProperties.energy;
+        int newEnergy = energyDiff + pm.GetEnergy(pm.Runner.LocalPlayer);
         return newEnergy >= 0;
     }
 
