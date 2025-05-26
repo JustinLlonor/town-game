@@ -66,6 +66,7 @@ public class PlayerStats : NetworkBehaviour
     GameManager gameManager;
     ObjectManager objectManager;
 
+    [System.Serializable]
     public class OdourPresence
     {
         public string odour;
@@ -428,13 +429,15 @@ public class PlayerStats : NetworkBehaviour
     /// <param name="amount"></param>
     private void DecreaseTotalOdour(float amount)
     {
+        if (amount == 0f) return;
         if (odourPrescences.Count == 0) return;
         float decreasedAmount = amount / odourPrescences.Count;
         foreach (OdourPresence prescence in odourPrescences)
         {
             prescence.amount -= decreasedAmount;
         }
-        CheckOdourRemoval();
+        float leftovers = CheckOdourRemoval();
+        DecreaseTotalOdour(-leftovers);
     }
 
     /// <summary>

@@ -25,10 +25,12 @@ public class AnnouncementManager : MonoBehaviour
 
     private void Update()
     {
+        /**
         if (Input.GetKeyDown(KeyCode.B))
         {
             RPC_AnnounceAll("The cafeteria has opened.");
         }
+        **/
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
