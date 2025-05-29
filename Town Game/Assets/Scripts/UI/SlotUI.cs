@@ -21,6 +21,11 @@ public class SlotUI : MonoBehaviour
     bool isEquipped = false;
     bool animationStarted = false;
 
+    public void OnEnable()
+    {
+        SetEquipped(false);
+    }
+
     public void SetIndex(int index)
     {
         indexText.text = index.ToString();
