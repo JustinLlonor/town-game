@@ -10,15 +10,35 @@ public class BarUI : MonoBehaviour
     public RectTransform plusIndicator;
     public RectTransform minusIndicator;
     public Transform barGlass;
-    public MaskableGraphic[] graphics;
+    public List<MaskableGraphic> graphics;
     [Header("Animation Settings")]
     public AnimationCurve statChangeCurve;
     public float statChangeDelay;
     public float statChangeSpeed = 5f;
+    [Header("Stat Reveal Settings")]
+    public float showDuration = 3f;
+    public float showSpeed = 8f;
+    public float hideSpeed = 1f;
+    /// <summary>
+    /// If this stat is revealing or not
+    /// </summary>
+    public bool statRevealing = false;
     private float maxFillSize;
     private int maxValue;
-    private int destinedValue = 3;
-    
+    float currentAlpha = 1f;
+    IEnumerator currentChangeAnimation = null;
+    IEnumerator currentStatVisAnimation = null;
+
+    private void OnDisable()
+    {
+        currentChangeAnimation = null;
+        currentStatVisAnimation = null;
+        statRevealing = false;
+        plusIndicator.gameObject.SetActive(false);
+        minusIndicator.gameObject.SetActive(false);
+        StopAllCoroutines();
+    }
+
     /// <summary>
     /// To be called when the stat is recieved.
     /// </summary>
@@ -32,6 +52,7 @@ public class BarUI : MonoBehaviour
         {
             GameObject tickObject = Instantiate(barTick, barGlass);
             tickObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(tickSpacing * i, 0f);
+            graphics.Add(tickObject.GetComponent<RawImage>());
         }
     }
 
@@ -40,7 +61,11 @@ public class BarUI : MonoBehaviour
         plusIndicator.gameObject.SetActive(false);
         minusIndicator.gameObject.SetActive(false);
         float currentValue = (fill.sizeDelta.x / maxFillSize) * (float)maxValue;
-        StopAllCoroutines();
+        if (currentChangeAnimation != null)
+        {
+            StopCoroutine(currentChangeAnimation);
+            currentChangeAnimation = null;
+        }
         if (newValue > currentValue)
         {
             StartAddAnimation(newValue);
@@ -53,7 +78,8 @@ public class BarUI : MonoBehaviour
         {
             return;
         }
-        StartCoroutine(ChangeAnimation(newValue));
+        currentChangeAnimation = ChangeAnimation(newValue);
+        StartCoroutine(currentChangeAnimation);
     }
 
     /// <summary>
@@ -97,5 +123,68 @@ public class BarUI : MonoBehaviour
         fill.sizeDelta = new Vector2(finalSize, fill.sizeDelta.y);
         plusIndicator.gameObject.SetActive(false);
         minusIndicator.gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// Sets the transparency of this stat bar.
+    /// </summary>
+    /// <param name="alpha"></param>
+    public void SetAlpha(float alpha)
+    {
+        currentAlpha = alpha;
+        foreach (MaskableGraphic graphic in graphics)
+        {
+            graphic.color = new Color(graphic.color.r, graphic.color.g, graphic.color.b, alpha);
+        }
+    }
+
+    /// <summary>
+    /// When this is called, temporarily reveals this bar before disappearing.
+    /// </summary>
+    public void RevealStat()
+    {
+        if (currentAlpha == 1f) return;
+        if (currentStatVisAnimation != null)
+        {
+            StopCoroutine(currentStatVisAnimation);
+            currentStatVisAnimation = null;
+        }
+        statRevealing = true;
+        currentStatVisAnimation = StatRevealAnimation();
+        StartCoroutine(currentStatVisAnimation);
+    }
+
+    IEnumerator StatRevealAnimation()
+    {
+        float progress = 0f;
+        float originalAlpha = currentAlpha;
+        float finalAlpha = 1f;
+        while (progress < 1f)
+        {
+            progress += Time.deltaTime * showSpeed;
+            float eval = Mathf.Lerp(originalAlpha, finalAlpha, progress);
+            SetAlpha(eval);
+            yield return null;
+        }
+        SetAlpha(1f);
+        yield return new WaitForSeconds(showDuration);
+        currentStatVisAnimation = StatHideAnimation();
+        StartCoroutine(currentStatVisAnimation);
+    }
+
+    IEnumerator StatHideAnimation()
+    {
+        float progress = 0f;
+        float originalAlpha = currentAlpha;
+        float finalAlpha = 0f;
+        while (progress < 1f)
+        {
+            progress += Time.deltaTime * showSpeed;
+            float eval = Mathf.Lerp(originalAlpha, finalAlpha, progress);
+            SetAlpha(eval);
+            yield return null;
+        }
+        SetAlpha(0f);
+        statRevealing = false;
     }
 }

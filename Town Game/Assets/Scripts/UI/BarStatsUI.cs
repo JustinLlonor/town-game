@@ -4,11 +4,14 @@ using UnityEngine;
 
 public class BarStatsUI : MonoBehaviour
 {
+    [Header("Hotbar Snap Settings")]
     public List<Transform> slotHolders = new List<Transform>();
     public Transform hotbarTransform;
     public bool appendToHighestSlot = true;
     public float minHeight = 50f;
     public float heightThreshold = -43f;
+    [Header("Bar Settings")]
+    public float barSpacing = 165f;
     public BarUI healthBar;
     public BarUI hungerBar;
     PlayerStats trackedStats;
@@ -33,16 +36,20 @@ public class BarStatsUI : MonoBehaviour
         hungerBar.Init(trackedStats.maxHunger);
         trackedStats.onHPChangeClient += OnHPChange;
         trackedStats.onHungerChangeClient += OnHungerChange;
+        healthBar.SetAlpha(0f);
+        hungerBar.SetAlpha(0f);
     }
 
     private void OnHPChange(int value)
     {
         healthBar.SetValue(trackedStats.HP);
+        healthBar.RevealStat();
     }
 
     private void OnHungerChange(int value)
     {
         hungerBar.SetValue(trackedStats.hunger);
+        hungerBar.RevealStat();
     }
 
     private void SetHeight()
