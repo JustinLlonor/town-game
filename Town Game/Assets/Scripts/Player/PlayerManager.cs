@@ -25,6 +25,7 @@ public class PlayerManager : NetworkBehaviour
 
     public PlayerSettings playerSettings;
     [Header("Assignables")]
+    public BarStatsUI bsUI;
     public Transform camTransform;
     public CameraBobbing camBobbing;
     public CameraShake camShake;
@@ -184,6 +185,7 @@ public class PlayerManager : NetworkBehaviour
         playerInventory.hotbarUI = hotbar;
         playerInventory.largeUI = largeUI;
         playerInventory.Setup();
+        if (bsUI != null) bsUI.InitializeSlotHolders();
 
         currentPlayer = player;
     }
