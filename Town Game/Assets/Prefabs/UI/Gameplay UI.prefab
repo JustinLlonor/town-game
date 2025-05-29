@@ -239,9 +239,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -159.48741, y: 0}
   m_SizeDelta: {x: 153.9749, y: 47.432}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &6922898903277741828
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -331,6 +331,10 @@ MonoBehaviour:
     m_RotationOrder: 4
   statChangeDelay: 0.5
   statChangeSpeed: 3
+  showDuration: 3
+  showSpeed: 8
+  hideSpeed: 1
+  statRevealing: 0
 --- !u!1 &949131133599333368
 GameObject:
   m_ObjectHideFlags: 0
@@ -753,9 +757,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 172.8, y: 0}
+  m_AnchoredPosition: {x: 5.512565, y: 0}
   m_SizeDelta: {x: 153.9749, y: 47.432}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &1666953350534801060
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -844,6 +848,10 @@ MonoBehaviour:
     m_RotationOrder: 4
   statChangeDelay: 0.5
   statChangeSpeed: 3
+  showDuration: 3
+  showSpeed: 8
+  hideSpeed: 1
+  statRevealing: 0
 --- !u!1 &2180689489918652122
 GameObject:
   m_ObjectHideFlags: 0
@@ -1451,6 +1459,8 @@ MonoBehaviour:
   appendToHighestSlot: 1
   minHeight: 110
   heightThreshold: -44
+  barSpacing: 165
+  barSpaceSpeed: 200
   healthBar: {fileID: 7911589925217691769}
   hungerBar: {fileID: 6034321134274356459}
 --- !u!1 &3459647967433955565

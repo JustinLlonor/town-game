@@ -31,6 +31,7 @@ public class BarUI : MonoBehaviour
 
     private void OnDisable()
     {
+        SetAlpha(0f);
         currentChangeAnimation = null;
         currentStatVisAnimation = null;
         statRevealing = false;
@@ -143,7 +144,11 @@ public class BarUI : MonoBehaviour
     /// </summary>
     public void RevealStat()
     {
-        if (currentAlpha == 1f) return;
+        if (currentAlpha == 1f)
+        {
+            statRevealing = false;
+            return;
+        }
         if (currentStatVisAnimation != null)
         {
             StopCoroutine(currentStatVisAnimation);
@@ -179,7 +184,7 @@ public class BarUI : MonoBehaviour
         float finalAlpha = 0f;
         while (progress < 1f)
         {
-            progress += Time.deltaTime * showSpeed;
+            progress += Time.deltaTime * hideSpeed;
             float eval = Mathf.Lerp(originalAlpha, finalAlpha, progress);
             SetAlpha(eval);
             yield return null;

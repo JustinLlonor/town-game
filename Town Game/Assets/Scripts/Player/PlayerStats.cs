@@ -93,6 +93,7 @@ public class PlayerStats : NetworkBehaviour
     public override void Spawned()
     {
         gameManager = FindAnyObjectByType<GameManager>();
+        hungerTickPeriod = 7f;
         objectManager = FindAnyObjectByType<ObjectManager>();
         changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
         pm.SetGrounded();

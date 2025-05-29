@@ -12,8 +12,10 @@ public class BarStatsUI : MonoBehaviour
     public float heightThreshold = -43f;
     [Header("Bar Settings")]
     public float barSpacing = 165f;
+    public float barSpaceSpeed = 5f;
     public BarUI healthBar;
     public BarUI hungerBar;
+    private List<BarUI> activeBars = new List<BarUI>();
     PlayerStats trackedStats;
     float shMinHeight;
     bool init = false;
@@ -27,6 +29,8 @@ public class BarStatsUI : MonoBehaviour
     private void LateUpdate()
     {
         SetHeight();
+        CheckBars();
+        AdjustBarSpacing();
     }
 
     void AssignPlayerReferences(GameObject player)
@@ -40,16 +44,61 @@ public class BarStatsUI : MonoBehaviour
         hungerBar.SetAlpha(0f);
     }
 
+    private void CheckBars()
+    {
+        for (int i = 0; i < activeBars.Count; i++)
+        {
+            if (!activeBars[i].statRevealing)
+            {
+                activeBars.RemoveAt(i);
+                i--;
+            }
+        }
+    }
+
+    private void AdjustBarSpacing()
+    {
+        int i = 0;
+        float step = Time.deltaTime * barSpaceSpeed;
+        float middleOffset = GetTotalWidth() / 2f;
+        foreach (var bar in activeBars)
+        {
+            RectTransform barTransform = (RectTransform)bar.transform;
+            float newXPos = i * barSpacing - middleOffset;
+            Vector2 targetLocation = new Vector2(newXPos, 0f);
+            barTransform.anchoredPosition = Vector2.MoveTowards(barTransform.anchoredPosition, targetLocation, step);
+            i++;
+        }
+    }
+
+    private float GetTotalWidth()
+    {
+        if (activeBars.Count == 0) return 0f;
+        return (activeBars.Count - 1) * barSpacing + ((RectTransform)activeBars[activeBars.Count - 1].transform).sizeDelta.x;
+    }
+
+    private void AddActiveBar(BarUI bar)
+    {
+        if (!activeBars.Contains(bar))
+        {
+            activeBars.Add(bar);
+            RectTransform rt = bar.GetComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(-(rt.sizeDelta.x / 2f), 0f);
+        }
+    }
+
     private void OnHPChange(int value)
     {
         healthBar.SetValue(trackedStats.HP);
         healthBar.RevealStat();
+        AddActiveBar(healthBar);
     }
 
     private void OnHungerChange(int value)
     {
         hungerBar.SetValue(trackedStats.hunger);
         hungerBar.RevealStat();
+        AddActiveBar(hungerBar);
     }
 
     private void SetHeight()
