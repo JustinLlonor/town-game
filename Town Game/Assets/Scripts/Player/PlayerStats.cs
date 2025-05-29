@@ -56,7 +56,6 @@ public class PlayerStats : NetworkBehaviour
     // Client events
     public IntEvent onHPChangeClient;
     public IntEvent onHungerChangeClient;
-    public StatsEvent onDeathClient;
 
     CameraShake shake;
     //PhotonView view;
@@ -239,7 +238,7 @@ public class PlayerStats : NetworkBehaviour
         CameraBobbing cb = FindFirstObjectByType<CameraBobbing>();
         cb.isBobbing = false;
         cb.isSprinting = false;
-        onDeathClient?.Invoke();
+        FindAnyObjectByType<PlayerManager>().onDestroyPlayer?.Invoke();
     }
     #endregion
 

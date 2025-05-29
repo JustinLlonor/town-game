@@ -16,6 +16,6 @@ public class OfflineMode : MonoBehaviour
     private void Start()
     {
         Debug.Log("invoking");
-        FindFirstObjectByType<PlayerManager>().OnInstantiatePlayer?.Invoke(transform.parent.gameObject);
+        FindFirstObjectByType<PlayerManager>().onInstantiatePlayer?.Invoke(transform.parent.gameObject);
     }
 }

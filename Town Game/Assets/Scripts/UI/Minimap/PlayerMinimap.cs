@@ -14,7 +14,7 @@ public class PlayerMinimap : MonoBehaviour
         PlayerManager pm = FindFirstObjectByType<PlayerManager>();
         minimap = GetComponent<Minimap>();
         runnerManager = FindAnyObjectByType<RunnerManager>();
-        pm.OnInstantiatePlayer += AddReferences;
+        pm.onInstantiatePlayer += AddReferences;
     }
 
     private void AddReferences(GameObject playerObject)

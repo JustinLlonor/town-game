@@ -15,7 +15,7 @@ public class MinimapRoomText : MonoBehaviour
         text = gameObject.GetComponent<TextMeshProUGUI>();
         animator = gameObject.GetComponent<Animator>();
         PlayerManager pm = FindFirstObjectByType<PlayerManager>();
-        pm.OnInstantiatePlayer += AddReferences;
+        pm.onInstantiatePlayer += AddReferences;
         if (trackedPM != null) trackedPM.OnEnterRoom += PlayRoomText;
     }
 

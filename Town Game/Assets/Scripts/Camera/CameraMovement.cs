@@ -42,7 +42,7 @@ public class CameraMovement : MonoBehaviour
         cameraManager = FindAnyObjectByType<CameraManager>();
         cursorManager = FindFirstObjectByType<CursorManager>();
         runnerManager = FindFirstObjectByType<RunnerManager>();
-        FindFirstObjectByType<PlayerManager>().OnInstantiatePlayer += AssignReferences;
+        FindFirstObjectByType<PlayerManager>().onInstantiatePlayer += AssignReferences;
         cameraManager.onSwitchCameraMode += OnCameraModeChange;
         GameManager gm = FindFirstObjectByType<GameManager>();
         InputManager inputManager = FindFirstObjectByType<InputManager>();

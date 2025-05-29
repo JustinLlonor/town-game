@@ -9,13 +9,40 @@ public class BarStatsUI : MonoBehaviour
     public bool appendToHighestSlot = true;
     public float minHeight = 50f;
     public float heightThreshold = -43f;
+    public BarUI healthBar;
+    public BarUI hungerBar;
+    PlayerStats trackedStats;
     float shMinHeight;
     bool init = false;
     float hotbarScale;
 
+    private void Awake()
+    {
+        FindFirstObjectByType<PlayerManager>().onInstantiatePlayer += AssignPlayerReferences;
+    }
+
     private void LateUpdate()
     {
         SetHeight();
+    }
+
+    void AssignPlayerReferences(GameObject player)
+    {   
+        trackedStats = player.GetComponent<PlayerStats>();
+        healthBar.Init(trackedStats.maxHP);
+        hungerBar.Init(trackedStats.maxHunger);
+        trackedStats.onHPChangeClient += OnHPChange;
+        trackedStats.onHungerChangeClient += OnHungerChange;
+    }
+
+    private void OnHPChange(int value)
+    {
+        healthBar.SetValue(trackedStats.HP);
+    }
+
+    private void OnHungerChange(int value)
+    {
+        hungerBar.SetValue(trackedStats.hunger);
     }
 
     private void SetHeight()

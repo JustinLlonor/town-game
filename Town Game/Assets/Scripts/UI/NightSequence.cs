@@ -25,7 +25,7 @@ public class NightSequence : MonoBehaviour
 
         gm.OnNightSkipStart += AllowNightScreen;
         gm.OnDayStart += DayStuff;
-        pm.OnInstantiatePlayer += GetReferences;
+        pm.onInstantiatePlayer += GetReferences;
     }
 
     private void AllowNightScreen()

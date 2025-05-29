@@ -37,8 +37,15 @@ public class PlayerManager : NetworkBehaviour
     /// <summary>
     /// Called when the player is spawned on the client
     /// </summary>
-    public InstantiatePlayer OnInstantiatePlayer;
-    public PlayerEvent OnTeleportPlayer;
+    public InstantiatePlayer onInstantiatePlayer;
+    /// <summary>
+    /// Called when the player is teleported on this client
+    /// </summary>
+    public PlayerEvent onTeleportPlayer;
+    /// <summary>
+    /// Called when this client's player is destroyed
+    /// </summary>
+    public PlayerEvent onDestroyPlayer; // NOT PROGRAMMED YET, ATTACH TO OnDespawn
     public delegate void InstantiatePlayer(GameObject player);
     public delegate void PlayerEvent();
 
@@ -179,7 +186,7 @@ public class PlayerManager : NetworkBehaviour
 
     public void SetupOnClient(GameObject player)
     {
-        OnInstantiatePlayer?.Invoke(player);
+        onInstantiatePlayer?.Invoke(player);
         PlayerInventory playerInventory = player.GetComponent<PlayerInventory>();
         playerInventory.camTransform = camTransform;
         playerInventory.hotbarUI = hotbar;
@@ -300,7 +307,7 @@ public class PlayerManager : NetworkBehaviour
         rb.velocity = Vector3.zero;
         cm.yRotation = rotation.eulerAngles.y;
         cm.xRotation = rotation.eulerAngles.x;
-        OnTeleportPlayer?.Invoke();
+        onTeleportPlayer?.Invoke();
     }
 
     public GameObject GetPlayerObject(PlayerRef player)

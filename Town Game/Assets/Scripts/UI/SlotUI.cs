@@ -23,6 +23,8 @@ public class SlotUI : MonoBehaviour
 
     public void OnEnable()
     {
+        StopAllCoroutines();
+        isEquipped = true;
         SetEquipped(false);
     }
 

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BarUI : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class BarUI : MonoBehaviour
     public RectTransform plusIndicator;
     public RectTransform minusIndicator;
     public Transform barGlass;
-    public BarStatsUI bsUI;
+    public MaskableGraphic[] graphics;
     [Header("Animation Settings")]
     public AnimationCurve statChangeCurve;
     public float statChangeDelay;
@@ -17,24 +18,6 @@ public class BarUI : MonoBehaviour
     private float maxFillSize;
     private int maxValue;
     private int destinedValue = 3;
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.I))
-        {
-            Init(3);
-        }
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            SetValue(destinedValue - 1);
-            destinedValue--;
-        }
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            SetValue(destinedValue + 1);
-            destinedValue++;
-        }
-    }
     
     /// <summary>
     /// To be called when the stat is recieved.

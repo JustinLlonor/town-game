@@ -21,7 +21,7 @@ public class FirstPerson : MonoBehaviour
     private void Awake()
     {
         PlayerManager pm = FindFirstObjectByType<PlayerManager>();
-        if (pm != null) pm.OnInstantiatePlayer += AssignPlayerReferences;
+        if (pm != null) pm.onInstantiatePlayer += AssignPlayerReferences;
         animator = gameObject.GetComponent<Animator>();
         itemFilter = itemTransform.GetComponent<MeshFilter>();
         itemRenderer = itemTransform.GetComponent<MeshRenderer>();

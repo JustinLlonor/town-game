@@ -26,7 +26,7 @@ public class RoleRevealer : MonoBehaviour
         cm = FindFirstObjectByType<CameraManager>();
         bs = FindFirstObjectByType<BlackScreen>();
         rtxt = FindFirstObjectByType<RoleText>();;
-        FindObjectOfType<PlayerManager>().OnInstantiatePlayer += GetReferences;
+        FindObjectOfType<PlayerManager>().onInstantiatePlayer += GetReferences;
         //if (PhotonNetwork.CurrentRoom != null) bs.ShowCover();
     }
     

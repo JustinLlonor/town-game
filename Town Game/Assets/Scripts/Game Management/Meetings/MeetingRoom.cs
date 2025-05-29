@@ -17,7 +17,7 @@ public class MeetingRoom : MonoBehaviour
     {
         gm = FindFirstObjectByType<GameManager>();
         //pm = FindObjectOfType<PlayerManager>();
-        pm.OnInstantiatePlayer += GetReferences;
+        pm.onInstantiatePlayer += GetReferences;
     }
 
     void GetReferences(GameObject player)

@@ -14,7 +14,7 @@ public class AffecterHolder : MonoBehaviour
 
     private void Awake()
     {
-        FindFirstObjectByType<PlayerManager>().OnInstantiatePlayer += GetReferences;
+        FindFirstObjectByType<PlayerManager>().onInstantiatePlayer += GetReferences;
     }
 
     void GetReferences(GameObject player)
