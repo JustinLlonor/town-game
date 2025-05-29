@@ -5,6 +5,7 @@ using WebSocketSharp;
 using UnityEngine.UI;
 using Fusion;
 using UnityEngine.InputSystem;
+using static Fusion.Editor.FusionHubWindow;
 
 // Sync player inventory stuff
 public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
@@ -119,7 +120,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     {
         uiSetup = true;
         SetupHotbarUI();
-        UpdateHotbarUI();
+        //UpdateHotbarUI();
     }
 
     public void Previous()
@@ -143,7 +144,9 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     {
         for (int i = 0; i < hotbarLength; i++)
         {
-            Instantiate(hotbarSlot, hotbarUI);
+            GameObject slotObject = Instantiate(hotbarSlot, hotbarUI);
+            SlotUI slotUI = slotObject.GetComponent<SlotUI>();
+            slotUI.SetIndex(i + 1);
         }
         hotbarUI.anchoredPosition -= new Vector2((hotbar.Count - 1) * 50f, 0f); //For centering
     }
@@ -165,9 +168,20 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     public void UpdateHotbarUI()
     {
         if (!uiSetup) return;
-    //    //if (!view.IsMine) return;
         for (int i = 0; i < hotbar.Count; i++)
         {
+            SlotUI slotUI = hotbarUI.GetChild(i).GetComponent<SlotUI>();
+            //Sets icons
+            if (hotbar[i].ToString().IsNullOrEmpty())
+            {
+                slotUI.SetIcon(null);
+            }
+            else
+            {
+                slotUI.SetIcon(itemManager.itemSearch[hotbar[i].ToString()].icon);
+            }
+            slotUI.SetEquipped(equippedSlot == i);
+            /**
             RawImage panel = hotbarUI.GetChild(i).GetChild(0).GetComponent<RawImage>(); // WHAT THE FUCK
             RawImage icon = hotbarUI.GetChild(i).GetChild(0).GetChild(0).GetComponent<RawImage>();
             //Sets icons
@@ -189,6 +203,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
             {
                 panel.color = new Color(0f, 0f, 0f, .37f); ;
             }
+            **/
         }
     }
 
