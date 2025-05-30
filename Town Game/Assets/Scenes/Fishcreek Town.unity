@@ -4231,7 +4231,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh48066
+  m_Name: pb_Mesh68636
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -4711,7 +4711,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh48208
+  m_Name: pb_Mesh68778
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -15879,6 +15879,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7352551331507055887, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+      propertyPath: m_Name
+      value: Objective
+      objectReference: {fileID: 0}
     - target: {fileID: 7380572934361974900, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -16098,6 +16102,14 @@ PrefabInstance:
     - target: {fileID: 8661592104333125207, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -13.9925
+      objectReference: {fileID: 0}
+    - target: {fileID: 8766146431310722832, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 304.882
+      objectReference: {fileID: 0}
+    - target: {fileID: 8766146431310722832, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 129.939
       objectReference: {fileID: 0}
     - target: {fileID: 8891418559194178641, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_AnchorMax.y
