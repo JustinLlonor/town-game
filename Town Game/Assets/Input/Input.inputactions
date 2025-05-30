@@ -403,7 +403,7 @@
             ]
         },
         {
-            "name": "UI",
+            "name": "TabUI",
             "id": "3307821f-1aca-46a8-9499-b109925a45d8",
             "actions": [
                 {
@@ -431,6 +431,90 @@
             ]
         },
         {
+            "name": "MapUI",
+            "id": "30975db3-c2c2-4c5a-ab0f-f1131828e051",
+            "actions": [
+                {
+                    "name": "Exit",
+                    "type": "Button",
+                    "id": "c524ce1c-10c9-4e2b-80b8-c95bdd3078fd",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "672684f3-50a4-4d22-a3d9-715ddd20d9eb",
+                    "path": "<Keyboard>/m",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Exit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "InventoryUI",
+            "id": "4b536cd4-526a-43e9-aa1d-f47b54e3b4ad",
+            "actions": [
+                {
+                    "name": "Exit",
+                    "type": "Button",
+                    "id": "3f33548c-0868-4099-a842-500df7c5ca99",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "1390f82e-ac13-4dcc-902f-531b4f93e00f",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Exit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "SettingsUI",
+            "id": "2ad4b175-6814-4dca-8426-5c78673c3c99",
+            "actions": [
+                {
+                    "name": "Exit",
+                    "type": "Button",
+                    "id": "af8461c6-f82e-42f9-bf70-8894667bafe2",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "328d1cd2-4fc4-4fc4-bff5-c6ac00b4ec9f",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Exit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
             "name": "ClosedUI",
             "id": "8eea350f-0aad-49cb-8a63-40a431b3e4a6",
             "actions": [
@@ -438,6 +522,33 @@
                     "name": "PlayerMenu",
                     "type": "Button",
                     "id": "21c72a3a-2839-45dd-87d0-a233b82480ba",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "MapMenu",
+                    "type": "Button",
+                    "id": "54538b6f-1669-42ad-9cbb-24f8a1ec09fb",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "InventoryMenu",
+                    "type": "Button",
+                    "id": "d9aa5025-136a-4993-a9cf-72ad2453b634",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "SettingsMenu",
+                    "type": "Button",
+                    "id": "37f6f949-b9c8-4610-bd94-4ee6c0232d2a",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -453,6 +564,39 @@
                     "processors": "",
                     "groups": "",
                     "action": "PlayerMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "27f04652-c877-42d9-a6cf-1932de8b3236",
+                    "path": "<Keyboard>/m",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MapMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3a0701f5-464e-406a-bb53-c2610d8dc358",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "InventoryMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bb11744a-bebb-4d24-835b-f711746b69e6",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SettingsMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

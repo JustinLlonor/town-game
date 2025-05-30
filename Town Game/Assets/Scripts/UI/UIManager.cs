@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,41 +9,70 @@ public class UIManager : MonoBehaviour
     public bool uiOpened = false;
     public static UIManager instance;
     public CorpseUI cUI;
-    public OpenUI OnUIOpen;
-    public CloseUI OnUIClose;
+    public UIMenuEvent OnUIOpen;
+    public MenuEvent OnUIClose;
     public StatsUI statsUI;
     public GameObject gameplayUI;
     public GameObject hotbarUI;
-    public TabUI tabUI;
     public GameObject glitchObject;
     public AttackQTE attackQTE;
     public UIPlayerList uip;
     public PositionUI pui;
+    [Header("Menus")]
+    public GameObject[] uiMenus;
+    public int menuOpened = -1;
+    bool justExited = false;
 
     CursorManager cm;
     InteractableFinder iFinder;
+    InputManager inputManager;
 
-    public delegate void OpenUI();
-    public delegate void CloseUI();
+    // Player Menu = 0, Map menu = 1, Inventory menu = 2, Settings = 3
+    public delegate void UIMenuEvent(int menuIndex);
+    public delegate void MenuEvent();
 
     private void Awake()
     {
         instance = this;
         cm = FindFirstObjectByType<CursorManager>();
         iFinder = FindFirstObjectByType<InteractableFinder>();
-        tabUI.gameObject.SetActive(true);
+        foreach (var menu in uiMenus) menu.SetActive(true);
         OnUIClose += CloseCorpse;
-        OnUIClose += CloseTabMenu;
+        OnUIClose += CloseUI;
         OnUIClose += SetOpenFalse;
-        OnUIOpen += SetOpenTrue;
-        OnUIOpen += cm.Unlock;
+        OnUIOpen += UIOpen;
         PlayerManager pm = FindFirstObjectByType<PlayerManager>();
         FindFirstObjectByType<CameraManager>().onSwitchCameraMode += OnCameraChangeMode;
-        InputManager inputManager = FindFirstObjectByType<InputManager>();
+        inputManager = FindFirstObjectByType<InputManager>();
         inputManager.onExit += ExitUI;
+        inputManager.onPlayerMenu += OpenTabMenu;
+        inputManager.onMapMenu += OpenMapMenu;
         uip.Init();
         if (pui != null) pui.Init();
-        tabUI.gameObject.SetActive(false);
+        foreach (var menu in uiMenus) menu.SetActive(false);
+    }
+
+    private void LateUpdate()
+    {
+        if (justExited) justExited = false;
+    }
+
+    private void UIOpen(int menu)
+    {
+        if (menuOpened == menu) return;
+        menuOpened = menu;
+        cm.Unlock();
+        Cursor.visible = true;
+        uiOpened = true;
+        for (int i = 0; i < uiMenus.Length; i++)
+        {
+            if (i == menu)
+            {
+                uiMenus[i].SetActive(true);
+                continue;
+            }
+            uiMenus[i].SetActive(false);
+        }
     }
 
     /// <summary>
@@ -51,15 +81,21 @@ public class UIManager : MonoBehaviour
     public void ExitUI()
     {
         if (!uiOpened) return;
-        OnUIClose.Invoke();
-        cm.Lock();
+        justExited = true;
+        OnUIClose?.Invoke();
+        menuOpened = -1;
     }
 
-    public void OpenPlayerMenu()
+    public void OpenTabMenu()
     {
-        if (tabUI == null) return;
-        OnUIOpen.Invoke();
-        OpenTabMenu();
+        if (justExited) return;
+        OnUIOpen?.Invoke(0);
+    }
+
+    public void OpenMapMenu()
+    {
+        if (justExited) return;
+        OnUIOpen?.Invoke(1);
     }
 
     // Corpse code //
@@ -69,17 +105,12 @@ public class UIManager : MonoBehaviour
         cUI.CreateEvidenceList(evidence, depth);
         cUI.SetName(nickname);
         cUI.SetAlignment(isCultist);
-        OnUIOpen.Invoke();
+        OnUIOpen.Invoke(-1);
     }
 
     public void CloseCorpse()
     {
         cUI.gameObject.SetActive(false);
-    }
-
-    void SetOpenTrue()
-    {
-        uiOpened = true;
     }
 
     void SetOpenFalse()
@@ -96,18 +127,10 @@ public class UIManager : MonoBehaviour
         hotbarUI.SetActive(enabled);
     }
 
-    public void OpenTabMenu()
-    {
-        tabUI.gameObject.SetActive(true);
-        OnUIOpen.Invoke();
-        tabUI.UpdatePlayerList();
-        Cursor.visible = true;
-        //tabUI.playerList.OnDeselectPlayer?.Invoke(null);
-    }
-
-    public void CloseTabMenu()
+    public void CloseUI()
     {
         Cursor.visible = false;
-        tabUI.gameObject.SetActive(false);
+        cm.Lock();
+        foreach (var menu in uiMenus) menu.SetActive(false);
     }
 }

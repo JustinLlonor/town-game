@@ -8,14 +8,21 @@ public class InputManager : MonoBehaviour
     public string[] currentMaps = new string[] { };
     public string[] baseGameplayMaps = new string[] { };
     public string[] observableMaps = new string[] { };
-    public string[] uiMaps = new string[] { };
+    public MapHolder[] uiMenuMaps;
     public string[] buildingChooseMaps = new string[] { };
     private bool uiOpen = false;
     [HideInInspector] public PlayerInput input;
     private bool cinematicDisable = true;
+    private string[] enabledUIMaps = new string[0];
 
     public delegate void InputEvent();
     public delegate void InputValueEvent(InputValue iv);
+
+    [System.Serializable]
+    public struct MapHolder
+    {
+        public string[] maps;
+    }
 
     private void Awake()
     {
@@ -30,17 +37,21 @@ public class InputManager : MonoBehaviour
     }
 
     // Map switching logic
-    private void OnUIOpen()
+    private void OnUIOpen(int menu)
     {
         uiOpen = true;
-        DisableMaps(currentMaps);
-        EnableMaps(uiMaps);
+        string[] mapsEnabled = uiMenuMaps[menu].maps;
+        if (enabledUIMaps.Length > 0) DisableMaps(enabledUIMaps);
+        else DisableMaps(currentMaps);
+        EnableMaps(mapsEnabled);
+        enabledUIMaps = mapsEnabled;
     }
 
     private void OnUIClose()
     {
+        enabledUIMaps = new string[0];
         uiOpen = false;
-        DisableMaps(uiMaps);
+        DisableMaps(enabledUIMaps);
         EnableMaps(currentMaps);
     }
 
@@ -133,6 +144,9 @@ public class InputManager : MonoBehaviour
     public InputEvent onExit;
     // ClosedUI
     public InputEvent onPlayerMenu;
+    public InputEvent onMapMenu;
+    public InputEvent onInventoryMenu;
+    public InputEvent onSettingsMenu;
     // Building
     public InputEvent onScrollLeft;
     public InputEvent onScrollRight;
@@ -149,13 +163,16 @@ public class InputManager : MonoBehaviour
     private void OnPrimaryFire() { onPrimaryFire?.Invoke(); }
     private void OnSecondaryFire() { onSecondaryFire?.Invoke(); }
     private void OnCamera(InputValue iv) { onCamera?.Invoke(iv); }
-    private void OnScheduleSwap () { onScheduleSwap?.Invoke(); }
+    private void OnScheduleSwap() { onScheduleSwap?.Invoke(); }
     private void OnInteract1(InputValue iv) { onInteract1?.Invoke(iv); }
     private void OnInteract2(InputValue iv) { onInteract2?.Invoke(iv); }
     private void OnInteract3(InputValue iv) { onInteract3?.Invoke(iv); }
     private void OnPrimaryObserve(InputValue iv) { onPrimaryObserve?.Invoke(iv); }
     private void OnExit() { onExit?.Invoke(); }
     private void OnPlayerMenu() { onPlayerMenu?.Invoke(); }
+    private void OnMapMenu() { onMapMenu?.Invoke(); }
+    private void OnInventoryMenu() { onInventoryMenu?.Invoke(); }
+    private void OnSettingsMenu() { onSettingsMenu?.Invoke(); }
     private void OnExitObserve() { onExitObserve?.Invoke(); }
     private void OnScrollLeft() { onScrollLeft?.Invoke(); }
     private void OnScrollRight() { onScrollRight?.Invoke(); }

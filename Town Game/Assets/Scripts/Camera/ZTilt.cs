@@ -26,7 +26,7 @@ public class ZTilt : MonoBehaviour
         canTurn = true;
     }
 
-    void SetCanTurnFalse()
+    void SetCanTurnFalse(int i)
     {
         canTurn = false;
     }

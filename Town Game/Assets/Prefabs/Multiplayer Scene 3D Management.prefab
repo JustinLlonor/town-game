@@ -118,7 +118,6 @@ GameObject:
   - component: {fileID: 2323387331785147983}
   - component: {fileID: 2569944803188570069}
   - component: {fileID: 4854093095659709370}
-  - component: {fileID: 753382421335983435}
   m_Layer: 0
   m_Name: Input Manager
   m_TagString: Untagged
@@ -253,24 +252,22 @@ MonoBehaviour:
   - Observable
   - ClosedUI
   - Voice
-  uiMaps:
-  - UI
-  - Voice
+  uiMenuMaps:
+  - maps:
+    - TabUI
+    - ClosedUI
+  - maps:
+    - MapUI
+    - ClosedUI
+  - maps:
+    - InventoryUI
+    - ClosedUI
+  - maps:
+    - SettingsUI
+    - ClosedUI
   buildingChooseMaps:
   - Building
   input: {fileID: 2569944803188570069}
---- !u!114 &753382421335983435
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7199109093382088593}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f5cf3b6093861d4ca71e7ca2c067354, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &8092358370384849730
 GameObject:
   m_ObjectHideFlags: 0

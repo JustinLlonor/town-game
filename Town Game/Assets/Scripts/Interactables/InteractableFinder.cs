@@ -44,7 +44,7 @@ public class InteractableFinder : NetworkBehaviour
     public override void Spawned()
     {
         if (IsProxy) Destroy(this);
-        if (HasInputAuthority) UIManager.instance.OnUIOpen += ResetInteractions;
+        if (HasInputAuthority) UIManager.instance.OnUIOpen += ResetInteractionUIOpen;
         init = true;
         iui = FindFirstObjectByType<InteractableUI>();
         rm = FindFirstObjectByType<RunnerManager>();
@@ -187,6 +187,11 @@ public class InteractableFinder : NetworkBehaviour
             return;
         }
         if (currentInteractable != null) ResetInteractions();
+    }
+
+    private void ResetInteractionUIOpen(int i)
+    {
+        ResetInteractions();
     }
 
     public void ResetInteractions()

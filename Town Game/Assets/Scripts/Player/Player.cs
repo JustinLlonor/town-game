@@ -174,7 +174,7 @@ public class Player : NetworkBehaviour
         }
     }
 
-    void MenuOpen()
+    void MenuOpen(int i)
     {
         rm.menu = true;
     }

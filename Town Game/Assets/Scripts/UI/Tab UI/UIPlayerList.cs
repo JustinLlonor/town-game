@@ -26,8 +26,11 @@ public class UIPlayerList : MonoBehaviour//PunCallbacks
     RunnerManager rm;
     VotingManager votingManager;
     GameManager gameManager;
+    bool init = false;
+
     public void Init()
     {
+        init = true;
         playerManager = FindFirstObjectByType<PlayerManager>();
         gameManager = FindFirstObjectByType<GameManager>();
         rm = FindFirstObjectByType<RunnerManager>();
@@ -50,6 +53,7 @@ public class UIPlayerList : MonoBehaviour//PunCallbacks
     // Updates player list off of players in room
     public void UpdatePlayerList()
     {
+        if (!init) return;
         List<GameObject> toDestroy = new List<GameObject>();
         List<PlayerRef> playerList = rm.nRunner.ActivePlayers.ToList();
         // Update individual cards, destroy unnecessary
