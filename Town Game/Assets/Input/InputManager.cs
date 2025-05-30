@@ -153,6 +153,9 @@ public class InputManager : MonoBehaviour
     public InputEvent onChooseBuilding;
     // Voice
     public InputValueEvent onVoice;
+    // MapUI
+    public InputValueEvent onMapZoom;
+    public InputValueEvent onMapDrag;
 
     private void OnJump() { onJump?.Invoke(); }
     private void OnMove(InputValue iv) { onMove?.Invoke(iv); }
@@ -178,4 +181,6 @@ public class InputManager : MonoBehaviour
     private void OnScrollRight() { onScrollRight?.Invoke(); }
     private void OnChooseBuilding() { onChooseBuilding?.Invoke(); }
     private void OnVoice(InputValue iv) { onVoice?.Invoke(iv); }
+    private void OnMapZoom(InputValue iv) { onMapZoom?.Invoke(iv); }
+    private void OnMapDrag(InputValue iv) { onMapDrag?.Invoke(iv);  }
 }

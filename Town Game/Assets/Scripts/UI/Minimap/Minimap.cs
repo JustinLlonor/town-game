@@ -155,6 +155,11 @@ public class Minimap : MonoBehaviour
 
     public void SetPosition(Vector3 position)
     {
+        if (!init)
+        {
+            init = true;
+            Init();
+        }
         viewPosition = position;
         DisplayPosition();
     }
