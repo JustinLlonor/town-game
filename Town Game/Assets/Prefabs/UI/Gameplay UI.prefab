@@ -1512,7 +1512,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3984674237289843922}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 7b97f2501144ab046b825871874d08d7, type: 2}
   m_CullingMode: 0
@@ -2984,6 +2984,10 @@ PrefabInstance:
       objectReference: {fileID: 6009405203510403485, guid: a1555df677f31e148a18b95e59e87c9a, type: 2}
     - target: {fileID: 1550496435449591346, guid: 5ded7dab57a868543b373076a89357ca, type: 3}
       propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5243666486425006659, guid: 5ded7dab57a868543b373076a89357ca, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5684387999265211453, guid: 5ded7dab57a868543b373076a89357ca, type: 3}

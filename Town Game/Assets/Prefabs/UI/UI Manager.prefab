@@ -525,11 +525,12 @@ MonoBehaviour:
   statsUI: {fileID: 0}
   gameplayUI: {fileID: 0}
   hotbarUI: {fileID: 2142610577585994373}
-  tabUI: {fileID: 0}
   glitchObject: {fileID: 6933423066389320224}
   attackQTE: {fileID: 5361299768802958010}
   uip: {fileID: 0}
   pui: {fileID: 0}
+  uiMenus: []
+  menuOpened: -1
 --- !u!114 &1050493808116937831
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1054,7 +1055,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2142610577585994373}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: da136a0a1781cf2458a0b46123018d3f, type: 2}
   m_CullingMode: 0

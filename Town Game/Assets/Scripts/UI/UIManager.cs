@@ -73,6 +73,15 @@ public class UIManager : MonoBehaviour
             }
             uiMenus[i].SetActive(false);
         }
+        // Hide Gameplay UI if the map menu is open
+        if (menu == 1)
+        {
+            gameplayUI.SetActive(false);
+        }else
+        {
+            gameplayUI.SetActive(true);
+        }
+
     }
 
     /// <summary>
@@ -84,6 +93,7 @@ public class UIManager : MonoBehaviour
         justExited = true;
         OnUIClose?.Invoke();
         menuOpened = -1;
+        gameplayUI.SetActive(true);
     }
 
     public void OpenTabMenu()
