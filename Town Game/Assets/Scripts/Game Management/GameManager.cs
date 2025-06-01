@@ -102,7 +102,6 @@ public class GameManager : NetworkBehaviour
     private void Awake()
     {
         rv = gameObject.GetComponent<RoleRevealer>();
-        OnRevealRoles += rv.RevealRole;
         rm = FindFirstObjectByType<RoomManager>();
         pm = FindFirstObjectByType<PlayerManager>();
         sm = FindFirstObjectByType<ScheduleManager>();
@@ -110,10 +109,9 @@ public class GameManager : NetworkBehaviour
         runnerManager = FindFirstObjectByType<RunnerManager>();
         runnerManager.onPlayerLeave += RemoveAlivePlayer;
         //cm = FindFirstObjectByType<CameraManager>();
-        if (!SessionData.isTesting)
-        {
-            FindFirstObjectByType<BlackScreen>().ShowCover();
-        }
+        if (SessionData.isTesting) return;
+        OnRevealRoles += rv.RevealRole;
+        FindFirstObjectByType<BlackScreen>().ShowCover();
     }
 
     void RemoveAlivePlayer(PlayerRef player)
@@ -505,6 +503,7 @@ public class GameManager : NetworkBehaviour
             Transform roomT = rm.playerRooms[pm.GetRoom(player)].spawnTransform;
             GameObject playerObject = pm.SpawnPlayerAtTransform(Runner, player, roomT);
             if (!SessionData.isTesting) playerObject.GetComponent<PlayerMovement>().Freeze();
+            Debug.Log(SessionData.isTesting);
         }
         //OnRevealRoles?.Invoke((bool)PhotonNetwork.LocalPlayer.CustomProperties["isCultist"]);
     }

@@ -5,7 +5,6 @@ using WebSocketSharp;
 using UnityEngine.UI;
 using Fusion;
 using UnityEngine.InputSystem;
-using static Fusion.Editor.FusionHubWindow;
 
 // Sync player inventory stuff
 public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable

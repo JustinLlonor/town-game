@@ -29,14 +29,6 @@ public class RoleRevealer : MonoBehaviour
         FindObjectOfType<PlayerManager>().onInstantiatePlayer += GetReferences;
         //if (PhotonNetwork.CurrentRoom != null) bs.ShowCover();
     }
-    
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.J))
-        {
-            RevealRole(false);
-        }
-    }
 
     void GetReferences(GameObject player)
     {
