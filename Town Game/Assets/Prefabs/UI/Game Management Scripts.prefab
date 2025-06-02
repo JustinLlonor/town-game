@@ -93,21 +93,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gamePhase: 0
   cultists: []
+  _cultistsLeft: 0
   alivePlayers: []
   _gameTime: 0
   currentPeriod: 0
   currentDay: 0
   _timeStopped: 0
   cultistAssignment: 0100000000010000000100000001000000010000
-  hourLength: 30
+  hourLength: 17
   timeSpeed: 1
   startCurrency: 100
   startEnergy: 2
   maxEnergy: 2
   startTime: {x: 7, y: 25}
   buildingChooseTimer: 10
-  timeSkipPeriod: 21.25
-  timeSkippedPeriod: 4.5
+  timeSkipPeriod: 21
+  timeSkippedPeriod: 1.75
   dayStartPeriod: 6.75
   days:
   - Monday
@@ -121,6 +122,8 @@ MonoBehaviour:
   - Civilian
   - Guard
   - Mayor
+  _skippedNight: 0
+  init: 0
 --- !u!114 &1646914702507024258
 MonoBehaviour:
   m_ObjectHideFlags: 0

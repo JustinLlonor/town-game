@@ -4460,7 +4460,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh44244
+  m_Name: pb_Mesh38100
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -4940,7 +4940,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh44386
+  m_Name: pb_Mesh38242
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -15829,6 +15829,22 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4503870476434461167, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4503870476434461167, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4503870476434461167, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4503870476434461167, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4649679775538203036, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -16616,6 +16632,7 @@ PrefabInstance:
     - {fileID: 3669693831023946022, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
     - {fileID: 7433140591541654460, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
     - {fileID: 4031855489801447912, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
+    - {fileID: 1133678573662455001, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 291896232417801374, guid: 7aa08810c62ffca40b85e64b3e8ed59a, type: 3}
       insertIndex: -1
