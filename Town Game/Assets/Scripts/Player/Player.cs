@@ -20,6 +20,7 @@ public class Player : NetworkBehaviour
     [HideInInspector] public InteractableFinder inf;
     [HideInInspector] public ItemUse itemUse;
     [HideInInspector] public PlayerClothing playerClothing;
+    public PlayerRoom playerRoom;
     public Speaker speaker;
     Transform playerGFX;
     Transform cameraPosition;

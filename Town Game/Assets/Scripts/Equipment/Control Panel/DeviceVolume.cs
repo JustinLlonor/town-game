@@ -1,37 +1,38 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Fusion;
 
 /// <summary>
-/// Defines a volume in which a device can be placed in
+/// Defines a volume in which a device can be placed in, stores every device within the volume
 /// </summary>
 public class DeviceVolume : MonoBehaviour
 {
-    // use an event for connectability when player enters/exits?
-    public ControlPanel connectedPanel;
-    List<Collider> collidedObjects;
+    /// <summary>
+    /// All the devices that this DeviceVolume has. 
+    /// A player can only place a device in a DeviceVolume if they are connected to the corresponding ControlPanel
+    /// </summary>
+    public List<PhysDevice> connectedDevices = new List<PhysDevice>();
+    public List<PlayerRef> containedPlayers = new List<PlayerRef>();
+    public PlayerEvent onPlayerEnterVolume;
+    public PlayerEvent onPlayerLeaveVolume;
 
-    public delegate void DeviceVolumeEvent();
+    public delegate void PlayerEvent(PlayerRef player);
 
-    private void OnTriggerEnter(Collider other)
+    public bool PlayerContainedWithinVolume(PlayerRef player)
     {
-        collidedObjects.Add(other);
-        PlayerEnterCheck(other);
+        return containedPlayers.Contains(player);
     }
 
-    private void OnTriggerExit(Collider other)
+    public void OnPlayerEnter(PlayerRef player)
     {
-        PlayerExitCheck(other);
-        if (collidedObjects.Contains(other)) collidedObjects.Remove(other);
+        if (!containedPlayers.Contains(player)) containedPlayers.Add(player);
+        onPlayerEnterVolume?.Invoke(player);
     }
 
-    private void PlayerEnterCheck(Collider coll)
+    public void OnPlayerExit(PlayerRef player)
     {
-        
-    }
-
-    private void PlayerExitCheck(Collider coll)
-    {
-
+        if (containedPlayers.Contains(player)) containedPlayers.Remove(player);
+        onPlayerLeaveVolume?.Invoke(player);
     }
 }

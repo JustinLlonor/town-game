@@ -13,6 +13,7 @@ public class Interactable : MonoBehaviour
     public bool glow = false;
     public Renderer[] renderers;
     public float glowAmount = 1f;
+    
     /// <summary>
     /// Called when the player looks at this interactable on the client
     /// </summary>
@@ -25,7 +26,10 @@ public class Interactable : MonoBehaviour
     public delegate void InteractableEvent();
 
     bool isGlowing = false;
-    bool isLooking = false;
+    /// <summary>
+    /// If the player is looking at this interactable
+    /// </summary>
+    public bool isLooking { get; private set; } = false;
 
     [Serializable]
     public class Hover
@@ -40,6 +44,13 @@ public class Interactable : MonoBehaviour
         public bool trackLore = false;
         public bool trackColor = false;
         public NetworkSettings networkSettings;
+
+        public Hover()
+        {
+            color = Color.white;
+            fillColor = new Color(0, 0, 0, 0.5607843f);
+            keyColor = Color.black;
+        }
 
         [Serializable]
         public class NetworkSettings
@@ -135,5 +146,11 @@ public class Interactable : MonoBehaviour
             r.material.SetFloat("_RimBrightness", .3f);
         }
         isGlowing = false;
+    }
+
+    [ContextMenu("Add Default Hover")]
+    public void AddDefaultHover()
+    {
+        hovers = new Hover[] { new Hover() };
     }
 }

@@ -23,7 +23,6 @@ public class PositionManager : NetworkBehaviour
     PlayerRef trackedPlayer;
     bool init = false;
 
-
     public delegate void BranchEvent(PlayerRef player, string branch);
     public delegate void PlayerEvent(PlayerRef player);
     public delegate void JobEvent(Vector2Int jobRef);

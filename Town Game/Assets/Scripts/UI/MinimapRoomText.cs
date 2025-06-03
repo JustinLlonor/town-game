@@ -21,7 +21,7 @@ public class MinimapRoomText : MonoBehaviour
 
     void AddReferences(GameObject player)
     {
-        trackedPM = player.GetComponent<PlayerRoom>();
+        trackedPM = player.GetComponent<Player>().playerRoom;
         trackedPM.OnEnterRoom += PlayRoomText;
     }
 

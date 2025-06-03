@@ -396,6 +396,78 @@ Transform:
   m_Father: {fileID: 6706510609064349016}
   m_RootOrder: -2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1459768424888841295
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3804039477495290723}
+  - component: {fileID: 3246050477725740936}
+  - component: {fileID: 9151465664628427954}
+  m_Layer: 0
+  m_Name: Player Volume Collider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3804039477495290723
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1459768424888841295}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1317372394872903684}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3246050477725740936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1459768424888841295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd2fd45514d528845b363208c8d42d01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentRoom: {fileID: 0}
+  deviceVolumes: []
+  deviceVolumeTag: Device Volume
+  roomTag: Room
+--- !u!136 &9151465664628427954
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1459768424888841295}
+  m_Material: {fileID: 13400000, guid: e4f5d06317088d64493e84cd03fa6135, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.21
+  m_Height: 1.79
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.895, z: 0}
 --- !u!1 &1733608181469062427
 GameObject:
   m_ObjectHideFlags: 0
@@ -450,7 +522,6 @@ GameObject:
   - component: {fileID: 847193838002151960}
   - component: {fileID: 5432845057157182992}
   - component: {fileID: 873785079005984450}
-  - component: {fileID: 4262745249595203894}
   - component: {fileID: 8777106030094182887}
   - component: {fileID: 2324421915886620022}
   - component: {fileID: 9025657517201421562}
@@ -482,6 +553,7 @@ Transform:
   - {fileID: 854407532444519849}
   - {fileID: 6748732434187779059}
   - {fileID: 147890084963948018}
+  - {fileID: 3804039477495290723}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -508,6 +580,7 @@ MonoBehaviour:
   inf: {fileID: 8489816749943817623}
   itemUse: {fileID: 2378964989146487730}
   playerClothing: {fileID: 873785079005984450}
+  playerRoom: {fileID: 3246050477725740936}
   speaker: {fileID: 4245333172940040223}
   _camDirection: 0
   _camDirectionX: 0
@@ -536,7 +609,6 @@ MonoBehaviour:
   - {fileID: 7351151026128905701}
   - {fileID: 6160271850420175375}
   - {fileID: 873785079005984450}
-  - {fileID: 4262745249595203894}
   - {fileID: 8777106030094182887}
   - {fileID: 2324421915886620022}
   - {fileID: 9025657517201421562}
@@ -544,6 +616,7 @@ MonoBehaviour:
   - {fileID: 8314741821198590847}
   - {fileID: 8489816749943817623}
   - {fileID: 991788123578228062}
+  - {fileID: 3246050477725740936}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &2442258754578231911
 MonoBehaviour:
@@ -985,20 +1058,6 @@ MonoBehaviour:
   - {fileID: 2100000, guid: ef526697ae326fa4995303c6d58932f7, type: 2}
   - {fileID: 2100000, guid: e1258ddff029bcd469c2eb0bcafdfe11, type: 2}
   - {fileID: 2100000, guid: c86683c1742598949a65b19ea1d1a5b0, type: 2}
---- !u!114 &4262745249595203894
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1787190705143953567}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd2fd45514d528845b363208c8d42d01, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentRoom: {fileID: 0}
-  roomTag: Room
 --- !u!114 &8777106030094182887
 MonoBehaviour:
   m_ObjectHideFlags: 0

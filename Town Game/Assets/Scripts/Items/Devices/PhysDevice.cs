@@ -5,7 +5,7 @@ using Fusion;
 
 public class PhysDevice : NetworkBehaviour
 {
-    public MapRoom property;
+    public DeviceVolume volume;
 
     // Client sided events
     /// <summary>
@@ -23,5 +23,5 @@ public class PhysDevice : NetworkBehaviour
     /// Called when the player closes the device UI
     /// </summary>
     /// <param name="uiBehaviour"></param>
-    public virtual void DeviceClosed(DeviceUI uiBehaviour) { }
+    public virtual void DeviceClosed() { }
 }

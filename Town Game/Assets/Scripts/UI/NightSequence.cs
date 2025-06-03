@@ -46,7 +46,7 @@ public class NightSequence : MonoBehaviour
 
     void GetReferences(GameObject player)
     {
-        pr = player.GetComponent<PlayerRoom>();
+        pr = player.GetComponent<Player>().playerRoom;
         Debug.Log(pr);
     }
 
