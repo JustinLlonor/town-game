@@ -5,7 +5,62 @@ using Fusion;
 
 public class PhysDevice : NetworkBehaviour
 {
+    public Texture2D icon;
     public DeviceVolume volume;
+    [Tooltip("If this device takes input or not")]
+    public bool takesInput = false;
+    [Networked, Capacity(15)] public NetworkDictionary<PlayerRef, NetworkId> playerInputs => default;
+    public NetworkPrefabRef deviceInputPrefab;
+
+    /// <summary>
+    /// For testing, remove this after device placement is added
+    /// </summary>
+    public override void Spawned()
+    {
+        volume.connectedDevices.Add(Object);
+    }
+
+    /// <summary>
+    /// Adds the player input object for this player
+    /// </summary>
+    /// <param name="player"></param>
+    public void AddPlayerInput(PlayerRef player)
+    {
+        Debug.Log("Adding player input");
+        if (!takesInput) return;
+        if (playerInputs.ContainsKey(player)) return;
+        Debug.Log("Instantiating object");
+        NetworkObject newObject = Runner.Spawn(deviceInputPrefab, null, null, player);
+        playerInputs.Add(player, newObject);
+        newObject.GetComponent<DeviceInput>().connectedDevice = this;
+    }
+
+    /// <summary>
+    /// Removes the player input object for this player
+    /// </summary>
+    /// <param name="player"></param>
+    public void RemovePlayerInput(PlayerRef player)
+    {
+        if (!takesInput) return;
+        if (!playerInputs.ContainsKey(player)) return;
+        NetworkObject foundObject = null;
+        Runner.TryFindObject(playerInputs[player], out foundObject);
+        playerInputs.Remove(player);
+        if (foundObject != null)
+        {
+            Runner.Despawn(foundObject);
+        }
+    }
+
+    // Server sided events
+
+    /// <summary>
+    /// (Server side) Called when this device receives some input from the player.
+    /// Use the "is" operator to determine the input type. Ex. input is string
+    /// </summary>
+    /// <param name="input"></param>
+    /// <param name="player"></param>
+    public virtual void ReceivedInput(object input, PlayerRef player) { }
 
     // Client sided events
     /// <summary>

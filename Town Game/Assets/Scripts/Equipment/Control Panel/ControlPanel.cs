@@ -16,6 +16,7 @@ public class ControlPanel : Equipment
     private bool connected = false;
     PositionManager positionManager;
 
+    // TODO: Disconnect on death or player leave
     public override void Spawned()
     {
         base.Spawned();
@@ -24,6 +25,34 @@ public class ControlPanel : Equipment
         interactable.onLook += CheckConnection;
         positionManager.onJobAdd += CheckConnection;
         positionManager.onJobRemove += CheckConnection;
+    }
+
+    private void ConnectDevices(PlayerRef player)
+    {
+        foreach (NetworkId nID in connectedVolume.connectedDevices)
+        {
+            PhysDevice device = GetPhysDevice(nID);
+            if (device == null) continue;
+            device.AddPlayerInput(player);
+        }
+    }
+
+    private void DisconnectDevices(PlayerRef player)
+    {
+        foreach (NetworkId nID in connectedVolume.connectedDevices)
+        {
+            PhysDevice device = GetPhysDevice(nID);
+            if (device == null) continue;
+            device.RemovePlayerInput(player);
+        }
+    }
+
+    private PhysDevice GetPhysDevice(NetworkId id)
+    {
+        NetworkObject no = null;
+        Runner.TryFindObject(id, out no);
+        if (no != null) return no.GetComponent<PhysDevice>();
+        return null;
     }
 
     public void ToggleConnection(PlayerRef player)
@@ -46,6 +75,7 @@ public class ControlPanel : Equipment
         {
             AddConnectedPlayer(player);
             RPC_SendConnected(player, true);
+            ConnectDevices(player);
         }
     }
 
@@ -53,6 +83,7 @@ public class ControlPanel : Equipment
     {
         RemoveConnectedPlayer(player);
         RPC_SendConnected(player, false);
+        DisconnectDevices(player);
     }
 
     private void AddConnectedPlayer(PlayerRef player)
@@ -87,16 +118,7 @@ public class ControlPanel : Equipment
 
     public void SwapConnection()
     {
-        if (!positionManager.PlayerHasAccessToRoom(Runner.LocalPlayer, room.roomName)) return;
-        connected = !connected;
-        if (connected)
-        {
-            SetDisconnect();
-        }
-        else
-        {
-            SetConnect();
-        }
+        interactable.hovers[0].lore = "";
     }
 
     public void SetCantConnect()
