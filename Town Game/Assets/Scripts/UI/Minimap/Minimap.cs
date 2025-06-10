@@ -276,20 +276,24 @@ public class Minimap : MonoBehaviour
 
     private void CheckUnremovedElements()
     {
+        List<MinimapIcon> removedIcons = new List<MinimapIcon>();
         foreach (var kvp in activeIcons)
         {
             if (!minimapManager.icons.ContainsKey(kvp.Key.name))
             {
-                RemoveIcon(kvp.Key);
+                removedIcons.Add(kvp.Key);
             }
         }
+        foreach (MinimapIcon icon in removedIcons) RemoveIcon(icon);
+        List<MinimapPointer> removedPointers = new List<MinimapPointer>();
         foreach (var kvp in activePointers)
         {
             if (!minimapManager.pointers.ContainsKey(kvp.Key.name))
             {
-                RemovePointer(kvp.Key);
+                removedPointers.Add(kvp.Key);
             }
         }
+        foreach (MinimapPointer pointer in removedPointers) RemovePointer(pointer);
     }
 
     private void SetPositions()

@@ -77,7 +77,7 @@ public class PhysDevice : NetworkBehaviour
     public virtual void DeviceOpened(GameObject uiObject) { }
 
     /// <summary>
-    /// Called when the player closes the device UI (not programmed yet)
+    /// Called when the player closes the device UI
     /// </summary>
     /// <param name="uiBehaviour"></param>
     public virtual void DeviceClosed() { }

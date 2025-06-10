@@ -6,6 +6,8 @@ using UnityEngine.Rendering;
 
 public class ClientGFX : MonoBehaviour
 {
+    public LayerMask uiFrontMask;
+    public LayerMask clientGFXMask;
     //public PhotonView view;
     public GameObject[] renderers;
     public MeshRenderer serverItem;
@@ -22,13 +24,16 @@ public class ClientGFX : MonoBehaviour
         // Add client check here
         if (!no.HasInputAuthority) return;
         HideRenderers();
-        serverItem.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+        serverItem.gameObject.layer = (int)Mathf.Log(clientGFXMask.value, 2f);
+        //serverItem.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
     }
 
     public void ShowRenderers()
     {
         foreach (GameObject go in renderers)
         {
+            go.layer = (int)Mathf.Log(uiFrontMask.value, 2f);
+            /**
             if (go.GetComponent<SkinnedMeshRenderer>() != null)
             {
                 go.GetComponent<SkinnedMeshRenderer>().shadowCastingMode = ShadowCastingMode.On;
@@ -37,6 +42,7 @@ public class ClientGFX : MonoBehaviour
             {
                 go.GetComponent<MeshRenderer>().shadowCastingMode = ShadowCastingMode.On;
             }
+            **/
         }
     }
 
@@ -44,6 +50,8 @@ public class ClientGFX : MonoBehaviour
     {
         foreach(GameObject go in renderers)
         {
+            go.layer = (int)Mathf.Log(clientGFXMask.value, 2f);
+            /**
             if (go.GetComponent<SkinnedMeshRenderer>() != null)
             {
                 go.GetComponent<SkinnedMeshRenderer>().shadowCastingMode = ShadowCastingMode.ShadowsOnly;
@@ -52,6 +60,7 @@ public class ClientGFX : MonoBehaviour
             {
                 go.GetComponent<MeshRenderer>().shadowCastingMode = ShadowCastingMode.ShadowsOnly;
             }
+            **/
         }
     }
 

@@ -176,6 +176,7 @@ public class ControlPanel : Equipment
     {
         MapMenuUI mmUI = UIManager.instance.mapMenuUI;
         mmUI.ClearDeviceButtons();
+        mmUI.HidePanel(true);
     }
 
     public void SwapConnection()

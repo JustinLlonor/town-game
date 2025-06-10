@@ -582,6 +582,8 @@ MonoBehaviour:
   playerClothing: {fileID: 873785079005984450}
   playerRoom: {fileID: 3246050477725740936}
   speaker: {fileID: 4245333172940040223}
+  connectedPanel: {fileID: 0}
+  connectedClientPanel: {fileID: 0}
   _camDirection: 0
   _camDirectionX: 0
 --- !u!114 &2540704478665164047
@@ -2068,6 +2070,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1dcf2f6cdd8ec9741ad19c5dcafa09aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  uiFrontMask:
+    serializedVersion: 2
+    m_Bits: 32768
+  clientGFXMask:
+    serializedVersion: 2
+    m_Bits: 1048576
   renderers:
   - {fileID: 4009504184231693971}
   - {fileID: 9163674519702303380}
