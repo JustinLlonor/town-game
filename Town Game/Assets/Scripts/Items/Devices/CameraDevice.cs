@@ -6,7 +6,7 @@ public class CameraDevice : PhysDevice
 {
     public Camera attachedCamera;
 
-    public override void DeviceOpened(DeviceUI uiBehaviour)
+    public override void DeviceOpened(GameObject uiObject)
     {
 
     }

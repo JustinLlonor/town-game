@@ -18,6 +18,7 @@ public class UIManager : MonoBehaviour
     public AttackQTE attackQTE;
     public UIPlayerList uip;
     public PositionUI pui;
+    public MapMenuUI mapMenuUI;
     [Header("Menus")]
     public GameObject[] uiMenus;
     public int menuOpened = -1;

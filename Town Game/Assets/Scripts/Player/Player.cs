@@ -22,6 +22,8 @@ public class Player : NetworkBehaviour
     [HideInInspector] public PlayerClothing playerClothing;
     public PlayerRoom playerRoom;
     public Speaker speaker;
+    public ControlPanel connectedPanel;
+    public ControlPanel connectedClientPanel;
     Transform playerGFX;
     Transform cameraPosition;
     PlayerManager playerManager;

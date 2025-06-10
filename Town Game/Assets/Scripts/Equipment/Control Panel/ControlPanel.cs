@@ -15,12 +15,15 @@ public class ControlPanel : Equipment
     // Client sided attribute if the player is connected or not
     private bool connected = false;
     PositionManager positionManager;
+    PlayerManager playerManager;
 
     // TODO: Disconnect on death or player leave
+    // TODO: Player interest should only show connected devices when a player can access it
     public override void Spawned()
     {
         base.Spawned();
         positionManager = FindAnyObjectByType<PositionManager>();
+        playerManager = FindAnyObjectByType<PlayerManager>();
         connectedVolume.onPlayerLeaveVolume += Disconnect;
         interactable.onLook += CheckConnection;
         positionManager.onJobAdd += CheckConnection;
@@ -73,6 +76,7 @@ public class ControlPanel : Equipment
     {
         if (connectedVolume.PlayerContainedWithinVolume(player))
         {
+            CheckPlayerControlPanels(player);
             AddConnectedPlayer(player);
             RPC_SendConnected(player, true);
             ConnectDevices(player);
@@ -82,8 +86,35 @@ public class ControlPanel : Equipment
     public void Disconnect(PlayerRef player)
     {
         RemoveConnectedPlayer(player);
-        RPC_SendConnected(player, false);
         DisconnectDevices(player);
+        DeselectPlayerControlPanel(player);
+        RPC_SendConnected(player, false);
+    }
+
+    private void DeselectPlayerControlPanel(PlayerRef player)
+    {
+        NetworkObject playerObject = playerManager.GetPlayerNetworkObject(player);
+        if (playerObject == null) return;
+        Player playerBehaviour = playerObject.GetComponent<Player>();
+        playerBehaviour.connectedPanel = null;
+    }
+
+    /// <summary>
+    /// Disconnects from any control panels the player may have connected to, and sets their connected panel to this
+    /// </summary>
+    /// <param name="player"></param>
+    private void CheckPlayerControlPanels(PlayerRef player)
+    {
+        NetworkObject playerObject = playerManager.GetPlayerNetworkObject(player);
+        if (playerObject != null)
+        {
+            Player playerBehaviour = playerObject.GetComponent<Player>();
+            if (playerBehaviour.connectedPanel != null)
+            {
+                playerBehaviour.connectedPanel.Disconnect(player);
+            }
+            playerBehaviour.connectedPanel = this;
+        }
     }
 
     private void AddConnectedPlayer(PlayerRef player)
@@ -103,17 +134,48 @@ public class ControlPanel : Equipment
     // Client sided stuff
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
-    public void RPC_SendConnected([RpcTarget] PlayerRef player, bool connection)
+    public void RPC_SendConnected([RpcTarget] PlayerRef player, bool isConnected)
     {
-        if (connection)
+        Player playerB = null;
+        if (playerManager.currentPlayer != null)
+        {
+            playerB = playerManager.currentPlayer.GetComponent<Player>();
+        }
+        if (isConnected)
         {
             SetDisconnect();
+            ConnectDeviceUI();
+            playerB.connectedClientPanel = this;
         }
         else
         {
             SetConnect();
+            // For the case of switching control panels, if the disconnect packet arrives after the new connection, won't clear device UI
+            if (playerB.connectedClientPanel == this)
+            {
+                ClearDeviceUI();
+                playerB.connectedClientPanel = null;
+            }
         }
-        connected = connection;
+        connected = isConnected;
+    }
+
+    private void ConnectDeviceUI()
+    {
+        MapMenuUI mmUI = UIManager.instance.mapMenuUI;
+        mmUI.ClearDeviceButtons();
+        foreach (NetworkId deviceId in connectedVolume.connectedDevices)
+        {
+            PhysDevice device = GetPhysDevice(deviceId);
+            if (device == null) continue;
+            mmUI.AddDeviceButton(device);
+        }
+    }
+
+    private void ClearDeviceUI()
+    {
+        MapMenuUI mmUI = UIManager.instance.mapMenuUI;
+        mmUI.ClearDeviceButtons();
     }
 
     public void SwapConnection()

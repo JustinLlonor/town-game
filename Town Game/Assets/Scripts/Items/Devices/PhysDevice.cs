@@ -6,6 +6,8 @@ using Fusion;
 public class PhysDevice : NetworkBehaviour
 {
     public Texture2D icon;
+    [Tooltip("The ui object this device is associated with")]
+    public GameObject uiObject;
     public DeviceVolume volume;
     [Tooltip("If this device takes input or not")]
     public bool takesInput = false;
@@ -72,10 +74,10 @@ public class PhysDevice : NetworkBehaviour
     /// Called when the player opens the device UI
     /// </summary>
     /// <param name="uiBehaviour">The ui behaviour this device is attached to, to be casted into the actual corresponding behaviour</param>
-    public virtual void DeviceOpened(DeviceUI uiBehaviour) { }
+    public virtual void DeviceOpened(GameObject uiObject) { }
 
     /// <summary>
-    /// Called when the player closes the device UI
+    /// Called when the player closes the device UI (not programmed yet)
     /// </summary>
     /// <param name="uiBehaviour"></param>
     public virtual void DeviceClosed() { }
