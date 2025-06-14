@@ -14,6 +14,7 @@ public class PlayerDropManager : NetworkBehaviour
     public LayerMask environmentMask;
     public float surfaceTolerance = 0.95f;
     [Header("References")]
+    public GizmoManager gizmoManager;
     public NetworkPrefabRef physItem;
     public NetworkPrefabRef itemGizmo;
     public Transform camTransform;

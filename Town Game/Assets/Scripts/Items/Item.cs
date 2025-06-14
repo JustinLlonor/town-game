@@ -10,6 +10,7 @@ public class Item : ScriptableObject
     public Texture2D icon;
     public string description = "";
     public string customType = "";
+    public GizmoSettings dropSettings;
     public Vector3 placedRotation = Vector3.zero;
     public GameObject itemBehaviourObject;
     public Mesh mesh; // Mesh of the item
