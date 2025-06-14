@@ -33,6 +33,7 @@ public class ItemGizmo : NetworkBehaviour
         {
             currentCollisions.Add(collider.gameObject);
         }
+        
     }
 
     IEnumerator AssignCoroutine()

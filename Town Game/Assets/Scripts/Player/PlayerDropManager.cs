@@ -14,7 +14,7 @@ public class PlayerDropManager : NetworkBehaviour
     public LayerMask environmentMask;
     public float surfaceTolerance = 0.95f;
     [Header("References")]
-    public GizmoManager gizmoManager;
+    public GameObject gizmoPrefab;
     public NetworkPrefabRef physItem;
     public NetworkPrefabRef itemGizmo;
     public Transform camTransform;
@@ -23,12 +23,18 @@ public class PlayerDropManager : NetworkBehaviour
     public ItemGizmo gizmo;
     bool isPlacing = false;
     bool isPlace = false;
+    GizmoManager gizmoManager;
     RunnerManager rm;
     PositionManager positionManager;
 
     public override void Spawned()
     {
-        if (Runner.IsServer) Runner.Spawn(itemGizmo, Vector3.zero, Quaternion.identity, Object.InputAuthority);
+        //if (Runner.IsServer) Runner.Spawn(itemGizmo, Vector3.zero, Quaternion.identity, Object.InputAuthority);
+        if (!Object.IsProxy)
+        {
+            GameObject gizmoObject = Instantiate(gizmoPrefab);
+            gizmoManager = gizmoObject.GetComponent<GizmoManager>();
+        }
         rm = FindFirstObjectByType<RunnerManager>();
         positionManager = FindAnyObjectByType<PositionManager>();
         inventory.OnSwitchSlot += CancelDrop;
@@ -95,6 +101,7 @@ public class PlayerDropManager : NetworkBehaviour
     void CancelDrop()
     {
         gizmo.SetRenderer(false);
+        if (!HasInputAuthority) return;
         isPlacing = false;
     }
 
