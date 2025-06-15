@@ -40,7 +40,9 @@ public class GizmoManager : MonoBehaviour
         Debug.Log("up axis: " + upAxis);
         float upExtent = GetMeshExtent(mesh, upAxis);
         float upCenter = GetMeshCenter(mesh, upAxis);
-        float newY = upExtent - upCenter + settings.upSettings.upDisplacement;
+        float newY = settings.upSettings.upDisplacement;
+        if (upAxis.IsNegative()) upCenter *= -1;
+        newY += -upCenter + upExtent;
         meshCollider.transform.localPosition = new Vector3(meshCollider.transform.localPosition.x,
                 newY, meshCollider.transform.localPosition.z);
     }
@@ -59,7 +61,9 @@ public class GizmoManager : MonoBehaviour
         float meshDisplacementZ = GetMeshCenter(mesh, meshZAxis);
         // Sets the new x and z, depending on if we want to center the axes
         float newX = -meshDisplacementX;
+        if (meshXAxis.IsNegative()) newX *= -1;
         float newZ = -meshDisplacementZ;
+        if (meshZAxis.IsNegative()) newZ *= -1;
         if (!centerX) newX = displacement.x;
         if (!centerZ) newZ = displacement.y;
         // Sets local pos
@@ -81,9 +85,9 @@ public class GizmoManager : MonoBehaviour
         if (axis == GizmoAxis.PosX) return mesh.bounds.center.x;
         if (axis == GizmoAxis.PosY) return mesh.bounds.center.y;
         if (axis == GizmoAxis.PosZ) return mesh.bounds.center.z;
-        if (axis == GizmoAxis.NegX) return -mesh.bounds.center.x;
-        if (axis == GizmoAxis.NegY) return -mesh.bounds.center.y;
-        return -mesh.bounds.center.z;
+        if (axis == GizmoAxis.NegX) return mesh.bounds.center.x;
+        if (axis == GizmoAxis.NegY) return mesh.bounds.center.y;
+        return mesh.bounds.center.z;
     }
 
     public void HideGizmo()
