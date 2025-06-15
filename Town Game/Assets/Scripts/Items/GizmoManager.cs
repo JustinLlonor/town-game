@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 public class GizmoManager : MonoBehaviour
 {
+    public float errorDisplacement = 0.05f;
     public Item testItem;
     [Header("References")]
+    public GizmoCollider gizmoCollider;
     public MeshCollider meshCollider;
     public MeshRenderer meshRenderer;
     public MeshFilter meshFilter;
+    private bool gizmoEnabled = false;
+    private GizmoSettings currentSettings;
 
     private void Update()
     {
@@ -19,6 +23,8 @@ public class GizmoManager : MonoBehaviour
 
     public void CreateGizmo(GizmoSettings settings, Mesh mesh)
     {
+        currentSettings = settings;
+        gizmoEnabled = true;
         meshCollider.enabled = true;
         meshRenderer.enabled = true;
         meshFilter.mesh = mesh;
@@ -28,6 +34,27 @@ public class GizmoManager : MonoBehaviour
         ReadUpSettings(settings, mesh);
     }
 
+    public void DisableGizmo()
+    {
+        gizmoEnabled = false;
+        meshCollider.enabled = false;
+        meshRenderer.enabled = false;
+    }
+    
+    /// <summary>
+    /// Determines if the placement of the gizmo is valid
+    /// </summary>
+    /// <returns></returns>
+    public bool PlacementValid()
+    {
+        return !gizmoCollider.ColliderTouchingEnvironment();
+    }
+
+    /// <summary>
+    /// Displaces the collider up so that it touches the ground
+    /// </summary>
+    /// <param name="settings"></param>
+    /// <param name="mesh"></param>
     private void ReadUpSettings(GizmoSettings settings, Mesh mesh)
     {
         if (!settings.upSettings.useMeshData)
@@ -37,10 +64,10 @@ public class GizmoManager : MonoBehaviour
             return;
         }
         GizmoAxis upAxis = settings.GetUpAxis();
-        Debug.Log("up axis: " + upAxis);
         float upExtent = GetMeshExtent(mesh, upAxis);
         float upCenter = GetMeshCenter(mesh, upAxis);
-        float newY = settings.upSettings.upDisplacement;
+        float newY = settings.upSettings.upDisplacement + errorDisplacement;
+        // if the axis is negative, then flip it and use the negative up center
         if (upAxis.IsNegative()) upCenter *= -1;
         newY += -upCenter + upExtent;
         meshCollider.transform.localPosition = new Vector3(meshCollider.transform.localPosition.x,
@@ -49,8 +76,6 @@ public class GizmoManager : MonoBehaviour
 
     private void ReadCenterSettings(GizmoSettings settings, Mesh mesh)
     {
-        Debug.Log("x axis: " + settings.GetXAxis());
-        Debug.Log("z axis: " + settings.GetZAxis());
         CenterAxes(settings.GetXAxis(), settings.GetZAxis(), settings.centerSettings.centerX, settings.centerSettings.centerZ, settings.centerSettings.displacement, mesh);
     }
 
