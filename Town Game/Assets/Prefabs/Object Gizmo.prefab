@@ -128,12 +128,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 053e09b0942982b4b96bea6048da10ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attachedPlayer: {fileID: 0}
   errorDisplacement: 0.02
+  surfaceTolerance: 0.95
+  environmentMask:
+    serializedVersion: 2
+    m_Bits: 128
   testItem: {fileID: 11400000, guid: a5d5dffa5b8249d429824aa66f7c6fde, type: 2}
   gizmoCollider: {fileID: 7873202944890244410}
   meshCollider: {fileID: 8150435482391729824}
   meshRenderer: {fileID: 7145001266866544258}
   meshFilter: {fileID: 6259766029650306911}
+  camTransform: {fileID: 0}
 --- !u!1 &4902210618816407129
 GameObject:
   m_ObjectHideFlags: 0

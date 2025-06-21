@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: 0, 0, 0
   m_EditorClassIdentifier: 
   rotation: {x: 0, y: 0, z: 0}
+  placementRange: 3
   centerSettings:
     centerX: 1
     centerZ: 1
     displacement: {x: 0, y: 0}
   upSettings:
-    upAxis: 1
     upDisplacement: 0
     useMeshData: 1
   rotationSettings:

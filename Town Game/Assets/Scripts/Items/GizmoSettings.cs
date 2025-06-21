@@ -7,6 +7,7 @@ using System;
 public class GizmoSettings : ScriptableObject
 {
     public Vector3 rotation;
+    public float placementRange = 2f;
     public CenterSettings centerSettings = new CenterSettings();
     public UpSettings upSettings = new UpSettings();
     public RotationSettings rotationSettings = new RotationSettings();
@@ -39,6 +40,7 @@ public class GizmoSettings : ScriptableObject
         public RotationLimit rotationLimit;
         public RotationLimit surfaceRotationLimit;
     }
+
 
     [System.Serializable]
     public struct RotationLimit

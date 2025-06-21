@@ -21,7 +21,7 @@ public class PlayerDropManager : NetworkBehaviour
     public Material canPlace;
     public Material cantPlace;
     public ItemGizmo gizmo;
-    bool isPlacing = false;
+    [Networked] public bool isPlacing { get; set; } = false;
     bool isPlace = false;
     GizmoManager gizmoManager;
     RunnerManager rm;
@@ -32,9 +32,13 @@ public class PlayerDropManager : NetworkBehaviour
         //if (Runner.IsServer) Runner.Spawn(itemGizmo, Vector3.zero, Quaternion.identity, Object.InputAuthority);
         if (!Object.IsProxy)
         {
+            // Initialize the gizmo
             GameObject gizmoObject = Instantiate(gizmoPrefab);
             gizmoManager = gizmoObject.GetComponent<GizmoManager>();
+            gizmoManager.camTransform = camTransform;
+            gizmoManager.attachedPlayer = player;
         }
+
         rm = FindFirstObjectByType<RunnerManager>();
         positionManager = FindAnyObjectByType<PositionManager>();
         inventory.OnSwitchSlot += CancelDrop;
@@ -50,15 +54,17 @@ public class PlayerDropManager : NetworkBehaviour
 
     private void Update()
     {
+        /**
         if (isPlacing && HasInputAuthority)
         {
             UpdateGizmo();
         }
+        **/
     }
 
     public override void FixedUpdateNetwork()
     {
-        if (gizmo == null) return;
+        if (gizmoManager == null) return;
         if (Runner.IsResimulation) return;
         // Change detector
         if (previousPressed != dropPressed)
@@ -66,16 +72,19 @@ public class PlayerDropManager : NetworkBehaviour
             previousPressed = dropPressed;
             if (dropPressed)
             {
+                Debug.Log("drop pressed 2");
                 OnDropPressed();
             }
             if (!dropPressed)
             {
+                Debug.Log("drop released");
                 OnDropRelease();
             }
         }
-        if (Runner.IsServer && !HasInputAuthority)
+        if (!Object.IsProxy && isPlacing)
         {
-            UpdateGizmo();
+            gizmoManager.LookModeRaycast();
+            //UpdateGizmo();
         }
     }
 
@@ -84,16 +93,21 @@ public class PlayerDropManager : NetworkBehaviour
     {
         Item currentItem = GetCurrentItem();
         // if we are not holding an item, return
+        Debug.Log("drop pressed function call");
         if (currentItem == null) return;
         // Enable mesh renderer
-        if (HasInputAuthority) gizmo.SetRenderer(true, currentItem.mesh);
-        gizmo.SetColliderBounds(currentItem.mesh.bounds.center, currentItem.mesh.bounds.size);
+        gizmoManager.EnterLookMode(currentItem.mesh, currentItem.dropSettings, Object.HasInputAuthority);
+        //if (HasInputAuthority) gizmo.SetRenderer(true, currentItem.mesh);
+        //gizmo.SetColliderBounds(currentItem.mesh.bounds.center, currentItem.mesh.bounds.size);
         isPlacing = true;
     }
 
     void OnDropRelease()
     {
         if (!isPlacing) return;
+        gizmoManager.ExitLookMode();
+        isPlacing = false;
+        return;
         VerifyPlacement();
         CancelDrop();
     }
@@ -101,8 +115,8 @@ public class PlayerDropManager : NetworkBehaviour
     void CancelDrop()
     {
         gizmo.SetRenderer(false);
-        if (!HasInputAuthority) return;
         isPlacing = false;
+        return;
     }
 
     void VerifyPlacement() // Places the item if the item placement is valid
@@ -142,7 +156,9 @@ public class PlayerDropManager : NetworkBehaviour
 
     private void UpdateGizmo(Vector2Int jobRef)
     {
-        UpdateGizmo();
+        //TODO: Create a function that checks if the placement is valid
+
+        //UpdateGizmo();
     }
 
     void UpdateGizmo()
@@ -242,6 +258,7 @@ public class PlayerDropManager : NetworkBehaviour
 
     private void OnDropItem(InputValue iv)
     {
+        Debug.Log("drop pressed");
         if (iv.Get<float>() == 0f)
         {
             rm.dropPressed = false;

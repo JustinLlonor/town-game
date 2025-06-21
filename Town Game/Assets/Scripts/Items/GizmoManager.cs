@@ -1,33 +1,162 @@
+using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
 public class GizmoManager : MonoBehaviour
 {
+    /// <summary>
+    /// The player this gizmo is tracking
+    /// </summary>
+    public Player attachedPlayer;
     public float errorDisplacement = 0.05f;
-    public Item testItem;
+    public float surfaceTolerance = 0.95f;
+    public LayerMask environmentMask;
+    //public Item testItem;
     [Header("References")]
     public GizmoCollider gizmoCollider;
     public MeshCollider meshCollider;
     public MeshRenderer meshRenderer;
     public MeshFilter meshFilter;
-    private bool gizmoEnabled = false;
+    [HideInInspector] public Transform camTransform;
+    [HideInInspector] public bool gizmoEnabled = false;
     private GizmoSettings currentSettings;
+    private RunnerManager rm;
+    private bool graphicsShown = false;
+    private bool unparentedGFX = false;
 
-    private void Update()
+    private struct GizmoPlacementInfo
     {
-        if (Input.GetKeyDown(KeyCode.I))
+        public Vector3 position;
+        public Quaternion rotation;
+        public bool gizmoOnSurface;
+
+        public GizmoPlacementInfo(Vector3 position, Quaternion rotation, bool gizmoOnSurface)
         {
-            CreateGizmo(testItem.dropSettings, testItem.mesh);
+            this.position = position;
+            this.rotation = rotation;
+            this.gizmoOnSurface = gizmoOnSurface;
         }
     }
 
-    public void CreateGizmo(GizmoSettings settings, Mesh mesh)
+    private void Awake()
+    {
+        rm = FindAnyObjectByType<RunnerManager>();
+    }
+
+    private void Update()
+    {
+        return;
+        if (graphicsShown && gizmoEnabled)
+        {
+            float localCamX = rm.camOrientation;
+            float localCamY = rm.orientation;
+            PlaceGraphics(Quaternion.Euler(localCamX, localCamY, 0f) * Vector3.forward);
+        }
+    }
+
+    public void EnterLookMode(Mesh gizmoMesh, GizmoSettings settings, bool showGraphics)
+    {
+        Debug.Log("look mode entered");
+        graphicsShown = showGraphics;
+        if (showGraphics)
+        {
+            meshCollider.enabled = true;
+            meshRenderer.enabled = true;
+            meshFilter.mesh = gizmoMesh;
+        }
+        CreateGizmo(settings, gizmoMesh);
+        gizmoEnabled = true;
+    }
+
+    public void ExitLookMode()
+    {
+        gizmoEnabled = false;
+        DisableGizmo();
+    }
+
+    public void LookModeRaycast()
+    {
+        float camX;
+        float camY;
+        camX = attachedPlayer.camDirectionX;
+        camY = attachedPlayer.camDirection;
+        Vector3 direction = Quaternion.Euler(camX, camY, 0f) * Vector3.forward;
+        GizmoPlacementInfo placementInfo = GetPlacementInfo(direction, true);
+        transform.position = placementInfo.position;
+        transform.rotation = placementInfo.rotation;
+    }
+
+    private void PlaceGraphics(Vector3 direction)
+    {
+        if (!unparentedGFX)
+        {
+            meshRenderer.transform.parent = null;
+            unparentedGFX = true;
+        }
+        GizmoPlacementInfo placementInfo = GetPlacementInfo(direction);
+        meshRenderer.transform.position = placementInfo.position;
+        meshRenderer.transform.rotation = placementInfo.rotation;
+    }
+
+    /// <summary>
+    /// Gets the placement info given the direction from the player
+    /// </summary>
+    /// <param name="direction"></param>
+    /// <returns></returns>
+    private GizmoPlacementInfo GetPlacementInfo(Vector3 direction, bool useErrorDisplacement = false)
+    {
+        GizmoPlacementInfo output = new GizmoPlacementInfo();
+        RaycastHit hit;
+        if (Physics.Raycast(camTransform.position, direction, out hit, currentSettings.placementRange, (int)environmentMask))
+        {
+            // Error displacement is for checks
+            if (useErrorDisplacement) output.position = hit.point + hit.normal * errorDisplacement;
+            else output.position = hit.point;
+            // If the item is on a floor or ceiling surface, point to the player, otherwise, point up
+            // TODO: Make the ceiling and floor dots actually have good up vectors?
+            if (Vector3.Dot(hit.normal, Vector3.up) >= surfaceTolerance)
+            {
+                Vector3 forward = output.position - camTransform.position;
+                forward = new Vector3(forward.x, 0f, forward.z).normalized;
+                if (forward.Equals(Vector3.zero)) forward = Quaternion.Euler(0f, attachedPlayer.camDirection, 0f) * Vector3.forward;
+                Quaternion outputRotation = Quaternion.LookRotation(forward, Vector3.up);
+                Debug.DrawLine(transform.position, transform.position + Vector3.up, Color.green);
+                Debug.DrawLine(transform.position, transform.position + forward, Color.red);
+                output.rotation = outputRotation;
+            }
+            else if (Vector3.Dot(hit.normal, Vector3.down) >= surfaceTolerance)
+            {
+                Vector3 forward = camTransform.position - output.position;
+                forward = new Vector3(forward.x, 0f, forward.z).normalized;
+                if (forward.Equals(Vector3.zero)) forward = Quaternion.Euler(0f, attachedPlayer.camDirection, 0f) * Vector3.back;
+                Quaternion outputRotation = Quaternion.LookRotation(forward, Vector3.down);
+                Debug.DrawLine(transform.position, transform.position + Vector3.down, Color.green);
+                Debug.DrawLine(transform.position, transform.position + forward, Color.red);
+                output.rotation = outputRotation;
+            }
+            else
+            {
+                Vector3 right = Vector3.Cross(Vector3.up, hit.normal);
+                Vector3 up = Vector3.Cross(hit.normal, right);
+                Quaternion outputRotation = Quaternion.LookRotation(up, hit.normal);
+                output.rotation = outputRotation;
+                Debug.DrawLine(transform.position, transform.position + up, Color.green);
+                Debug.DrawLine(transform.position, transform.position + hit.normal, Color.red);
+            }
+            output.gizmoOnSurface = true;
+            return output;
+        }
+        output.position = camTransform.position + (direction.normalized * currentSettings.placementRange);
+        output.rotation = Quaternion.LookRotation(direction);
+        output.gizmoOnSurface = false;
+        return output;
+    }
+
+    private void CreateGizmo(GizmoSettings settings, Mesh mesh)
     {
         currentSettings = settings;
-        gizmoEnabled = true;
-        meshCollider.enabled = true;
-        meshRenderer.enabled = true;
-        meshFilter.mesh = mesh;
+        meshCollider.sharedMesh = mesh;
         meshCollider.transform.localPosition = Vector3.zero;
         meshCollider.transform.localEulerAngles = settings.rotation;
         ReadCenterSettings(settings, mesh);
@@ -36,7 +165,6 @@ public class GizmoManager : MonoBehaviour
 
     public void DisableGizmo()
     {
-        gizmoEnabled = false;
         meshCollider.enabled = false;
         meshRenderer.enabled = false;
     }
