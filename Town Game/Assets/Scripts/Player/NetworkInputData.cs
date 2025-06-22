@@ -26,4 +26,7 @@ public struct NetworkInputData : INetworkInput
     public int interaction;
 
     public int subInteractableIndex; // -1 means not pressed
+
+    public NetworkBool rotateModePressed;
+    public float rotateDelta;
 }

@@ -22,10 +22,14 @@ public class PlayerDropManager : NetworkBehaviour
     public Material cantPlace;
     public ItemGizmo gizmo;
     [Networked] public bool isPlacing { get; set; } = false;
+    [Networked] public bool isRotating { get; set; } = false;
+    private bool previousRotating = false;
     bool isPlace = false;
+    bool rotationPressed = false;
     GizmoManager gizmoManager;
     RunnerManager rm;
     PositionManager positionManager;
+    CameraMovement cameraMovement;
 
     public override void Spawned()
     {
@@ -45,11 +49,26 @@ public class PlayerDropManager : NetworkBehaviour
         if (!HasInputAuthority) return;
         InputManager inputManager = FindFirstObjectByType<InputManager>();
         inputManager.onDropItem += OnDropItem;
+        inputManager.onRotateMode += OnRotateModePressed;
+        cameraMovement = FindAnyObjectByType<CameraMovement>();
         if (positionManager != null)
         {
             positionManager.onJobAdd += UpdateGizmo;
             positionManager.onJobRemove += UpdateGizmo;
         }
+    }
+
+    /// <summary>
+    /// Destroy the associated gizmo manager when this player object is destroyed
+    /// </summary>
+    /// <param name="runner"></param>
+    /// <param name="hasState"></param>
+    public override void Despawned(NetworkRunner runner, bool hasState)
+    {
+        if (!Object.IsProxy && gizmoManager != null)
+        {
+            Destroy(gizmoManager.gameObject);
+        } 
     }
 
     private void Update()
@@ -72,6 +91,7 @@ public class PlayerDropManager : NetworkBehaviour
             previousPressed = dropPressed;
             if (dropPressed)
             {
+                isRotating = false;
                 Debug.Log("drop pressed 2");
                 OnDropPressed();
             }
@@ -85,6 +105,26 @@ public class PlayerDropManager : NetworkBehaviour
         {
             gizmoManager.LookModeRaycast();
             //UpdateGizmo();
+        }
+        if (!isPlacing) return;
+        if (previousRotating != isRotating)
+        {
+            previousRotating = isRotating;
+            if (!HasInputAuthority) return;
+            if (isRotating)
+            {
+                cameraMovement.LockX();
+            }
+            if (!isRotating)
+            {
+                cameraMovement.UnlockX();
+                rm.lockedDelta = 0f;
+            }
+        }
+        if (isRotating && HasInputAuthority)
+        {
+            float newDelta = cameraMovement.GetLockedDelta();
+            rm.lockedDelta = newDelta;
         }
     }
 
@@ -152,6 +192,11 @@ public class PlayerDropManager : NetworkBehaviour
     void TransferItemData(ItemData data, ItemPhys physItem)
     {
         physItem.itemData = new ItemData(data.metadata, data.fingerprints);
+    }
+
+    public void ReceiveRotationDelta(float rotDelta)
+    {
+        gizmoManager.Rotate(rotDelta);
     }
 
     private void UpdateGizmo(Vector2Int jobRef)
@@ -265,5 +310,15 @@ public class PlayerDropManager : NetworkBehaviour
             return;
         }
         rm.dropPressed = true;
+    }
+
+    private void OnRotateModePressed(InputValue iv)
+    {
+        if (iv.Get<float>() == 0f)
+        {
+            rm.rotateModePressed = false;
+            return;
+        }
+        rm.rotateModePressed = true;
     }
 }

@@ -31,6 +31,8 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
     public int siPressed = -1;
     public bool itemUse;
     public bool itemUseSecondary;
+    public bool rotateModePressed = false;
+    public float lockedDelta = 0f;
     [HideInInspector] public bool heldOnSI = false;
     [HideInInspector] public bool isHoldSI;
     public bool firstFrame = true;
@@ -190,6 +192,8 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         data.buttons.Set(NetworkInputData.Buttons.SecondaryItem, itemUseSecondary);
         itemUse = false;
         itemUseSecondary = false;
+        data.rotateModePressed = rotateModePressed;
+        data.rotateDelta = lockedDelta;
 
         input.Set(data);
     }

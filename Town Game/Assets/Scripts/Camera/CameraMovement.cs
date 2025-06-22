@@ -21,6 +21,8 @@ public class CameraMovement : MonoBehaviour
     public Transform lockedPlayer = null;
     public float lockLerpTime = 2f;
     public AnimationCurve lockCurve;
+    public bool lockX = false; // if this is true, the camera movement on the x axis is locked
+    public float lockedDelta;
 
     Transform fpsTransform;
     NetworkRigidbody3D playerRb;
@@ -172,5 +174,25 @@ public class CameraMovement : MonoBehaviour
 
         runnerManager.orientation = yRotation;
         runnerManager.camOrientation = xRotation;
+    }
+
+    public void LockX()
+    {
+        lockX = true;
+        lockedDelta = 0f;
+        zTilt.canTurn = false;
+    }
+
+    public float GetLockedDelta()
+    {
+        float returnedDelta = lockedDelta;
+        lockedDelta = 0f;
+        return returnedDelta;
+    }
+
+    public void UnlockX()
+    {
+        lockX = false;
+        zTilt.canTurn = true;
     }
 }

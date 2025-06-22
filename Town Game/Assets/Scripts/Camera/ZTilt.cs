@@ -10,7 +10,7 @@ public class ZTilt : MonoBehaviour
     public float maxDeg = 10f;
     public float camXMultiplier = 2.5f;
     public float stepSpeed = 5f;
-    bool canTurn = true;
+    public bool canTurn = true;
     float desiredZ = 0f;
     float cmX = 0f;
 

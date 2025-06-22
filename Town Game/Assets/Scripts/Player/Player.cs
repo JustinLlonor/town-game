@@ -119,13 +119,24 @@ public class Player : NetworkBehaviour
                 IncreaseSIAtIndex(data.subInteractableIndex);
             }
             // Items
-            if (data.buttons.IsSet(NetworkInputData.Buttons.PrimaryItem))
+            if (!dropManager.isPlacing)
             {
-                itemUse.UseItem();
+                if (data.buttons.IsSet(NetworkInputData.Buttons.PrimaryItem))
+                {
+                    itemUse.UseItem();
+                }
+                if (data.buttons.IsSet(NetworkInputData.Buttons.SecondaryItem))
+                {
+                    itemUse.UseSecondary();
+                }
             }
-            if (data.buttons.IsSet(NetworkInputData.Buttons.SecondaryItem))
+            dropManager.isRotating = data.rotateModePressed;
+            if (dropManager.isPlacing && dropManager.isRotating)
             {
-                itemUse.UseSecondary();
+                if (data.rotateDelta != 0f)
+                {
+                    dropManager.ReceiveRotationDelta(data.rotateDelta);
+                }
             }
         }
         Simulate();

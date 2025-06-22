@@ -14,6 +14,10 @@ public class GizmoManager : MonoBehaviour
     public LayerMask environmentMask;
     //public Item testItem;
     [Header("References")]
+    // Graphics parent transform
+    public Transform gizmoRotationPivot;
+    public Transform graphicsTransform;
+    public Transform GFXRotationPivot;
     public GizmoCollider gizmoCollider;
     public MeshCollider meshCollider;
     public MeshRenderer meshRenderer;
@@ -46,7 +50,6 @@ public class GizmoManager : MonoBehaviour
 
     private void Update()
     {
-        return;
         if (graphicsShown && gizmoEnabled)
         {
             float localCamX = rm.camOrientation;
@@ -91,12 +94,12 @@ public class GizmoManager : MonoBehaviour
     {
         if (!unparentedGFX)
         {
-            meshRenderer.transform.parent = null;
+            graphicsTransform.parent = null;
             unparentedGFX = true;
         }
         GizmoPlacementInfo placementInfo = GetPlacementInfo(direction);
-        meshRenderer.transform.position = placementInfo.position;
-        meshRenderer.transform.rotation = placementInfo.rotation;
+        graphicsTransform.position = placementInfo.position;
+        graphicsTransform.rotation = placementInfo.rotation;
     }
 
     /// <summary>
@@ -148,7 +151,9 @@ public class GizmoManager : MonoBehaviour
             return output;
         }
         output.position = camTransform.position + (direction.normalized * currentSettings.placementRange);
-        output.rotation = Quaternion.LookRotation(direction);
+        Vector3 fDirection = new Vector3(direction.x, 0f, direction.z).normalized;
+        if (fDirection.Equals(Vector3.zero)) fDirection = Quaternion.Euler(0f, attachedPlayer.camDirection, 0f) * Vector3.forward;
+        output.rotation = Quaternion.LookRotation(fDirection, Vector3.up);
         output.gizmoOnSurface = false;
         return output;
     }
@@ -157,8 +162,10 @@ public class GizmoManager : MonoBehaviour
     {
         currentSettings = settings;
         meshCollider.sharedMesh = mesh;
-        meshCollider.transform.localPosition = Vector3.zero;
+        gizmoRotationPivot.localEulerAngles = Vector3.zero;
+        GFXRotationPivot.localEulerAngles = Vector3.zero;
         meshCollider.transform.localEulerAngles = settings.rotation;
+        meshRenderer.transform.localEulerAngles = settings.rotation;
         ReadCenterSettings(settings, mesh);
         ReadUpSettings(settings, mesh);
     }
@@ -200,11 +207,19 @@ public class GizmoManager : MonoBehaviour
         newY += -upCenter + upExtent;
         meshCollider.transform.localPosition = new Vector3(meshCollider.transform.localPosition.x,
                 newY, meshCollider.transform.localPosition.z);
+        meshRenderer.transform.localPosition = new Vector3(meshRenderer.transform.localPosition.x,
+                newY, meshRenderer.transform.localPosition.z);
     }
 
     private void ReadCenterSettings(GizmoSettings settings, Mesh mesh)
     {
         CenterAxes(settings.GetXAxis(), settings.GetZAxis(), settings.centerSettings.centerX, settings.centerSettings.centerZ, settings.centerSettings.displacement, mesh);
+    }
+
+    public void Rotate(float rotDelta)
+    {
+        gizmoRotationPivot.localEulerAngles += new Vector3(0f, rotDelta, 0f);
+        GFXRotationPivot.localEulerAngles += new Vector3(0f, rotDelta, 0f);
     }
 
     private void CenterAxes(GizmoAxis meshXAxis, GizmoAxis meshZAxis, bool centerX, bool centerZ, Vector2 displacement, Mesh mesh)
@@ -221,6 +236,7 @@ public class GizmoManager : MonoBehaviour
         if (!centerZ) newZ = displacement.y;
         // Sets local pos
         meshCollider.transform.localPosition = new Vector3(newX, meshCollider.transform.localPosition.y, newZ);
+        meshRenderer.transform.localPosition = new Vector3(newX, meshRenderer.transform.localPosition.y, newZ);
     }
 
     private float GetMeshExtent(Mesh mesh, GizmoAxis axis)

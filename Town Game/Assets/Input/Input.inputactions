@@ -94,6 +94,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "RotateMode",
+                    "type": "Value",
+                    "id": "eea8f5d6-8381-4196-b361-6d1ab272ffba",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -281,6 +290,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Schedule Swap",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "fa3a3aac-2280-4a23-8b93-c5baa4751680",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RotateMode",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
