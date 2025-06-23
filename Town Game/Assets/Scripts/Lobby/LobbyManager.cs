@@ -24,18 +24,10 @@ public class LobbyManager : MonoBehaviour//PunCallbacks
 
     private void Start()
     {
-        List<int> tsetARray = new List<int>() { 43 };
-        ModifyIntArray(tsetARray);
-        Debug.Log(tsetARray[0]);
         string defaultNick = "";
         if (SteamManager.Initialized) defaultNick = SteamFriends.GetPersonaName();
         SessionData.nickname = defaultNick;
         runnerManager = FindFirstObjectByType<RunnerManager>();
-    }
-
-    private void ModifyIntArray(List<int> array)
-    {
-        array[0] = 69;
     }
 
     public void CreatePress()

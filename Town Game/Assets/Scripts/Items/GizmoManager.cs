@@ -9,9 +9,12 @@ public class GizmoManager : MonoBehaviour
     /// The player this gizmo is tracking
     /// </summary>
     public Player attachedPlayer;
+    public float rotation;
     public float errorDisplacement = 0.05f;
     public float surfaceTolerance = 0.95f;
     public LayerMask environmentMask;
+    public Material[] gizmoMaterials;
+    public Material errorMaterial;
     //public Item testItem;
     [Header("References")]
     // Graphics parent transform
@@ -67,6 +70,7 @@ public class GizmoManager : MonoBehaviour
             meshCollider.enabled = true;
             meshRenderer.enabled = true;
             meshFilter.mesh = gizmoMesh;
+            meshRenderer.material = gizmoMaterials[(int)settings.gizmoMode];
         }
         CreateGizmo(settings, gizmoMesh);
         gizmoEnabled = true;
@@ -162,8 +166,10 @@ public class GizmoManager : MonoBehaviour
     {
         currentSettings = settings;
         meshCollider.sharedMesh = mesh;
-        gizmoRotationPivot.localEulerAngles = Vector3.zero;
-        GFXRotationPivot.localEulerAngles = Vector3.zero;
+        rotation = settings.rotationSettings.initialRotation;
+        Vector3 initRotVector = new Vector3(0f, settings.rotationSettings.initialRotation, 0f);
+        gizmoRotationPivot.localEulerAngles = initRotVector;
+        GFXRotationPivot.localEulerAngles = initRotVector;
         meshCollider.transform.localEulerAngles = settings.rotation;
         meshRenderer.transform.localEulerAngles = settings.rotation;
         ReadCenterSettings(settings, mesh);
@@ -218,8 +224,11 @@ public class GizmoManager : MonoBehaviour
 
     public void Rotate(float rotDelta)
     {
-        gizmoRotationPivot.localEulerAngles += new Vector3(0f, rotDelta, 0f);
-        GFXRotationPivot.localEulerAngles += new Vector3(0f, rotDelta, 0f);
+        float previousRotation = rotation;
+        float newRotation = rotation + rotDelta;
+        rotation = currentSettings.rotationSettings.rotationLimit.ClampAngle(newRotation, previousRotation);
+        gizmoRotationPivot.localEulerAngles = new Vector3(0f, rotation, 0f);
+        GFXRotationPivot.localEulerAngles = new Vector3(0f, rotation, 0f);
     }
 
     private void CenterAxes(GizmoAxis meshXAxis, GizmoAxis meshZAxis, bool centerX, bool centerZ, Vector2 displacement, Mesh mesh)

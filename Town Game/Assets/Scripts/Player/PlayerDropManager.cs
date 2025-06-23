@@ -18,8 +18,6 @@ public class PlayerDropManager : NetworkBehaviour
     public NetworkPrefabRef physItem;
     public NetworkPrefabRef itemGizmo;
     public Transform camTransform;
-    public Material canPlace;
-    public Material cantPlace;
     public ItemGizmo gizmo;
     [Networked] public bool isPlacing { get; set; } = false;
     [Networked] public bool isRotating { get; set; } = false;
@@ -145,17 +143,21 @@ public class PlayerDropManager : NetworkBehaviour
     void OnDropRelease()
     {
         if (!isPlacing) return;
-        gizmoManager.ExitLookMode();
-        isPlacing = false;
-        return;
-        VerifyPlacement();
+        //VerifyPlacement();
         CancelDrop();
     }
 
     void CancelDrop()
     {
-        gizmo.SetRenderer(false);
+        //gizmo.SetRenderer(false);
+        gizmoManager.ExitLookMode();
         isPlacing = false;
+        if (isRotating)
+        {
+            cameraMovement.UnlockX();
+            isRotating = false;
+            previousRotating = false;
+        }
         return;
     }
 

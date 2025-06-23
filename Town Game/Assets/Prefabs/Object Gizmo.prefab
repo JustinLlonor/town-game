@@ -166,6 +166,10 @@ MonoBehaviour:
   environmentMask:
     serializedVersion: 2
     m_Bits: 128
+  gizmoMaterials:
+  - {fileID: 2100000, guid: b51cc5a231301754c859aebb437eb17a, type: 2}
+  - {fileID: 2100000, guid: 58eb4a14ea758a748ac7ffa4c33744c0, type: 2}
+  errorMaterial: {fileID: 2100000, guid: 095279de25b14c94c8efcd5a31092d33, type: 2}
   gizmoRotationPivot: {fileID: 2703657412808872341}
   graphicsTransform: {fileID: 5104170034000122657}
   GFXRotationPivot: {fileID: 4091159615538550255}

@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using Fusion;
 
 [CreateAssetMenu(fileName = "New Gizmo Settings", menuName = "Items/Gizmo Settings")]
 public class GizmoSettings : ScriptableObject
 {
     public Vector3 rotation;
     public float placementRange = 2f;
+    public GizmoMode gizmoMode;
     public CenterSettings centerSettings = new CenterSettings();
     public UpSettings upSettings = new UpSettings();
     public RotationSettings rotationSettings = new RotationSettings();
@@ -58,6 +60,43 @@ public class GizmoSettings : ScriptableObject
             float checkedRotation = rotation - (rotationInt * 360f);
             if (!inverted) return ((checkedRotation >= minRotation) && (checkedRotation <= maxRotation));
             return (checkedRotation <= minRotation) || (checkedRotation >= maxRotation);
+        }
+
+        public float ClampAngle(float angle, float previousAngle)
+        {
+            float angleDelta = Mathf.DeltaAngle(previousAngle, angle);
+            if (angleDelta == 0f) return angle;
+            float modulusExcess = Mathf.FloorToInt(angle / 360f) * 360f;
+            float modulusAngle = angle - modulusExcess;
+            if (!inverted)
+            {
+                if (modulusAngle < minRotation || modulusAngle > maxRotation)
+                {
+                    if (angleDelta > 0)
+                    {
+                        return maxRotation + modulusExcess;
+                    }
+                    else
+                    {
+                        return minRotation + modulusExcess;
+                    }
+                }
+            }
+            if (inverted)
+            {
+                if (modulusAngle > minRotation && modulusAngle < maxRotation)
+                {
+                    if (angleDelta > 0f)
+                    {
+                        return minRotation + modulusExcess;
+                    }
+                    else
+                    {
+                        return maxRotation + modulusExcess;
+                    }
+                }
+            }
+            return angle;
         }
     }
 
