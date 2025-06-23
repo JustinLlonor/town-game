@@ -1078,7 +1078,7 @@ MonoBehaviour:
   dropDistance: 4
   environmentMask:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 8192
   surfaceTolerance: 0.95
   gizmoPrefab: {fileID: 4146309737813505359, guid: 811531e6281c5a747b50bf8f7426525f, type: 3}
   physItem:
@@ -1086,10 +1086,6 @@ MonoBehaviour:
   itemGizmo:
     RawGuidValue: f7ee5bdcbcb56334cafa539d73522876
   camTransform: {fileID: 8806967224018203518}
-  gizmoMaterials:
-  - {fileID: 2100000, guid: b51cc5a231301754c859aebb437eb17a, type: 2}
-  - {fileID: 2100000, guid: 58eb4a14ea758a748ac7ffa4c33744c0, type: 2}
-  cantPlace: {fileID: 2100000, guid: 095279de25b14c94c8efcd5a31092d33, type: 2}
   gizmo: {fileID: 0}
   _isPlacing: 0
   _isRotating: 0

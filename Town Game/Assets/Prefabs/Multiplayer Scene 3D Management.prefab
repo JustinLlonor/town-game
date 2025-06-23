@@ -448,6 +448,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Camera Holder
       objectReference: {fileID: 0}
+    - target: {fileID: 910149815204121929, guid: 668a749bb83c86446922dfb5701650ab, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 327415
+      objectReference: {fileID: 0}
     - target: {fileID: 1413364252004775969, guid: 668a749bb83c86446922dfb5701650ab, type: 3}
       propertyPath: m_CameraType
       value: 0

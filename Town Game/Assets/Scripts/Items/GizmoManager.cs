@@ -29,8 +29,10 @@ public class GizmoManager : MonoBehaviour
     [HideInInspector] public bool gizmoEnabled = false;
     private GizmoSettings currentSettings;
     private RunnerManager rm;
+    private PositionManager positionManager;
     private bool graphicsShown = false;
     private bool unparentedGFX = false;
+    private bool onSurface = false;
 
     private struct GizmoPlacementInfo
     {
@@ -49,6 +51,7 @@ public class GizmoManager : MonoBehaviour
     private void Awake()
     {
         rm = FindAnyObjectByType<RunnerManager>();
+        positionManager = FindAnyObjectByType<PositionManager>();
     }
 
     private void Update()
@@ -63,16 +66,17 @@ public class GizmoManager : MonoBehaviour
 
     public void EnterLookMode(Mesh gizmoMesh, GizmoSettings settings, bool showGraphics)
     {
+        if (gizmoEnabled) return;
         Debug.Log("look mode entered");
+        CreateGizmo(settings, gizmoMesh);
         graphicsShown = showGraphics;
         if (showGraphics)
         {
             meshCollider.enabled = true;
             meshRenderer.enabled = true;
             meshFilter.mesh = gizmoMesh;
-            meshRenderer.material = gizmoMaterials[(int)settings.gizmoMode];
+            SetModeMat();
         }
-        CreateGizmo(settings, gizmoMesh);
         gizmoEnabled = true;
     }
 
@@ -92,6 +96,8 @@ public class GizmoManager : MonoBehaviour
         GizmoPlacementInfo placementInfo = GetPlacementInfo(direction, true);
         transform.position = placementInfo.position;
         transform.rotation = placementInfo.rotation;
+        onSurface = placementInfo.gizmoOnSurface;
+        UpdateIndicator();
     }
 
     private void PlaceGraphics(Vector3 direction)
@@ -164,10 +170,11 @@ public class GizmoManager : MonoBehaviour
 
     private void CreateGizmo(GizmoSettings settings, Mesh mesh)
     {
-        currentSettings = settings;
-        meshCollider.sharedMesh = mesh;
+        onSurface = false;
         rotation = settings.rotationSettings.initialRotation;
         Vector3 initRotVector = new Vector3(0f, settings.rotationSettings.initialRotation, 0f);
+        currentSettings = settings;
+        meshCollider.sharedMesh = mesh;
         gizmoRotationPivot.localEulerAngles = initRotVector;
         GFXRotationPivot.localEulerAngles = initRotVector;
         meshCollider.transform.localEulerAngles = settings.rotation;
@@ -188,7 +195,21 @@ public class GizmoManager : MonoBehaviour
     /// <returns></returns>
     public bool PlacementValid()
     {
-        return !gizmoCollider.ColliderTouchingEnvironment();
+        // if its touching any surface, return false
+        if (gizmoCollider.ColliderTouchingEnvironment()) return false;
+        // if not attached to a surface, then return false
+        if (!onSurface) return false;
+        // Item surface/Device volume checks
+        if (currentSettings.gizmoMode == GizmoMode.Item)
+        {
+            ItemSurface foundSurface = gizmoCollider.GetItemSurface();
+            if (!positionManager.PlayerHasAccessToRoom(attachedPlayer.owner, foundSurface.property.roomName)) return false;
+        }
+        else if (currentSettings.gizmoMode == GizmoMode.Device)
+        {
+            // Device volume check
+        }
+        return true;
     }
 
     /// <summary>
@@ -272,5 +293,29 @@ public class GizmoManager : MonoBehaviour
     {
         meshCollider.enabled = false;
         meshRenderer.enabled = false;
+    }
+
+    private void SetModeMat()
+    {
+        meshRenderer.material = gizmoMaterials[(int)currentSettings.gizmoMode];
+    }
+
+    private void SetErrorMat()
+    {
+        meshRenderer.material = errorMaterial;
+    }
+
+    /// <summary>
+    /// Updates the material for the gizmo based on if the placement is valid or not
+    /// </summary>
+    private void UpdateIndicator()
+    {
+        bool placementValid = PlacementValid();
+        if (placementValid)
+        {
+            SetModeMat();
+            return;
+        }
+        SetErrorMat();
     }
 }

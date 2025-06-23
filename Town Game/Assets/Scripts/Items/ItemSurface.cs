@@ -27,19 +27,19 @@ public class ItemSurface : MonoBehaviour
     }
 
     /// <summary>
-    /// Returns true if a box collider is within this item surface's bounds
+    /// Returns true if a mesh collider is within this item surface's bounds
     /// </summary>
     /// <returns></returns>
-    public bool WithinSurface(BoxCollider box, List<GameObject> collisions)
+    public bool WithinSurface(MeshCollider meshCollider, List<GameObject> collisions)
     {
-        Vector3[] colliderPoints = GetBoxColliderVertices(box);
+        Vector3[] colliderPoints = GetBoxColliderVertices(meshCollider);
         if (collisions.Contains(gameObject))
         {
             if (!PointsWithinCollider(colliderPoints, outerBounds)) // If all the points are not within the outer bounds, return false
             {
                 return false;
             }
-        } 
+        }
         else
         {
             return false;
@@ -66,11 +66,11 @@ public class ItemSurface : MonoBehaviour
     }
 
     // Credit: Bunny83 on the Unity forums
-    public Vector3[] GetBoxColliderVertices(BoxCollider col) // Gets the  collider vertices
+    public Vector3[] GetBoxColliderVertices(MeshCollider col) // Gets the  collider vertices
     {
         var trans = col.transform;
-        var min = col.center - col.size * 0.5f;
-        var max = col.center + col.size * 0.5f;
+        var min = col.bounds.center - col.bounds.size * 0.5f;
+        var max = col.bounds.center + col.bounds.size * 0.5f;
 
         var P000 = trans.TransformPoint(new Vector3(min.x, min.y, min.z));
         var P001 = trans.TransformPoint(new Vector3(min.x, min.y, max.z));

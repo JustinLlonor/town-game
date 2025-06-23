@@ -53,10 +53,12 @@ public class ItemGizmo : NetworkBehaviour
             ItemSurface iSurface = collision.GetComponent<ItemSurface>();
             if (iSurface != null)
             {
+                /**
                 if (iSurface.WithinSurface(bCollider, currentCollisions)) // If this item gizmo is within the box collider's surface, return true
                 {
                     return iSurface;
                 }
+                **/
             }
         }
         return null; // Returns false if the item is within no item surface
