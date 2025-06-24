@@ -28,6 +28,7 @@ public class PlayerDropManager : NetworkBehaviour
     RunnerManager rm;
     PositionManager positionManager;
     CameraMovement cameraMovement;
+    private bool xLocked = false;
 
     public override void Spawned()
     {
@@ -83,6 +84,11 @@ public class PlayerDropManager : NetworkBehaviour
     {
         if (gizmoManager == null) return;
         if (Runner.IsResimulation) return;
+        if (Object.HasInputAuthority && xLocked && !isPlacing)
+        {
+            cameraMovement.UnlockX();
+            xLocked = false;
+        }
         // Change detector
         if (previousPressed != dropPressed)
         {
@@ -112,10 +118,12 @@ public class PlayerDropManager : NetworkBehaviour
             if (isRotating)
             {
                 cameraMovement.LockX();
+                xLocked = true;
             }
             if (!isRotating)
             {
                 cameraMovement.UnlockX();
+                xLocked = false;
                 rm.lockedDelta = 0f;
             }
         }
@@ -142,8 +150,7 @@ public class PlayerDropManager : NetworkBehaviour
 
     void OnDropRelease()
     {
-        if (!isPlacing) return;
-        //VerifyPlacement();
+        VerifyPlacement();
         CancelDrop();
     }
 
@@ -154,7 +161,11 @@ public class PlayerDropManager : NetworkBehaviour
         isPlacing = false;
         if (isRotating)
         {
-            cameraMovement.UnlockX();
+            if (Object.HasInputAuthority)
+            {
+                cameraMovement.UnlockX();
+                xLocked = true;
+            }
             isRotating = false;
             previousRotating = false;
         }
@@ -163,23 +174,27 @@ public class PlayerDropManager : NetworkBehaviour
 
     void VerifyPlacement() // Places the item if the item placement is valid
     {
-        ItemSurface iSurface = gizmo.GetItemSurface();
-        if (iSurface != null && isPlace && positionManager.PlayerHasAccessToRoom(Runner.LocalPlayer, iSurface.property.roomName))
+        if (!gizmoManager.PlacementValid()) return;
+        GizmoManager.PlacementInfo placeInfo = gizmoManager.GetPlacementInfo();
+        if (placeInfo.mode == GizmoMode.Item)
         {
-            PlaceItem(iSurface);
-            return;
+            PlaceItem(placeInfo.position, placeInfo.rotation, placeInfo.itemSurface);
+        }
+        else if (placeInfo.mode == GizmoMode.Device)
+        {
+
         }
         // Play an error sfx
     }
 
-    void PlaceItem(ItemSurface iSurface)
+    void PlaceItem(Vector3 position, Quaternion rotation, ItemSurface iSurface)
     {
         Item item = GetCurrentItem();
         if (item == null) return;
         if (inventory.hotbar[inventory.equippedSlot].ToString().IsNullOrEmpty()) return;
         if (!Runner.IsServer && HasInputAuthority) inventory.RemoveItem(inventory.equippedSlot);
         if (!Runner.IsServer) return;
-        NetworkObject itemObj = Runner.Spawn(physItem, gizmo.transform.position, gizmo.transform.rotation);
+        NetworkObject itemObj = Runner.Spawn(physItem, position, rotation);
         ItemPhys pItem = itemObj.GetComponent<ItemPhys>();
         pItem.itemName = item.name;
         pItem.gameObject.name = item.name;

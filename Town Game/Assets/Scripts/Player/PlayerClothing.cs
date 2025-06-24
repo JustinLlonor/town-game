@@ -12,7 +12,7 @@ public class PlayerClothing : NetworkBehaviour
     public Attire[] attires;
     [Networked, Capacity(6)] public NetworkArray<int> nAttires { get; } = MakeInitializer(new int[5]); // Change this number as you add more clothes
     public RandomizedClothing[] randomizedClothing;
-    [Networked] public int skinTone { get; set; }
+    [Networked] public int skinTone { get; set; } = -1;
     public Material[] skinTones;
     ObjectManager om;
     ChangeDetector changeDetector;
@@ -23,14 +23,10 @@ public class PlayerClothing : NetworkBehaviour
     private void Start()
     {
         RenderAllClothing();
-    }
-
-    private void Update()
-    {
-        if (updatedMat != null)
+        if (skinTone != -1)
         {
+            updatedMat = skinTones[skinTone];
             SetAllAttireMaterials(updatedMat);
-            updatedMat = null;
         }
     }
 
@@ -39,7 +35,7 @@ public class PlayerClothing : NetworkBehaviour
         fps = FindFirstObjectByType<FirstPerson>();
         om = FindFirstObjectByType<ObjectManager>();
         changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
-;        if (isCorpse) return;
+        if (isCorpse) return;
         if (!HasStateAuthority) return;
         RandomizeGender();
         RandomizeClothing();
@@ -57,6 +53,7 @@ public class PlayerClothing : NetworkBehaviour
                     break;
                 case nameof(skinTone):
                     updatedMat = skinTones[skinTone];
+                    SetAllAttireMaterials(updatedMat);
                     if (HasInputAuthority) fps.ChangeArmMaterials(skinTones[skinTone]);
                     break;
             }
@@ -68,7 +65,7 @@ public class PlayerClothing : NetworkBehaviour
         foreach (int clothingIndex in nAttires)
         {
             if (clothingIndex == -1) continue;
-            if (!HasStateAuthority) SetClothing(om.clothings[clothingIndex]);
+            SetClothing(om.clothings[clothingIndex]);
             foreach (Attire attire in attires)
             {
                 RenderClothing(attire);

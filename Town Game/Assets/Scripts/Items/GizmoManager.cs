@@ -1,3 +1,4 @@
+using Fusion;
 using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
@@ -34,18 +35,37 @@ public class GizmoManager : MonoBehaviour
     private bool graphicsShown = false;
     private bool unparentedGFX = false;
     private bool onSurface = false;
+    private Vector3 surfaceNormal = Vector3.zero;
 
     private struct GizmoPlacementInfo
     {
         public Vector3 position;
         public Quaternion rotation;
         public bool gizmoOnSurface;
+        public Vector3 surfaceNormal;
 
-        public GizmoPlacementInfo(Vector3 position, Quaternion rotation, bool gizmoOnSurface)
+        public GizmoPlacementInfo(Vector3 position, Quaternion rotation, bool gizmoOnSurface, Vector3 surfaceNormal)
         {
             this.position = position;
             this.rotation = rotation;
             this.gizmoOnSurface = gizmoOnSurface;
+            this.surfaceNormal = surfaceNormal;
+        }
+    }
+
+    public struct PlacementInfo
+    {
+        public Vector3 position;
+        public Quaternion rotation;
+        public GizmoMode mode;
+        public ItemSurface itemSurface;
+
+        public PlacementInfo(Vector3 position, Quaternion rotation, GizmoMode mode, ItemSurface itemSurface)
+        {
+            this.position = position;
+            this.rotation = rotation;
+            this.mode = mode;
+            this.itemSurface = itemSurface;
         }
     }
 
@@ -69,6 +89,7 @@ public class GizmoManager : MonoBehaviour
     {
         if (gizmoEnabled) return;
         Debug.Log("look mode entered");
+        gizmoCollider.ResetColliders();
         CreateGizmo(settings, gizmoMesh);
         if (settings.gizmoMode == GizmoMode.Device)
         {
@@ -82,7 +103,6 @@ public class GizmoManager : MonoBehaviour
         graphicsShown = showGraphics;
         if (showGraphics)
         {
-            meshCollider.enabled = true;
             meshRenderer.enabled = true;
             meshFilter.mesh = gizmoMesh;
             SetModeMat();
@@ -107,6 +127,7 @@ public class GizmoManager : MonoBehaviour
         transform.position = placementInfo.position;
         transform.rotation = placementInfo.rotation;
         onSurface = placementInfo.gizmoOnSurface;
+        surfaceNormal = placementInfo.surfaceNormal;
         UpdateIndicator();
     }
 
@@ -138,6 +159,7 @@ public class GizmoManager : MonoBehaviour
             else output.position = hit.point;
             // If the item is on a floor or ceiling surface, point to the player, otherwise, point up
             // TODO: Make the ceiling and floor dots actually have good up vectors?
+            output.surfaceNormal = hit.normal;
             if (Vector3.Dot(hit.normal, Vector3.up) >= surfaceTolerance)
             {
                 Vector3 forward = output.position - camTransform.position;
@@ -174,12 +196,14 @@ public class GizmoManager : MonoBehaviour
         Vector3 fDirection = new Vector3(direction.x, 0f, direction.z).normalized;
         if (fDirection.Equals(Vector3.zero)) fDirection = Quaternion.Euler(0f, attachedPlayer.camDirection, 0f) * Vector3.forward;
         output.rotation = Quaternion.LookRotation(fDirection, Vector3.up);
+        output.surfaceNormal = Vector3.zero;
         output.gizmoOnSurface = false;
         return output;
     }
 
     private void CreateGizmo(GizmoSettings settings, Mesh mesh)
     {
+        meshCollider.enabled = true;
         onSurface = false;
         rotation = settings.rotationSettings.initialRotation;
         Vector3 initRotVector = new Vector3(0f, settings.rotationSettings.initialRotation, 0f);
@@ -199,6 +223,7 @@ public class GizmoManager : MonoBehaviour
         meshRenderer.enabled = false;
     }
     
+    //TODO: Make device system use itemsurface component as well
     /// <summary>
     /// Determines if the placement of the gizmo is valid
     /// </summary>
@@ -215,7 +240,6 @@ public class GizmoManager : MonoBehaviour
             ItemSurface foundSurface = gizmoCollider.GetItemSurface();
             if (foundSurface != null)
             {
-                Debug.Log("checking room access");
                 if (!positionManager.PlayerHasAccessToRoom(attachedPlayer.owner, foundSurface.property.roomName)) return false;
             }
             else return false;
@@ -333,5 +357,11 @@ public class GizmoManager : MonoBehaviour
             return;
         }
         SetErrorMat();
+    }
+
+    public PlacementInfo GetPlacementInfo()
+    {
+        Vector3 newPos = meshCollider.transform.position - surfaceNormal.normalized * errorDisplacement;
+        return new PlacementInfo(newPos, meshCollider.transform.rotation, currentSettings.gizmoMode, gizmoCollider.GetItemSurface());
     }
 }

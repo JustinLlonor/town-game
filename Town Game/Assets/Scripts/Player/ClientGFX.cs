@@ -30,6 +30,7 @@ public class ClientGFX : MonoBehaviour
 
     public void ShowRenderers()
     {
+        Debug.Log("Showing renderers");
         foreach (GameObject go in renderers)
         {
             go.layer = (int)Mathf.Log(uiFrontMask.value, 2f);
@@ -48,6 +49,7 @@ public class ClientGFX : MonoBehaviour
 
     public void HideRenderers()
     {
+        Debug.Log("hiding renderers");
         foreach(GameObject go in renderers)
         {
             go.layer = (int)Mathf.Log(clientGFXMask.value, 2f);

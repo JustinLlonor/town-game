@@ -131,7 +131,7 @@ public class Player : NetworkBehaviour
                 }
             }
             dropManager.isRotating = data.rotateModePressed;
-            if (dropManager.isPlacing && dropManager.isRotating)
+            if (dropManager.isPlacing && dropManager.isRotating && !Runner.IsResimulation)
             {
                 if (data.rotateDelta != 0f)
                 {

@@ -39,10 +39,11 @@ public class GizmoCollider : MonoBehaviour
         }
     }
 
-    private void OnDisable()
+    public void ResetColliders()
     {
         currentColliders.Clear();
         environmentColliders.Clear();
+        deviceVolumeColliders.Clear();
     }
 
     public ItemSurface GetItemSurface()
@@ -54,6 +55,7 @@ public class GizmoCollider : MonoBehaviour
             {
                 if (iSurface.WithinSurface(meshCollider, currentColliders)) // If this item gizmo is within the box collider's surface, return true
                 {
+                    Debug.Log("Checking within surface");
                     return iSurface;
                 }
             }
