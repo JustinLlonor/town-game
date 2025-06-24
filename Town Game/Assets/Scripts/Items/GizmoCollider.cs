@@ -6,8 +6,10 @@ public class GizmoCollider : MonoBehaviour
 {
     public MeshCollider meshCollider;
     public LayerMask itemEnvironment;
+    public LayerMask deviceVolume;
     public List<GameObject> currentColliders = new List<GameObject>();
     private List<Collider> environmentColliders = new List<Collider>();
+    private List<Collider> deviceVolumeColliders = new List<Collider>();
 
     private void OnTriggerEnter(Collider other)
     {
@@ -16,6 +18,10 @@ public class GizmoCollider : MonoBehaviour
         if (Contains(itemEnvironment, other.gameObject.layer) && !environmentColliders.Contains(other))
         {
             environmentColliders.Add(other);
+        }
+        if (Contains(deviceVolume, other.gameObject.layer) && !deviceVolumeColliders.Contains(other))
+        {
+            deviceVolumeColliders.Add(other);
         }
     }
 
@@ -26,6 +32,10 @@ public class GizmoCollider : MonoBehaviour
         if (environmentColliders.Contains(other))
         {
             environmentColliders.Remove(other);
+        }
+        if (deviceVolumeColliders.Contains(other))
+        {
+            deviceVolumeColliders.Remove(other);
         }
     }
 
@@ -54,6 +64,11 @@ public class GizmoCollider : MonoBehaviour
     public bool ColliderTouchingEnvironment()
     {
         return environmentColliders.Count > 0;
+    }
+
+    public bool ColliderInDeviceVolume(Collider deviceVolumeCollider)
+    {
+        return deviceVolumeColliders.Contains(deviceVolumeCollider);
     }
 
     /// <summary>

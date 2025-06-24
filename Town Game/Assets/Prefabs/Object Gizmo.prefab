@@ -224,7 +224,7 @@ GameObject:
   - component: {fileID: 8150435482391729824}
   - component: {fileID: 7873202944890244410}
   - component: {fileID: 2607762301491176023}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -285,6 +285,9 @@ MonoBehaviour:
   itemEnvironment:
     serializedVersion: 2
     m_Bits: 8192
+  deviceVolume:
+    serializedVersion: 2
+    m_Bits: 8388608
   currentColliders: []
 --- !u!54 &2607762301491176023
 Rigidbody:

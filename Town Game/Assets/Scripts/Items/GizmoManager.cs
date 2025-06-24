@@ -28,6 +28,7 @@ public class GizmoManager : MonoBehaviour
     [HideInInspector] public Transform camTransform;
     [HideInInspector] public bool gizmoEnabled = false;
     private GizmoSettings currentSettings;
+    private DeviceVolume currentDeviceVolume;
     private RunnerManager rm;
     private PositionManager positionManager;
     private bool graphicsShown = false;
@@ -69,6 +70,15 @@ public class GizmoManager : MonoBehaviour
         if (gizmoEnabled) return;
         Debug.Log("look mode entered");
         CreateGizmo(settings, gizmoMesh);
+        if (settings.gizmoMode == GizmoMode.Device)
+        {
+            if (attachedPlayer.connectedPanel != null)
+            {
+                Debug.Log("setting");
+                currentDeviceVolume = attachedPlayer.connectedPanel.connectedVolume;
+            }
+            else Debug.Log("no connected panel");
+        }
         graphicsShown = showGraphics;
         if (showGraphics)
         {
@@ -199,15 +209,21 @@ public class GizmoManager : MonoBehaviour
         if (gizmoCollider.ColliderTouchingEnvironment()) return false;
         // if not attached to a surface, then return false
         if (!onSurface) return false;
-        // Item surface/Device volume checks
+        // Item surface check
         if (currentSettings.gizmoMode == GizmoMode.Item)
         {
             ItemSurface foundSurface = gizmoCollider.GetItemSurface();
-            if (!positionManager.PlayerHasAccessToRoom(attachedPlayer.owner, foundSurface.property.roomName)) return false;
+            if (foundSurface != null)
+            {
+                Debug.Log("checking room access");
+                if (!positionManager.PlayerHasAccessToRoom(attachedPlayer.owner, foundSurface.property.roomName)) return false;
+            }
+            else return false;
         }
-        else if (currentSettings.gizmoMode == GizmoMode.Device)
+        else if (currentSettings.gizmoMode == GizmoMode.Device) // Device volume check
         {
-            // Device volume check
+            if (currentDeviceVolume == null) return false;
+            if (!gizmoCollider.ColliderInDeviceVolume(currentDeviceVolume.volumeCollider)) return false;
         }
         return true;
     }

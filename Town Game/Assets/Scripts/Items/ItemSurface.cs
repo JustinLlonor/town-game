@@ -69,8 +69,8 @@ public class ItemSurface : MonoBehaviour
     public Vector3[] GetBoxColliderVertices(MeshCollider col) // Gets the  collider vertices
     {
         var trans = col.transform;
-        var min = col.bounds.center - col.bounds.size * 0.5f;
-        var max = col.bounds.center + col.bounds.size * 0.5f;
+        var min = col.sharedMesh.bounds.center - col.sharedMesh.bounds.size * 0.5f;
+        var max = col.sharedMesh.bounds.center + col.sharedMesh.bounds.size * 0.5f;
 
         var P000 = trans.TransformPoint(new Vector3(min.x, min.y, min.z));
         var P001 = trans.TransformPoint(new Vector3(min.x, min.y, max.z));

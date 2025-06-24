@@ -8,6 +8,7 @@ using Fusion;
 /// </summary>
 public class DeviceVolume : NetworkBehaviour
 {
+    public Collider volumeCollider;
     /// <summary>
     /// All the devices that this DeviceVolume has. 
     /// A player can only place a device in a DeviceVolume if they are connected to the corresponding ControlPanel
