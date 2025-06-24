@@ -35,6 +35,7 @@ public class PlayerRoom : NetworkBehaviour
 
     private void DVEnterCheck(Collider other)
     {
+        if (Runner == null) return;
         if (!Runner.IsServer) return;
         if (other.gameObject.tag != deviceVolumeTag) return;
         other.GetComponent<DeviceVolume>().OnPlayerEnter(player);
@@ -42,6 +43,7 @@ public class PlayerRoom : NetworkBehaviour
 
     private void DVExitCheck(Collider other)
     {
+        if (Runner == null) return;
         if (!Runner.IsServer) return;
         if (other.gameObject.tag != deviceVolumeTag) return;
         other.GetComponent<DeviceVolume>().OnPlayerExit(player);

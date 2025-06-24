@@ -46,6 +46,7 @@ public class PlayerInfoView : NetworkBehaviour
 
     private void Update()
     {
+        if (!init) return;
         if (vi == null) return;
         UpdateNickname();
         UpdateHP(Mathf.Clamp01(recievedHP / stats.maxHP));
@@ -59,7 +60,6 @@ public class PlayerInfoView : NetworkBehaviour
 
     void UpdateNickname()
     {
-        if (!init) return;
         if (updatedNick) return;
         if (!player.nickname.IsNullOrEmpty())
         {
@@ -70,7 +70,6 @@ public class PlayerInfoView : NetworkBehaviour
 
     void UpdateHP(float eval)
     {
-        if (!init) return;
         //if (view.IsMine) return;
         int newIndex = Mathf.FloorToInt(healthTextGradient.Length*(1-eval));
         if (newIndex != previousIndex)
