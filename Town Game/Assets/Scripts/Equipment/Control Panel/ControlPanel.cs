@@ -182,6 +182,7 @@ public class ControlPanel : Equipment
     public void SwapConnection()
     {
         interactable.hovers[0].lore = "";
+        interactable.hovers[0].interactKey = Interactable.InteractKey.None;
     }
 
     public void SetCantConnect()

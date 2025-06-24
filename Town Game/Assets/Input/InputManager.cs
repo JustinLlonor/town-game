@@ -129,8 +129,8 @@ public class InputManager : MonoBehaviour
     public InputValueEvent onCrouch;
     public InputValueEvent onDropItem;
     public InputValueEvent onEquipItem;
-    public InputEvent onPrimaryFire;
-    public InputEvent onSecondaryFire;
+    public InputValueEvent onPrimaryFire;
+    public InputValueEvent onSecondaryFire;
     public InputValueEvent onCamera;
     public InputEvent onScheduleSwap;
     public InputValueEvent onRotateMode;
@@ -164,8 +164,8 @@ public class InputManager : MonoBehaviour
     private void OnCrouch(InputValue iv) { onCrouch?.Invoke(iv); }
     private void OnDropItem(InputValue iv) { onDropItem?.Invoke(iv); }
     private void OnEquipItem(InputValue iv) { onEquipItem?.Invoke(iv); }
-    private void OnPrimaryFire() { onPrimaryFire?.Invoke(); }
-    private void OnSecondaryFire() { onSecondaryFire?.Invoke(); }
+    private void OnPrimaryFire(InputValue iv) { onPrimaryFire?.Invoke(iv); }
+    private void OnSecondaryFire(InputValue iv) { onSecondaryFire?.Invoke(iv); }
     private void OnCamera(InputValue iv) { onCamera?.Invoke(iv); }
     private void OnScheduleSwap() { onScheduleSwap?.Invoke(); }
     private void OnRotateMode(InputValue iv) { onRotateMode?.Invoke(iv); }

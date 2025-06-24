@@ -29,7 +29,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
     public bool dropPressed = false;
     public bool exitObservePressed = false;
     public int siPressed = -1;
-    public bool itemUse;
+    public bool itemUsePrimary;
     public bool itemUseSecondary;
     public bool rotateModePressed = false;
     public float lockedDelta = 0f;
@@ -78,11 +78,13 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         dropPressed = false;
         exitObservePressed = false;
         siPressed = -1;
-        itemUse = false;
+        itemUsePrimary = false;
         itemUseSecondary = false;
         heldOnSI = false;
         isHoldSI = false;
         firstFrame = true;
+        rotateModePressed = false;
+        lockedDelta = 0f;
     }
 
     public async void StartGame(GameMode mode, string name, int sceneIndex)
@@ -188,10 +190,10 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
             data.subInteractableIndex = -1;
         }
         // Item use
-        data.buttons.Set(NetworkInputData.Buttons.PrimaryItem, itemUse);
-        data.buttons.Set(NetworkInputData.Buttons.SecondaryItem, itemUseSecondary);
-        itemUse = false;
-        itemUseSecondary = false;
+        data.itemUsePrimary = itemUsePrimary;
+        data.itemUseSecondary = itemUseSecondary;
+        //data.buttons.Set(NetworkInputData.Buttons.PrimaryItem, itemUsePrimary);
+        //data.buttons.Set(NetworkInputData.Buttons.SecondaryItem, itemUseSecondary);
         data.rotateModePressed = rotateModePressed;
         data.rotateDelta = lockedDelta;
 

@@ -39,6 +39,9 @@ public class Player : NetworkBehaviour
     [Networked] Vector2 direction { get; set; }
     bool nicknameSet = false;
     bool previousCrouchSet = false;
+    // Previous inputs for primary use and secondary use
+    private bool previousPrimary = false;
+    private bool previousSecondary = false;
 
     private void Awake()
     {
@@ -119,17 +122,53 @@ public class Player : NetworkBehaviour
                 IncreaseSIAtIndex(data.subInteractableIndex);
             }
             // Items
-            if (!dropManager.isPlacing)
+            if (!Runner.IsResimulation && !pi.hotbar[pi.equippedSlot].ToString().IsNullOrEmpty())
             {
-                if (data.buttons.IsSet(NetworkInputData.Buttons.PrimaryItem))
+                // State change detector
+                bool usePrimary = data.itemUsePrimary;
+                bool useSecondary = data.itemUseSecondary;
+                if (dropManager.isPlacing)
                 {
-                    itemUse.UseItem();
+                    usePrimary = false;
+                    useSecondary = false;
                 }
-                if (data.buttons.IsSet(NetworkInputData.Buttons.SecondaryItem))
+                // Primary state change functions
+                if (usePrimary != previousPrimary)
                 {
-                    itemUse.UseSecondary();
+                    previousPrimary = usePrimary;
+                    if (usePrimary)
+                    {
+                        itemUse.UsePrimary();
+                    }
+                    else
+                    {
+                        itemUse.ReleasePrimary();
+                    }
+                }
+                // Secondary state change functions
+                if (useSecondary != previousSecondary)
+                {
+                    previousSecondary = useSecondary;
+                    if (useSecondary)
+                    {
+                        itemUse.UseSecondary();
+                    }
+                    else
+                    {
+                        itemUse.ReleaseSecondary();
+                    }
+                }
+                // Item use hold functions
+                if (usePrimary)
+                {
+                    itemUse.HoldPrimary();
+                }
+                if (useSecondary)
+                {
+                    itemUse.HoldSecondary();
                 }
             }
+            
             dropManager.isRotating = data.rotateModePressed;
             if (dropManager.isPlacing && dropManager.isRotating && !Runner.IsResimulation)
             {

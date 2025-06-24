@@ -4,6 +4,7 @@ using UnityEngine;
 using WebSocketSharp;
 using UnityEngine.EventSystems;
 using Fusion;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// Item use code
@@ -41,37 +42,77 @@ public class ItemUse : NetworkBehaviour
         runnerManager = FindFirstObjectByType<RunnerManager>();
     }
 
-    private void OnPrimaryItem()
+    private void OnPrimaryItem(InputValue iv)
     {
-        runnerManager.itemUse = true;
+        if (iv.Get<float>() == 1f)
+        {
+            runnerManager.itemUsePrimary = true;
+            return;
+        }
+        runnerManager.itemUsePrimary = false;
     }
 
-    private void OnSecondaryItem()
+    private void OnSecondaryItem(InputValue iv)
     {
-        runnerManager.itemUseSecondary = true;
+        if (iv.Get<float>() == 1f)
+        {
+            runnerManager.itemUseSecondary = true;
+            return;
+        }
+        runnerManager.itemUseSecondary = false;
     }
     
-    public void UseItem()
+    public void UsePrimary()
     {
-        if (inventory.hotbar[inventory.equippedSlot].ToString().IsNullOrEmpty()) return;
         Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
+        if (item == null) return; // If item doesn't exist
         if (item as Weapon)
         {
             Weapon weapon = (Weapon)item;
             attackManager.Attack(weapon); // called on client and server
             return;
         }
-        if (item == null) return; // If item doesn't exist
         if (inventory.itemComponentObject == null) return;
         inventory.itemComponentObject.SendMessage("OnPrimaryUse", SendMessageOptions.DontRequireReceiver); // Sends the message OnPrimaryUse to every component in the item component holder
     }
 
+    public void HoldPrimary()
+    {
+        //Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
+        //if (item == null) return; // If item doesn't exist
+        if (inventory.itemComponentObject == null) return;
+        inventory.itemComponentObject.SendMessage("OnPrimaryHold", SendMessageOptions.DontRequireReceiver); // Sends the message OnPrimaryUse to every component in the item component holder
+    }
+
+    public void ReleasePrimary()
+    {
+        //Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
+        //if (item == null) return; // If item doesn't exist
+        if (inventory.itemComponentObject == null) return;
+        inventory.itemComponentObject.SendMessage("OnPrimaryRelease", SendMessageOptions.DontRequireReceiver); // Sends the message OnPrimaryUse to every component in the item component holder
+    }
+
     public void UseSecondary()
     {
-        if (inventory.hotbar[inventory.equippedSlot].ToString().IsNullOrEmpty()) return;
         Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
         if (item == null) return;
         if (inventory.itemComponentObject == null) return;
         inventory.itemComponentObject.SendMessage("OnSecondaryUse", SendMessageOptions.DontRequireReceiver);
+    }
+
+    public void HoldSecondary()
+    {
+        //Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
+        //if (item == null) return; // If item doesn't exist
+        if (inventory.itemComponentObject == null) return;
+        inventory.itemComponentObject.SendMessage("OnSecondaryHold", SendMessageOptions.DontRequireReceiver); // Sends the message OnPrimaryUse to every component in the item component holder
+    }
+
+    public void ReleaseSecondary()
+    {
+        //Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
+        //if (item == null) return; // If item doesn't exist
+        if (inventory.itemComponentObject == null) return;
+        inventory.itemComponentObject.SendMessage("OnSecondaryRelease", SendMessageOptions.DontRequireReceiver); // Sends the message OnPrimaryUse to every component in the item component holder
     }
 }

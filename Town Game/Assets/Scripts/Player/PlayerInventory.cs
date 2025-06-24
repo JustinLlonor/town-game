@@ -96,6 +96,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         //for (int i = 0; i < itemData.Length; i++) itemData[i] = null; item data stuff doesn't matter until an item enters that slot
     }
 
+    //TODO: Hide hotbar from others, networked variable of the shown item
     public override void Render()
     {
         foreach (var change in changeDetector.DetectChanges(this))
@@ -110,6 +111,13 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
                         return;
                     }
                     ShowItem(hotbar[equippedSlot].ToString());
+                    break;
+                case nameof(hotbar):
+                    if (hotbar[equippedSlot].ToString().IsNullOrEmpty())
+                    {
+                        HideItem();
+                        return;
+                    }
                     break;
             }
         }
