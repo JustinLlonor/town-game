@@ -254,8 +254,22 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         if (equippedItem.itemBehaviourObject != null)
         {
             itemComponentObject = Instantiate(equippedItem.itemBehaviourObject, itemComponentHolder);
+            if (equippedItem as Device)
+            {
+                itemComponentObject.AddComponent<DevicePlacement>();
+            }
             object[] data = new object[] { gameObject, itemData[equippedSlot].metadata, hotbar[equippedSlot].ToString() };
             itemComponentObject.SendMessage("Initialize", data, SendMessageOptions.DontRequireReceiver); // Gives metadata information to any listeners
+        }
+        else
+        {
+            if (equippedItem as Device)
+            {
+                itemComponentObject = new GameObject("Device Placement", typeof(DevicePlacement));
+                itemComponentObject.transform.parent = itemComponentHolder;
+                object[] data = new object[] { gameObject, itemData[equippedSlot].metadata, hotbar[equippedSlot].ToString() };
+                itemComponentObject.SendMessage("Initialize", data, SendMessageOptions.DontRequireReceiver); // Gives metadata information to any listeners
+            }
         }
 
         ShowItem(hotbar[equippedSlot].ToString()); // Sync with change detector

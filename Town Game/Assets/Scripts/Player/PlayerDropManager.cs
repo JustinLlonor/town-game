@@ -137,6 +137,7 @@ public class PlayerDropManager : NetworkBehaviour
     // When drop pressed down
     void OnDropPressed()
     {
+        if (isPlacing) return;
         Item currentItem = GetCurrentItem();
         // if we are not holding an item, return
         Debug.Log("drop pressed function call");
@@ -150,8 +151,19 @@ public class PlayerDropManager : NetworkBehaviour
 
     void OnDropRelease()
     {
+        if (!isPlacing) return;
         VerifyPlacement();
         CancelDrop();
+    }
+
+    public void DevicePlacePress(Device device)
+    {
+
+    }
+
+    public void DevicePlaceRelease()
+    {
+
     }
 
     void CancelDrop()

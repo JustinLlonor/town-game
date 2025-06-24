@@ -5,6 +5,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "New Item", menuName = "Items/Item")]
 public class Device : Item
 {
+    public GizmoSettings devicePlacementSettings;
+
     public override string GetItemType()
     {
         return "Device";

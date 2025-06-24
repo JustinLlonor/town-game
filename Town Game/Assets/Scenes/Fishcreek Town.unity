@@ -2681,7 +2681,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 117.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 220.6, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &505501084
@@ -19457,30 +19457,6 @@ PrefabInstance:
       propertyPath: spawnPlayersOnStart
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4533379040906137666, guid: 510253d1d4f227543af658125b506bb6, type: 3}
-      propertyPath: odours.Array.size
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 4533379040906137666, guid: 510253d1d4f227543af658125b506bb6, type: 3}
-      propertyPath: odours.Array.data[2].name
-      value: smoke
-      objectReference: {fileID: 0}
-    - target: {fileID: 4533379040906137666, guid: 510253d1d4f227543af658125b506bb6, type: 3}
-      propertyPath: odours.Array.data[2].color.a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4533379040906137666, guid: 510253d1d4f227543af658125b506bb6, type: 3}
-      propertyPath: odours.Array.data[2].color.b
-      value: 0.3301887
-      objectReference: {fileID: 0}
-    - target: {fileID: 4533379040906137666, guid: 510253d1d4f227543af658125b506bb6, type: 3}
-      propertyPath: odours.Array.data[2].color.g
-      value: 0.3301887
-      objectReference: {fileID: 0}
-    - target: {fileID: 4533379040906137666, guid: 510253d1d4f227543af658125b506bb6, type: 3}
-      propertyPath: odours.Array.data[2].color.r
-      value: 0.3301887
-      objectReference: {fileID: 0}
     - target: {fileID: 4854093095659709370, guid: 510253d1d4f227543af658125b506bb6, type: 3}
       propertyPath: uiMenuMaps.Array.data[4].maps.Array.size
       value: 1
@@ -20019,7 +19995,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8651062661500560227, guid: 14b3bd7b2761271458b67401a13b9c4a, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 117.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8651062661500560227, guid: 14b3bd7b2761271458b67401a13b9c4a, type: 3}
       propertyPath: m_AnchoredPosition.y

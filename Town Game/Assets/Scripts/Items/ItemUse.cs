@@ -81,7 +81,7 @@ public class ItemUse : NetworkBehaviour
         //Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
         //if (item == null) return; // If item doesn't exist
         if (inventory.itemComponentObject == null) return;
-        inventory.itemComponentObject.SendMessage("OnPrimaryHold", SendMessageOptions.DontRequireReceiver); // Sends the message OnPrimaryUse to every component in the item component holder
+        inventory.itemComponentObject.SendMessage("OnPrimaryHold", SendMessageOptions.DontRequireReceiver); 
     }
 
     public void ReleasePrimary()
@@ -89,7 +89,7 @@ public class ItemUse : NetworkBehaviour
         //Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
         //if (item == null) return; // If item doesn't exist
         if (inventory.itemComponentObject == null) return;
-        inventory.itemComponentObject.SendMessage("OnPrimaryRelease", SendMessageOptions.DontRequireReceiver); // Sends the message OnPrimaryUse to every component in the item component holder
+        inventory.itemComponentObject.SendMessage("OnPrimaryRelease", SendMessageOptions.DontRequireReceiver);
     }
 
     public void UseSecondary()
@@ -105,7 +105,7 @@ public class ItemUse : NetworkBehaviour
         //Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
         //if (item == null) return; // If item doesn't exist
         if (inventory.itemComponentObject == null) return;
-        inventory.itemComponentObject.SendMessage("OnSecondaryHold", SendMessageOptions.DontRequireReceiver); // Sends the message OnPrimaryUse to every component in the item component holder
+        inventory.itemComponentObject.SendMessage("OnSecondaryHold", SendMessageOptions.DontRequireReceiver);
     }
 
     public void ReleaseSecondary()
@@ -113,6 +113,6 @@ public class ItemUse : NetworkBehaviour
         //Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
         //if (item == null) return; // If item doesn't exist
         if (inventory.itemComponentObject == null) return;
-        inventory.itemComponentObject.SendMessage("OnSecondaryRelease", SendMessageOptions.DontRequireReceiver); // Sends the message OnPrimaryUse to every component in the item component holder
+        inventory.itemComponentObject.SendMessage("OnSecondaryRelease", SendMessageOptions.DontRequireReceiver);
     }
 }
