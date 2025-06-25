@@ -7,10 +7,11 @@ public class DevicePlacement : MonoBehaviour
     private PlayerDropManager dropManager;
     private Device device;
 
-    private void OnInitialize(object[] data)
+    private void Initialize(ItemInitInfo info)
     {
-        dropManager = ((GameObject)data[0]).GetComponent<PlayerDropManager>();
-        string deviceName = (string)data[2];
+        Debug.Log("Initialize called");
+        dropManager = info.player.GetComponent<PlayerDropManager>();
+        string deviceName = info.item;
         device = (Device)ObjectManager.i.itemSearch[deviceName];
     }
 
@@ -21,6 +22,6 @@ public class DevicePlacement : MonoBehaviour
 
     private void OnPrimaryRelease()
     {
-        dropManager.DevicePlaceRelease();
+        dropManager.OnDropRelease();
     }
 }

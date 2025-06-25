@@ -21,6 +21,7 @@ public class ItemPhys : NetworkBehaviour
     public InteractableSettings pickUpSettings = new InteractableSettings();
     public InteractableSettings notOwnedSettings = new InteractableSettings();
     public InteractableSettings stealSettings = new InteractableSettings();
+    public Material itemMaterial;
 
     PositionManager positionManager;
     RoomManager roomManager;
@@ -205,7 +206,13 @@ public class ItemPhys : NetworkBehaviour
     {
         if (item == null) return;
         gameObject.GetComponent<MeshFilter>().mesh = item.mesh;
-        gameObject.GetComponent<MeshRenderer>().material.SetTexture("_MainTex", item.texture);
+        MeshRenderer renderer = gameObject.GetComponent<MeshRenderer>();
+        if (item.material == null)
+        {
+            renderer.material = itemMaterial;
+            renderer.material.SetTexture("_MainTex", item.texture);
+        }
+        else renderer.material = item.material;
         SetColliderBounds();
     }
 

@@ -8,18 +8,16 @@ public class PhysDevice : NetworkBehaviour
     public Texture2D icon;
     [Tooltip("The ui object this device is associated with")]
     public GameObject uiObject;
-    public DeviceVolume volume;
     [Tooltip("If this device takes input or not")]
     public bool takesInput = false;
     [Networked, Capacity(15)] public NetworkDictionary<PlayerRef, NetworkId> playerInputs => default;
     public NetworkPrefabRef deviceInputPrefab;
+    [Tooltip("If this property is not null, then the game automatically adds this device to the specified volume")]
+    public DeviceVolume defaultVolume;
 
-    /// <summary>
-    /// For testing, remove this after device placement is added
-    /// </summary>
     public override void Spawned()
     {
-        volume.connectedDevices.Add(Object);
+        if (defaultVolume != null) defaultVolume.connectedDevices.Add(Object);
     }
 
     /// <summary>

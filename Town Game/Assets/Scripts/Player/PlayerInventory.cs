@@ -45,6 +45,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     MeshRenderer sRenderer;
     Transform mainCam;
     Rigidbody rb;
+    private Material ogMaterial;
     List<int> equipLayers = new List<int>();
     int previousSlot;
     bool uiSetup = false;
@@ -63,6 +64,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         rb = gameObject.GetComponent<Rigidbody>();
         mainCam = Camera.main.transform;
         fps = FindFirstObjectByType<FirstPerson>();
+        ogMaterial = sRenderer.material;
     }
 
     private void Update()
@@ -258,17 +260,21 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
             {
                 itemComponentObject.AddComponent<DevicePlacement>();
             }
-            object[] data = new object[] { gameObject, itemData[equippedSlot].metadata, hotbar[equippedSlot].ToString() };
-            itemComponentObject.SendMessage("Initialize", data, SendMessageOptions.DontRequireReceiver); // Gives metadata information to any listeners
+            Debug.Log("Initializing regular item");
+            itemComponentObject.SendMessage("Initialize", 
+                new ItemInitInfo(gameObject, itemData[equippedSlot].metadata, hotbar[equippedSlot].ToString()), 
+                SendMessageOptions.DontRequireReceiver); // Gives metadata information to any listeners
         }
         else
         {
             if (equippedItem as Device)
             {
+                Debug.Log("initializing device");
                 itemComponentObject = new GameObject("Device Placement", typeof(DevicePlacement));
                 itemComponentObject.transform.parent = itemComponentHolder;
-                object[] data = new object[] { gameObject, itemData[equippedSlot].metadata, hotbar[equippedSlot].ToString() };
-                itemComponentObject.SendMessage("Initialize", data, SendMessageOptions.DontRequireReceiver); // Gives metadata information to any listeners
+                itemComponentObject.SendMessage("Initialize", 
+                    new ItemInitInfo(gameObject, itemData[equippedSlot].metadata, hotbar[equippedSlot].ToString()), 
+                    SendMessageOptions.DontRequireReceiver); // Gives metadata information to any listeners
             }
         }
 
@@ -281,7 +287,12 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         if (itemName.IsNullOrEmpty()) return;
         Item equippedItem = itemManager.itemSearch[itemName];
         sFilter.mesh = equippedItem.mesh;
-        sRenderer.material.SetTexture("_MainTex", equippedItem.texture);
+        if (equippedItem.material == null)
+        {
+            sRenderer.material = ogMaterial;
+            sRenderer.material.SetTexture("_MainTex", equippedItem.texture);
+        }
+        else sRenderer.material = equippedItem.material;
         ResetEquipLayers();
         // Play all pose animations on the item
         foreach (Item.AnimationState pose in equippedItem.holdPoses)

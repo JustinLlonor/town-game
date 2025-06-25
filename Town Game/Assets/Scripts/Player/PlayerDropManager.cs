@@ -29,6 +29,7 @@ public class PlayerDropManager : NetworkBehaviour
     PositionManager positionManager;
     CameraMovement cameraMovement;
     private bool xLocked = false;
+    private GizmoMode currentPlacementMode = GizmoMode.None;
 
     public override void Spawned()
     {
@@ -138,6 +139,7 @@ public class PlayerDropManager : NetworkBehaviour
     void OnDropPressed()
     {
         if (isPlacing) return;
+        currentPlacementMode = GizmoMode.Item;
         Item currentItem = GetCurrentItem();
         // if we are not holding an item, return
         Debug.Log("drop pressed function call");
@@ -149,7 +151,7 @@ public class PlayerDropManager : NetworkBehaviour
         isPlacing = true;
     }
 
-    void OnDropRelease()
+    public void OnDropRelease()
     {
         if (!isPlacing) return;
         VerifyPlacement();
@@ -158,12 +160,9 @@ public class PlayerDropManager : NetworkBehaviour
 
     public void DevicePlacePress(Device device)
     {
-
-    }
-
-    public void DevicePlaceRelease()
-    {
-
+        if (isPlacing) return;
+        currentPlacementMode = GizmoMode.Device;
+        gizmoManager.EnterLookMode(device.mesh, device.devicePlacementSettings, Object.HasInputAuthority);
     }
 
     void CancelDrop()
@@ -171,6 +170,7 @@ public class PlayerDropManager : NetworkBehaviour
         //gizmo.SetRenderer(false);
         gizmoManager.ExitLookMode();
         isPlacing = false;
+        currentPlacementMode = GizmoMode.None;
         if (isRotating)
         {
             if (Object.HasInputAuthority)
@@ -194,12 +194,12 @@ public class PlayerDropManager : NetworkBehaviour
         }
         else if (placeInfo.mode == GizmoMode.Device)
         {
-
+            PlaceDevice(placeInfo.position, placeInfo.rotation, player.connectedPanel.connectedVolume);
         }
         // Play an error sfx
     }
 
-    void PlaceItem(Vector3 position, Quaternion rotation, ItemSurface iSurface)
+    private void PlaceItem(Vector3 position, Quaternion rotation, ItemSurface iSurface)
     {
         Item item = GetCurrentItem();
         if (item == null) return;
@@ -216,6 +216,11 @@ public class PlayerDropManager : NetworkBehaviour
 
         inventory.RemoveItem(inventory.equippedSlot);
         //RemoveItem(hotbar[equippedSlot].ToString(), equippedSlot);
+    }
+
+    private void PlaceDevice(Vector3 position, Quaternion rotation, DeviceVolume deviceVolume)
+    {
+
     }
 
     void TransferItemData(ItemData data, ItemPhys physItem)

@@ -15,6 +15,8 @@ public class Item : ScriptableObject
     public GameObject itemBehaviourObject;
     public Mesh mesh; // Mesh of the item
     public Texture2D texture;
+    [Tooltip("If this is set, the material will be used on the placed item instead of the texture")]
+    public Material material;
     [Header("Sound")]
     public string[] useSounds = new string[] { };
     public string[] equipSounds = new string[] { "Equip1", "Equip2", "Equip3" };

@@ -17,6 +17,7 @@ public class FirstPerson : MonoBehaviour
     CameraManager cameraManager;
     PlayerStats stats;
     bool visible = true;
+    private Material ogMaterial;
 
     private void Awake()
     {
@@ -28,6 +29,7 @@ public class FirstPerson : MonoBehaviour
         cameraManager = FindFirstObjectByType<CameraManager>();
         cameraManager.onSwitchCameraMode += OnCameraModeChange;
         cameraManager.onStartCameraTransition += OnTransitionChange;
+        ogMaterial = itemRenderer.sharedMaterial;
     }
 
     private void Update()
@@ -54,7 +56,12 @@ public class FirstPerson : MonoBehaviour
     {
         StopAllCoroutines();
         itemFilter.mesh = item.mesh;
-        itemRenderer.material.SetTexture("_MainTex", item.texture);
+        if (item.material == null)
+        {
+            itemRenderer.material = ogMaterial;
+            itemRenderer.material.SetTexture("_MainTex", item.texture);
+        }
+        else itemRenderer.material = item.material;
         int gripIndex = animator.GetLayerIndex("Grip");
         int itemIndex = animator.GetLayerIndex("Item");
         animator.Play(item.gripPose);
