@@ -29,7 +29,7 @@ public class PlayerDropManager : NetworkBehaviour
     PositionManager positionManager;
     CameraMovement cameraMovement;
     private bool xLocked = false;
-    private GizmoMode currentPlacementMode = GizmoMode.None;
+    public GizmoMode currentPlacementMode = GizmoMode.None;
 
     public override void Spawned()
     {
@@ -97,13 +97,11 @@ public class PlayerDropManager : NetworkBehaviour
             if (dropPressed)
             {
                 isRotating = false;
-                Debug.Log("drop pressed 2");
                 OnDropPressed();
             }
             if (!dropPressed)
             {
-                Debug.Log("drop released");
-                OnDropRelease();
+                if (currentPlacementMode == GizmoMode.Item) OnDropRelease();
             }
         }
         if (!Object.IsProxy && isPlacing)
@@ -163,6 +161,7 @@ public class PlayerDropManager : NetworkBehaviour
         if (isPlacing) return;
         currentPlacementMode = GizmoMode.Device;
         gizmoManager.EnterLookMode(device.mesh, device.devicePlacementSettings, Object.HasInputAuthority);
+        isPlacing = true;
     }
 
     void CancelDrop()
@@ -206,6 +205,8 @@ public class PlayerDropManager : NetworkBehaviour
         if (inventory.hotbar[inventory.equippedSlot].ToString().IsNullOrEmpty()) return;
         if (!Runner.IsServer && HasInputAuthority) inventory.RemoveItem(inventory.equippedSlot);
         if (!Runner.IsServer) return;
+
+        // Item spawning
         NetworkObject itemObj = Runner.Spawn(physItem, position, rotation);
         ItemPhys pItem = itemObj.GetComponent<ItemPhys>();
         pItem.itemName = item.name;
@@ -220,7 +221,19 @@ public class PlayerDropManager : NetworkBehaviour
 
     private void PlaceDevice(Vector3 position, Quaternion rotation, DeviceVolume deviceVolume)
     {
+        Item item = GetCurrentItem();
+        if (item == null) return;
+        if (inventory.hotbar[inventory.equippedSlot].ToString().IsNullOrEmpty()) return;
+        if (!Runner.IsServer && HasInputAuthority) inventory.RemoveItem(inventory.equippedSlot);
+        if (!Runner.IsServer) return;
+        if (!(item as Device)) return;
 
+        // Device spawning
+        Device device = (Device)item;
+        NetworkObject deviceObject = Runner.Spawn(device.devicePrefab, position, rotation);
+        deviceVolume.AddDevice(deviceObject);
+
+        inventory.RemoveItem(inventory.equippedSlot);
     }
 
     void TransferItemData(ItemData data, ItemPhys physItem)

@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotation: {x: 0, y: 0, z: 0}
   placementRange: 3
+  gizmoMode: 0
   centerSettings:
     centerX: 1
     centerZ: 1
@@ -28,6 +29,6 @@ MonoBehaviour:
       maxRotation: 360
       inverted: 0
     surfaceRotationLimit:
-      minRotation: 0
-      maxRotation: 360
-      inverted: 0
+      minRotation: 5
+      maxRotation: 355
+      inverted: 1

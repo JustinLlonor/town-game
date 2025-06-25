@@ -36,4 +36,14 @@ public class DeviceVolume : NetworkBehaviour
         if (containedPlayers.Contains(player)) containedPlayers.Remove(player);
         onPlayerLeaveVolume?.Invoke(player);
     }
+
+    public void AddDevice(NetworkId id)
+    {
+        connectedDevices.Add(id);
+    }
+
+    public void RemoveDevice(NetworkId id)
+    {
+        if (connectedDevices.Contains(id)) connectedDevices.Remove(id);
+    }
 }

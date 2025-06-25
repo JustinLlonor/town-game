@@ -127,7 +127,7 @@ public class Player : NetworkBehaviour
                 // State change detector
                 bool usePrimary = data.itemUsePrimary;
                 bool useSecondary = data.itemUseSecondary;
-                if (dropManager.isPlacing)
+                if (dropManager.currentPlacementMode == GizmoMode.Item)
                 {
                     usePrimary = false;
                     useSecondary = false;

@@ -88,7 +88,6 @@ public class GizmoManager : MonoBehaviour
     public void EnterLookMode(Mesh gizmoMesh, GizmoSettings settings, bool showGraphics)
     {
         if (gizmoEnabled) return;
-        Debug.Log("look mode entered");
         gizmoCollider.ResetColliders();
         CreateGizmo(settings, gizmoMesh);
         if (settings.gizmoMode == GizmoMode.Device)
@@ -234,6 +233,9 @@ public class GizmoManager : MonoBehaviour
         if (gizmoCollider.ColliderTouchingEnvironment()) return false;
         // if not attached to a surface, then return false
         if (!onSurface) return false;
+        // Surface normal angle check
+        float normalAngle = Mathf.Acos(Mathf.Clamp(Vector3.Dot(surfaceNormal, Vector3.up), -1f, 1f)) * Mathf.Rad2Deg;
+        if (!currentSettings.rotationSettings.surfaceRotationLimit.RotationWithinLimit(normalAngle)) return false;
         // Item surface check
         if (currentSettings.gizmoMode == GizmoMode.Item)
         {

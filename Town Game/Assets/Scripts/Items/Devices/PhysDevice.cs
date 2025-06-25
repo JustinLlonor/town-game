@@ -17,7 +17,7 @@ public class PhysDevice : NetworkBehaviour
 
     public override void Spawned()
     {
-        if (defaultVolume != null) defaultVolume.connectedDevices.Add(Object);
+        if (defaultVolume != null) defaultVolume.AddDevice(Object);
     }
 
     /// <summary>

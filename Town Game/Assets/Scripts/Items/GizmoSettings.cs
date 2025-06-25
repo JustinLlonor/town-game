@@ -40,9 +40,8 @@ public class GizmoSettings : ScriptableObject
     {
         public float initialRotation;
         public RotationLimit rotationLimit;
-        public RotationLimit surfaceRotationLimit;
+        public RotationLimit surfaceRotationLimit = RotationLimit.Ground;
     }
-
 
     [System.Serializable]
     public struct RotationLimit
@@ -53,6 +52,13 @@ public class GizmoSettings : ScriptableObject
         public float maxRotation;
         [Tooltip("When inverted, the gap between the minRotation and maxRotation becomes the area where the rotation is not allowed.")]
         public bool inverted;
+
+        public RotationLimit(float minRotation, float maxRotation, bool inverted)
+        {
+            this.minRotation = minRotation;
+            this.maxRotation = maxRotation;
+            this.inverted = inverted;
+        }
 
         public bool RotationWithinLimit(float rotation)
         {
@@ -97,6 +103,17 @@ public class GizmoSettings : ScriptableObject
                 }
             }
             return angle;
+        }
+        
+        /// <summary>
+        /// Rotation limit constant for a gizmo that is grounded
+        /// </summary>
+        public static RotationLimit Ground 
+        { 
+            get
+            {
+                return new RotationLimit(5f, 355f, true);
+            }
         }
     }
 
