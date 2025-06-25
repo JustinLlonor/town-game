@@ -11,6 +11,7 @@ public class MapMenuUI : MonoBehaviour
     public PhysDevice selectedDevice;
     public GameObject deviceButtonPrefab;
     public Minimap minimap;
+    public MapUI mapUI;
     public float deviceOpenedX = -566.3641f;
     private List<string> listedDevices = new List<string>();
     MinimapManager minimapManager;
@@ -83,7 +84,7 @@ public class MapMenuUI : MonoBehaviour
         }
         ShowPanel();
         minimap.SetPosition(device.transform.position);
-        minimap.SetZoom(5f);
+        mapUI.SetZoom(8f);
         ClearDeviceUIPanel();
         GameObject uiObject = Instantiate(selectedDevice.uiObject, deviceUIPanel);
         uiObject.transform.localPosition = Vector2.zero;
@@ -112,8 +113,8 @@ public class MapMenuUI : MonoBehaviour
         {
             if (selectedDevice != null)
             {
-                selectedDevice = null;
                 selectedDevice.DeviceClosed();
+                selectedDevice = null;
             }
         }
     }

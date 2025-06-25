@@ -69,6 +69,12 @@ public class MapUI : MonoBehaviour
 
     }
 
+    public void SetZoom(float zoom)
+    {
+        currentZoom = zoom;
+        map.SetZoom(currentZoom);
+    }
+
     private void ZoomOut(float delta)
     {
         currentZoom -= delta;

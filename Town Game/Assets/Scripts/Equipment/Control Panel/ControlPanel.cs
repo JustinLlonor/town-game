@@ -28,6 +28,7 @@ public class ControlPanel : Equipment
         interactable.onLook += CheckConnection;
         positionManager.onJobAdd += CheckConnection;
         positionManager.onJobRemove += CheckConnection;
+        connectedVolume.onConnectedDevicesUpdate += CheckUIDevices;
     }
 
     private void ConnectDevices(PlayerRef player)
@@ -160,16 +161,30 @@ public class ControlPanel : Equipment
         connected = isConnected;
     }
 
+    /// <summary>
+    /// Clears device buttons and adds a button for each device
+    /// </summary>
     private void ConnectDeviceUI()
     {
         MapMenuUI mmUI = UIManager.instance.mapMenuUI;
         mmUI.ClearDeviceButtons();
         foreach (NetworkId deviceId in connectedVolume.connectedDevices)
         {
-            PhysDevice device = GetPhysDevice(deviceId);
-            if (device == null) continue;
-            mmUI.AddDeviceButton(device);
+            AddToDeviceUI(deviceId);
         }
+    }
+
+    private void CheckUIDevices()
+    {
+        if (!connected) return;
+        ConnectDeviceUI();
+    }
+    
+    private void AddToDeviceUI(NetworkId deviceId)
+    {
+        PhysDevice device = GetPhysDevice(deviceId);
+        if (device == null) return;
+        UIManager.instance.mapMenuUI.AddDeviceButton(device);
     }
 
     private void ClearDeviceUI()

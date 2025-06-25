@@ -83,6 +83,17 @@ public class GizmoManager : MonoBehaviour
             float localCamY = rm.orientation;
             PlaceGraphics(Quaternion.Euler(localCamX, localCamY, 0f) * Vector3.forward);
         }
+        if (gizmoEnabled && currentSettings.gizmoMode == GizmoMode.Device)
+        {
+            if (attachedPlayer.connectedPanel == null)
+            {
+                currentDeviceVolume = null;
+            }
+            else
+            {
+                currentDeviceVolume = attachedPlayer.connectedPanel.connectedVolume;
+            }
+        }
     }
 
     public void EnterLookMode(Mesh gizmoMesh, GizmoSettings settings, bool showGraphics)
@@ -90,6 +101,7 @@ public class GizmoManager : MonoBehaviour
         if (gizmoEnabled) return;
         gizmoCollider.ResetColliders();
         CreateGizmo(settings, gizmoMesh);
+        /**
         if (settings.gizmoMode == GizmoMode.Device)
         {
             if (attachedPlayer.connectedPanel != null)
@@ -99,6 +111,7 @@ public class GizmoManager : MonoBehaviour
             }
             else Debug.Log("no connected panel");
         }
+        **/
         graphicsShown = showGraphics;
         if (showGraphics)
         {
@@ -111,6 +124,7 @@ public class GizmoManager : MonoBehaviour
 
     public void ExitLookMode()
     {
+        currentDeviceVolume = null;
         gizmoEnabled = false;
         DisableGizmo();
     }

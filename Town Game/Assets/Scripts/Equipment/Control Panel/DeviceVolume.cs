@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
+using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
+using NUnit.Framework.Internal;
 
 /// <summary>
 /// Defines a volume in which a device can be placed in, stores every device within the volume
@@ -17,8 +19,30 @@ public class DeviceVolume : NetworkBehaviour
     public List<PlayerRef> containedPlayers = new List<PlayerRef>();
     public PlayerEvent onPlayerEnterVolume;
     public PlayerEvent onPlayerLeaveVolume;
+    public DeviceVolumeEvent onConnectedDevicesUpdate;
 
     public delegate void PlayerEvent(PlayerRef player);
+    public delegate void DeviceVolumeEvent();
+
+    private ChangeDetector changeDetector;
+
+    public override void Spawned()
+    {
+        changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
+    }
+
+    public override void Render()
+    {
+        foreach (var change in changeDetector.DetectChanges(this, out var previousBuffer, out var currentBuffer))
+        {
+            switch (change)
+            {
+                case nameof(connectedDevices):
+                    onConnectedDevicesUpdate?.Invoke();
+                    break;
+            }
+        }
+    }
 
     public bool PlayerContainedWithinVolume(PlayerRef player)
     {
