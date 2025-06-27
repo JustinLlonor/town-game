@@ -25,11 +25,14 @@ public class JobHandler : NetworkBehaviour
     public string[] taskCategories = new string[0];
     public string generalPeriodName = "General Job Stuff";
     public int jobIconIndex;
-    public List<Task> activeTasks;
+    [Networked, Capacity(15)] public NetworkLinkedList<Task> activeTasks => default;
+    [Networked, Capacity(15)] public NetworkDictionary<Task, PlayerRef> assignedPlayers => default;
 
-    public JobHandlerEvent OnTasksUpdate;
+    public JobHandlerEvent OnTaskListUpdate;
+    public TaskEvent OnTaskComplete;
 
     public delegate void JobHandlerEvent();
+    public delegate void TaskEvent(Task task);
 
     RunnerManager runnerManager;
     ScheduleManager scheduleManager;
@@ -118,29 +121,121 @@ public class JobHandler : NetworkBehaviour
         if (!hiredPlayers.Contains(player)) return;
         hiredPlayers.Remove(player);
         playerManager.RemovePlayerFromGroup(player, groupIndex);
+        // Unassign this player from every task
+        List<Task> removalList = new List<Task>();
+        foreach (KeyValuePair<Task, PlayerRef> kvp in assignedPlayers)
+        {
+            if (kvp.Value == player)
+            {
+                removalList.Add(kvp.Key);
+            }
+        }
+        foreach (Task task in removalList) RemoveTaskAssignment(task);
     }
 
-    public void AddTasks(List<Task> tasks)
+    /// <summary>
+    /// Adds a task and automatically assigns it to a player
+    /// </summary>
+    /// <param name="task"></param>
+    /// <param name="assignedPlayer"></param>
+    public void AddTask(Task task)
     {
-        Debug.Log("Adding tasks");
-        foreach (Task task in tasks)
-        {
-            activeTasks.Add(task);
-        }
-        OnTasksUpdate?.Invoke();
+        activeTasks.Add(task);
+        AutoAssignTasks();
+        OnTaskListUpdate?.Invoke();
+    }
+
+    /// <summary>
+    /// Adds a task assigned to the specified player
+    /// </summary>
+    /// <param name="task"></param>
+    /// <param name="assignedPlayer"></param>
+    public void AddTask(Task task, PlayerRef assignedPlayer)
+    {
+        activeTasks.Add(task);
+        AssignTask(task, assignedPlayer);
+        OnTaskListUpdate?.Invoke();
     }
 
     public void RemoveTask(Task taskReference)
     {
         if (!activeTasks.Contains(taskReference)) return;
         activeTasks.Remove(taskReference);
-        OnTasksUpdate?.Invoke();
+        OnTaskListUpdate?.Invoke();
     }
 
-    public void CompleteTask(Task task)
+    public Task CompleteTask(Task task)
     {
-        if (!activeTasks.Contains(task)) return;
+        if (!activeTasks.Contains(task)) return Task.None;
         int taskIndex = activeTasks.IndexOf(task);
-        activeTasks[taskIndex].isCompleted = true;
+        if (taskIndex == -1)
+        {
+            Debug.LogError("Task not found!");
+            return Task.None;
+        }
+        Task newTask = activeTasks[taskIndex];
+        newTask.isCompleted = true;
+        activeTasks.Set(taskIndex, newTask);
+        OnTaskComplete?.Invoke(newTask);
+        return newTask;
+    }
+
+    public void RemoveTaskAssignment(Task task)
+    {
+        assignedPlayers.Remove(task);
+    }
+
+    public void AssignTask(Task task, PlayerRef player)
+    {
+        if (assignedPlayers.ContainsKey(task)) return;
+        assignedPlayers.Add(task, player);
+    }
+
+    /// <summary>
+    /// Assigns tasks to players automatically
+    /// </summary>
+    private void AutoAssignTasks()
+    {
+        if (assignedPlayers.Count == activeTasks.Count) return;
+        if (hiredPlayers.Count == 0) return;
+        if (hiredPlayers.Count == 1)
+        {
+            foreach (Task task in activeTasks)
+            {
+                if (assignedPlayers.ContainsKey(task)) continue;
+                AssignTask(task, hiredPlayers[0]);
+            }
+            return;
+        }
+        // Set initial task counts
+        Dictionary<PlayerRef, int> taskCounts = new Dictionary<PlayerRef, int>();
+        foreach (PlayerRef player in hiredPlayers)
+        {
+            taskCounts.Add(player, 0);
+        }
+        foreach (KeyValuePair<Task, PlayerRef> kvp in assignedPlayers)
+        {
+            taskCounts[kvp.Value]++;
+        }
+        // Assign tasks to the lowest player
+        foreach (Task task in activeTasks)
+        {
+            if (assignedPlayers.ContainsKey(task)) continue;
+            int lowestValue = 999;
+            PlayerRef lowestPlayer = PlayerRef.None;
+            foreach (KeyValuePair<PlayerRef, int> kvp in taskCounts)
+            {
+                if (kvp.Value < lowestValue)
+                {
+                    lowestValue = kvp.Value;
+                    lowestPlayer = kvp.Key;
+                }
+            }
+            if (lowestPlayer == PlayerRef.None) return;
+            // Increase task count for the lowest player on this iteration
+            taskCounts[lowestPlayer]++;
+            AssignTask(task, lowestPlayer);
+        }
+        
     }
 }

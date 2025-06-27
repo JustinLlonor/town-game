@@ -1,39 +1,59 @@
 using Fusion;
+using System;
 using System.Collections.Generic;
 
 [System.Serializable]
-public class Task
+public struct Task : INetworkStruct, IEquatable<Task>
 {
-    public static int idIndex = 0;
-
-    public string name;
+    public NetworkString<_256> name;
     public int category;
     public float secondsTaken;
-    public string room;
-    public bool isCompleted;
-    public int id;
+    public NetworkString<_64> room;
+    public NetworkBool isCompleted;
 
-    /// <summary>
-    /// Constructor for a task. If the id parameter is left alone, will automatically increment task id index
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="category"></param>
-    /// <param name="secondsTaken"></param>
-    /// <param name="id"></param>
-    public Task(string name, int category, float secondsTaken, string room, bool isCompleted = false, int id = -1)
+    public Task(NetworkString<_256> name, int category, float secondsTaken, NetworkString<_64> room, NetworkBool isCompleted)
     {
         this.name = name;
         this.category = category;
         this.secondsTaken = secondsTaken;
         this.room = room;
         this.isCompleted = isCompleted;
-        if (id != -1)
+    }
+
+    public override bool Equals(object obj)
+    {
+        return obj is Task task && Equals(task);
+    }
+
+    public bool Equals(Task other)
+    {
+        return name.Equals(other.name) &&
+               category == other.category &&
+               secondsTaken == other.secondsTaken &&
+               room.Equals(other.room) &&
+               isCompleted.Equals(other.isCompleted);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(name, category, secondsTaken, room, isCompleted);
+    }
+
+    public static bool operator ==(Task left, Task right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(Task left, Task right)
+    {
+        return !(left == right);
+    }
+
+    public static Task None
+    {
+        get
         {
-            this.id = idIndex++;
-        }
-        else
-        {
-            this.id = id;
+            return new Task("None", -999, -1f, "", false);
         }
     }
 }
