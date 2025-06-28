@@ -13,12 +13,12 @@ public class JobHandler : NetworkBehaviour
     public int jobIconIndex;
     // Use change detectors with these task lists for the UI stuff
     // The list of all tasks that are currently active
-    [Networked, Capacity(15)] public NetworkLinkedList<Task> activeTasks => default;
+    [Networked, Capacity(10)] public NetworkLinkedList<Task> activeTasks => default;
     // The list of all tasks that have been resolved. Tasks that are not complete within resolvedTasks are cancelled.
     [Networked, Capacity(10)] public NetworkLinkedList<Task> resolvedTasks => default;
     private List<int> previousResolvedTasks = new List<int>();
     // The players that are assigned to each task
-    [Networked, Capacity(15)] public NetworkDictionary<int, PlayerRef> assignedPlayers => default;
+    [Networked, Capacity(10)] public NetworkDictionary<int, PlayerRef> assignedPlayers => default;
 
     public JobHandlerEvent OnTaskListUpdate;
     public TaskEvent OnTaskCompleteServer;
