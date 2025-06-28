@@ -15,7 +15,7 @@ public class PlayerInfoUI : MonoBehaviour
     private void Awake()
     {
         gm = FindFirstObjectByType<GameManager>();
-        FindFirstObjectByType<RoleRevealer>().OnGetRole += SetRole;
+        //FindFirstObjectByType<RoleRevealer>().OnGetRole += SetRole;
         //gm.OnUpdatePositions += OnUpdatePositions;
     }
 
