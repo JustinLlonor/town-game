@@ -1,23 +1,46 @@
 using Fusion;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 [System.Serializable]
 public struct Task : INetworkStruct, IEquatable<Task>
 {
-    public NetworkString<_256> name;
-    public int category;
-    public float secondsTaken;
-    public NetworkString<_64> room;
-    public NetworkBool isCompleted;
+    public static int idCounter = 0;
 
-    public Task(NetworkString<_256> name, int category, float secondsTaken, NetworkString<_64> room, NetworkBool isCompleted)
+    public NetworkString<_256> name;
+    public Vector3 location;
+    public NetworkBool isCompleted;
+    public int id;
+
+    /// <summary>
+    /// Creates a task. If the id parameter is set, creates the task with that id.
+    /// Otherwise, creates a task with a new id
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="room"></param>
+    /// <param name="isCompleted"></param>
+    /// <param name="id"></param>
+    public Task(NetworkString<_256> name, Vector3 location, NetworkBool isCompleted, int id = -1)
     {
         this.name = name;
-        this.category = category;
-        this.secondsTaken = secondsTaken;
-        this.room = room;
+        this.location = location;
         this.isCompleted = isCompleted;
+        if (id >= 0)
+        {
+            this.id = id;
+            return;
+        }
+        this.id = idCounter;
+        idCounter++;
+    }
+
+    public static Task None
+    {
+        get
+        {
+            return new Task("None", Vector3.zero, false, -999);
+        }
     }
 
     public override bool Equals(object obj)
@@ -28,15 +51,14 @@ public struct Task : INetworkStruct, IEquatable<Task>
     public bool Equals(Task other)
     {
         return name.Equals(other.name) &&
-               category == other.category &&
-               secondsTaken == other.secondsTaken &&
-               room.Equals(other.room) &&
-               isCompleted.Equals(other.isCompleted);
+               location.Equals(other.location) &&
+               isCompleted.Equals(other.isCompleted) &&
+               id == other.id;
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(name, category, secondsTaken, room, isCompleted);
+        return HashCode.Combine(name, location, isCompleted, id);
     }
 
     public static bool operator ==(Task left, Task right)
@@ -47,13 +69,5 @@ public struct Task : INetworkStruct, IEquatable<Task>
     public static bool operator !=(Task left, Task right)
     {
         return !(left == right);
-    }
-
-    public static Task None
-    {
-        get
-        {
-            return new Task("None", -999, -1f, "", false);
-        }
     }
 }

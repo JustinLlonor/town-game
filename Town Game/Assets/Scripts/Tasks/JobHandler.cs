@@ -6,89 +6,55 @@ using Fusion;
 
 public class JobHandler : NetworkBehaviour
 {
-    [Header("Set this to false if this job handler is not associated with a job. Make the Job.cs class automatically remove the job ref from player properties later.")]
-    public bool associatedWithJob = true;
     [Header("Settings")]
-    // All tasks
-    // The amount of tasks assigned to a category it takes to create a new state
-    public int stateCreationThreshold = 2;
     public List<PlayerRef> hiredPlayers = new List<PlayerRef>();
     public int groupIndex = 0;
-    [Header("Period Settings")]
-    [Tooltip("The range of the period blocks from this job holder we can have. x is the beginning bounds, y is the end bounds")]
-    public Vector2Int periodAddRange = new Vector2Int(9, 19);
-    public float periodLength = 2f;
-    public float periodSpacing = 2f;
-    public float periodTimePerDay = 4f;
-    public int maxDays = 3;
     public Color jobColor = Color.white;
-    public string[] taskCategories = new string[0];
-    public string generalPeriodName = "General Job Stuff";
     public int jobIconIndex;
+    // Use change detectors with these task lists for the UI stuff
+    // The list of all tasks that are currently active
     [Networked, Capacity(15)] public NetworkLinkedList<Task> activeTasks => default;
-    [Networked, Capacity(15)] public NetworkDictionary<Task, PlayerRef> assignedPlayers => default;
+    // The list of all tasks that have been resolved. Tasks that are not complete within resolvedTasks are cancelled.
+    [Networked, Capacity(10)] public NetworkLinkedList<Task> resolvedTasks => default;
+    private List<int> previousResolvedTasks = new List<int>();
+    // The players that are assigned to each task
+    [Networked, Capacity(15)] public NetworkDictionary<int, PlayerRef> assignedPlayers => default;
 
     public JobHandlerEvent OnTaskListUpdate;
-    public TaskEvent OnTaskComplete;
+    public TaskEvent OnTaskCompleteServer;
+    public TaskEvent OnTaskCancelServer;
+    public TaskEvent onTaskCompleteClient;
+    public TaskEvent onTaskCancelClient;
 
     public delegate void JobHandlerEvent();
-    public delegate void TaskEvent(Task task);
+    public delegate void TaskEvent(int taskId);
 
     RunnerManager runnerManager;
-    ScheduleManager scheduleManager;
-    GameManager gameManager;
     PlayerManager playerManager;
-    AnnouncementManager announcementManager;
-    ScheduleUI scheduleUI;
     PositionManager positionManager;
-
-    // Test
-    //public Task testTask = new Task("Serve Food", 0, 20f, "Cafeteria");
-    //Task recentTask;
-    //TaskState recentState;
-
-    private void Update()
-    {
-        // Test code for reference
-        /**
-        if (Input.GetKeyDown(KeyCode.U))
-        {
-            Task newTask = new Task(testTask.name, testTask.category, testTask.secondsTaken, testTask.room);
-            recentState = AddClosedState(new List<Task>() { newTask }, "Maintain Cafeteria", new List<PlayerRef>() { Runner.LocalPlayer }, 9f, 1f);
-            recentTask = newTask;
-        }
-        if (Input.GetKeyDown(KeyCode.Y))
-        {
-            if (!hiredPlayers.Contains(Runner.LocalPlayer))
-            {
-                HirePlayer(Runner.LocalPlayer);
-            }
-            else
-            {
-                FirePlayer(Runner.LocalPlayer);
-            }
-        }
-        if (Input.GetKeyDown(KeyCode.I)) CompleteTask(recentTask);
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            Task newTask = new Task(testTask.name, testTask.category, testTask.secondsTaken, testTask.room);
-            recentTask = newTask;
-            AddTaskToState(newTask, recentState);
-        }
-        **/
-    }
+    ChangeDetector changeDetector;
 
     public override void Spawned()
     {
         runnerManager = FindFirstObjectByType<RunnerManager>();
-        scheduleManager = FindFirstObjectByType<ScheduleManager>();
-        gameManager = FindFirstObjectByType<GameManager>();
         playerManager = FindFirstObjectByType<PlayerManager>();
-        scheduleUI = FindFirstObjectByType<ScheduleUI>();
-        announcementManager = FindFirstObjectByType<AnnouncementManager>();
         positionManager = FindAnyObjectByType<PositionManager>();
+        changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
         if (!Runner.IsServer) return;
         runnerManager.onPlayerLeave += FirePlayer;
+    }
+
+    public override void Render()
+    {
+        foreach (var change in changeDetector.DetectChanges(this))
+        {
+            switch (change)
+            {
+                case nameof(resolvedTasks):
+                    ClientTaskEvent();
+                    break;
+            }
+        }
     }
 
     /// <summary>
@@ -101,10 +67,9 @@ public class JobHandler : NetworkBehaviour
         Debug.Log("Hired player");
         hiredPlayers.Add(player);
         playerManager.AddPlayerToGroup(player, groupIndex);
-        if (associatedWithJob)
-        {
-            positionManager.AddJobProperty(player, positionManager.GetJobHandlerFromRef(this));
-        }
+        //if (associatedWithJob)
+        positionManager.AddJobProperty(player, positionManager.GetJobHandlerFromRef(this));
+        AutoAssignTasks();
     }
 
     /// <summary>
@@ -113,48 +78,46 @@ public class JobHandler : NetworkBehaviour
     /// <param name="player"></param>
     public void FirePlayer(PlayerRef player)
     {
-        if (associatedWithJob)
-        {
-            positionManager.RemoveJobProperty(player, positionManager.GetJobHandlerFromRef(this));
-        }
+        //if (associatedWithJob)
+        positionManager.RemoveJobProperty(player, positionManager.GetJobHandlerFromRef(this));
         Debug.Log("Firing player");
         if (!hiredPlayers.Contains(player)) return;
         hiredPlayers.Remove(player);
         playerManager.RemovePlayerFromGroup(player, groupIndex);
         // Unassign this player from every task
-        List<Task> removalList = new List<Task>();
-        foreach (KeyValuePair<Task, PlayerRef> kvp in assignedPlayers)
+        List<int> removalList = new List<int>();
+        foreach (KeyValuePair<int, PlayerRef> kvp in assignedPlayers)
         {
             if (kvp.Value == player)
             {
                 removalList.Add(kvp.Key);
             }
         }
-        foreach (Task task in removalList) RemoveTaskAssignment(task);
+        foreach (int task in removalList) RemoveTaskAssignment(task);
     }
 
     /// <summary>
-    /// Adds a task and automatically assigns it to a player
+    /// Adds a new incomplete task and automatically assigns it to a player
     /// </summary>
-    /// <param name="task"></param>
-    /// <param name="assignedPlayer"></param>
-    public void AddTask(Task task)
+    /// <param name="name">The name of the task</param>
+    /// <param name="location">The location of the task. Will automatically tell the player which room it is in</param>
+    /// <returns></returns>
+    public int AddTask(string name, Vector3 location)
     {
+        Task task = new Task(name, location, false);
         activeTasks.Add(task);
         AutoAssignTasks();
         OnTaskListUpdate?.Invoke();
+        return task.id;
     }
 
-    /// <summary>
-    /// Adds a task assigned to the specified player
-    /// </summary>
-    /// <param name="task"></param>
-    /// <param name="assignedPlayer"></param>
-    public void AddTask(Task task, PlayerRef assignedPlayer)
+    public int AddTask(string name, Vector3 location, PlayerRef player)
     {
+        Task task = new Task(name, location, false);
         activeTasks.Add(task);
-        AssignTask(task, assignedPlayer);
+        AutoAssignTasks();
         OnTaskListUpdate?.Invoke();
+        return task.id;
     }
 
     public void RemoveTask(Task taskReference)
@@ -164,31 +127,58 @@ public class JobHandler : NetworkBehaviour
         OnTaskListUpdate?.Invoke();
     }
 
-    public Task CompleteTask(Task task)
+    /// <summary>
+    /// Marks the task as complete and moves it to the resolvedTasks list
+    /// </summary>
+    /// <param name="taskId"></param>
+    public void CompleteTask(int taskId)
     {
-        if (!activeTasks.Contains(task)) return Task.None;
-        int taskIndex = activeTasks.IndexOf(task);
-        if (taskIndex == -1)
-        {
-            Debug.LogError("Task not found!");
-            return Task.None;
-        }
-        Task newTask = activeTasks[taskIndex];
+        Task taskObject = GetActiveTask(taskId);
+        int taskIndex = activeTasks.IndexOf(taskObject);
+        if (taskIndex != -1) return;
+        if (taskObject.Equals(Task.None)) return;
+        Task newTask = taskObject;
         newTask.isCompleted = true;
         activeTasks.Set(taskIndex, newTask);
-        OnTaskComplete?.Invoke(newTask);
-        return newTask;
+        ResolveTask(newTask.id);
+        OnTaskCompleteServer?.Invoke(taskId);
     }
 
-    public void RemoveTaskAssignment(Task task)
+    /// <summary>
+    /// Moves the incomplete task from the active list to the resolved list
+    /// </summary>
+    /// <param name="taskId"></param>
+    public void CancelTask(int taskId)
+    {
+        Task taskObject = GetActiveTask(taskId);
+        if (taskObject.Equals(Task.None)) return;
+        activeTasks.Remove(taskObject);
+        resolvedTasks.Add(taskObject);
+        OnTaskCancelServer?.Invoke(taskId);
+    }
+
+    /// <summary>
+    /// Unassigns this task from anyone who may have it
+    /// </summary>
+    /// <param name="task"></param>
+    public void RemoveTaskAssignment(int task)
     {
         assignedPlayers.Remove(task);
     }
 
-    public void AssignTask(Task task, PlayerRef player)
+    /// <summary>
+    /// Assigns a player to the specfied task
+    /// </summary>
+    /// <param name="taskId"></param>
+    /// <param name="player"></param>
+    public void AssignTask(int taskId, PlayerRef player)
     {
-        if (assignedPlayers.ContainsKey(task)) return;
-        assignedPlayers.Add(task, player);
+        if (assignedPlayers.ContainsKey(taskId))
+        {
+            assignedPlayers.Set(taskId, player);
+            return;
+        }
+        assignedPlayers.Add(taskId, player);
     }
 
     /// <summary>
@@ -200,10 +190,11 @@ public class JobHandler : NetworkBehaviour
         if (hiredPlayers.Count == 0) return;
         if (hiredPlayers.Count == 1)
         {
+            // Assign all unassinged tasks to the player
             foreach (Task task in activeTasks)
             {
-                if (assignedPlayers.ContainsKey(task)) continue;
-                AssignTask(task, hiredPlayers[0]);
+                if (assignedPlayers.ContainsKey(task.id)) continue;
+                AssignTask(task.id, hiredPlayers[0]);
             }
             return;
         }
@@ -213,14 +204,14 @@ public class JobHandler : NetworkBehaviour
         {
             taskCounts.Add(player, 0);
         }
-        foreach (KeyValuePair<Task, PlayerRef> kvp in assignedPlayers)
+        foreach (KeyValuePair<int, PlayerRef> kvp in assignedPlayers)
         {
             taskCounts[kvp.Value]++;
         }
         // Assign tasks to the lowest player
         foreach (Task task in activeTasks)
         {
-            if (assignedPlayers.ContainsKey(task)) continue;
+            if (assignedPlayers.ContainsKey(task.id)) continue;
             int lowestValue = 999;
             PlayerRef lowestPlayer = PlayerRef.None;
             foreach (KeyValuePair<PlayerRef, int> kvp in taskCounts)
@@ -234,8 +225,98 @@ public class JobHandler : NetworkBehaviour
             if (lowestPlayer == PlayerRef.None) return;
             // Increase task count for the lowest player on this iteration
             taskCounts[lowestPlayer]++;
-            AssignTask(task, lowestPlayer);
+            AssignTask(task.id, lowestPlayer);
         }
-        
+    }
+
+    /// <summary>
+    /// Gets the task from the active task list
+    /// </summary>
+    /// <param name="taskId"></param>
+    /// <returns></returns>
+    public Task GetActiveTask(int taskId)
+    {
+        foreach (Task task in activeTasks)
+        {
+            if (task.id == taskId) return task;
+        }
+        return Task.None;
+    }
+
+    /// <summary>
+    /// Gets the task from the resolved task list
+    /// </summary>
+    /// <param name="taskId"></param>
+    /// <returns></returns>
+    public Task GetResolvedTask(int taskId)
+    {
+        foreach (Task task in resolvedTasks)
+        {
+            if (task.id == taskId) return task;
+        }
+        return Task.None;
+    }
+
+    /// <summary>
+    /// Gets a task from both the resolved and active task lists
+    /// </summary>
+    /// <param name="taskId"></param>
+    /// <returns></returns>
+    public Task GetTaskFromId(int taskId)
+    {
+        foreach (Task task in activeTasks)
+        {
+            if (task.id ==  taskId) return task;
+        }
+        foreach (Task task in resolvedTasks)
+        {
+            if (task.id == taskId) return task;
+        }
+        return Task.None;
+    }
+
+    private void ResolveTask(int taskId)
+    {
+        Task resolvedTask = GetActiveTask(taskId);
+        if (resolvedTask.Equals(Task.None)) return;
+        activeTasks.Remove(resolvedTask);
+        // Deletes the oldest resolved task
+        if (resolvedTasks.Count == resolvedTasks.Capacity)
+        {
+            resolvedTasks.Remove(resolvedTasks[0]);
+        }
+        resolvedTasks.Add(resolvedTask);
+    }
+
+    private void ClientTaskEvent()
+    {
+        // Find the new tasks
+        List<Task> newTasks = new List<Task>();
+        foreach (Task task in resolvedTasks)
+        {
+            // If a task's id isn't in a previous check, it must be new
+            if (!previousResolvedTasks.Contains(task.id))
+            {
+                newTasks.Add(task);
+            }
+        }
+        // Invoke the client events
+        foreach (Task task in newTasks)
+        {
+            if (task.isCompleted)
+            {
+                onTaskCompleteClient?.Invoke(task.id);
+            }
+            else
+            {
+                onTaskCancelClient?.Invoke(task.id);
+            }
+        }
+        // Set the new previous resolved tasks to be a list containing the ids of the current resolved tasks
+        previousResolvedTasks.Clear();
+        foreach (Task task in resolvedTasks)
+        {
+            previousResolvedTasks.Add(task.id);
+        }
     }
 }
