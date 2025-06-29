@@ -97,7 +97,7 @@ public class JobHandler : NetworkBehaviour
     }
 
     /// <summary>
-    /// Adds a new incomplete task and automatically assigns it to a player
+    /// Adds a new incomplete task and automatically assigns it to a player. To be called mostly when the day starts.
     /// </summary>
     /// <param name="name">The name of the task</param>
     /// <param name="location">The location of the task. Will automatically tell the player which room it is in</param>
@@ -131,7 +131,7 @@ public class JobHandler : NetworkBehaviour
     /// Marks the task as complete and moves it to the resolvedTasks list
     /// </summary>
     /// <param name="taskId"></param>
-    public void CompleteTask(int taskId)
+    public void CompleteTask(int taskId, int reward)
     {
         Task taskObject = GetActiveTask(taskId);
         int taskIndex = activeTasks.IndexOf(taskObject);
