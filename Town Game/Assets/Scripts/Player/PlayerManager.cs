@@ -367,7 +367,7 @@ public class PlayerManager : NetworkBehaviour
         return -1;
     }
 
-    public int GetMoney(PlayerRef player)
+    public float GetMoney(PlayerRef player)
     {
         if (properties.ContainsKey(player)) return GetPlayerPropertyHolder(properties[player]).money;
         return -1;
@@ -400,9 +400,21 @@ public class PlayerManager : NetworkBehaviour
         GetPlayerPropertyHolder(properties[player]).room = room;
     }
 
-    public void SetMoney(PlayerRef player, int money)
+    public void SetMoney(PlayerRef player, float money)
     {
         GetPlayerPropertyHolder(properties[player]).money = money;
+    }
+
+    public void AddMoney(PlayerRef player, float amount)
+    {
+        GetPlayerPropertyHolder(properties[player]).money += amount;
+    }
+
+    public void RemoveMoney(PlayerRef player, float amount)
+    {
+        float newMoney = GetPlayerPropertyHolder(properties[player]).money - amount;
+        if (newMoney < 0f) newMoney = 0f;
+        GetPlayerPropertyHolder(properties[player]).money = newMoney;
     }
 
     public void AddPlayerToGroup(PlayerRef player, int group)

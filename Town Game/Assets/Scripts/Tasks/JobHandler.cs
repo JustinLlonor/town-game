@@ -6,20 +6,28 @@ using Fusion;
 
 public class JobHandler : NetworkBehaviour
 {
+    /// <summary>
+    /// The maximum amount of tasks a JobHandler can have a day
+    /// </summary>
+    private static int maxTasks = 12;
     [Header("Settings")]
     public List<PlayerRef> hiredPlayers = new List<PlayerRef>();
+    public int maxStrikes = 2;
+    public int taskCount { get; private set; }
     public int groupIndex = 0;
     public Color jobColor = Color.white;
     public int jobIconIndex;
     // Use change detectors with these task lists for the UI stuff
     // The list of all tasks that are currently active
-    [Networked, Capacity(10)] public NetworkLinkedList<Task> activeTasks => default;
+    [Networked, Capacity(12)] public NetworkLinkedList<Task> activeTasks => default;
     private List<int> previousActiveTasks = new List<int>();
     // The list of all tasks that have been resolved. Tasks that are not complete within resolvedTasks are cancelled.
-    [Networked, Capacity(10)] public NetworkLinkedList<Task> resolvedTasks => default;
+    [Networked, Capacity(12)] public NetworkLinkedList<Task> resolvedTasks => default;
     private List<int> previousResolvedTasks = new List<int>();
-    // The players that are assigned to each task
-    [Networked, Capacity(10)] public NetworkDictionary<int, PlayerRef> assignedPlayers => default;
+    // A task id and its associated player assignment. Gets removed upon the task finishing, or if the player gets fired
+    [Networked, Capacity(15)] public NetworkDictionary<int, PlayerRef> assignedPlayers => default;
+    // The # of strikes every player has
+    [Networked, Capacity(5)] public NetworkDictionary<PlayerRef, int> playerStrikes => default;
     // If this client is connected to this job handler;
     [HideInInspector] public bool clientConnected = false;
     private Dictionary<float, List<int>> taskDeadlines = new Dictionary<float, List<int>>();
@@ -27,15 +35,23 @@ public class JobHandler : NetworkBehaviour
     public JobHandlerEvent OnTaskListUpdate; // executed on server
     public TaskEvent OnTaskCompleteServer;
     public TaskEvent OnTaskCancelServer;
-    public MultipleTaskEvent OnTasksFinishServer;
+    /// <summary>
+    /// Called on the server when tasks are completed.
+    /// Attach 1 function which returns a TaskFinishInfo struct, for the consequences of the tasks.
+    /// </summary>
+    public TaskFinishEvent OnTasksFinishServer;
     public TaskEvent onTaskAddClient;
     public TaskEvent onTaskCompleteClient;
     public TaskEvent onTaskCancelClient;
-    public MultipleTaskEvent onTasksFinishClient;
+    /// <summary>
+    /// Called on the client when receiving task finishing info
+    /// </summary>
+    public ClientTaskFinishEvent onTasksFinishClient;
 
     public delegate void JobHandlerEvent();
     public delegate void TaskEvent(int taskId, JobHandler source);
-    public delegate void MultipleTaskEvent(int[] taskIds, JobHandler source);
+    public delegate void ClientTaskFinishEvent(TaskFinishInfo finishInfo, JobHandler source);
+    public delegate TaskFinishInfo TaskFinishEvent(List<Task> tasks, PlayerRef player, JobHandler source);
 
     GameManager gameManager;
     RunnerManager runnerManager;
@@ -51,7 +67,8 @@ public class JobHandler : NetworkBehaviour
         gameManager = FindAnyObjectByType<GameManager>();
         changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
         if (!Runner.IsServer) return;
-        runnerManager.onPlayerLeave += FirePlayer;
+        runnerManager.onPlayerLeave += RealFirePlayer;
+        gameManager.OnChangeDay += ClearTasks;
     }
 
     public override void FixedUpdateNetwork()
@@ -92,8 +109,14 @@ public class JobHandler : NetworkBehaviour
         AutoAssignTasks();
     }
 
+    private void RealFirePlayer(PlayerRef player)
+    {
+        Vector2Int jobRef = positionManager.GetJobHandlerFromRef(this);
+        positionManager.GetJobFromRef(jobRef).RemovePlayer(player);
+    }
+
     /// <summary>
-    /// Removes a player from this job
+    /// Removes the player from this JobHandler. DOES NOT remove it from the job.
     /// </summary>
     /// <param name="player"></param>
     public void FirePlayer(PlayerRef player)
@@ -104,6 +127,7 @@ public class JobHandler : NetworkBehaviour
         if (!hiredPlayers.Contains(player)) return;
         hiredPlayers.Remove(player);
         playerManager.RemovePlayerFromGroup(player, groupIndex);
+        if (playerStrikes.ContainsKey(player)) playerStrikes.Remove(player);
         // Unassign this player from every task
         List<int> removalList = new List<int>();
         foreach (KeyValuePair<int, PlayerRef> kvp in assignedPlayers)
@@ -117,28 +141,61 @@ public class JobHandler : NetworkBehaviour
     }
 
     /// <summary>
-    /// Adds a new incomplete task and automatically assigns it to a player. To be called mostly when the day starts.
+    /// Adds the specified amount of strikes to the player. 
+    /// If the number of strikes a player has exceeds the max strike amount, the player is fired
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="strikes"></param>
+    public void StrikePlayer(PlayerRef player, int strikes = 1)
+    {
+        if (!playerStrikes.ContainsKey(player))
+        {
+            playerStrikes.Add(player, 0);
+        }
+        playerStrikes.Set(player, playerStrikes[player] + strikes);
+        if (playerStrikes[player] > maxStrikes)
+        {
+            RealFirePlayer(player);
+        }
+    }
+
+    /// <summary>
+    /// Adds a new incomplete task and automatically assigns it to a player.
+    /// To be called mostly when the day starts.
     /// </summary>
     /// <param name="name">The name of the task</param>
     /// <param name="deadline">The time, in game time, when the task will finish and assessed for rewards/strikes</param>
     /// <param name="location">The location of the task. Will automatically tell the player which room it is in</param>
-    /// <returns></returns>
+    /// <returns>A natural number if the max task count has not been exceeded. A negative integer otherwise</returns>
     public int AddTask(string name, float deadline, Vector3 location)
     {
+        if (taskCount >= maxTasks) return -1;
         Task task = new Task(name, deadline, location, false);
         activeTasks.Add(task);
+        taskCount++;
         AutoAssignTasks();
         OnTaskListUpdate?.Invoke();
         AddTaskDeadline(task);
         return task.id;
     }
 
+    /// <summary>
+    /// Adds a new incomplete task and assigns it to the specified player.
+    /// </summary>
+    /// <param name="name">The name of the task</param>
+    /// <param name="deadline">The time, in game time, when the task will finish and assessed for rewards/strikes</param>
+    /// <param name="location">The location of the task. Will automatically tell the player which room it is in</param>
+    /// <param name="player">The player to assign the task to</param>
+    /// <returns>A natural number if the max task count has not been exceeded. A negative integer otherwise</returns>
     public int AddTask(string name, float deadline, Vector3 location, PlayerRef player)
     {
+        if (taskCount >= maxTasks) return -1;
         Task task = new Task(name, deadline, location, false);
         activeTasks.Add(task);
-        AutoAssignTasks();
+        taskCount++;
+        AssignTask(task.id, player);
         OnTaskListUpdate?.Invoke();
+        AddTaskDeadline(task);
         return task.id;
     }
 
@@ -369,7 +426,10 @@ public class JobHandler : NetworkBehaviour
         }
     }
 
-    // Adds a task to the deadline dictionary check
+    /// <summary>
+    /// Adds a task to the deadline dictionary check
+    /// </summary>
+    /// <param name="task"></param>
     private void AddTaskDeadline(Task task)
     {
         if (taskDeadlines.ContainsKey(task.deadline))
@@ -394,6 +454,9 @@ public class JobHandler : NetworkBehaviour
         foreach (float key in removalList) taskDeadlines.Remove(key);
     }
 
+    /// <summary>
+    /// Checks tasks deadlines and finishes them if they are past the deadline.
+    /// </summary>
     private void CheckTaskDeadlines()
     {
         // Checks the task deadlines to see if they passed or have no more tasks
@@ -411,19 +474,88 @@ public class JobHandler : NetworkBehaviour
             List<int> finishedTasks = taskDeadlines[deadline];
             taskDeadlines.Remove(deadline);
             if (finishedTasks.Count == 0) continue;
-            OnTasksFinishServer?.Invoke(finishedTasks.ToArray(), this);
-            //TODO: Make this send groups of info only to the players assigned with their specific tasks.
-            //But this is ok if theres only 1 player doing the task stuff
-            foreach (PlayerRef player in hiredPlayers)
+            // Code for finding the tasks each individual player finished
+            Dictionary<PlayerRef, List<int>> finishedPlayerTasks = new Dictionary<PlayerRef, List<int>>();
+            foreach (var kvp in assignedPlayers)
             {
-                RPC_TasksFinish(player, finishedTasks.ToArray());
+                // Adds the assigned task ids to the player in the dictionary
+                if (finishedPlayerTasks.ContainsKey(kvp.Value))
+                {
+                    finishedPlayerTasks[kvp.Value].Add(kvp.Key);
+                    continue;
+                }
+                finishedPlayerTasks.Add(kvp.Value, new List<int>() { kvp.Key });
+            }
+            // Send the client side task finish delegate
+            foreach (var kvp in finishedPlayerTasks)
+            {
+                TaskFinishInfo finishInfo = new TaskFinishInfo();
+                bool finishInfoSet = false;
+                if (OnTasksFinishServer.GetInvocationList().Length > 0)
+                {
+                    List<Task> taskList = IdToTaskList(kvp.Value);
+                    finishInfo = OnTasksFinishServer.Invoke(taskList, kvp.Key, this);
+                    // Set associated task list to task list
+                    foreach (Task task in taskList)
+                    {
+                        finishInfo.associatedTasks.Add(task);
+                    }
+                    finishInfoSet = true;
+                    ProcessTaskFinish(finishInfo, kvp.Key);
+                }
+                if (finishInfoSet)
+                {
+                    RPC_TasksFinish(kvp.Key, finishInfo);
+                }
             }
         }
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
-    public void RPC_TasksFinish([RpcTarget] PlayerRef player, int[] finishedTasks)
+    public List<Task> IdToTaskList(List<int> idList)
     {
-        onTasksFinishClient?.Invoke(finishedTasks, this);
+        List<Task> output = new List<Task>();
+        foreach (var id in idList)
+        {
+            Task task = GetTaskFromId(id);
+            if (!task.Equals(Task.None))
+            {
+                output.Add(task);
+            }
+        }
+        return output;
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_TasksFinish([RpcTarget] PlayerRef player, TaskFinishInfo finishInfo)
+    {
+        onTasksFinishClient?.Invoke(finishInfo, this);
+    }
+
+    /// <summary>
+    /// Processes the consequence of tasks being finished
+    /// </summary>
+    /// <param name="finishInfo"></param>
+    private void ProcessTaskFinish(TaskFinishInfo finishInfo, PlayerRef player)
+    {
+        if (finishInfo.strikes > 0)
+        {
+            StrikePlayer(player, finishInfo.strikes);
+        }
+        if (finishInfo.reward > 0f)
+        {
+            playerManager.AddMoney(player, finishInfo.reward);
+        }
+    }
+
+    /// <summary>
+    /// Resets all JobHandler task info. Called whenever a new day starts.
+    /// </summary>
+    public void ClearTasks()
+    {
+        activeTasks.Clear();
+        resolvedTasks.Clear();
+        assignedPlayers.Clear();
+        taskDeadlines.Clear();
+        taskCount = 0;
     }
 }
