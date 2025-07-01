@@ -14,21 +14,30 @@ public class JobHandler : NetworkBehaviour
     // Use change detectors with these task lists for the UI stuff
     // The list of all tasks that are currently active
     [Networked, Capacity(10)] public NetworkLinkedList<Task> activeTasks => default;
+    private List<int> previousActiveTasks = new List<int>();
     // The list of all tasks that have been resolved. Tasks that are not complete within resolvedTasks are cancelled.
     [Networked, Capacity(10)] public NetworkLinkedList<Task> resolvedTasks => default;
     private List<int> previousResolvedTasks = new List<int>();
     // The players that are assigned to each task
     [Networked, Capacity(10)] public NetworkDictionary<int, PlayerRef> assignedPlayers => default;
+    // If this client is connected to this job handler;
+    [HideInInspector] public bool clientConnected = false;
+    private Dictionary<float, List<int>> taskDeadlines = new Dictionary<float, List<int>>();
 
-    public JobHandlerEvent OnTaskListUpdate;
+    public JobHandlerEvent OnTaskListUpdate; // executed on server
     public TaskEvent OnTaskCompleteServer;
     public TaskEvent OnTaskCancelServer;
+    public MultipleTaskEvent OnTasksFinishServer;
+    public TaskEvent onTaskAddClient;
     public TaskEvent onTaskCompleteClient;
     public TaskEvent onTaskCancelClient;
+    public MultipleTaskEvent onTasksFinishClient;
 
     public delegate void JobHandlerEvent();
-    public delegate void TaskEvent(int taskId);
+    public delegate void TaskEvent(int taskId, JobHandler source);
+    public delegate void MultipleTaskEvent(int[] taskIds, JobHandler source);
 
+    GameManager gameManager;
     RunnerManager runnerManager;
     PlayerManager playerManager;
     PositionManager positionManager;
@@ -39,19 +48,30 @@ public class JobHandler : NetworkBehaviour
         runnerManager = FindFirstObjectByType<RunnerManager>();
         playerManager = FindFirstObjectByType<PlayerManager>();
         positionManager = FindAnyObjectByType<PositionManager>();
+        gameManager = FindAnyObjectByType<GameManager>();
         changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
         if (!Runner.IsServer) return;
         runnerManager.onPlayerLeave += FirePlayer;
     }
 
+    public override void FixedUpdateNetwork()
+    {
+        if (!Runner.IsServer) return;
+        CheckTaskDeadlines();
+    }
+
     public override void Render()
     {
+        if (!clientConnected) return;
         foreach (var change in changeDetector.DetectChanges(this))
         {
             switch (change)
             {
                 case nameof(resolvedTasks):
-                    ClientTaskEvent();
+                    ClientResolvedTaskEvent();
+                    break;
+                case nameof(activeTasks):
+                    ClientActiveTaskEvent();
                     break;
             }
         }
@@ -100,20 +120,22 @@ public class JobHandler : NetworkBehaviour
     /// Adds a new incomplete task and automatically assigns it to a player. To be called mostly when the day starts.
     /// </summary>
     /// <param name="name">The name of the task</param>
+    /// <param name="deadline">The time, in game time, when the task will finish and assessed for rewards/strikes</param>
     /// <param name="location">The location of the task. Will automatically tell the player which room it is in</param>
     /// <returns></returns>
-    public int AddTask(string name, Vector3 location)
+    public int AddTask(string name, float deadline, Vector3 location)
     {
-        Task task = new Task(name, location, false);
+        Task task = new Task(name, deadline, location, false);
         activeTasks.Add(task);
         AutoAssignTasks();
         OnTaskListUpdate?.Invoke();
+        AddTaskDeadline(task);
         return task.id;
     }
 
-    public int AddTask(string name, Vector3 location, PlayerRef player)
+    public int AddTask(string name, float deadline, Vector3 location, PlayerRef player)
     {
-        Task task = new Task(name, location, false);
+        Task task = new Task(name, deadline, location, false);
         activeTasks.Add(task);
         AutoAssignTasks();
         OnTaskListUpdate?.Invoke();
@@ -124,6 +146,7 @@ public class JobHandler : NetworkBehaviour
     {
         if (!activeTasks.Contains(taskReference)) return;
         activeTasks.Remove(taskReference);
+        RemoveTaskFromDeadlines(taskReference);
         OnTaskListUpdate?.Invoke();
     }
 
@@ -141,7 +164,7 @@ public class JobHandler : NetworkBehaviour
         newTask.isCompleted = true;
         activeTasks.Set(taskIndex, newTask);
         ResolveTask(newTask.id);
-        OnTaskCompleteServer?.Invoke(taskId);
+        OnTaskCompleteServer?.Invoke(taskId, this);
     }
 
     /// <summary>
@@ -154,7 +177,8 @@ public class JobHandler : NetworkBehaviour
         if (taskObject.Equals(Task.None)) return;
         activeTasks.Remove(taskObject);
         resolvedTasks.Add(taskObject);
-        OnTaskCancelServer?.Invoke(taskId);
+        RemoveTaskFromDeadlines(taskObject);
+        OnTaskCancelServer?.Invoke(taskId, this);
     }
 
     /// <summary>
@@ -288,28 +312,53 @@ public class JobHandler : NetworkBehaviour
         resolvedTasks.Add(resolvedTask);
     }
 
-    private void ClientTaskEvent()
+    private void ClientActiveTaskEvent()
     {
-        // Find the new tasks
-        List<Task> newTasks = new List<Task>();
+        // Find the newtasks
+        List<Task> newActiveTasks = new List<Task>();
+        foreach (Task task in activeTasks)
+        {
+            // If a task's id isn't in a previous check, it must be new
+            if (!previousActiveTasks.Contains(task.id))
+            {
+                newActiveTasks.Add(task);
+            }
+        }
+        // Invoke the client events
+        foreach (Task task in newActiveTasks)
+        {
+            onTaskAddClient?.Invoke(task.id, this);
+        }
+        // Set the new previous tasks to be a list containing the ids of the current resolved tasks
+        previousActiveTasks.Clear();
+        foreach (Task task in resolvedTasks)
+        {
+            previousActiveTasks.Add(task.id);
+        }
+    }
+
+    private void ClientResolvedTaskEvent()
+    {
+        // Find the new resolved tasks
+        List<Task> newResolvedTasks = new List<Task>();
         foreach (Task task in resolvedTasks)
         {
             // If a task's id isn't in a previous check, it must be new
             if (!previousResolvedTasks.Contains(task.id))
             {
-                newTasks.Add(task);
+                newResolvedTasks.Add(task);
             }
         }
         // Invoke the client events
-        foreach (Task task in newTasks)
+        foreach (Task task in newResolvedTasks)
         {
             if (task.isCompleted)
             {
-                onTaskCompleteClient?.Invoke(task.id);
+                onTaskCompleteClient?.Invoke(task.id, this);
             }
             else
             {
-                onTaskCancelClient?.Invoke(task.id);
+                onTaskCancelClient?.Invoke(task.id, this);
             }
         }
         // Set the new previous resolved tasks to be a list containing the ids of the current resolved tasks
@@ -318,5 +367,63 @@ public class JobHandler : NetworkBehaviour
         {
             previousResolvedTasks.Add(task.id);
         }
+    }
+
+    // Adds a task to the deadline dictionary check
+    private void AddTaskDeadline(Task task)
+    {
+        if (taskDeadlines.ContainsKey(task.deadline))
+        {
+            taskDeadlines[task.deadline].Add(task.id);
+            return;
+        }
+        taskDeadlines.Add(task.deadline, new List<int>() { task.id });
+    }
+
+    private void RemoveTaskFromDeadlines(Task task)
+    {
+        List<float> removalList = new List<float>();
+        foreach (var kvp in taskDeadlines)
+        {
+            if (kvp.Value.Contains(task.id))
+            {
+                taskDeadlines[kvp.Key].Remove(task.id);
+                removalList.Add(kvp.Key);
+            }
+        }
+        foreach (float key in removalList) taskDeadlines.Remove(key);
+    }
+
+    private void CheckTaskDeadlines()
+    {
+        // Checks the task deadlines to see if they passed or have no more tasks
+        List<float> finishedDeadlines = new List<float>();
+        foreach (var kvp in taskDeadlines)
+        {
+            if (gameManager.gameTime > kvp.Key || kvp.Value.Count == 0)
+            {
+                finishedDeadlines.Add(kvp.Key);
+            }
+        }
+        // Removes the task deadlines and invokes the delegate if it has more than 1 task
+        foreach (float deadline in finishedDeadlines)
+        {
+            List<int> finishedTasks = taskDeadlines[deadline];
+            taskDeadlines.Remove(deadline);
+            if (finishedTasks.Count == 0) continue;
+            OnTasksFinishServer?.Invoke(finishedTasks.ToArray(), this);
+            //TODO: Make this send groups of info only to the players assigned with their specific tasks.
+            //But this is ok if theres only 1 player doing the task stuff
+            foreach (PlayerRef player in hiredPlayers)
+            {
+                RPC_TasksFinish(player, finishedTasks.ToArray());
+            }
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_TasksFinish([RpcTarget] PlayerRef player, int[] finishedTasks)
+    {
+        onTasksFinishClient?.Invoke(finishedTasks, this);
     }
 }

@@ -8,9 +8,10 @@ public struct Task : INetworkStruct, IEquatable<Task>
 {
     public static int idCounter = 0;
 
-    public NetworkString<_256> name;
+    public NetworkString<_128> name;
     public Vector3 location;
     public NetworkBool isCompleted;
+    public float deadline;
     public int id;
 
     /// <summary>
@@ -21,11 +22,12 @@ public struct Task : INetworkStruct, IEquatable<Task>
     /// <param name="room"></param>
     /// <param name="isCompleted"></param>
     /// <param name="id"></param>
-    public Task(NetworkString<_256> name, Vector3 location, NetworkBool isCompleted, int id = -1)
+    public Task(NetworkString<_128> name, float deadline, Vector3 location, NetworkBool isCompleted, int id = -1)
     {
         this.name = name;
         this.location = location;
         this.isCompleted = isCompleted;
+        this.deadline = deadline;
         if (id >= 0)
         {
             this.id = id;
@@ -39,7 +41,7 @@ public struct Task : INetworkStruct, IEquatable<Task>
     {
         get
         {
-            return new Task("None", Vector3.zero, false, -999);
+            return new Task("None", -1f, Vector3.zero, false, -999);
         }
     }
 

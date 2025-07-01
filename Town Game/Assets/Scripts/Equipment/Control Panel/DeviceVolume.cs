@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
-using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
-using NUnit.Framework.Internal;
 
 /// <summary>
 /// Defines a volume in which a device can be placed in, stores every device within the volume

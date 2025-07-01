@@ -13,7 +13,13 @@ public class PositionManager : NetworkBehaviour
     public BranchEvent OnLeaderRemove;
     [Networked, Capacity(20)] NetworkDictionary<PlayerRef, NetworkString<_64>> playerJobs => default;
     [Networked, Capacity(20)] NetworkDictionary<PlayerRef, int> playerBranches => default;
+    /// <summary>
+    /// Called on the client whenever a job is added
+    /// </summary>
     public JobEvent onJobAdd;
+    /// <summary>
+    /// Called on the client whenever a job is removed
+    /// </summary>
     public JobEvent onJobRemove;
     public IntEvent onBranchSwitch;
     List<Vector2Int> previousJobs = new List<Vector2Int>();
