@@ -9,7 +9,7 @@ public struct TaskFinishInfo : INetworkStruct
     public int strikes;
     public NetworkString<_64> strikeReason;
     public NetworkString<_64> rewardReason;
-    [Networked, Capacity(10)] public NetworkLinkedList<Task> associatedTasks => default;
+    [Networked, Capacity(12)] public NetworkLinkedList<Task> associatedTasks => default;
 
     public TaskFinishInfo(float reward, int strikes, string strikeReason = "", string rewardReason = "All objectives compeleted.")
     {
