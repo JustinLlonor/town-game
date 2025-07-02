@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class PhysTask : MonoBehaviour
 {
     [Header("Settings")]
+    public float minHeight = 56.35f;
     public float padding = 5f;
     [Header("References")]
     public GameObject completionObject;
@@ -24,9 +25,14 @@ public class PhysTask : MonoBehaviour
     {
         taskText.text = text;
         Vector2 preferredValues = taskText.GetPreferredValues();
-        preferredValues.y += padding * 2;
+        float newY = preferredValues.y + padding * 2;
         RectTransform rt = (RectTransform)transform;
-        rt.sizeDelta = new Vector2(rt.sizeDelta.x, preferredValues.y);
+        if (newY > minHeight)
+        {
+            rt.sizeDelta = new Vector2(rt.sizeDelta.x, newY);
+            return;
+        }
+        rt.sizeDelta = new Vector2(rt.sizeDelta.x, minHeight);
     }
 
     /// <summary>

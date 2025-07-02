@@ -191,9 +191,9 @@ public class JobHandler : NetworkBehaviour
     {
         if (taskCount >= maxTasks) return -1;
         Task task = new Task(name, deadline, location, false);
+        AssignTask(task.id, player);
         activeTasks.Add(task);
         taskCount++;
-        AssignTask(task.id, player);
         OnTaskListUpdate?.Invoke();
         AddTaskDeadline(task);
         return task.id;
@@ -384,7 +384,7 @@ public class JobHandler : NetworkBehaviour
         // Invoke the client events
         foreach (Task task in newActiveTasks)
         {
-            onTaskAddClient?.Invoke(task.id, this);
+            if (assignedPlayers[task.id] == Runner.LocalPlayer) onTaskAddClient?.Invoke(task.id, this);
         }
         // Set the new previous tasks to be a list containing the ids of the current resolved tasks
         previousActiveTasks.Clear();
@@ -411,11 +411,11 @@ public class JobHandler : NetworkBehaviour
         {
             if (task.isCompleted)
             {
-                onTaskCompleteClient?.Invoke(task.id, this);
+                if (assignedPlayers[task.id] == Runner.LocalPlayer) onTaskCompleteClient?.Invoke(task.id, this);
             }
             else
             {
-                onTaskCancelClient?.Invoke(task.id, this);
+                if (assignedPlayers[task.id] == Runner.LocalPlayer) onTaskCancelClient?.Invoke(task.id, this);
             }
         }
         // Set the new previous resolved tasks to be a list containing the ids of the current resolved tasks

@@ -30,9 +30,24 @@ public class PhysTaskFinish : MonoBehaviour
         rewardText.enabled = false;
     }
 
-    public void SetTaskText(string text)
+    public void SetTaskText(string rewardText, string strikeText)
     {
-        taskText.text = text;
+        string outputText = "";
+        bool rewardEmpty = rewardText.IsNullOrEmpty();
+        bool strikeEmpty = strikeText.IsNullOrEmpty();
+        if (!rewardEmpty && !strikeEmpty)
+        {
+            outputText = rewardText + " " + strikeText;
+        }
+        else if (rewardEmpty && !strikeEmpty)
+        {
+            outputText = strikeText;
+        }
+        else
+        {
+            outputText = rewardText;
+        }
+        taskText.text = outputText;
     }
 
     public void SetRewardText(float currencyReward, int strikes)
@@ -55,8 +70,8 @@ public class PhysTaskFinish : MonoBehaviour
         }
         // Set the corresponding text color and text combo
         string rewardString = "";
-        bool currencyRewarded = currencyString.IsNullOrEmpty();
-        bool strikeReceived = strikeString.IsNullOrEmpty();
+        bool currencyRewarded = !currencyString.IsNullOrEmpty(); // if not null or empty, currency awarded
+        bool strikeReceived = !strikeString.IsNullOrEmpty();
         if (currencyRewarded && strikeReceived)
         {
             SetRewardTextColor(mixedRewardColor);

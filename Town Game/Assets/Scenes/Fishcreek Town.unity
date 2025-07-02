@@ -12076,7 +12076,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh51806
+  m_Name: pb_Mesh38750
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -12451,7 +12451,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh51880
+  m_Name: pb_Mesh38824
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -13214,9 +13214,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.10684, y: -213.6}
+  m_AnchoredPosition: {x: -0.106839344, y: -93.39142}
   m_SizeDelta: {x: 348.7083, y: 231.3948}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1505031968
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13229,6 +13229,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0515e34dd7a1bc45a527c4c3cffe023, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  minHeight: 56.35
+  cancelDuration: 3
   taskPrefab: {fileID: 5088394608040643710, guid: bdc754d3a70ac3e40930fd7e291cceca, type: 3}
   taskResolutionPrefab: {fileID: 5464975363356009160, guid: bd7096a1b88684a4daf949c781ab1397, type: 3}
   taskHolder: {fileID: 36004338}
@@ -18406,7 +18408,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh51580
+  m_Name: pb_Mesh38518
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -23191,10 +23193,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 36004338}
     m_Modifications:
-    - target: {fileID: 517189602394333513, guid: bd7096a1b88684a4daf949c781ab1397, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 609546360356100783, guid: bd7096a1b88684a4daf949c781ab1397, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -23229,7 +23227,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 609546360356100783, guid: bd7096a1b88684a4daf949c781ab1397, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 140.887
+      value: 56.35
       objectReference: {fileID: 0}
     - target: {fileID: 609546360356100783, guid: bd7096a1b88684a4daf949c781ab1397, type: 3}
       propertyPath: m_LocalPosition.x
