@@ -40,6 +40,7 @@ public class JobHandler : NetworkBehaviour
     /// Attach 1 function which returns a TaskFinishInfo struct, for the consequences of the tasks.
     /// </summary>
     public TaskFinishEvent OnTasksFinishServer;
+    // TODO: MAKE THIS EVENT HAPPEN WHEN THE PLAYER IS ASSIGNED A TASK, NOT WHEN A TASK IS ADDED
     public TaskEvent onTaskAddClient;
     public TaskEvent onTaskCompleteClient;
     public TaskEvent onTaskCancelClient;
@@ -183,7 +184,7 @@ public class JobHandler : NetworkBehaviour
     /// Adds a new incomplete task and assigns it to the specified player.
     /// </summary>
     /// <param name="name">The name of the task</param>
-    /// <param name="deadline">The time, in game time, when the task will finish and assessed for rewards/strikes</param>
+    /// <param name="deadline">The time, in period time, when the task will finish and assessed for rewards/strikes</param>
     /// <param name="location">The location of the task. Will automatically tell the player which room it is in</param>
     /// <param name="player">The player to assign the task to</param>
     /// <returns>A natural number if the max task count has not been exceeded. A negative integer otherwise</returns>
@@ -211,11 +212,11 @@ public class JobHandler : NetworkBehaviour
     /// Marks the task as complete and moves it to the resolvedTasks list
     /// </summary>
     /// <param name="taskId"></param>
-    public void CompleteTask(int taskId, int reward)
+    public void CompleteTask(int taskId)
     {
         Task taskObject = GetActiveTask(taskId);
         int taskIndex = activeTasks.IndexOf(taskObject);
-        if (taskIndex != -1) return;
+        if (taskIndex == -1) return;
         if (taskObject.Equals(Task.None)) return;
         Task newTask = taskObject;
         newTask.isCompleted = true;
@@ -232,8 +233,7 @@ public class JobHandler : NetworkBehaviour
     {
         Task taskObject = GetActiveTask(taskId);
         if (taskObject.Equals(Task.None)) return;
-        activeTasks.Remove(taskObject);
-        resolvedTasks.Add(taskObject);
+        ResolveTask(taskId);
         RemoveTaskFromDeadlines(taskObject);
         OnTaskCancelServer?.Invoke(taskId, this);
     }
@@ -463,7 +463,7 @@ public class JobHandler : NetworkBehaviour
         List<float> finishedDeadlines = new List<float>();
         foreach (var kvp in taskDeadlines)
         {
-            if (gameManager.gameTime > kvp.Key || kvp.Value.Count == 0)
+            if (gameManager.currentPeriod > kvp.Key || kvp.Value.Count == 0)
             {
                 finishedDeadlines.Add(kvp.Key);
             }
