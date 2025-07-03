@@ -15,7 +15,7 @@ public class TaskTest : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha0)) currentTaskId = jobHandler.AddTask("Do the dishes by <deadline>", FindAnyObjectByType<GameManager>().currentPeriod + 3f, Vector3.zero);
+        if (Input.GetKeyDown(KeyCode.Alpha0)) currentTaskId = jobHandler.AddTask("Do the dishes by <deadline>. No hard feelings if you can't though UWU! Anyway, the weather's pretty bad outside i hate how hot it is.", FindAnyObjectByType<GameManager>().currentPeriod + 3f, Vector3.zero);
         if (Input.GetKeyDown(KeyCode.Alpha9)) jobHandler.CompleteTask(currentTaskId);
         if (Input.GetKeyDown(KeyCode.Alpha8)) jobHandler.CancelTask(currentTaskId);
     }

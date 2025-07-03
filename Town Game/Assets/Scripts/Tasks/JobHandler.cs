@@ -25,7 +25,8 @@ public class JobHandler : NetworkBehaviour
     [Networked, Capacity(12)] public NetworkLinkedList<Task> resolvedTasks => default;
     private List<int> previousResolvedTasks = new List<int>();
     // A task id and its associated player assignment. Gets removed upon the task finishing, or if the player gets fired
-    [Networked, Capacity(15)] public NetworkDictionary<int, PlayerRef> assignedPlayers => default;
+    [Networked, Capacity(24)] public NetworkDictionary<int, PlayerRef> assignedPlayers => default;
+    private List<int> previousAssignedTasks = new List<int>(); // Assigned tasks to this client on the last frame
     // The # of strikes every player has
     [Networked, Capacity(5)] public NetworkDictionary<PlayerRef, int> playerStrikes => default;
     // If this client is connected to this job handler;
@@ -41,7 +42,7 @@ public class JobHandler : NetworkBehaviour
     /// </summary>
     public TaskFinishEvent OnTasksFinishServer;
     // TODO: MAKE THIS EVENT HAPPEN WHEN THE PLAYER IS ASSIGNED A TASK, NOT WHEN A TASK IS ADDED
-    public TaskEvent onTaskAddClient;
+    public TaskEvent onTaskAssignClient;
     public TaskEvent onTaskCompleteClient;
     public TaskEvent onTaskCancelClient;
     /// <summary>
@@ -88,8 +89,8 @@ public class JobHandler : NetworkBehaviour
                 case nameof(resolvedTasks):
                     ClientResolvedTaskEvent();
                     break;
-                case nameof(activeTasks):
-                    ClientActiveTaskEvent();
+                case nameof(assignedPlayers):
+                    ClientAssignedTaskEvent();
                     break;
             }
         }
@@ -215,6 +216,7 @@ public class JobHandler : NetworkBehaviour
     public void CompleteTask(int taskId)
     {
         Task taskObject = GetActiveTask(taskId);
+        if (!activeTasks.Contains(taskObject)) return;
         int taskIndex = activeTasks.IndexOf(taskObject);
         if (taskIndex == -1) return;
         if (taskObject.Equals(Task.None)) return;
@@ -244,7 +246,7 @@ public class JobHandler : NetworkBehaviour
     /// <param name="task"></param>
     public void RemoveTaskAssignment(int task)
     {
-        assignedPlayers.Remove(task);
+        if (assignedPlayers.ContainsKey(task)) assignedPlayers.Remove(task);
     }
 
     /// <summary>
@@ -254,6 +256,7 @@ public class JobHandler : NetworkBehaviour
     /// <param name="player"></param>
     public void AssignTask(int taskId, PlayerRef player)
     {
+        Debug.Log("Assigning task with id " + taskId);
         if (assignedPlayers.ContainsKey(taskId))
         {
             assignedPlayers.Set(taskId, player);
@@ -267,14 +270,17 @@ public class JobHandler : NetworkBehaviour
     /// </summary>
     private void AutoAssignTasks()
     {
-        if (assignedPlayers.Count == activeTasks.Count) return;
+        Debug.Log("2");
         if (hiredPlayers.Count == 0) return;
+        Debug.Log("3");
         if (hiredPlayers.Count == 1)
         {
+            Debug.Log("4");
             // Assign all unassinged tasks to the player
             foreach (Task task in activeTasks)
             {
                 if (assignedPlayers.ContainsKey(task.id)) continue;
+                Debug.Log("5");
                 AssignTask(task.id, hiredPlayers[0]);
             }
             return;
@@ -384,14 +390,39 @@ public class JobHandler : NetworkBehaviour
         // Invoke the client events
         foreach (Task task in newActiveTasks)
         {
-            if (assignedPlayers[task.id] == Runner.LocalPlayer) onTaskAddClient?.Invoke(task.id, this);
+            if (assignedPlayers[task.id] == Runner.LocalPlayer) onTaskAssignClient?.Invoke(task.id, this);
         }
         // Set the new previous tasks to be a list containing the ids of the current resolved tasks
         previousActiveTasks.Clear();
-        foreach (Task task in resolvedTasks)
+        foreach (Task task in activeTasks)
         {
             previousActiveTasks.Add(task.id);
         }
+    }
+
+    private void ClientAssignedTaskEvent()
+    {
+        // Get all assigned tasks that are assigned to the player
+        List<int> newPreviousAssigned = new List<int>();
+        // Get new assigned tasks
+        List<int> newAssignedTasks = new List<int>();
+        foreach (var kvp in assignedPlayers)
+        {
+            if (kvp.Value == Runner.LocalPlayer)
+            {
+                newPreviousAssigned.Add(kvp.Key);
+                if (!previousAssignedTasks.Contains(kvp.Key))
+                {
+                    newAssignedTasks.Add(kvp.Key);
+                }
+            }
+        }
+        // Invoke event
+        foreach (int taskId in newAssignedTasks)
+        {
+            onTaskAssignClient?.Invoke(taskId, this);
+        }
+        previousAssignedTasks = newPreviousAssigned;
     }
 
     private void ClientResolvedTaskEvent()
@@ -474,6 +505,11 @@ public class JobHandler : NetworkBehaviour
             List<int> finishedTasks = taskDeadlines[deadline];
             taskDeadlines.Remove(deadline);
             if (finishedTasks.Count == 0) continue;
+            foreach (int task in finishedTasks)
+            {
+                RemoveTaskAssignment(task);
+                RemoveTask(task);
+            }
             // Code for finding the tasks each individual player finished
             Dictionary<PlayerRef, List<int>> finishedPlayerTasks = new Dictionary<PlayerRef, List<int>>();
             foreach (var kvp in assignedPlayers)
@@ -544,6 +580,26 @@ public class JobHandler : NetworkBehaviour
         if (finishInfo.reward > 0f)
         {
             playerManager.AddMoney(player, finishInfo.reward);
+        }
+    }
+
+    private void RemoveTask(int id)
+    {
+        for (int i = 0; i < activeTasks.Count; i++)
+        {
+            if (activeTasks[i].id == id)
+            {
+                activeTasks.Remove(activeTasks[i]);
+                return;
+            }
+        }
+        for (int i = 0; i < resolvedTasks.Count; i++)
+        {
+            if (resolvedTasks[i].id == id)
+            {
+                resolvedTasks.Remove(resolvedTasks[i]);
+                return;
+            }
         }
     }
 

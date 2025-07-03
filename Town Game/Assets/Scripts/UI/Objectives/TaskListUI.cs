@@ -68,7 +68,7 @@ public class TaskListUI : MonoBehaviour
         JobHandler jobHandler = job.handler;
         jobHandler.clientConnected = true;
 
-        jobHandler.onTaskAddClient += TaskAdd;
+        jobHandler.onTaskAssignClient += TaskAdd;
         jobHandler.onTasksFinishClient += TaskFinish;
         jobHandler.onTaskCancelClient += TaskCancel;
         jobHandler.onTaskCompleteClient += TaskComplete;
@@ -81,7 +81,7 @@ public class TaskListUI : MonoBehaviour
         JobHandler jobHandler = job.handler;
         jobHandler.clientConnected = false;
 
-        jobHandler.onTaskAddClient -= TaskAdd;
+        jobHandler.onTaskAssignClient -= TaskAdd;
         jobHandler.onTasksFinishClient -= TaskFinish;
         jobHandler.onTaskCancelClient -= TaskCancel;
         jobHandler.onTaskCompleteClient -= TaskComplete;
