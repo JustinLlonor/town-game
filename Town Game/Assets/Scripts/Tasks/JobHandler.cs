@@ -32,6 +32,7 @@ public class JobHandler : NetworkBehaviour
     // If this client is connected to this job handler;
     [HideInInspector] public bool clientConnected = false;
     private Dictionary<float, List<int>> taskDeadlines = new Dictionary<float, List<int>>();
+    private Job associatedJob;
 
     public JobHandlerEvent OnTaskListUpdate; // executed on server
     public TaskEvent OnTaskCompleteServer;
@@ -41,7 +42,6 @@ public class JobHandler : NetworkBehaviour
     /// Attach 1 function which returns a TaskFinishInfo struct, for the consequences of the tasks.
     /// </summary>
     public TaskFinishEvent OnTasksFinishServer;
-    // TODO: MAKE THIS EVENT HAPPEN WHEN THE PLAYER IS ASSIGNED A TASK, NOT WHEN A TASK IS ADDED
     public TaskEvent onTaskAssignClient;
     public TaskEvent onTaskCompleteClient;
     public TaskEvent onTaskCancelClient;
@@ -68,6 +68,7 @@ public class JobHandler : NetworkBehaviour
         positionManager = FindAnyObjectByType<PositionManager>();
         gameManager = FindAnyObjectByType<GameManager>();
         changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
+        associatedJob = positionManager.GetJobFromHandler(this);
         if (!Runner.IsServer) return;
         runnerManager.onPlayerLeave += RealFirePlayer;
         gameManager.OnChangeDay += ClearTasks;
@@ -172,6 +173,7 @@ public class JobHandler : NetworkBehaviour
     public int AddTask(string name, float deadline, Vector3 location)
     {
         if (taskCount >= maxTasks) return -1;
+        name = associatedJob.shortName + ": " + name;
         Task task = new Task(name, deadline, location, false);
         activeTasks.Add(task);
         taskCount++;
@@ -505,15 +507,12 @@ public class JobHandler : NetworkBehaviour
             List<int> finishedTasks = taskDeadlines[deadline];
             taskDeadlines.Remove(deadline);
             if (finishedTasks.Count == 0) continue;
-            foreach (int task in finishedTasks)
-            {
-                RemoveTaskAssignment(task);
-                RemoveTask(task);
-            }
             // Code for finding the tasks each individual player finished
             Dictionary<PlayerRef, List<int>> finishedPlayerTasks = new Dictionary<PlayerRef, List<int>>();
             foreach (var kvp in assignedPlayers)
             {
+                // Only ad the finished tasks to the dictionary
+                if (!finishedTasks.Contains(kvp.Key)) continue;
                 // Adds the assigned task ids to the player in the dictionary
                 if (finishedPlayerTasks.ContainsKey(kvp.Value))
                 {
@@ -543,6 +542,11 @@ public class JobHandler : NetworkBehaviour
                 {
                     RPC_TasksFinish(kvp.Key, finishInfo);
                 }
+            }
+            foreach (int task in finishedTasks)
+            {
+                RemoveTaskAssignment(task);
+                RemoveTask(task);
             }
         }
     }

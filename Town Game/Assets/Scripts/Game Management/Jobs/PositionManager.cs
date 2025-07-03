@@ -199,6 +199,18 @@ public class PositionManager : NetworkBehaviour
         return branches[index];
     }
 
+    public Job GetJobFromHandler(JobHandler handler)
+    {
+        foreach (Branch branch in branches)
+        {
+            foreach (Job job in branch.jobs)
+            {
+                if (job.handler == handler) return job;
+            }
+        }
+        return null;
+    }
+
     // Job property stuff
 
     /// <summary>

@@ -9,6 +9,7 @@ public class Job
     public JobHandler handler;
     [Header("Info")]
     public string name;
+    public string shortName;
     public string description;
     public Texture icon;
     public string[] buildingAccess = new string[] { };

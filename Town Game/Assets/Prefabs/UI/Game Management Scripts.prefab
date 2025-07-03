@@ -340,6 +340,7 @@ MonoBehaviour:
     jobs:
     - handler: {fileID: 2146126489367553974}
       name: Chef
+      shortName: Chef
       description: Cook stuff
       icon: {fileID: 2800000, guid: 669f02f136d943e4a954daad8bbcbeac, type: 3}
       buildingAccess:
@@ -403,20 +404,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de452253259a0eb4aa019398f4edffd2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  associatedWithJob: 1
-  stateCreationThreshold: 2
   hiredPlayers: []
+  maxStrikes: 2
   groupIndex: 0
-  periodAddRange: {x: 9, y: 19}
-  periodLength: 2
-  periodSpacing: 2
-  periodTimePerDay: 4
-  maxDays: 3
   jobColor: {r: 0.29622638, g: 0.54840404, b: 1, a: 1}
-  taskCategories:
-  - Work in Cafeteria
-  generalPeriodName: General Job Stuff
   jobIconIndex: 0
+  clientConnected: 0
+  _activeTasks: []
+  _resolvedTasks: []
+  _assignedPlayers:
+    _items: []
+  _playerStrikes:
+    _items: []
 --- !u!1 &5211516756420375758
 GameObject:
   m_ObjectHideFlags: 0
