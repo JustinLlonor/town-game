@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
-using UnityEngine.Rendering.UI;
 
 public class PlayerNodes : NetworkBehaviour
 {
