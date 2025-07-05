@@ -54,6 +54,9 @@ public class GameManager : NetworkBehaviour
     [Networked] public bool skippedNight { get; set; } = false;
     bool previousSkippedNight = false;
     bool startedDay = false;
+    /// <summary>
+    /// Note: this delegate does not execute on all clients, only the server, and its attached to clock UI
+    /// </summary>
     public GameEvent OnTimeChange;
     public RevealRoles OnRevealRoles;
     /// <summary>

@@ -23,7 +23,7 @@ public class BarStatsUI : MonoBehaviour
 
     private void Awake()
     {
-        FindFirstObjectByType<PlayerManager>().onInstantiatePlayer += AssignPlayerReferences;
+        //FindFirstObjectByType<PlayerManager>().onInstantiatePlayer += AssignPlayerReferences;
     }
 
     private void LateUpdate()
@@ -33,6 +33,7 @@ public class BarStatsUI : MonoBehaviour
         AdjustBarSpacing();
     }
 
+    /**
     void AssignPlayerReferences(GameObject player)
     {   
         trackedStats = player.GetComponent<PlayerStats>();
@@ -43,6 +44,7 @@ public class BarStatsUI : MonoBehaviour
         healthBar.SetAlpha(0f);
         hungerBar.SetAlpha(0f);
     }
+    **/
 
     private void CheckBars()
     {
