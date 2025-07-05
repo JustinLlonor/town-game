@@ -22,7 +22,6 @@ public class UIManager : MonoBehaviour
     [Header("Menus")]
     public GameObject[] uiMenus;
     public int menuOpened = -1;
-    bool justExited = false;
 
     CursorManager cm;
     InteractableFinder iFinder;
@@ -45,17 +44,22 @@ public class UIManager : MonoBehaviour
         PlayerManager pm = FindFirstObjectByType<PlayerManager>();
         FindFirstObjectByType<CameraManager>().onSwitchCameraMode += OnCameraChangeMode;
         inputManager = FindFirstObjectByType<InputManager>();
-        inputManager.onExit += ExitUI;
+        //inputManager.onExit += ExitUIPressed;
         inputManager.onPlayerMenu += OpenTabMenu;
         inputManager.onMapMenu += OpenMapMenu;
+        inputManager.onInventoryMenu += OpenInventoryMenu;
         uip.Init();
         if (pui != null) pui.Init();
         foreach (var menu in uiMenus) menu.SetActive(false);
     }
 
-    private void LateUpdate()
+    private void Update()
     {
-        if (justExited) justExited = false;
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Debug.Log(uiOpened);
+            Debug.Log(menuOpened);
+        }
     }
 
     private void UIOpen(int menu)
@@ -91,7 +95,7 @@ public class UIManager : MonoBehaviour
     public void ExitUI()
     {
         if (!uiOpened) return;
-        justExited = true;
+        uiOpened = false;
         OnUIClose?.Invoke();
         menuOpened = -1;
         gameplayUI.SetActive(true);
@@ -99,14 +103,24 @@ public class UIManager : MonoBehaviour
 
     public void OpenTabMenu()
     {
-        if (justExited) return;
-        OnUIOpen?.Invoke(0);
+        OpenMenu(0);
     }
 
     public void OpenMapMenu()
     {
-        if (justExited) return;
-        OnUIOpen?.Invoke(1);
+        OpenMenu(1);
+    }
+
+    public void OpenInventoryMenu()
+    {
+        OpenMenu(2);
+    }
+
+    private void OpenMenu(int menuIndex)
+    {
+        int ogMenu = menuOpened;
+        ExitUI();
+        if (ogMenu != menuIndex) OnUIOpen?.Invoke(menuIndex);
     }
 
     // Corpse code //
