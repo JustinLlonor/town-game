@@ -202,7 +202,7 @@ public class PlayerNodes : NetworkBehaviour
         return -1;
     }
 
-    private NodeInfo GetNodeInfo(string nameId)
+    public NodeInfo GetNodeInfo(string nameId)
     {
         foreach (NodeInfo info in nodeInfo)
         {
@@ -211,7 +211,7 @@ public class PlayerNodes : NetworkBehaviour
         return null;
     }
 
-    private NodeInfo GetNodeInfo(int infoIndex)
+    public NodeInfo GetNodeInfo(int infoIndex)
     {
         return nodeInfo[infoIndex];
     }
@@ -249,5 +249,17 @@ public class PlayerNodes : NetworkBehaviour
             if (connectionInfo[i].name == connectionName) return i;
         }
         return -1;
+    }
+
+    public Node GetNode(int id)
+    {
+        foreach (Node node in nodes)
+        {
+            if (node.id == id)
+            {
+                return node;
+            }
+        }
+        return Node.None;
     }
 }

@@ -56,4 +56,12 @@ public struct Node : INetworkStruct
         this.value = value;
         this.baselineRate = baselineRate;
     }
+
+    public static Node None { 
+        get
+        {
+            return new Node(-1, -1, -1f, 0f);
+        }
+    
+    }
 }
