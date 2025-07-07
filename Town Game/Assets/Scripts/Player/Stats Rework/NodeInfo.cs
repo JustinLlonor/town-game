@@ -13,6 +13,7 @@ public class NodeInfo
     [Tooltip("The rate of change in units/period. Max units is 100")]
     public float startingRate;
     public bool highIsGood = true;
+    public Color attributeColor;
     [Tooltip("The status descriptions that appear at every level of this node")]
     public string[] statusDescriptions = new string[] { "Low", "Moderate", "High" };
     public Gradient statusGradient;

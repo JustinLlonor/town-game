@@ -12,6 +12,7 @@ public class PhysNode : MonoBehaviour
     public void Init(NodeInfo info)
     {
         attributeText.text = info.name;
+        attributeText.color = info.attributeColor;
         node = info;
         SetStatusText(info.startingValue);
     }

@@ -663,6 +663,7 @@ MonoBehaviour:
     startingValue: 100
     startingRate: 0
     highIsGood: 1
+    attributeColor: {r: 0.4198113, g: 1, b: 0.44523484, a: 1}
     statusDescriptions:
     - Critical
     - Injured
@@ -705,6 +706,7 @@ MonoBehaviour:
     startingValue: 75
     startingRate: -5
     highIsGood: 1
+    attributeColor: {r: 1, g: 0.763556, b: 0.495283, a: 1}
     statusDescriptions:
     - Starving
     - Hungry
@@ -747,6 +749,7 @@ MonoBehaviour:
     startingValue: 100
     startingRate: -8
     highIsGood: 1
+    attributeColor: {r: 0.5518868, g: 0.7984201, b: 1, a: 1}
     statusDescriptions:
     - Dehydrated
     - Parched
@@ -788,6 +791,7 @@ MonoBehaviour:
     startingValue: 100
     startingRate: -8
     highIsGood: 1
+    attributeColor: {r: 1, g: 1, b: 1, a: 1}
     statusDescriptions:
     - Dehydrated
     - Parched
