@@ -43,7 +43,7 @@ public struct Node : INetworkStruct
     public void RemoveConnection(int connectedNode)
     {
         if (!connections.ContainsKey(connectedNode)) return;
-        connetions.Remove(connectedNode);
+        connections.Remove(connectedNode);
     }
 
     /// <summary>

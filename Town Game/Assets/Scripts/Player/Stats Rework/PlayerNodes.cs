@@ -25,6 +25,15 @@ public class PlayerNodes : NetworkBehaviour
     {
         gameManager = FindAnyObjectByType<GameManager>();
         OnNodeCrossThreshold += CheckZeroDestroy;
+        AddNode("Health");
+        AddNode("Hunger", new List<NodeConnection> { new NodeConnection("Health", "Nutrition") });
+        AddNode("Thirst", new List<NodeConnection> { new NodeConnection("Health", "Nutrition") });
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha7))
+            AddNode("Test", new List<NodeConnection> { new NodeConnection("Hunger", "Nutrition") });
     }
 
     public override void FixedUpdateNetwork()
@@ -112,6 +121,7 @@ public class PlayerNodes : NetworkBehaviour
             if (!previousNodes.Contains(nNode)) nodeAddEvent.Add(nNode);
         }
         if (nodeAddEvent.Count > 0) onNodeAdd?.Invoke(nodeAddEvent);
+        previousNodes = newNodes;
     }
 
     /// <summary>
@@ -125,6 +135,20 @@ public class PlayerNodes : NetworkBehaviour
         NodeInfo info = GetNodeInfo(node.infoIndex);
         if (!info.destroyOnZero) return;
         RemoveNode(node.id);
+    }
+
+    public int AddNode(string nameId)
+    {
+        NodeInfo info = GetNodeInfo(nameId);
+        if (info == null)
+        {
+            Debug.LogError("Node nameId is invalid!");
+            return -1;
+        }
+        Node newNode = new Node(idCounter++, Array.IndexOf(nodeInfo, info), info.startingValue, info.startingRate);
+        if (info.destroyOnZero) newNode.thresholdEvents.Add(0f);
+        nodes.Add(newNode);
+        return -1;
     }
 
     public int AddNode(string nameId, List<NodeConnection> connections)

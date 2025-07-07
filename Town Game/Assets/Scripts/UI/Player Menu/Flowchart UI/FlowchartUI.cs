@@ -8,10 +8,13 @@ public class FlowchartUI : MonoBehaviour
     public Vector2Int gridSize;
     public Vector2 cellSize;
     public Transform contentTransform;
+    public Transform nodeHolder;
+    public Transform arrowHolder;
     public GameObject nodePrefab;
     public GameObject arrowPrefab;
     public NodeGrid uiGrid;
     public Dictionary<int, GameObject> uiObjects = new Dictionary<int, GameObject>();
+    public Dictionary<int, List<GameObject>> arrowObjects = new Dictionary<int, List<GameObject>>();
     PlayerNodes playerNodes;
 
     public struct NodeGrid
@@ -26,7 +29,7 @@ public class FlowchartUI : MonoBehaviour
             this.gridSize = gridSize;
             placedNodes = new Dictionary<int, Vector2Int>();
             occupiedLocations = new List<Vector2Int>();
-            center = new Vector2Int(Mathf.CeilToInt(gridSize.x / 2f), Mathf.CeilToInt(gridSize.y / 2f));
+            center = new Vector2Int(Mathf.FloorToInt(gridSize.x / 2f), Mathf.FloorToInt(gridSize.y / 2f));
         }
 
         public void PlaceNode(int nodeId, Vector2Int location)
@@ -100,6 +103,9 @@ public class FlowchartUI : MonoBehaviour
 
     private void Init()
     {
+        List<int> currentAddedNodes = new List<int>();
+        foreach (Node node in playerNodes.nodes) currentAddedNodes.Add(node.id);
+        if (currentAddedNodes.Count > 0) AddNodes(currentAddedNodes);
         playerNodes.onNodeAdd += AddNodes;
         playerNodes.onNodeRemove += RemoveNodes;
     }
@@ -108,8 +114,10 @@ public class FlowchartUI : MonoBehaviour
     {
         foreach (int nodeId in nodeIds)
         {
+            Debug.Log("added node of id: " + nodeId);
             CreateNode(nodeId);
         }
+        AdjustLayout();
     }
 
     private void RemoveNodes(List<int> nodeIds)
@@ -118,6 +126,7 @@ public class FlowchartUI : MonoBehaviour
         {
             RemoveNode(nodeId);
         }
+        AdjustLayout();
     }
     
     private void CreateNode(int id)
@@ -128,6 +137,29 @@ public class FlowchartUI : MonoBehaviour
         PhysNode pNode = nodeObject.GetComponent<PhysNode>();
         pNode.Init(nodeInfo);
         uiObjects.Add(id, nodeObject);
+    }
+
+    private void AdjustLayout()
+    {
+        if (playerNodes.nodes.Count == 0) return;
+        NodeGrid newUIGrid = CalculateNodeLayout();
+        foreach (var kvp in newUIGrid.placedNodes)
+        {
+            if (uiGrid.placedNodes.ContainsKey(kvp.Key))
+            {
+                if (uiGrid.placedNodes[kvp.Key].Equals(kvp.Value)) continue; // if same loc, don't move the node
+            }
+            MoveNode(kvp.Key, kvp.Value);
+        }
+        uiGrid = newUIGrid;
+    }
+
+    private void MoveNode(int id, Vector2Int location)
+    {
+        Vector2 newPos = GetContentLocation(location);
+        GameObject nodeObject = uiObjects[id];
+        Transform nodeTransform = nodeObject.transform;
+        nodeTransform.localPosition = newPos;
     }
 
     private NodeGrid CalculateNodeLayout()
@@ -304,6 +336,9 @@ public class FlowchartUI : MonoBehaviour
 
     private Vector2 GetContentLocation(Vector2Int gridLocation)
     {
-        return Vector2.zero;
+        Vector2 output = new Vector2(
+            (gridLocation.x - uiGrid.GetCenter().x) * cellSize.x, 
+            (gridLocation.y - uiGrid.GetCenter().y) * cellSize.y);
+        return output;
     }
 }
