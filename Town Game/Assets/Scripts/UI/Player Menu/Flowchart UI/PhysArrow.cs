@@ -26,6 +26,8 @@ public class PhysArrow : MonoBehaviour
     public Color flashColor;
     float finalHeight;
     float progress;
+    Vector2 previousStart;
+    Vector2 previousEnd;
 
     public List<MaskableGraphic> graphics = new List<MaskableGraphic>();
     List<Transform> triangles = new List<Transform>();
@@ -108,12 +110,18 @@ public class PhysArrow : MonoBehaviour
     /// <param name="endLocation">End local pos</param>
     public void Init(Vector2 startLocation, Vector2 endLocation)
     {
+        if ((previousStart == startLocation) && (previousEnd == endLocation)) return;
+        previousStart = startLocation;
+        previousEnd = endLocation;
+        Debug.Log("init beginning with start " + startLocation + " to " + endLocation);
         graphics.Clear();
         graphics.Add(lineImage);
         // Transform stuff
         transform.localPosition = startLocation;
         float height = Vector2.Distance(startLocation, endLocation);
         lineTransform.sizeDelta = new Vector2(lineTransform.sizeDelta.x, height);
+        Vector2 tanVector = endLocation - startLocation;
+        transform.eulerAngles = new Vector3(0f, 0f, Mathf.Atan2(tanVector.y, tanVector.x) * Mathf.Rad2Deg - 90f);
         // Triangles
         if (triangleHolder.childCount > 0)
         {
@@ -176,9 +184,29 @@ public class PhysArrow : MonoBehaviour
     {
         if (!flashEnabled) return;
         progress += Time.deltaTime * flashSpeed;
-        if (progress > Mathf.PI) progress -= Mathf.PI;
+        if (progress > Mathf.PI * 2f) progress -= Mathf.PI * 2f;
         float evaluation = (Mathf.Cos(progress) + 1f) / 2f;
         Color newColor = Color.Lerp(undottedColor, flashColor, evaluation);
         SetColor(newColor);
+    }
+
+    /// <summary>
+    /// Starts an arrow flash with the specified color and speed
+    /// </summary>
+    /// <param name="flashColor"></param>
+    /// <param name="flashSpeed"></param>
+    public void StartFlash(Color flashColor, float flashSpeed)
+    {
+        flashEnabled = true;
+        this.flashSpeed = flashSpeed;
+        this.flashColor = flashColor;
+    }
+
+    /// <summary>
+    /// Stops an arrow falsh
+    /// </summary>
+    public void StopFlash()
+    {
+        flashEnabled = false;
     }
 }

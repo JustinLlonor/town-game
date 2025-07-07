@@ -15,7 +15,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1177586900824043790
 RectTransform:
   m_ObjectHideFlags: 0
@@ -92,12 +92,12 @@ MonoBehaviour:
   triangleObject: {fileID: 5412249763462151589, guid: db9b3970cabe16a4393079e956a36f94, type: 3}
   lineTransform: {fileID: 1398147519792135982}
   triangleHolder: {fileID: 1177586900824043790}
-  lineImage: {fileID: 0}
+  lineImage: {fileID: 8829566452350678894}
   dottedLineSprite: {fileID: 66171839, guid: 06ce3c4dcc0f59f43a7e5dbe342a6468, type: 3}
   autoInitialize: 0
   trianglesActive: 0
-  dottedColor: {r: 0.67058825, g: 0.67058825, b: 0.67058825, a: 1}
-  undottedColor: {r: 1, g: 1, b: 1, a: 0}
+  dottedColor: {r: 0.24528301, g: 0.24528301, b: 0.24528301, a: 1}
+  undottedColor: {r: 0.735849, g: 0.735849, b: 0.735849, a: 1}
   flashEnabled: 0
   flashSpeed: 4
   flashColor: {r: 0, g: 0, b: 0, a: 0}
@@ -113,7 +113,6 @@ GameObject:
   - component: {fileID: 1398147519792135982}
   - component: {fileID: 4628783902443102865}
   - component: {fileID: 8829566452350678894}
-  - component: {fileID: 7879182727399640096}
   m_Layer: 5
   m_Name: Line
   m_TagString: Untagged
@@ -162,7 +161,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.735849, g: 0.735849, b: 0.735849, a: 1}
+  m_Color: {r: 0.24705882, g: 0.24705882, b: 0.24705882, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -179,18 +178,3 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 0.3
---- !u!114 &7879182727399640096
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6347081016445712519}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
-  m_EffectDistance: {x: 2.14, y: -2.62}
-  m_UseGraphicAlpha: 1

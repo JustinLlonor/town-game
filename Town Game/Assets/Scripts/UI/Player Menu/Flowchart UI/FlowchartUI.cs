@@ -5,6 +5,8 @@ using UnityEngine;
 public class FlowchartUI : MonoBehaviour
 {
     public string hpText = "Health";
+    public Color increaseColor = Color.green;
+    public Color decreaseColor = Color.red;
     public Vector2Int gridSize;
     public Vector2 cellSize;
     public Transform contentTransform;
@@ -13,8 +15,8 @@ public class FlowchartUI : MonoBehaviour
     public GameObject nodePrefab;
     public GameObject arrowPrefab;
     public NodeGrid uiGrid;
-    public Dictionary<int, GameObject> uiObjects = new Dictionary<int, GameObject>();
-    public Dictionary<int, List<GameObject>> arrowObjects = new Dictionary<int, List<GameObject>>();
+    public Dictionary<int, PhysNode> uiObjects = new Dictionary<int, PhysNode>(); // node id and game object
+    private Dictionary<int, List<ConnectionUI>> uiConnections = new Dictionary<int, List<ConnectionUI>>(); // node id and connection ui
     PlayerNodes playerNodes;
 
     public struct NodeGrid
@@ -90,6 +92,25 @@ public class FlowchartUI : MonoBehaviour
         }
     }
 
+    // When the value for a node updates, see if its connections are updated
+    private struct ConnectionUI
+    {
+        public int connectedNodeId;
+        public int connectionIndex;
+        public bool increaseIsGood;
+        public PhysArrow arrow;
+        public float previousConnectionDelta;
+
+        public ConnectionUI(int connectedNodeId, int connectionIndex, bool increaseIsGood, PhysArrow arrow)
+        {
+            this.connectedNodeId = connectedNodeId;
+            this.connectionIndex = connectionIndex;
+            this.increaseIsGood = increaseIsGood;
+            this.arrow = arrow;
+            previousConnectionDelta = 0f;
+        }
+    }
+
     private void OnEnable()
     {
         if (PlayerManager.i.currentPlayer == null) return;
@@ -108,6 +129,7 @@ public class FlowchartUI : MonoBehaviour
         if (currentAddedNodes.Count > 0) AddNodes(currentAddedNodes);
         playerNodes.onNodeAdd += AddNodes;
         playerNodes.onNodeRemove += RemoveNodes;
+        playerNodes.onNodeValueChange += ValueUpdate;
     }
 
     private void AddNodes(List<int> nodeIds)
@@ -132,11 +154,23 @@ public class FlowchartUI : MonoBehaviour
     private void CreateNode(int id)
     {
         Node addedNode = playerNodes.GetNode(id);
+        // Node object
         GameObject nodeObject = Instantiate(nodePrefab, contentTransform);
         NodeInfo nodeInfo = playerNodes.GetNodeInfo(addedNode.infoIndex);
         PhysNode pNode = nodeObject.GetComponent<PhysNode>();
         pNode.Init(nodeInfo);
-        uiObjects.Add(id, nodeObject);
+        // Arrows
+        List<ConnectionUI> connections = new List<ConnectionUI>();
+        foreach (var connection in addedNode.connections)
+        {
+            GameObject arrowObject = Instantiate(arrowPrefab, arrowHolder);
+            Node connectedNode = playerNodes.GetNode(connection.Key);
+            NodeInfo connectedNodeInfo = playerNodes.GetNodeInfo(connectedNode.infoIndex);
+            ConnectionUI cUI = new ConnectionUI(connection.Key, connection.Value, connectedNodeInfo.highIsGood, arrowObject.GetComponent<PhysArrow>());
+            connections.Add(cUI);
+        }
+        uiConnections.Add(id, connections);
+        uiObjects.Add(id, pNode);
     }
 
     private void AdjustLayout()
@@ -145,9 +179,20 @@ public class FlowchartUI : MonoBehaviour
         NodeGrid newUIGrid = CalculateNodeLayout();
         foreach (var kvp in newUIGrid.placedNodes)
         {
+            // Arrow connection code
+            if (uiConnections.ContainsKey(kvp.Key))
+            {
+                foreach (ConnectionUI cUI in uiConnections[kvp.Key])
+                {
+                    Debug.Log("initing arrow");
+                    cUI.arrow.Init(GetContentLocation(kvp.Value), 
+                        GetContentLocation(newUIGrid.placedNodes[cUI.connectedNodeId]));
+                }
+            }
+            // Node move code
             if (uiGrid.placedNodes.ContainsKey(kvp.Key))
             {
-                if (uiGrid.placedNodes[kvp.Key].Equals(kvp.Value)) continue; // if same loc, don't move the node
+                if (!uiGrid.placedNodes[kvp.Key].Equals(kvp.Value)) continue; // if same loc, don't move the node
             }
             MoveNode(kvp.Key, kvp.Value);
         }
@@ -157,7 +202,7 @@ public class FlowchartUI : MonoBehaviour
     private void MoveNode(int id, Vector2Int location)
     {
         Vector2 newPos = GetContentLocation(location);
-        GameObject nodeObject = uiObjects[id];
+        GameObject nodeObject = uiObjects[id].gameObject;
         Transform nodeTransform = nodeObject.transform;
         nodeTransform.localPosition = newPos;
     }
@@ -331,6 +376,15 @@ public class FlowchartUI : MonoBehaviour
     {
         if (!uiObjects.ContainsKey(id)) return;
         Destroy(uiObjects[id]);
+        // Destroy connection stuff
+        if (uiConnections.ContainsKey(id))
+        {
+            foreach (ConnectionUI cUI in uiConnections[id])
+            {
+                Destroy(cUI.arrow.gameObject);
+            }
+            uiConnections.Remove(id);
+        }
         uiObjects.Remove(id);
     }
 
@@ -340,5 +394,45 @@ public class FlowchartUI : MonoBehaviour
             (gridLocation.x - uiGrid.GetCenter().x) * cellSize.x, 
             (gridLocation.y - uiGrid.GetCenter().y) * cellSize.y);
         return output;
+    }
+
+    private void ValueUpdate(Node node)
+    {
+        uiObjects[node.id].SetStatusText(node.value);
+        // Updates the arrow uis
+        List<ConnectionUI> cUIs = new List<ConnectionUI>();
+        for (int i = 0; i < uiConnections[node.id].Count; i++)
+        {
+            ConnectionUI cUI = uiConnections[node.id][i];
+            ConnectionInfo info = playerNodes.GetConnectionInfo(cUI.connectionIndex);
+            float connectionDelta = info.effectLevels.Evaluate(node.value / 100f);
+            if (!cUI.increaseIsGood) connectionDelta *= -1f;
+            if (connectionDelta > 0f && (!(cUI.previousConnectionDelta > 0f)))
+            {
+                Debug.Log("starting postitive");
+                cUI.arrow.SetDotted(false);
+                cUI.arrow.SetTrianglesActive(true);
+                cUI.arrow.StartFlash(increaseColor, 1.2f);
+                cUI.arrow.SetTriangleText("+");
+            }
+            else if (connectionDelta < 0f && (!(cUI.previousConnectionDelta < 0f)))
+            {
+                Debug.Log("starting negative");
+                cUI.arrow.SetDotted(false);
+                cUI.arrow.SetTrianglesActive(true);
+                cUI.arrow.StartFlash(decreaseColor, 3.2f);
+                cUI.arrow.SetTriangleText("-");
+            }
+            else if (connectionDelta == 0 && (cUI.previousConnectionDelta != 0f))
+            {
+                Debug.Log("starting dotted");
+                cUI.arrow.SetDotted(true);
+                cUI.arrow.SetTrianglesActive(false);
+                cUI.arrow.StopFlash();
+            }
+            cUI.previousConnectionDelta = connectionDelta;
+            cUIs.Add(cUI);
+        }
+        uiConnections[node.id] = cUIs;
     }
 }

@@ -13,11 +13,15 @@ public class PlayerNodes : NetworkBehaviour
     public NodeThresholdEvent OnNodeCrossThreshold;
     // Client-sided events
     public NodesEvent onNodeAdd;
+    public NodeEvent onNodeValueChange;
     public NodesEvent onNodeRemove;
+    // Node ids and their values on the previous frame
+    private Dictionary<int, float> previousValues = new Dictionary<int, float>();
 
     private int idCounter = 0;
     GameManager gameManager;
 
+    public delegate void NodeEvent(Node node);
     public delegate void NodesEvent(List<int> nodeIds);
     public delegate void NodeThresholdEvent(Node node, float thresholdCrossed);
 
@@ -41,6 +45,7 @@ public class PlayerNodes : NetworkBehaviour
         UpdateNodes();
         if (!HasInputAuthority) return;
         CheckNodeChanges();
+        CheckPreviousValues();
     }
 
     private void UpdateNodes()
@@ -124,6 +129,24 @@ public class PlayerNodes : NetworkBehaviour
         previousNodes = newNodes;
     }
 
+    private void CheckPreviousValues()
+    {
+        Dictionary<int, float> modifications = new Dictionary<int, float>();
+        foreach (var kvp in previousValues)
+        {
+            Node node = GetNode(kvp.Key);
+            if (node.value != kvp.Value)
+            {
+                onNodeValueChange?.Invoke(node);
+                modifications.Add(kvp.Key, node.value);
+            }
+        }
+        foreach (var kvp in modifications)
+        {
+            previousValues[kvp.Key] = kvp.Value;
+        }
+    }
+
     /// <summary>
     /// Checks the node 
     /// </summary>
@@ -148,6 +171,7 @@ public class PlayerNodes : NetworkBehaviour
         Node newNode = new Node(idCounter++, Array.IndexOf(nodeInfo, info), info.startingValue, info.startingRate);
         if (info.destroyOnZero) newNode.thresholdEvents.Add(0f);
         nodes.Add(newNode);
+        AddPreviousValue(newNode);
         return -1;
     }
 
@@ -166,6 +190,7 @@ public class PlayerNodes : NetworkBehaviour
         }
         if (info.destroyOnZero) newNode.thresholdEvents.Add(0f);
         nodes.Add(newNode);
+        AddPreviousValue(newNode);
         return -1;
     }
 
@@ -184,6 +209,7 @@ public class PlayerNodes : NetworkBehaviour
             newNode.thresholdEvents.Add(tEvent);
         }
         nodes.Add(newNode);
+        AddPreviousValue(newNode);
         return -1;
     }
 
@@ -205,6 +231,7 @@ public class PlayerNodes : NetworkBehaviour
             }
         }
         RemoveConnectionFromAll(nodeId);
+        RemovePreviousValue(nodeId);
     }
 
     /// <summary>
@@ -222,6 +249,17 @@ public class PlayerNodes : NetworkBehaviour
                 nodes.Set(i, newNode);
             }
         }
+    }
+
+    private void AddPreviousValue(Node node)
+    {
+        previousValues.Add(node.id, node.value);
+    }
+
+    private void RemovePreviousValue(int id)
+    {
+        if (!previousValues.ContainsKey(id)) return;
+        previousValues.Remove(id);
     }
 
     public bool NodeExists(string nameId)
@@ -294,7 +332,7 @@ public class PlayerNodes : NetworkBehaviour
         return nodeInfo[infoIndex];
     }
 
-    private ConnectionInfo GetConnectionInfo(string nameId)
+    public ConnectionInfo GetConnectionInfo(string nameId)
     {
         foreach (ConnectionInfo info in connectionInfo)
         {
@@ -303,7 +341,7 @@ public class PlayerNodes : NetworkBehaviour
         return null;
     }
 
-    private ConnectionInfo GetConnectionInfo(int connectionIndex)
+    public ConnectionInfo GetConnectionInfo(int connectionIndex)
     {
         return connectionInfo[connectionIndex];
     }

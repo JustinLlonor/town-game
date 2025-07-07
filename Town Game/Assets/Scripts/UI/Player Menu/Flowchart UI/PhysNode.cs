@@ -25,6 +25,6 @@ public class PhysNode : MonoBehaviour
         string newText = node.statusDescriptions[statusWordIndex] + " (" + value.ToString("0.0") + "%)";
         statusText.text = newText;
         // attribute colour
-        attributeText.color = node.statusGradient.Evaluate(progress);
+        statusText.color = node.statusGradient.Evaluate(progress);
     }
 }

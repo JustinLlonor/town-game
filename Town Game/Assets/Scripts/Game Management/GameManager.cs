@@ -7,7 +7,6 @@ using TMPro;
 using Steamworks;
 using System;
 using WebSocketSharp;
-using static PlayerManager;
 
 public class GameManager : NetworkBehaviour
 {
