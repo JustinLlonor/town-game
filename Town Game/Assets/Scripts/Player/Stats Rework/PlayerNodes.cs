@@ -6,14 +6,19 @@ using Fusion;
 
 public class PlayerNodes : NetworkBehaviour
 {
-    [Networked, Capacity(12)] public NetworkLinkedList<Node> nodes => default;
+    [Networked, Capacity(15)] public NetworkLinkedList<Node> nodes => default;
+    private List<int> previousNodes = new List<int>();
     public NodeInfo[] nodeInfo;
     public ConnectionInfo[] connectionInfo;
     public NodeThresholdEvent OnNodeCrossThreshold;
+    // Client-sided events
+    public NodesEvent onNodeAdd;
+    public NodesEvent onNodeRemove;
 
     private int idCounter = 0;
     GameManager gameManager;
 
+    public delegate void NodesEvent(List<int> nodeIds);
     public delegate void NodeThresholdEvent(Node node, float thresholdCrossed);
 
     public override void Spawned()
@@ -25,6 +30,8 @@ public class PlayerNodes : NetworkBehaviour
     public override void FixedUpdateNetwork()
     {
         UpdateNodes();
+        if (!HasInputAuthority) return;
+        CheckNodeChanges();
     }
 
     private void UpdateNodes()
@@ -82,6 +89,31 @@ public class PlayerNodes : NetworkBehaviour
         }
     }
 
+    // Client sidede event
+    private void CheckNodeChanges()
+    {
+        // Create int list of nodes
+        List<int> newNodes = new List<int>();
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            newNodes.Add(nodes[i].id);
+        }
+        // Check if new nodes has previous nodes
+        List<int> nodeRemoveEvent = new List<int>(); // Record every change in chunks so the calculation doesn't happen multiple times
+        foreach (int pNode in previousNodes)
+        {
+            if (!newNodes.Contains(pNode)) nodeRemoveEvent.Add(pNode);
+        }
+        if (nodeRemoveEvent.Count > 0) onNodeRemove?.Invoke(nodeRemoveEvent);
+        // Check if new node is in previous node
+        List<int> nodeAddEvent = new List<int>();
+        foreach (int nNode in newNodes)
+        {
+            if (!previousNodes.Contains(nNode)) nodeAddEvent.Add(nNode);
+        }
+        if (nodeAddEvent.Count > 0) onNodeAdd?.Invoke(nodeAddEvent);
+    }
+
     /// <summary>
     /// Checks the node 
     /// </summary>
@@ -95,7 +127,7 @@ public class PlayerNodes : NetworkBehaviour
         RemoveNode(node.id);
     }
 
-    public int AddNode(string nameId)
+    public int AddNode(string nameId, List<NodeConnection> connections)
     {
         NodeInfo info = GetNodeInfo(nameId);
         if (info == null)
@@ -104,12 +136,16 @@ public class PlayerNodes : NetworkBehaviour
             return -1;
         }
         Node newNode = new Node(idCounter++, Array.IndexOf(nodeInfo, info), info.startingValue, info.startingRate);
+        foreach (NodeConnection connection in connections)
+        {
+            newNode.AddConnection(GetNodeId(connection.connectedNodeName), GetConnectionIndex(connection.connectionName));
+        }
         if (info.destroyOnZero) newNode.thresholdEvents.Add(0f);
         nodes.Add(newNode);
         return -1;
     }
 
-    public int AddNode(string nameId, List<float> thresholdEvents)
+    public int AddNode(string nameId, List<NodeConnection> connections, List<float> thresholdEvents)
     {
         NodeInfo info = GetNodeInfo(nameId);
         if (info == null)
@@ -141,7 +177,25 @@ public class PlayerNodes : NetworkBehaviour
             if (nodes[i].id == nodeId)
             {
                 nodes.Remove(nodes[i]);
-                return;
+                break;
+            }
+        }
+        RemoveConnectionFromAll(nodeId);
+    }
+
+    /// <summary>
+    /// Removes the specified connection from all nodes
+    /// </summary>
+    /// <param name="nodeId"></param>
+    private void RemoveConnectionFromAll(int nodeId)
+    {
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            Node newNode = nodes[i];
+            if (newNode.connections.ContainsKey(nodeId))
+            {
+                newNode.RemoveConnection(nodeId);
+                nodes.Set(i, newNode);
             }
         }
     }
@@ -181,7 +235,7 @@ public class PlayerNodes : NetworkBehaviour
         int fromNodeIndex = GetNodeIndexFromId(fromNodeId);
         int toNodeIndex = GetNodeIndexFromId(toNodeId);
         if (fromNodeIndex == -1 || toNodeIndex == -1) return;
-        int connectionIndex = GetConnectionIndexFromName(connectionName);
+        int connectionIndex = GetConnectionIndex(connectionName);
         if (connectionIndex == -1) return;
         Node fromNode = nodes[fromNodeIndex];
         fromNode.AddConnection(toNodeIndex, connectionIndex);
@@ -242,7 +296,7 @@ public class PlayerNodes : NetworkBehaviour
         return -1;
     }
 
-    private int GetConnectionIndexFromName(string connectionName)
+    private int GetConnectionIndex(string connectionName)
     {
         for (int i = 0; i < connectionInfo.Length; i++)
         {
@@ -259,6 +313,16 @@ public class PlayerNodes : NetworkBehaviour
             {
                 return node;
             }
+        }
+        return Node.None;
+    }
+
+    public Node GetNode(string nameId)
+    {
+        foreach (Node node in nodes)
+        {
+            NodeInfo info = GetNodeInfo(node.infoIndex);
+            if (info.name == nameId) return node;
         }
         return Node.None;
     }

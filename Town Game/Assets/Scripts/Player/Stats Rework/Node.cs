@@ -40,6 +40,12 @@ public struct Node : INetworkStruct
         connections.Add(connectedNode, connectionIndex);
     }
 
+    public void RemoveConnection(int connectedNode)
+    {
+        if (!connections.ContainsKey(connectedNode)) return;
+        connetions.Remove(connectedNode);
+    }
+
     /// <summary>
     /// Adds/subtracts value to this node with a clamp
     /// </summary>
