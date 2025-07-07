@@ -152,7 +152,7 @@ public class UIManager : MonoBehaviour
         hotbarUI.SetActive(enabled);
     }
 
-    public void CloseUI()
+    private void CloseUI()
     {
         Cursor.visible = false;
         cm.Lock();

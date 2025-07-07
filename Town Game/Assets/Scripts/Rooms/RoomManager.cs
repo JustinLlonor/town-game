@@ -76,7 +76,7 @@ public class RoomManager : MonoBehaviour
     void BuildingChooseStart()
     {
         PlayerRef localPlayer = positionManager.Runner.LocalPlayer;
-        Debug.Log("starting");
+        UIManager.instance.ExitUI();
         //if (!gm.alivePlayers.Contains(PhotonNetwork.LocalPlayer)) return;
         ownedRooms = new List<MapRoom>() { playerRooms[pm.GetRoom(localPlayer)] }; // Creates new owned rooms list
         foreach (MapRoom room in workRooms)

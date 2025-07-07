@@ -661,6 +661,7 @@ MonoBehaviour:
   - name: Health
     description: Your life force. When this attribute reaches 0%, you die.
     startingValue: 100
+    criticalDisplayRange: {x: 0, y: 30}
     startingRate: 0
     highIsGood: 1
     attributeColor: {r: 0.4198113, g: 1, b: 0.44523484, a: 1}
@@ -704,6 +705,7 @@ MonoBehaviour:
     description: Your nourishment level. When this attribute reaches 25%, you start
       to take damage. Increase Hunger by eating food.
     startingValue: 75
+    criticalDisplayRange: {x: 0, y: 30}
     startingRate: -5
     highIsGood: 1
     attributeColor: {r: 1, g: 0.763556, b: 0.495283, a: 1}
@@ -747,6 +749,7 @@ MonoBehaviour:
     description: Your hydration level. When this attribute reaches 25%, you start
       to take damage. Increase Thirst by drinking liquids.
     startingValue: 100
+    criticalDisplayRange: {x: 0, y: 30}
     startingRate: -8
     highIsGood: 1
     attributeColor: {r: 0.5518868, g: 0.7984201, b: 1, a: 1}
@@ -789,6 +792,7 @@ MonoBehaviour:
   - name: Test
     description: A simple and humble test node
     startingValue: 100
+    criticalDisplayRange: {x: 0, y: 30}
     startingRate: -8
     highIsGood: 1
     attributeColor: {r: 1, g: 1, b: 1, a: 1}
@@ -876,11 +880,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: efc2677e6c533a4478fed0a1da7cd129, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerNodes: {fileID: 4418607301688802760}
   maxHP: 3
   _HP: 3
-  maxHunger: 3
-  _hunger: 3
-  hungerTickDelay: 6
   maxStamina: 120
   _stamina: 100
   staminaRegenSpeed: 25

@@ -4,20 +4,11 @@ using UnityEngine;
 
 public class PlayerStats : NetworkBehaviour
 {
+    public PlayerNodes playerNodes;
     [Header("HP")]
-    public int maxHP = 3;
-    [Networked] public int HP { get; set; } = 3;
-    private int previousHP = 3;
-    [Header("Hunger")]
-    public int maxHunger = 3;
-    [Networked] public int hunger { get; set; } = 3;
-    [Tooltip("The amount of periods in between each hunger tick")]
-    public float hungerTickDelay = 6f;
-    private int previousHunger = 3;
-    /// <summary>
-    /// The next period for the hunger check to occur
-    /// </summary>
-    private float hungerTickPeriod = 0f;
+    public float maxHP = 100f;
+    [Networked] public float HP { get; set; } = 100f;
+    private float previousHP = 100f;
     [Header("Stamina")]
     public float maxStamina = 100f;
     [Networked] public float stamina { get; set; } = 100f;
@@ -57,22 +48,6 @@ public class PlayerStats : NetworkBehaviour
     GameManager gameManager;
     ObjectManager objectManager;
 
-    [System.Serializable]
-    public class OdourPresence
-    {
-        public string odour;
-        /// <summary>
-        /// The amount of odour present
-        /// </summary>
-        public float amount;
-
-        public OdourPresence(string odour, float amount)
-        {
-            this.odour = odour;
-            this.amount = amount;
-        }
-    }
-
     private void Start()
     {
         shake = FindFirstObjectByType<CameraShake>();
@@ -85,18 +60,17 @@ public class PlayerStats : NetworkBehaviour
     public override void Spawned()
     {
         gameManager = FindAnyObjectByType<GameManager>();
-        hungerTickPeriod = 7f;
         objectManager = FindAnyObjectByType<ObjectManager>();
         changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
         pm.SetGrounded();
         stamina = 100f;
         staminaCooldown = 0f;
         previousHP = HP;
-        previousHunger = hunger;
     }
 
     public override void Render()
     {
+        /**
         foreach (var change in changeDetector.DetectChanges(this))
         {
             switch (change)
@@ -111,6 +85,7 @@ public class PlayerStats : NetworkBehaviour
                     break;
             }
         }
+        **/
     }
 
     public override void Despawned(NetworkRunner runner, bool hasState)
@@ -120,6 +95,8 @@ public class PlayerStats : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
+        GetHP();
+        CheckDeath();
         piv.recievedHP = HP;
         if (staminaCooldown > 0f) staminaCooldown -= Runner.DeltaTime;
         if (staminaRegenCooldown > 0f) staminaRegenCooldown -= Runner.DeltaTime;
@@ -127,57 +104,17 @@ public class PlayerStats : NetworkBehaviour
         {
             RegenStamina();
         }
-        HungerCheck();
-    }
-    // Health and hunger will be replaced/heavily modified
-
-    // Health
-    #region
-    /// <summary>
-    /// Sets the health of this player
-    /// </summary>
-    /// <param name="health"></param>
-    public void SetHealth(int health)
-    {
-        int previousHealth = HP;
-        HP = health;
-        onHPChange?.Invoke(HP - previousHealth);
     }
 
-    /// <summary>
-    /// Damages the player by the specified amount
-    /// </summary>
-    /// <param name="amount"></param>
-    public void Damage(int amount)
+    public void Damage(float damage)
     {
-        if (!Runner.IsServer) return;
-        HP -= amount;
-        onHPChange?.Invoke(-amount);
-        CheckDeath();
-        /**
-        if (playShake)
-        {
-            if (amount < softThreshold)
-            {
-                shake.StartShake(softHurt.shakeProperties);
-            }
-            else
-            {
-                shake.StartShake(hardHurt.shakeProperties);
-            }
-        }
-        **/
+        playerNodes.ChangeNodeValue("Health", -damage);
     }
 
-    /// <summary>
-    /// Heals the player by the specified amount
-    /// </summary>
-    /// <param name="amount"></param>
-    public void Heal(int amount)
+    private void GetHP()
     {
-        HP += amount;
-        if (HP > maxHP) HP = maxHP;
-        onHPChange?.Invoke(amount);
+        Debug.Log(playerNodes.GetNode("Health").infoIndex);
+        HP = playerNodes.GetNode("Health").value;
     }
 
     /// <summary>
@@ -218,7 +155,8 @@ public class PlayerStats : NetworkBehaviour
     /// </summary>
     void CheckDeath()
     {
-        if (HP <= 0)
+        if (!Runner.IsServer) return;
+        if (HP <= 0f)
         {
             Kill();
         }
@@ -234,68 +172,7 @@ public class PlayerStats : NetworkBehaviour
         cb.isSprinting = false;
         FindAnyObjectByType<PlayerManager>().onDestroyPlayer?.Invoke();
     }
-    #endregion
 
-    // Hunger
-    #region
-    /// <summary>
-    /// Sets the hunger of this player
-    /// </summary>
-    /// <param name="amount"></param>
-    public void SetHunger(int amount)
-    {
-        amount = Mathf.Clamp(amount, 0, maxHunger);
-        int previousHunger = hunger;
-        hunger = amount;
-        onHungerChange?.Invoke(hunger - previousHunger);
-    }
-
-    /// <summary>
-    /// Adds hunger by the specified amount
-    /// </summary>
-    /// <param name="amount"></param>
-    public void AddHunger(int amount)
-    {
-        SetHunger(hunger + amount);
-    }
-
-    /// <summary>
-    /// Removes hunger by the specified amount
-    /// </summary>
-    /// <param name="amount"></param>
-    public void RemoveHunger(int amount)
-    {
-        SetHunger(hunger - amount);
-    }
-
-    /// <summary>
-    /// To be called at specified periods of the day. 
-    /// Removes 1 hunger from the player. If the player's hunger is already 0, then removes 1 HP from the player
-    /// </summary>
-    public void TickHunger()
-    {
-        if (hunger <= 0)
-        {
-            Damage(1);
-            return;
-        }
-        RemoveHunger(1);
-    }
-
-    private void HungerCheck()
-    {
-        if (!HasStateAuthority) return;
-        if (gameManager == null) return;
-        if (gameManager.currentPeriod > hungerTickPeriod)
-        {
-            hungerTickPeriod += hungerTickDelay;
-            TickHunger();
-        }
-    }
-    #endregion
-
-    // Stamina
-    #region
     private void RegenStamina()
     {
         if (stamina == maxStamina) return;
@@ -333,6 +210,5 @@ public class PlayerStats : NetworkBehaviour
         
         return true;
     }
-    #endregion
 }
 

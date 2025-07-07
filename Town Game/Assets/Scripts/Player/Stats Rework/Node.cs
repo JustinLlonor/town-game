@@ -68,6 +68,10 @@ public struct Node : INetworkStruct
         {
             return new Node(-1, -1, -1f, 0f);
         }
-    
+    }
+
+    public bool IsNone()
+    {
+        return id == -1;
     }
 }

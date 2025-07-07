@@ -358,6 +358,18 @@ public class PlayerNodes : NetworkBehaviour
         return -1;
     }
 
+    private int GetNodeIndexFromName(string nameId)
+    {
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            if (GetNodeInfo(nodes[i].infoIndex).name == nameId)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     private int GetConnectionIndex(string connectionName)
     {
         for (int i = 0; i < connectionInfo.Length; i++)
@@ -387,5 +399,13 @@ public class PlayerNodes : NetworkBehaviour
             if (info.name == nameId) return node;
         }
         return Node.None;
+    }
+
+    public void ChangeNodeValue(string nameId, float change)
+    {
+        int nodeIndex = GetNodeIndexFromName(nameId);
+        Node newNode = nodes[nodeIndex];
+        newNode.value += change;
+        nodes.Set(nodeIndex, newNode);
     }
 }

@@ -1225,10 +1225,11 @@ MonoBehaviour:
   appendToHighestSlot: 1
   minHeight: 110
   heightThreshold: -44
+  nodeHolder: {fileID: 2521241109484306126}
+  hotbarNodePrefab: {fileID: 5681053317827519434, guid: eeb3468da59ecc84b9b91cfeabbbbc29, type: 3}
   barSpacing: 165
   barSpaceSpeed: 200
-  healthBar: {fileID: 7911589925217691769}
-  hungerBar: {fileID: 6034321134274356459}
+  flowchartUI: {fileID: 0}
 --- !u!1 &3459647967433955565
 GameObject:
   m_ObjectHideFlags: 0

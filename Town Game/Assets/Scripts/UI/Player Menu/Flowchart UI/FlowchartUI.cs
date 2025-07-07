@@ -17,7 +17,15 @@ public class FlowchartUI : MonoBehaviour
     public NodeGrid uiGrid;
     public Dictionary<int, PhysNode> uiObjects = new Dictionary<int, PhysNode>(); // node id and game object
     private Dictionary<int, List<ConnectionUI>> uiConnections = new Dictionary<int, List<ConnectionUI>>(); // node id and connection ui
+    private Dictionary<int, string> previousStatus = new Dictionary<int, string>();
     PlayerNodes playerNodes;
+
+    /// <summary>
+    /// Called when ndoe info needs to be shown in the hotbar
+    /// </summary>
+    public NodeUIEvent onInfoSend;
+
+    public delegate void NodeUIEvent(int id);
 
     public struct NodeGrid
     {
@@ -399,6 +407,12 @@ public class FlowchartUI : MonoBehaviour
     private void ValueUpdate(Node node)
     {
         uiObjects[node.id].SetStatusText(node.value);
+        NodeInfo nodeInfo = playerNodes.GetNodeInfo(node.infoIndex);
+        if ((nodeInfo.criticalDisplayRange.x <= node.value) && (nodeInfo.criticalDisplayRange.y >= node.value))
+        {
+            Debug.LogError("displaying");
+            onInfoSend?.Invoke(node.id);
+        }
         // Updates the arrow uis
         List<ConnectionUI> cUIs = new List<ConnectionUI>();
         for (int i = 0; i < uiConnections[node.id].Count; i++)

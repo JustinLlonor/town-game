@@ -1,3 +1,4 @@
+using Mono.Cecil.Cil;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,12 +12,14 @@ public class BarStatsUI : MonoBehaviour
     public float minHeight = 50f;
     public float heightThreshold = -43f;
     [Header("Bar Settings")]
+    public Transform nodeHolder;
+    public GameObject hotbarNodePrefab;
     public float barSpacing = 165f;
     public float barSpaceSpeed = 5f;
-    public BarUI healthBar;
-    public BarUI hungerBar;
-    private List<BarUI> activeBars = new List<BarUI>();
+    private List<HotbarNode> activeNodes = new List<HotbarNode>();
     PlayerStats trackedStats;
+    PlayerNodes trackedNodes;
+    public FlowchartUI flowchartUI;
     float shMinHeight;
     bool init = false;
     float hotbarScale;
@@ -24,6 +27,7 @@ public class BarStatsUI : MonoBehaviour
     private void Awake()
     {
         FindFirstObjectByType<PlayerManager>().onInstantiatePlayer += AssignPlayerReferences;
+        flowchartUI.onInfoSend += CheckShowNode;
     }
 
     private void LateUpdate()
@@ -36,21 +40,23 @@ public class BarStatsUI : MonoBehaviour
     void AssignPlayerReferences(GameObject player)
     {   
         trackedStats = player.GetComponent<PlayerStats>();
-        healthBar.Init(trackedStats.maxHP);
-        hungerBar.Init(trackedStats.maxHunger);
-        trackedStats.onHPChangeClient += OnHPChange;
-        trackedStats.onHungerChangeClient += OnHungerChange;
-        healthBar.SetAlpha(0f);
-        hungerBar.SetAlpha(0f);
+        trackedNodes = player.GetComponent<PlayerNodes>();
+        //healthBar.Init(trackedStats.maxHP);
+        //hungerBar.Init(trackedStats.maxHunger);
+        //trackedStats.onHPChangeClient += OnHPChange;
+        //trackedStats.onHungerChangeClient += OnHungerChange;
+        //healthBar.SetAlpha(0f);
+        //hungerBar.SetAlpha(0f);
     }
 
     private void CheckBars()
     {
-        for (int i = 0; i < activeBars.Count; i++)
+        for (int i = 0; i < activeNodes.Count; i++)
         {
-            if (!activeBars[i].statRevealing)
+            if (!activeNodes[i].statRevealing)
             {
-                activeBars.RemoveAt(i);
+                Destroy(activeNodes[i].gameObject);
+                activeNodes.RemoveAt(i);
                 i--;
             }
         }
@@ -61,7 +67,7 @@ public class BarStatsUI : MonoBehaviour
         int i = 0;
         float step = Time.deltaTime * barSpaceSpeed;
         float middleOffset = GetTotalWidth() / 2f;
-        foreach (var bar in activeBars)
+        foreach (var bar in activeNodes)
         {
             RectTransform barTransform = (RectTransform)bar.transform;
             float newXPos = i * barSpacing - middleOffset;
@@ -73,32 +79,43 @@ public class BarStatsUI : MonoBehaviour
 
     private float GetTotalWidth()
     {
-        if (activeBars.Count == 0) return 0f;
-        return (activeBars.Count - 1) * barSpacing + ((RectTransform)activeBars[activeBars.Count - 1].transform).sizeDelta.x;
+        if (activeNodes.Count == 0) return 0f;
+        return (activeNodes.Count - 1) * barSpacing + ((RectTransform)activeNodes[activeNodes.Count - 1].transform).sizeDelta.x;
     }
 
-    private void AddActiveBar(BarUI bar)
+    private void CheckShowNode(int nodeId)
     {
-        if (!activeBars.Contains(bar))
+        int nodeIndex = GetNodeIndex(nodeId);
+        if (nodeIndex > -1)
         {
-            activeBars.Add(bar);
-            RectTransform rt = bar.GetComponent<RectTransform>();
-            rt.anchoredPosition = new Vector2(-(rt.sizeDelta.x / 2f), 0f);
+            activeNodes[nodeIndex].ResetTime();
+        }
+        else
+        {
+            AddActiveNode(nodeId);
         }
     }
 
-    private void OnHPChange(int value)
+    private int GetNodeIndex(int nodeId)
     {
-        healthBar.SetValue(trackedStats.HP);
-        healthBar.RevealStat();
-        AddActiveBar(healthBar);
+        for (int i = 0; i < activeNodes.Count; i++)
+        {
+            if (activeNodes[i].trackedNodeId == nodeId) return i;
+        }
+        return -1;
     }
 
-    private void OnHungerChange(int value)
+    private void AddActiveNode(int nodeId)
     {
-        hungerBar.SetValue(trackedStats.hunger);
-        hungerBar.RevealStat();
-        AddActiveBar(hungerBar);
+        GameObject nodeObject = Instantiate(hotbarNodePrefab, nodeHolder);
+        HotbarNode node = nodeObject.GetComponent<HotbarNode>();
+        node.Init(nodeId, trackedNodes);
+        if (!activeNodes.Contains(node))
+        {
+            activeNodes.Add(node);
+            RectTransform rt = nodeObject.GetComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(-(rt.sizeDelta.x / 2f), 0f);
+        }
     }
 
     private void SetHeight()
