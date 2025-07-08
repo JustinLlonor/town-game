@@ -59,6 +59,10 @@ public class HotbarNode : MonoBehaviour
             ProcessEndAnim();
             return;
         }
+        if (alphaGroup.alpha != 1f)
+        {
+            alphaGroup.SetAlpha(1f);
+        }
     }
 
     private void ProcessStartAnim()

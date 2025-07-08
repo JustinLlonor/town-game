@@ -28,7 +28,7 @@ public class BarStatsUI : MonoBehaviour
     private void Awake()
     {
         FindFirstObjectByType<PlayerManager>().onInstantiatePlayer += AssignPlayerReferences;
-        flowchartUI.onInfoSend += CheckShowNode;
+        //flowchartUI.onInfoSend += CheckShowNode;
     }
 
     private void LateUpdate()
@@ -42,6 +42,7 @@ public class BarStatsUI : MonoBehaviour
     {   
         trackedStats = player.GetComponent<PlayerStats>();
         trackedNodes = player.GetComponent<PlayerNodes>();
+        trackedNodes.onNodeValueChange += ValueUpdate;
         //healthBar.Init(trackedStats.maxHP);
         //hungerBar.Init(trackedStats.maxHunger);
         //trackedStats.onHPChangeClient += OnHPChange;
@@ -161,5 +162,15 @@ public class BarStatsUI : MonoBehaviour
             }
         }
         return heighestHeight;
+    }
+
+    private void ValueUpdate(Node node)
+    {
+        NodeInfo nodeInfo = trackedNodes.GetNodeInfo(node.infoIndex);
+        if ((nodeInfo.criticalDisplayRange.x <= node.value) && (nodeInfo.criticalDisplayRange.y >= node.value))
+        {
+            Debug.LogError("displaying");
+            CheckShowNode(node.id);
+        }
     }
 }
