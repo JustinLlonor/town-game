@@ -130,7 +130,7 @@ public class FlowchartUI : MonoBehaviour
         }
     }
 
-    private void Init()
+    public void Init()
     {
         List<int> currentAddedNodes = new List<int>();
         foreach (Node node in playerNodes.nodes) currentAddedNodes.Add(node.id);

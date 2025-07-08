@@ -23,6 +23,7 @@ public class BarStatsUI : MonoBehaviour
     float shMinHeight;
     bool init = false;
     float hotbarScale;
+    bool fInit = false;
 
     private void Awake()
     {
@@ -71,6 +72,7 @@ public class BarStatsUI : MonoBehaviour
         {
             RectTransform barTransform = (RectTransform)bar.transform;
             float newXPos = i * barSpacing - middleOffset;
+            Debug.Log(newXPos);
             Vector2 targetLocation = new Vector2(newXPos, 0f);
             barTransform.anchoredPosition = Vector2.MoveTowards(barTransform.anchoredPosition, targetLocation, step);
             i++;

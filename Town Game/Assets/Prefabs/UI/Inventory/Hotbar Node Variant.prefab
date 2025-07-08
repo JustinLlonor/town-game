@@ -74,7 +74,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 557449999597995534, guid: 0591025a9c4bf524b8f1007ba33ce1b1, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: -2
       objectReference: {fileID: 0}
     - target: {fileID: 557449999597995534, guid: 0591025a9c4bf524b8f1007ba33ce1b1, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -95,6 +95,22 @@ PrefabInstance:
     - target: {fileID: 2188189990689986940, guid: 0591025a9c4bf524b8f1007ba33ce1b1, type: 3}
       propertyPath: m_Name
       value: Hotbar Node Variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 5018351394603794508, guid: 0591025a9c4bf524b8f1007ba33ce1b1, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 75
+      objectReference: {fileID: 0}
+    - target: {fileID: 5299154843240205803, guid: 0591025a9c4bf524b8f1007ba33ce1b1, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 75
+      objectReference: {fileID: 0}
+    - target: {fileID: 5731406340031453957, guid: 0591025a9c4bf524b8f1007ba33ce1b1, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 75
+      objectReference: {fileID: 0}
+    - target: {fileID: 8354958238281310417, guid: 0591025a9c4bf524b8f1007ba33ce1b1, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 75
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -184,6 +200,7 @@ MonoBehaviour:
   alphaGroup: {fileID: 7857114704575355166}
   physNode: {fileID: 5256657622988742172}
   trackedNodes: {fileID: 0}
+  trackedNodeId: -1
 --- !u!114 &5739410606789271230 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2247119599143560200, guid: 0591025a9c4bf524b8f1007ba33ce1b1, type: 3}
