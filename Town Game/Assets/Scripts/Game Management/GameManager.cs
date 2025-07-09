@@ -42,6 +42,7 @@ public class GameManager : NetworkBehaviour
     public float timeSkippedPeriod = 4.5f;
     public float dayStartPeriod = 7.5f;
     [Header("Constants")]
+    public EventHandler cultistEvents;
     public string[] days;
     public string[] positions;
     RoleRevealer rv;
@@ -495,6 +496,8 @@ public class GameManager : NetworkBehaviour
     void AssignRole(PlayerRef player, bool isCultist)
     {
         pm.SetIsCultist(player, isCultist);
+        pm.AddPlayerToGroup(player, -1);
+        cultistEvents.AddSubscription(player);
     }
 
     public void SpawnPositions()

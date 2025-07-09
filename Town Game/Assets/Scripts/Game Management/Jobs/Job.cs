@@ -7,6 +7,7 @@ using Fusion;
 public class Job
 {
     public JobHandler handler;
+    public EventHandler[] associatedEventHandlers;
     [Header("Info")]
     public string name;
     public string shortName;
@@ -42,6 +43,10 @@ public class Job
         if (assignedPlayers.Count >= maxPlayers) return;
         assignedPlayers.Add(player);
         handler.HirePlayer(player);
+        foreach (EventHandler handler in associatedEventHandlers)
+        {
+            handler.AddSubscription(player);
+        }
     }
 
     /// <summary>
@@ -53,6 +58,10 @@ public class Job
         if (!assignedPlayers.Contains(player)) return;
         handler.FirePlayer(player);
         assignedPlayers.Remove(player);
+        foreach (EventHandler handler in associatedEventHandlers)
+        {
+            handler.RemoveSubscription(player);
+        }
     }
 
     /// <summary>

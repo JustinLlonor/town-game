@@ -91,7 +91,7 @@ public class ScheduleManager : NetworkBehaviour
     /// <param name="room"></param>
     /// <param name="time"></param>
     /// <param name="length"></param>
-    /// <param name="interestGroups"></param>
+    /// <param name="interestGroups">Groups that can see this block</param>
     /// <returns>The added schedule block</returns>
     public ScheduleBlock AddBlock(string periodName, string room, float time, float length, Color color, List<PlayerRef> assignedPlayers, List<int> interestGroups = null)
     {
