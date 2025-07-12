@@ -496,8 +496,12 @@ public class GameManager : NetworkBehaviour
     void AssignRole(PlayerRef player, bool isCultist)
     {
         pm.SetIsCultist(player, isCultist);
-        pm.AddPlayerToGroup(player, -1);
-        cultistEvents.AddSubscription(player);
+        //TODO: FIX THIS (the game doesn't start when adding players to groups after assigning)
+        if (isCultist)
+        {
+            pm.AddPlayerToGroup(player, -1);
+            cultistEvents.AddSubscription(player);
+        }
     }
 
     public void SpawnPositions()

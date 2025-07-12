@@ -37,7 +37,9 @@ public class PlayerNodes : NetworkBehaviour
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha7))
-            AddNode("Test", new List<NodeConnection> { new NodeConnection("Hunger", "Nutrition") });
+        {
+            AddNode("Dirtiness");
+        }
     }
 
     public override void FixedUpdateNetwork()
@@ -180,7 +182,7 @@ public class PlayerNodes : NetworkBehaviour
         NodeInfo info = GetNodeInfo(nameId);
         if (info == null)
         {
-            Debug.LogError("Node nameId is invalid!");
+            Debug.LogError($"Node {nameId} is invalid!");
             return -1;
         }
         Node newNode = new Node(idCounter++, Array.IndexOf(nodeInfo, info), info.startingValue, info.startingRate);

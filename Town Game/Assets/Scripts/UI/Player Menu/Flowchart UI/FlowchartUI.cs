@@ -410,23 +410,22 @@ public class FlowchartUI : MonoBehaviour
             if (!cUI.increaseIsGood) connectionDelta *= -1f;
             if (connectionDelta > 0f && (!(cUI.previousConnectionDelta > 0f)))
             {
-                Debug.Log("starting postitive");
                 cUI.arrow.SetDotted(false);
                 cUI.arrow.SetTrianglesActive(true);
                 cUI.arrow.StartFlash(increaseColor, 1.2f);
-                cUI.arrow.SetTriangleText("+");
+                if (cUI.increaseIsGood) cUI.arrow.SetTriangleText("+");
+                else cUI.arrow.SetTriangleText("-");
             }
             else if (connectionDelta < 0f && (!(cUI.previousConnectionDelta < 0f)))
             {
-                Debug.Log("starting negative");
                 cUI.arrow.SetDotted(false);
                 cUI.arrow.SetTrianglesActive(true);
                 cUI.arrow.StartFlash(decreaseColor, 3.2f);
-                cUI.arrow.SetTriangleText("-");
+                if (cUI.increaseIsGood) cUI.arrow.SetTriangleText("-");
+                else cUI.arrow.SetTriangleText("+");
             }
             else if (connectionDelta == 0 && (cUI.previousConnectionDelta != 0f))
             {
-                Debug.Log("starting dotted");
                 cUI.arrow.SetDotted(true);
                 cUI.arrow.SetTrianglesActive(false);
                 cUI.arrow.StopFlash();

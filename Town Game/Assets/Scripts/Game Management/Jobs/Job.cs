@@ -7,7 +7,7 @@ using Fusion;
 public class Job
 {
     public JobHandler handler;
-    public EventHandler[] associatedEventHandlers;
+    public EventHandler[] associatedEventHandlers = new EventHandler[0];
     [Header("Info")]
     public string name;
     public string shortName;
