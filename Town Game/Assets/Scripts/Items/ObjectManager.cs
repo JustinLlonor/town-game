@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 /// <summary>
@@ -16,8 +17,15 @@ public class ObjectManager : MonoBehaviour
     public Dictionary<string, Clothing> clothingSearch = new Dictionary<string, Clothing>();
     public GameObject[] prefabs;
     public Dictionary<string, GameObject> prefabSearch = new Dictionary<string, GameObject>();
-    public Odour[] odours;
-    public Dictionary<string, Odour> odourSearch = new Dictionary<string, Odour>();
+    public NetworkCurve[] curves;
+    public Dictionary<string, AnimationCurve> animCurves = new Dictionary<string, AnimationCurve>();
+
+    [System.Serializable]
+    public struct NetworkCurve
+    {
+        public string name;
+        public AnimationCurve curve;
+    }
 
     private void Awake()
     {
@@ -26,6 +34,6 @@ public class ObjectManager : MonoBehaviour
         foreach (Texture2D tex in textures) texSearch.Add(tex.name, tex);
         foreach (Clothing clothing in clothings) clothingSearch.Add(clothing.name, clothing);
         foreach (GameObject prefab in prefabs) prefabSearch.Add(prefab.name, prefab);
-        foreach (Odour odour in odours) odourSearch.Add(odour.name, odour);
+        foreach (NetworkCurve curve in curves) animCurves.Add(curve.name, curve.curve);
     }
 }
