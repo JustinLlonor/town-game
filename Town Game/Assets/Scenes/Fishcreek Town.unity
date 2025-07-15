@@ -1818,7 +1818,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh38902
+  m_Name: pb_Mesh33314
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -12094,7 +12094,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh39144
+  m_Name: pb_Mesh33562
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -13725,6 +13725,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1587106769}
   - component: {fileID: 1587106770}
+  - component: {fileID: 1587106771}
   m_Layer: 0
   m_Name: Cutscene Manager
   m_TagString: Untagged
@@ -13762,20 +13763,15 @@ MonoBehaviour:
   _cutsceneProgress: -1
   editingIndex: 0
   sequenceSceneRefs:
-  - sceneElements:
-    - rid: 4125388838336462931
+  - name: 
+    sceneElements:
     - rid: 4125388838336462932
     - rid: 4125388838336462933
+    - rid: 4125388857389350930
+  cutsceneReader: {fileID: 1587106771}
   references:
     version: 2
     RefIds:
-    - rid: 4125388838336462931
-      type: {class: CameraShot, ns: , asm: Assembly-CSharp}
-      data:
-        time: 0
-        length: 0
-        spawnPosition: {x: 0, y: 0, z: 0}
-        spawnRotation: {x: 0, y: 0, z: 0, w: 0}
     - rid: 4125388838336462932
       type: {class: BlackScreenEffect, ns: , asm: Assembly-CSharp}
       data:
@@ -13793,6 +13789,50 @@ MonoBehaviour:
         color: {r: 1, g: 0, b: 0, a: 1}
         cutsceneAnchor: 0
         textAlignment: 0
+    - rid: 4125388857389350930
+      type: {class: ZoomEffect, ns: , asm: Assembly-CSharp}
+      data:
+        time: 0
+        length: 4
+        startDistance: 0
+        endDistance: -3
+        zoomCurve:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 1
+            outSlope: 1
+            tangentMode: 34
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 1
+            tangentMode: 34
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+--- !u!114 &1587106771
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1587106768}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94f79a98c05ecf04ea8672dc91358524, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cutsceneManager: {fileID: 1587106770}
 --- !u!1 &1587561282
 GameObject:
   m_ObjectHideFlags: 0
@@ -22240,7 +22280,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh39226
+  m_Name: pb_Mesh33642
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
