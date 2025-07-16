@@ -150,7 +150,7 @@ public class CutsceneReader : MonoBehaviour
     {
         if (element is TextEffect)
         {
-
+            ProcessText(element);
         }
         else if (element is ZoomEffect)
         {
@@ -184,6 +184,6 @@ public class CutsceneReader : MonoBehaviour
     {
         BlackScreenEffect blackScreenInfo = (BlackScreenEffect)element;
         float alpha = Mathf.Clamp01(blackScreenInfo.fadeCurve.Evaluate(element.GetProgress(currentLocalTime)));
-        blackScreen.SetAlpha(alpha);
+        blackScreen.SetAlpha(alpha, blackScreenInfo.screenColor);
     }
 }

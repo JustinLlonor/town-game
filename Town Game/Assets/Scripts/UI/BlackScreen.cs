@@ -53,6 +53,23 @@ public class BlackScreen : MonoBehaviour
         }
     }
 
+    public void SetAlpha(float alpha, Color color)
+    {
+        img.color = new Color(color.r, color.g, color.b, alpha);
+        if (alpha == 0f)
+        {
+            uiFront.SetParent(uiFrontHolder);
+        }
+        if (alpha == 1f)
+        {
+            uiFront.SetParent(transform);
+        }
+        foreach (var t in texts)
+        {
+            t.color = new Color(t.color.r, t.color.g, t.color.b, alpha);
+        }
+    }
+
     public void StartAlphaTransition(float to, float duration)
     {
         StopAllCoroutines();
