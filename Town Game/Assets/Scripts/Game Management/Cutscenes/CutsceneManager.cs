@@ -42,6 +42,7 @@ public class CutsceneManager : NetworkBehaviour
     /// </summary>
     public SequenceEvent onSequenceStart;
     public CutsceneReader cutsceneReader;
+    public float timelineLength { get; private set; }
 
     public delegate List<SeqScene> SequenceEvent(string sequenceName);
 
@@ -54,11 +55,25 @@ public class CutsceneManager : NetworkBehaviour
             cutsceneReader.StopReading();
         }
         if (cutsceneProgress == -1f) return;
-        if ((cutsceneProgress == -1f) && (clientProgress >= 0f)) cutsceneReader.StartReading();
+        if ((cutsceneProgress == -1f) && (clientProgress >= 0f))
+        {
+            cutsceneReader.StartReading();
+            timelineLength = GetSequenceLength();
+        }
         // Sync client progress with server
         if (cutsceneProgress > clientProgress) clientProgress = cutsceneProgress;
         clientProgress += Time.deltaTime;
         cutsceneReader.ReadCutscene(clientProgress);
+    }
+
+    private float GetSequenceLength()
+    {
+        float length = 0f;
+        foreach (SeqScene scene in timeline)
+        {
+            length += sequenceSceneRefs[scene.sceneIndex].GetLength();
+        }
+        return length;
     }
 
     public override void FixedUpdateNetwork()
@@ -99,5 +114,10 @@ public class CutsceneManager : NetworkBehaviour
             }
         }
         return output;
+    }
+
+    public SeqSceneRef GetRef(SeqScene scene)
+    {
+        return sequenceSceneRefs[scene.sceneIndex];
     }
 }
