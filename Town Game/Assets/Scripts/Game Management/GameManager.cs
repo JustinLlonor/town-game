@@ -254,15 +254,10 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    IEnumerator UnfreezeAll(float time)
+    IEnumerator UnfreezeAllAfterTime(float time)
     {
         yield return new WaitForSeconds(time);
-        foreach (KeyValuePair<PlayerRef, NetworkId> kvp in pm.playerObjects)
-        {
-            NetworkObject player = pm.GetPlayerNetworkObject(kvp.Key);
-            GameObject playerObject = player.gameObject;
-            playerObject.GetComponent<PlayerMovement>().Unfreeze();
-        }
+        pm.UnfreezeAll();
     }
 
     void Phase0()
@@ -486,7 +481,7 @@ public class GameManager : NetworkBehaviour
         cultists = assignedCultists.ToArray();
         cultistsLeft = cultists.Length;
 
-        if (!SessionData.isTesting) StartCoroutine(UnfreezeAll(8f));
+        if (!SessionData.isTesting) StartCoroutine(UnfreezeAllAfterTime(8f));
         foreach (PlayerRef player in Runner.ActivePlayers)
         {
             RPC_SendRole(player, pm.GetIsCultist(player));

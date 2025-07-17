@@ -28,12 +28,14 @@ public class PlayerNodes : NetworkBehaviour
     public override void Spawned()
     {
         gameManager = FindAnyObjectByType<GameManager>();
+        if (gameManager == null) return;
         OnNodeCrossThreshold += CheckZeroDestroy;
         AddNode("Health");
         AddNode("Hunger", new List<NodeConnection> { new NodeConnection("Health", "Nutrition") });
         AddNode("Thirst", new List<NodeConnection> { new NodeConnection("Health", "Nutrition") });
     }
 
+    /**
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha7))
@@ -41,9 +43,11 @@ public class PlayerNodes : NetworkBehaviour
             AddNode("Dirtiness");
         }
     }
+    **/
 
     public override void FixedUpdateNetwork()
     {
+        if (gameManager == null) return;
         UpdateNodes();
         if (!HasInputAuthority) return;
         CheckNodeChanges();

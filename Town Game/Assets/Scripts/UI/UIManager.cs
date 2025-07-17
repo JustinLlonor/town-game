@@ -36,7 +36,7 @@ public class UIManager : MonoBehaviour
         instance = this;
         cm = FindFirstObjectByType<CursorManager>();
         iFinder = FindFirstObjectByType<InteractableFinder>();
-        foreach (var menu in uiMenus) menu.SetActive(true);
+        if (uiMenus != null) foreach (var menu in uiMenus) menu.SetActive(true);
         OnUIClose += CloseCorpse;
         OnUIClose += CloseUI;
         OnUIClose += SetOpenFalse;
@@ -51,15 +51,6 @@ public class UIManager : MonoBehaviour
         uip.Init();
         if (pui != null) pui.Init();
         foreach (var menu in uiMenus) menu.SetActive(false);
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Debug.Log(uiOpened);
-            Debug.Log(menuOpened);
-        }
     }
 
     private void UIOpen(int menu)

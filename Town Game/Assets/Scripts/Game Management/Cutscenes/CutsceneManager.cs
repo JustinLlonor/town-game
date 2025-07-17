@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class CutsceneManager : NetworkBehaviour
 {
+    public float endLength = 0.5f;
     [Networked, Capacity(15)] public NetworkLinkedList<SeqScene> timeline => default;
     [Networked] public float cutsceneProgress { get; set; } = -1f;
     private float clientProgress = -1f;
@@ -42,12 +43,30 @@ public class CutsceneManager : NetworkBehaviour
     /// </summary>
     public SequenceEvent onSequenceStart;
     public CutsceneReader cutsceneReader;
-    public float timelineLength { get; private set; }
+    [Networked] public float timelineLength { get; set; }
+    bool init = false;
 
     public delegate List<SeqScene> SequenceEvent(string sequenceName);
+    PlayerManager playerManager;
+    GameManager gameManager;
 
+    public override void Spawned()
+    {
+        init = true;
+        playerManager = FindAnyObjectByType<PlayerManager>();
+        gameManager = FindAnyObjectByType<GameManager>();
+    }
+
+    // TODO: Make cutscene reader not activate on server mode
+
+    // Client stuff
     private void Update()
     {
+        if (!init) return;
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            StartSequence("Test");
+        }
         // Stop reading if we just exited
         if ((cutsceneProgress == -1f) && !(clientProgress == -1f))
         {
@@ -55,10 +74,9 @@ public class CutsceneManager : NetworkBehaviour
             cutsceneReader.StopReading();
         }
         if (cutsceneProgress == -1f) return;
-        if ((cutsceneProgress == -1f) && (clientProgress >= 0f))
+        if ((clientProgress == -1f) && (cutsceneProgress >= 0f))
         {
             cutsceneReader.StartReading();
-            timelineLength = GetSequenceLength();
         }
         // Sync client progress with server
         if (cutsceneProgress > clientProgress) clientProgress = cutsceneProgress;
@@ -81,6 +99,10 @@ public class CutsceneManager : NetworkBehaviour
         if (!Runner.IsServer) return;
         if (cutsceneProgress == -1f) return;
         cutsceneProgress += Runner.DeltaTime;
+        if (cutsceneProgress > (timelineLength + endLength))
+        {
+            StopSequence();
+        }
     }
 
     /// <summary>
@@ -97,8 +119,18 @@ public class CutsceneManager : NetworkBehaviour
         {
             timeline.Add(scene);
         }
+        timelineLength = GetSequenceLength();
         cutsceneProgress = 0f;
+        playerManager.FreezeAll();
+        gameManager.StopTime();
         return true;
+    }
+
+    public void StopSequence()
+    {
+        cutsceneProgress = -1f;
+        playerManager.UnfreezeAll();
+        gameManager.ResumeTime();
     }
 
     private List<SeqScene> GetSeqSceneList(string sequenceName)

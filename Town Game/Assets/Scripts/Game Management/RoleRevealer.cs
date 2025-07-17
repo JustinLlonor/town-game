@@ -26,7 +26,7 @@ public class RoleRevealer : MonoBehaviour
         cm = FindFirstObjectByType<CameraManager>();
         bs = FindFirstObjectByType<BlackScreen>();
         rtxt = FindFirstObjectByType<RoleText>();;
-        FindObjectOfType<PlayerManager>().onInstantiatePlayer += GetReferences;
+        FindAnyObjectByType<PlayerManager>().onInstantiatePlayer += GetReferences;
         //if (PhotonNetwork.CurrentRoom != null) bs.ShowCover();
     }
 
@@ -53,7 +53,7 @@ public class RoleRevealer : MonoBehaviour
         camPrefab.transform.rotation = playerTransform.rotation;
         cm.SetTrackedCinematicTransform(camPrefab.transform.GetChild(0));
         cm.ChangeCameraMode(CameraManager.CameraMode.Cinematic);
-        bs.SetAlpha(1f);
+        bs.SetAlpha(1f, true);
         cgfx.ShowRenderers();
         cgfx.SetRenderersLayer(uiFrontMask);
         StartCoroutine(SnapToFPS(5f, 1.5f));
@@ -83,6 +83,6 @@ public class RoleRevealer : MonoBehaviour
     IEnumerator FadeBlackScreen(float fadeBlackDuration)
     {
         yield return new WaitForSeconds(fadeBlackDuration);
-        bs.StartAlphaTransition(0f, 1f);
+        bs.StartAlphaTransition(0f, 1f, true);
     }
 }

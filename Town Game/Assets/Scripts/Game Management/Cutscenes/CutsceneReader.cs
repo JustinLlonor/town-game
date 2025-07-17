@@ -2,21 +2,26 @@ using Fusion;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CutsceneReader : MonoBehaviour
+public class CutsceneReader : NetworkBehaviour
 {
     public CutsceneManager cutsceneManager;
     public Transform cutsceneCamTransform;
+    public GameObject cutsceneTextPrefab;
     CameraManager cameraManager;
     BlackScreen blackScreen;
+    CutsceneElementUI ceUI;
+    SeqRefManager srManager;
     SeqScene currentScene = SeqScene.None;
     SeqScene previousScene = SeqScene.None;
     List<SceneElement> previousSceneElements = new List<SceneElement>();
     private float currentLocalTime = -1f;
 
-    private void Awake()
+    public override void Spawned()
     {
         cameraManager = FindAnyObjectByType<CameraManager>();
-        BlackScreen blackScreen = FindAnyObjectByType<BlackScreen>();
+        blackScreen = FindAnyObjectByType<BlackScreen>();
+        ceUI = FindAnyObjectByType<CutsceneElementUI>();
+        srManager = FindAnyObjectByType<SeqRefManager>();
     }
 
     public void StartReading()
@@ -31,6 +36,7 @@ public class CutsceneReader : MonoBehaviour
 
     public void StopReading()
     {
+        ceUI.ClearCutsceneUI();
         cameraManager.ChangeCameraMode(CameraManager.CameraMode.FirstPerson);
     }
 
@@ -91,7 +97,7 @@ public class CutsceneReader : MonoBehaviour
             SeqSceneRef sceneRef = cutsceneManager.GetRef(scene);
             if (progress <= previousEnding + sceneRef.GetLength())
             {
-                currentScene = cutsceneManager.timeline[currentSceneIndex];
+                currentScene = cutsceneManager.timeline[i];
                 currentSceneRef = sceneRef;
                 break;
             }
@@ -126,7 +132,10 @@ public class CutsceneReader : MonoBehaviour
     {
         if (element is TextEffect)
         {
-
+            TextEffect effect = (TextEffect)element;
+            GameObject eObj = ceUI.InstantiateElement(element, cutsceneTextPrefab, effect.cutsceneAnchor, effect.anchoredPosition);
+            CutsceneTextUI ctUI = eObj.GetComponent<CutsceneTextUI>();
+            ctUI.Init(effect, currentLocalTime, ProcessText(effect.text));
         }
     }
 
@@ -138,19 +147,7 @@ public class CutsceneReader : MonoBehaviour
     {
         if (element is TextEffect)
         {
-
-        }
-    }
-
-    /// <summary>
-    /// Called on every frame while progress is happening. Use currentLocalTime to get the local time
-    /// </summary>
-    /// <param name="element"></param>
-    private void ProcessElement(SceneElement element)
-    {
-        if (element is TextEffect)
-        {
-            ProcessText(element);
+            ceUI.DestroyElement(element);
         }
         else if (element is ZoomEffect)
         {
@@ -162,12 +159,20 @@ public class CutsceneReader : MonoBehaviour
         }
     }
 
-    private void ProcessText(SceneElement element)
+    /// <summary>
+    /// Called on every frame while progress is happening. Use currentLocalTime to get the local time
+    /// </summary>
+    /// <param name="element"></param>
+    private void ProcessElement(SceneElement element)
     {
-        TextEffect textInfo = (TextEffect)element;
-        //PlayerRef player;
-        //player.RawEncoded
-        // RawEncoded gets the corresponding integer id of the player. Use this when doing PlayerManager stuff
+        if (element is ZoomEffect)
+        {
+            ProcessZoom(element);
+        }
+        else if (element is BlackScreenEffect)
+        {
+            ProcessBlackScreen(element);
+        }
     }
 
     private void ProcessZoom(SceneElement element)
@@ -185,5 +190,15 @@ public class CutsceneReader : MonoBehaviour
         BlackScreenEffect blackScreenInfo = (BlackScreenEffect)element;
         float alpha = Mathf.Clamp01(blackScreenInfo.fadeCurve.Evaluate(element.GetProgress(currentLocalTime)));
         blackScreen.SetAlpha(alpha, blackScreenInfo.screenColor);
+    }
+
+    private string ProcessText(string text)
+    {
+        string output = text;
+        foreach (var kvp in currentScene.references)
+        {
+            output = output.Replace($"<{kvp.Key}>", srManager.GetRefString(kvp.Value));
+        }
+        return output;
     }
 }

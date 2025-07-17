@@ -11,6 +11,7 @@ public class CameraManager : MonoBehaviour
     public Transform trackedCinematicTransform;
     public Transform trackedObservableTransform;
     [SerializeField] private Observable currentObservable;
+    UIManager uiManager;
 
     /// <summary>
     /// Called when the camera switches modes
@@ -31,6 +32,11 @@ public class CameraManager : MonoBehaviour
         Observe = 2
     }
 
+    private void Awake()
+    {
+        uiManager = FindAnyObjectByType<UIManager>();
+    }
+
     public void SetCurrentObservable(Observable observable)
     {
         currentObservable = observable;
@@ -47,6 +53,7 @@ public class CameraManager : MonoBehaviour
         }
         if (newMode == CameraMode.Cinematic)
         {
+            uiManager.ExitUI();
             if (trackedCinematicTransform != null) transform.position = trackedCinematicTransform.position;
         }
         if (newMode == CameraMode.Observe)

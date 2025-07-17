@@ -47,6 +47,7 @@ public class PlayerStats : NetworkBehaviour
     [HideInInspector] public PlayerInfoView piv;
     GameManager gameManager;
     ObjectManager objectManager;
+    bool init = false;
 
     private void Start()
     {
@@ -66,6 +67,7 @@ public class PlayerStats : NetworkBehaviour
         stamina = 100f;
         staminaCooldown = 0f;
         previousHP = HP;
+        init = true;
     }
 
     public override void Render()
@@ -95,6 +97,7 @@ public class PlayerStats : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
+        if (!init) return;
         GetHP();
         CheckDeath();
         piv.recievedHP = HP;
@@ -113,8 +116,8 @@ public class PlayerStats : NetworkBehaviour
 
     private void GetHP()
     {
-        Debug.Log(playerNodes.GetNode("Health").infoIndex);
-        HP = playerNodes.GetNode("Health").value;
+        Node foundNode = playerNodes.GetNode("Health");
+        if (!foundNode.IsNone()) HP = playerNodes.GetNode("Health").value;
     }
 
     /// <summary>

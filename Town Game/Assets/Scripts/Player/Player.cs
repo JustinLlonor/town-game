@@ -59,6 +59,7 @@ public class Player : NetworkBehaviour
 
     public override void Spawned()
     {
+        playerManager = FindFirstObjectByType<PlayerManager>();
         cm = FindFirstObjectByType<CameraManager>();
         camMovement = FindFirstObjectByType<CameraMovement>();
         rm = FindFirstObjectByType<RunnerManager>();
@@ -205,6 +206,7 @@ public class Player : NetworkBehaviour
         if (nicknameSet) return;
         nickname = name;
         nicknameSet = true;
+        playerManager.SetNickname(owner, name);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]

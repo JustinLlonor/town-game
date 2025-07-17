@@ -8,7 +8,7 @@ public struct SeqScene : INetworkStruct
     public Vector3 camPosition;
     public Quaternion camRotation;
     public int sceneIndex;
-    [Networked, Capacity(8)] NetworkDictionary<int, SeqRef> references => default;
+    [Networked, Capacity(8)] public NetworkDictionary<int, SeqRef> references => default;
     public int id;
     public static int idCounter = 0;
 
@@ -19,6 +19,14 @@ public struct SeqScene : INetworkStruct
         this.sceneIndex = sceneIndex;
         id = idCounter++;
         foreach (var kvp in refs) references.Add(kvp.Key, kvp.Value);
+    }
+
+    public SeqScene(Vector3 camPosition, Quaternion camRotation, int sceneIndex)
+    {
+        this.camPosition = camPosition;
+        this.camRotation = camRotation;
+        this.sceneIndex = sceneIndex;
+        id = idCounter++;
     }
 
     public bool Equals(SeqScene other)

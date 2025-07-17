@@ -36,7 +36,7 @@ public class BlackScreen : MonoBehaviour
         }
     }
 
-    public void SetAlpha(float alpha)
+    public void SetAlpha(float alpha, bool showTexts = false)
     {
         img.color = new Color(0f, 0f, 0f, alpha);
         if (alpha == 0f)
@@ -47,13 +47,14 @@ public class BlackScreen : MonoBehaviour
         {
             uiFront.SetParent(transform);
         }
+        if (!showTexts) alpha = 0f;
         foreach (var t in texts)
         {
             t.color = new Color(t.color.r, t.color.g, t.color.b, alpha);
         }
     }
 
-    public void SetAlpha(float alpha, Color color)
+    public void SetAlpha(float alpha, Color color, bool showTexts = false)
     {
         img.color = new Color(color.r, color.g, color.b, alpha);
         if (alpha == 0f)
@@ -64,19 +65,20 @@ public class BlackScreen : MonoBehaviour
         {
             uiFront.SetParent(transform);
         }
+        if (!showTexts) alpha = 0f;
         foreach (var t in texts)
         {
             t.color = new Color(t.color.r, t.color.g, t.color.b, alpha);
         }
     }
 
-    public void StartAlphaTransition(float to, float duration)
+    public void StartAlphaTransition(float to, float duration, bool showTexts = false)
     {
         StopAllCoroutines();
-        StartCoroutine(TransitionAlpha(to, duration));
+        StartCoroutine(TransitionAlpha(to, duration, showTexts));
     }
 
-    IEnumerator TransitionAlpha(float to, float duration)
+    IEnumerator TransitionAlpha(float to, float duration, bool showTexts)
     {
         float timer = 0f;
         float initial = img.color.a;
@@ -85,9 +87,9 @@ public class BlackScreen : MonoBehaviour
         {
             yield return null;
             float newAlpha = Mathf.SmoothStep(initial, to, timer);
-            SetAlpha(newAlpha);
+            SetAlpha(newAlpha, showTexts);
             timer += Time.deltaTime * (1 / duration);
         }
-        SetAlpha(to);
+        SetAlpha(to, showTexts);
     }
 }

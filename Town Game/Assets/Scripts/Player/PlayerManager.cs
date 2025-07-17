@@ -17,6 +17,7 @@ public class PlayerManager : NetworkBehaviour
     [Networked, Capacity(20)] public NetworkDictionary<PlayerRef, NetworkId> properties => default;
     //public PlayerProperties currentPlayerProperties = new PlayerProperties("", false, 0, 0);
     private Dictionary<PlayerRef, TeleportInfo> teleportQueue = new Dictionary<PlayerRef, TeleportInfo>();
+    [Networked, Capacity(20)] public NetworkDictionary<int, NetworkString<_32>> playerRefNames => default;
     
     public GameObject currentPlayer;
     public NetworkPrefabRef playerPrefab;
@@ -335,6 +336,26 @@ public class PlayerManager : NetworkBehaviour
         if (!foundObject) return null;
         return nObj.GetComponent<PlayerPropertyHolder>();
     }
+
+    public void FreezeAll()
+    {
+        foreach (KeyValuePair<PlayerRef, NetworkId> kvp in playerObjects)
+        {
+            NetworkObject player = GetPlayerNetworkObject(kvp.Key);
+            GameObject playerObject = player.gameObject;
+            playerObject.GetComponent<PlayerMovement>().Freeze();
+        }
+    }
+
+    public void UnfreezeAll()
+    {
+        foreach (KeyValuePair<PlayerRef, NetworkId> kvp in playerObjects)
+        {
+            NetworkObject player = GetPlayerNetworkObject(kvp.Key);
+            GameObject playerObject = player.gameObject;
+            playerObject.GetComponent<PlayerMovement>().Unfreeze();
+        }
+    }
     #endregion
 
     // Properties
@@ -387,7 +408,8 @@ public class PlayerManager : NetworkBehaviour
 
     public void SetNickname(PlayerRef player, string name)
     {
-        GetPlayerPropertyHolder(properties[player]).nickname = name;
+        if (properties.ContainsKey(player)) GetPlayerPropertyHolder(properties[player]).nickname = name;
+        SetPlayerRefName(player, name);
     }
 
     public void SetIsCultist(PlayerRef player, bool isCultist)
@@ -453,4 +475,34 @@ public class PlayerManager : NetworkBehaviour
         GetPlayerPropertyHolder(properties[player]).energy = energy;
     }
     #endregion
+
+    private void SetPlayerRefName(PlayerRef player, string name)
+    {
+        int index = player.AsIndex;
+        if (!playerRefNames.ContainsKey(index))
+        {
+            playerRefNames.Add(index, name);
+            return;
+        }
+        playerRefNames.Set(index, name);
+    }
+
+    public string GetPlayerRefName(PlayerRef player)
+    {
+        int index = player.AsIndex;
+        if (playerRefNames.ContainsKey(index))
+        {
+            return playerRefNames[index].ToString();
+        }
+        return "";
+    }
+
+    public string GetPlayerRefName(int index)
+    {
+        if (playerRefNames.ContainsKey(index))
+        {
+            return playerRefNames[index].ToString();
+        }
+        return "";
+    }
 }
