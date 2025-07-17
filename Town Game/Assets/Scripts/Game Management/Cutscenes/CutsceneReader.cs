@@ -13,8 +13,9 @@ public class CutsceneReader : NetworkBehaviour
     SeqRefManager srManager;
     SeqScene currentScene = SeqScene.None;
     SeqScene previousScene = SeqScene.None;
-    List<SceneElement> previousSceneElements = new List<SceneElement>();
+    List<SceneElementInfo> previousSceneElements = new List<SceneElementInfo>();
     private float currentLocalTime = -1f;
+    private int currentSceneIndex = -1;
 
     public override void Spawned()
     {
@@ -43,25 +44,25 @@ public class CutsceneReader : NetworkBehaviour
     public void ReadCutscene(float progress)
     {
         // List change detector
-        List<SceneElement> currentSceneElements = GetElements(progress);
-        foreach (SceneElement element in currentSceneElements)
+        List<SceneElementInfo> currentSceneElements = GetElements(progress);
+        foreach (SceneElementInfo eInfo in currentSceneElements)
         {
-            if (!previousSceneElements.Contains(element))
+            if (!previousSceneElements.Contains(eInfo))
             {
-                AddElement(element);
+                AddElement(eInfo);
             }
         }
-        foreach (SceneElement element in previousSceneElements)
+        foreach (SceneElementInfo eInfo in previousSceneElements)
         {
-            if (!currentSceneElements.Contains(element))
+            if (!currentSceneElements.Contains(eInfo))
             {
-                RemoveElement(element);
+                RemoveElement(eInfo);
             }
         }
         previousSceneElements = currentSceneElements;
-        foreach (SceneElement element in previousSceneElements)
+        foreach (SceneElementInfo eInfo in previousSceneElements)
         {
-            ProcessElement(element);
+            ProcessElement(eInfo);
         }
         // Check if the scene changed
         if (!previousScene.Equals(currentScene))
@@ -83,13 +84,12 @@ public class CutsceneReader : NetworkBehaviour
     /// </summary>
     /// <param name="progress"></param>
     /// <returns></returns>
-    private List<SceneElement> GetElements(float progress)
+    private List<SceneElementInfo> GetElements(float progress)
     {
-        List<SceneElement> output = new List<SceneElement>();
+        List<SceneElementInfo> output = new List<SceneElementInfo>();
         if (cutsceneManager.timeline.Count == 0) return output;
         // Find the current scene we are working with
         float previousEnding = 0f;
-        int currentSceneIndex = -1;
         SeqSceneRef currentSceneRef = null;
         for (int i = 0; i < cutsceneManager.timeline.Count; i++)
         {
@@ -99,6 +99,7 @@ public class CutsceneReader : NetworkBehaviour
             {
                 currentScene = cutsceneManager.timeline[i];
                 currentSceneRef = sceneRef;
+                currentSceneIndex = i;
                 break;
             }
             previousEnding += sceneRef.GetLength();
@@ -117,7 +118,7 @@ public class CutsceneReader : NetworkBehaviour
         {
             if ((localTime >= element.time) && (localTime <= (element.time + element.length)))
             {
-                output.Add(element);
+                output.Add(new SceneElementInfo(element, currentSceneIndex));
             }
         }
         currentLocalTime = localTime;
@@ -127,13 +128,13 @@ public class CutsceneReader : NetworkBehaviour
     /// <summary>
     /// Called when an element has been reached
     /// </summary>
-    /// <param name="element"></param>
-    private void AddElement(SceneElement element)
+    /// <param name="eInfo"></param>
+    private void AddElement(SceneElementInfo eInfo)
     {
-        if (element is TextEffect)
+        if (eInfo.element is TextEffect)
         {
-            TextEffect effect = (TextEffect)element;
-            GameObject eObj = ceUI.InstantiateElement(element, cutsceneTextPrefab, effect.cutsceneAnchor, effect.anchoredPosition);
+            TextEffect effect = (TextEffect)eInfo.element;
+            GameObject eObj = ceUI.InstantiateElement(eInfo, cutsceneTextPrefab, effect.cutsceneAnchor, effect.anchoredPosition);
             CutsceneTextUI ctUI = eObj.GetComponent<CutsceneTextUI>();
             ctUI.Init(effect, currentLocalTime, ProcessText(effect.text));
         }
@@ -142,41 +143,42 @@ public class CutsceneReader : NetworkBehaviour
     /// <summary>
     /// Called when an element has ended
     /// </summary>
-    /// <param name="element"></param>
-    private void RemoveElement(SceneElement element)
+    /// <param name="eInfo"></param>
+    private void RemoveElement(SceneElementInfo eInfo)
     {
-        if (element is TextEffect)
+        if (eInfo.element is TextEffect)
         {
-            ceUI.DestroyElement(element);
+            ceUI.DestroyElement(eInfo);
         }
-        else if (element is ZoomEffect)
+        else if (eInfo.element is ZoomEffect)
         {
-            ProcessZoom(element);
+            ProcessZoom(eInfo);
         }
-        else if (element is BlackScreenEffect)
+        else if (eInfo.element is BlackScreenEffect)
         {
-            ProcessBlackScreen(element);
+            ProcessBlackScreen(eInfo);
         }
     }
 
     /// <summary>
     /// Called on every frame while progress is happening. Use currentLocalTime to get the local time
     /// </summary>
-    /// <param name="element"></param>
-    private void ProcessElement(SceneElement element)
+    /// <param name="eInfo"></param>
+    private void ProcessElement(SceneElementInfo eInfo)
     {
-        if (element is ZoomEffect)
+        if (eInfo.element is ZoomEffect)
         {
-            ProcessZoom(element);
+            ProcessZoom(eInfo);
         }
-        else if (element is BlackScreenEffect)
+        else if (eInfo.element is BlackScreenEffect)
         {
-            ProcessBlackScreen(element);
+            ProcessBlackScreen(eInfo);
         }
     }
 
-    private void ProcessZoom(SceneElement element)
+    private void ProcessZoom(SceneElementInfo eInfo)
     {
+        SceneElement element = eInfo.element;
         ZoomEffect zoomInfo = (ZoomEffect)element;
         Vector3 initialLocation = currentScene.camPosition;
         float distance = Mathf.Lerp(zoomInfo.startDistance, zoomInfo.endDistance, // Start and end distances
@@ -185,8 +187,9 @@ public class CutsceneReader : NetworkBehaviour
         cutsceneCamTransform.position = finalLocation;
     }
 
-    private void ProcessBlackScreen(SceneElement element)
+    private void ProcessBlackScreen(SceneElementInfo eInfo)
     {
+        SceneElement element = eInfo.element;
         BlackScreenEffect blackScreenInfo = (BlackScreenEffect)element;
         float alpha = Mathf.Clamp01(blackScreenInfo.fadeCurve.Evaluate(element.GetProgress(currentLocalTime)));
         blackScreen.SetAlpha(alpha, blackScreenInfo.screenColor);

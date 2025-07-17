@@ -47,11 +47,11 @@ public class CutsceneTextUI : MonoBehaviour
     {
         if (!canFlash) return;
         flashProgress += Time.deltaTime;
-        if (flashProgress > 1f)
+        if (flashProgress > .5f)
         {
             flashOn = !flashOn;
             cursor.enabled = flashOn;
-            flashProgress -= 1f;
+            flashProgress -= .5f;
         }
 
     }

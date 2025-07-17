@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,22 +6,23 @@ using UnityEngine;
 public class CutsceneElementUI : MonoBehaviour
 {
     public RectTransform[] anchoredTransforms;
-    private Dictionary<SceneElement, GameObject> elements = new Dictionary<SceneElement, GameObject>();
+    private Dictionary<SceneElementInfo, GameObject> elements = new Dictionary<SceneElementInfo, GameObject>();
 
-    public GameObject InstantiateElement(SceneElement element, GameObject prefab, CutsceneAnchor anchor, Vector2 anchoredPosition)
+    public GameObject InstantiateElement(SceneElementInfo eInfo, GameObject prefab, CutsceneAnchor anchor, Vector2 anchoredPosition)
     {
+        SceneElement element = eInfo.element;
         GameObject elementObject = Instantiate(prefab, anchoredTransforms[(int)anchor]);
         ((RectTransform)elementObject.transform).anchoredPosition = anchoredPosition;
-        elements.Add(element, elementObject);
+        elements.Add(eInfo, elementObject);
         return elementObject;
     }
 
-    public void DestroyElement(SceneElement element)
+    public void DestroyElement(SceneElementInfo eInfo)
     {
-        if (elements.ContainsKey(element))
+        if (elements.ContainsKey(eInfo))
         {
-            Destroy(elements[element]);
-            elements.Remove(element);
+            Destroy(elements[eInfo]);
+            elements.Remove(eInfo);
         }
     }
 
