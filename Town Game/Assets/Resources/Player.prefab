@@ -1252,7 +1252,9 @@ MonoBehaviour:
     m_Bits: 128
   groundCheck: {fileID: 4579068949193498039}
   jumpShake: {fileID: 11400000, guid: 75956f023138a7244a7a58663cb0ed13, type: 2}
-  groundedRadius: 0.2
+  groundedRadius: 0.25
+  groundChecks: 8
+  groundCheckDegree: 45
   _isGrounded: 0
   crouchJumpMultiplier: 0.7
   crouchTime: 0.2

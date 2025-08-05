@@ -29,6 +29,8 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
     public Transform groundCheck;
     public Shake jumpShake;
     public float groundedRadius = 0.2f;
+    public int groundChecks = 8;
+    public float groundCheckDegree = 30f;
     [Networked] public bool isGrounded { get; set; }
 
     [Header("Crouching")]
@@ -204,7 +206,36 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
 
     public void SetGrounded()
     {
-        isGrounded = Physics.CheckSphere(rb.position + groundCheckOffset, groundedRadius, environmentMask);
+        RaycastHit info;
+        Vector3 origin = rb.position + groundCheckOffset;
+        bool hit = Physics.Raycast(origin, Vector3.down, out info, groundedRadius, environmentMask);
+        if (hit)
+        {
+            // If the surface exceeds 45 degrees, the player will not be grounded.
+            if (Vector3.Dot(Vector3.up, info.normal) > 0.707106781f)
+            {
+                isGrounded = true;
+                return;
+            }
+        }
+        // Cast in every direction
+        Vector3 castDirection = Quaternion.Euler(groundCheckDegree, 0f, 0f) * Vector3.down;
+        float castRotation = 360f / groundChecks;
+        for (int i = 0; i < groundChecks; i++)
+        {
+            RaycastHit cInfo;
+            bool cHit = Physics.Raycast(origin, castDirection, out cInfo, groundedRadius, environmentMask);
+            Debug.Log("drawing");
+            Debug.DrawLine(origin, origin + castDirection * groundedRadius, Color.blue, 1f);
+            castDirection = Quaternion.Euler(0f, castRotation, 0f) * castDirection;
+            if (!cHit) continue;
+            if (Vector3.Dot(Vector3.up, cInfo.normal) > 0.707106781f)
+            {
+                isGrounded = true;
+                return;
+            }
+        }
+        isGrounded = false;
     }
 
     public void GroundSim()
