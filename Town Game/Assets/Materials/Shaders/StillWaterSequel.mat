@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Water
+  m_Name: StillWaterSequel
   m_Shader: {fileID: -6465566751694194690, guid: 120853f9b2ce6e44287fd0cd6e29c09d, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -51,13 +51,13 @@ Material:
     m_Ints: []
     m_Floats:
     - RippleDensity: 259.03
-    - RippleSlimness: 6.42
-    - RippleSpeed: 1
+    - RippleSlimness: 4.33
+    - RippleSpeed: 0.1
     - WaveHeight: 0.2
     - WaveSpeed: 0.1
     - _QueueControl: 0
     - _QueueOffset: 0
     m_Colors:
     - RippleColor: {r: 0.8, g: 1.490196, b: 2, a: 0}
-    - _Color: {r: 0.2688679, g: 0.6119493, b: 1, a: 0}
+    - _Color: {r: 0.11992702, g: 0.21887368, b: 0.3301887, a: 0}
   m_BuildTextureStacks: []

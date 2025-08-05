@@ -78,6 +78,7 @@ public class ItemUse : NetworkBehaviour
 
     public void HoldPrimary()
     {
+        Debug.Log("Holding");
         //Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
         //if (item == null) return; // If item doesn't exist
         if (inventory.itemComponentObject == null) return;

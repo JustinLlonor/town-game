@@ -53,10 +53,5 @@ public class CutsceneTextUI : MonoBehaviour
             cursor.enabled = flashOn;
             flashProgress -= .5f;
         }
-
     }
-
-
-
-
 }

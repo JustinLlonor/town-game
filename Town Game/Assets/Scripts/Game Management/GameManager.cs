@@ -7,6 +7,7 @@ using TMPro;
 using Steamworks;
 using System;
 using WebSocketSharp;
+using Photon.Realtime;
 
 public class GameManager : NetworkBehaviour
 {
@@ -45,6 +46,8 @@ public class GameManager : NetworkBehaviour
     public EventHandler cultistEvents;
     public string[] days;
     public string[] positions;
+    [Header("Testing")]
+    public Transform testTransform; // The transform the player teleports to if they are testing
     RoleRevealer rv;
     RoomManager rm;
     PlayerManager pm;
@@ -112,7 +115,10 @@ public class GameManager : NetworkBehaviour
         runnerManager = FindFirstObjectByType<RunnerManager>();
         runnerManager.onPlayerLeave += RemoveAlivePlayer;
         //cm = FindFirstObjectByType<CameraManager>();
-        if (SessionData.isTesting) return;
+        if (SessionData.isTesting)
+        {
+            return;
+        }
         OnRevealRoles += rv.RevealRole;
         FindFirstObjectByType<BlackScreen>().ShowCover();
     }
@@ -501,13 +507,17 @@ public class GameManager : NetworkBehaviour
 
     public void SpawnPositions()
     {
+        if (SessionData.isTesting && testTransform != null)
+        {
+            pm.SpawnPlayerAtTransform(Runner, Runner.LocalPlayer, testTransform);
+            return;
+        }
         // Invokes reveal roles delegate for the role reveal sequence
         foreach (PlayerRef player in Runner.ActivePlayers)
         {
             Transform roomT = rm.playerRooms[pm.GetRoom(player)].spawnTransform;
             GameObject playerObject = pm.SpawnPlayerAtTransform(Runner, player, roomT);
             if (!SessionData.isTesting) playerObject.GetComponent<PlayerMovement>().Freeze();
-            Debug.Log(SessionData.isTesting);
         }
         //OnRevealRoles?.Invoke((bool)PhotonNetwork.LocalPlayer.CustomProperties["isCultist"]);
     }
