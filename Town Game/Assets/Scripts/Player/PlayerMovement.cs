@@ -661,8 +661,10 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         //if (OnSlope()) return; // May be changed later
         if (!isMoving) return;
         if (!isGrounded) return;
-        if (Physics.Raycast(stepRayLower.position, moveDirection, stepDistance, environmentMask))
+        RaycastHit hit;
+        if (Physics.Raycast(stepRayLower.position, moveDirection, out hit, stepDistance, environmentMask))
         {
+            if (hit.collider.tag == "No Step Climb") return; // if we are looking at terrain, don't do any step climbs
             bool upper = Physics.Raycast(stepRayUpper.position, moveDirection, stepDistance + .05f, environmentMask);
             if (!upper)
             {
