@@ -20,6 +20,7 @@ public class Player : NetworkBehaviour
     [HideInInspector] public InteractableFinder inf;
     [HideInInspector] public ItemUse itemUse;
     [HideInInspector] public PlayerClothing playerClothing;
+    public PlayerGrab playerGrab;
     public PlayerRoom playerRoom;
     public Speaker speaker;
     public ControlPanel connectedPanel;
@@ -122,8 +123,8 @@ public class Player : NetworkBehaviour
             {
                 IncreaseSIAtIndex(data.subInteractableIndex);
             }
-            // Items
-            if (!Runner.IsResimulation && !pi.hotbar[pi.equippedSlot].ToString().IsNullOrEmpty())
+            // Item use and grabbing
+            if (!Runner.IsResimulation)
             {
                 // State change detector
                 bool usePrimary = data.itemUsePrimary;
@@ -137,13 +138,31 @@ public class Player : NetworkBehaviour
                 if (usePrimary != previousPrimary)
                 {
                     previousPrimary = usePrimary;
+                    bool grabbed = false;
+                    // Grabbing
                     if (usePrimary)
                     {
-                        itemUse.UsePrimary();
+                        grabbed = playerGrab.CheckGrab();
                     }
                     else
                     {
-                        itemUse.ReleasePrimary();
+                        playerGrab.CheckRelease();
+                    }
+                    // Item usage, can only be triggered when grabbing doesn't work
+                    if (!grabbed)
+                    {
+                        bool handEmpty = pi.hotbar[pi.equippedSlot].ToString().IsNullOrEmpty();
+                        if (!handEmpty)
+                        {
+                            if (usePrimary)
+                            {
+                                itemUse.UsePrimary();
+                            }
+                            else
+                            {
+                                itemUse.ReleasePrimary();
+                            }
+                        }
                     }
                 }
                 // Secondary state change functions

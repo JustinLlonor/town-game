@@ -527,6 +527,7 @@ GameObject:
   - component: {fileID: 2324421915886620022}
   - component: {fileID: 9025657517201421562}
   - component: {fileID: 2769369361019907945}
+  - component: {fileID: 7521404537294941852}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -581,6 +582,7 @@ MonoBehaviour:
   inf: {fileID: 8489816749943817623}
   itemUse: {fileID: 2378964989146487730}
   playerClothing: {fileID: 873785079005984450}
+  playerGrab: {fileID: 7521404537294941852}
   playerRoom: {fileID: 3246050477725740936}
   speaker: {fileID: 4245333172940040223}
   connectedPanel: {fileID: 0}
@@ -617,6 +619,7 @@ MonoBehaviour:
   - {fileID: 2324421915886620022}
   - {fileID: 9025657517201421562}
   - {fileID: 2769369361019907945}
+  - {fileID: 7521404537294941852}
   - {fileID: 8314741821198590847}
   - {fileID: 8489816749943817623}
   - {fileID: 991788123578228062}
@@ -1581,6 +1584,32 @@ MonoBehaviour:
   animator: {fileID: 5001893267009733704}
   speakerT: {fileID: 147890084963948018}
   speaker: {fileID: 4245333172940040223}
+--- !u!114 &7521404537294941852
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1787190705143953567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74fb72129dc601f4581dbee75439d673, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  grabDistance: 2
+  grabTerminationDistance: 3
+  _isGrabbing: 0
+  _grabbedObject:
+    Raw: 0
+  _grabbedBehaviour:
+    Object:
+      Raw: 0
+    Behaviour: 0
+  player: {fileID: 9069154022521576282}
+  inf: {fileID: 8489816749943817623}
+  environmentLayer:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!1 &2255715054737852972
 GameObject:
   m_ObjectHideFlags: 0
