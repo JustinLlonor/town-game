@@ -72,7 +72,7 @@ public class PlayerGrab : NetworkBehaviour
         Vector3 castDirection = inf.forwardDirection;
         RaycastHit hit;
         if (!Physics.Raycast(castTransform.position, castDirection, out hit, maxGrabDistance, environmentLayer)) return false;
-        if (hit.collider.gameObject.tag != "Grabbable") return false;
+        if ((hit.collider.gameObject.tag != "Grabbable")) return false;
         Grabbable grabbable = hit.collider.GetComponent<Grabbable>();
         if (!grabbable.canGrab) return false;
         grabbedBehaviour = grabbable.Id;

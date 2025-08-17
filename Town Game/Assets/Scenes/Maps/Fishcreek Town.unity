@@ -7979,7 +7979,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh106092
+  m_Name: pb_Mesh41220
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -9181,7 +9181,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh107066
+  m_Name: pb_Mesh42194
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -40381,7 +40381,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh107286
+  m_Name: pb_Mesh42414
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -57988,6 +57988,8 @@ GameObject:
   - component: {fileID: 1956711566}
   - component: {fileID: 1956711565}
   - component: {fileID: 1956711564}
+  - component: {fileID: 1956711567}
+  - component: {fileID: 1956711568}
   - component: {fileID: 1956711563}
   - component: {fileID: 1956711562}
   - component: {fileID: 1956711561}
@@ -58101,6 +58103,8 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 1956711564}
+  - {fileID: 1956711567}
+  - {fileID: 1956711568}
   ForceRemoteRenderTimeframe: 0
 --- !u!4 &1956711566
 Transform:
@@ -58117,6 +58121,39 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1956711567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1956711560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41d54d6d5ea63eb439437d0ccc3b5b84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventThresholds: []
+  defaultRate: 5
+  defaultRateSecondary: 0
+  attributeRates:
+  - attribute: -2
+    primaryUse: 0
+    modifiedRate: 50
+  itemRates: []
+  _progress: 0
+--- !u!114 &1956711568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1956711560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66bec06db90c9544390e82e51897262c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1959509965
 GameObject:
   m_ObjectHideFlags: 0
@@ -59256,6 +59293,51 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1978444733}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1979411231
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1979411232}
+  - component: {fileID: 1979411233}
+  m_Layer: 0
+  m_Name: Progress Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1979411232
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1979411231}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1303351295}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1979411233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1979411231}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b06a4f8093591f3469c5c5274b2be2ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _progressObjects: []
 --- !u!1 &1985027241
 GameObject:
   m_ObjectHideFlags: 0
@@ -63872,7 +63954,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7710707397463329135, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: NetworkedBehaviours.Array.size
-      value: 12
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: 7710707397463329135, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[3]'
@@ -63910,6 +63992,10 @@ PrefabInstance:
       propertyPath: 'NetworkedBehaviours.Array.data[11]'
       value: 
       objectReference: {fileID: 25853118}
+    - target: {fileID: 7710707397463329135, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      propertyPath: 'NetworkedBehaviours.Array.data[12]'
+      value: 
+      objectReference: {fileID: 1979411233}
     - target: {fileID: 8939135918072450520, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: sceneViewId
       value: 8
@@ -63926,6 +64012,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 466519801941495353, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       insertIndex: -1
       addedObject: {fileID: 25853117}
+    - targetCorrespondingSourceObject: {fileID: 466519801941495353, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1979411232}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5129982233875511372, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       insertIndex: -1

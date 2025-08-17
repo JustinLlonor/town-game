@@ -1,0 +1,217 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Fusion;
+using System;
+using System.Linq;
+
+public class ProgressHandler : NetworkBehaviour
+{
+    [Header("Settings")]
+    [Tooltip("Events called on the server side when a certain threshold is reached")]
+    public float[] eventThresholds;
+    [Tooltip("The default rate of progress when a player clicks on the object. How much progress is cleared in a second, with the max progress being 100")]
+    public float defaultRate = 10f;
+    public float defaultRateSecondary = 0f;
+    [Tooltip("The rate of progress when this handler is untouched")]
+    public float untouchedRate = 0f;
+    [Tooltip("Item attributes and their corresponding rate modifications")]
+    public ItemAttributeRate[] attributeRates = new ItemAttributeRate[0];
+    [Tooltip("Items and their corresponding rate modifications")]
+    public ItemRate[] itemRates = new ItemRate[0];
+    [Tooltip("If the progress stays when the player looks away")]
+    public bool retainProgress = true;
+    /// <summary>
+    /// A number from 0-100 inclusive indicating the progress of this progress handler
+    /// </summary>
+    [Networked] public float progress { get; set; }
+    /// <summary>
+    /// Called when a threshold is reached exactly at the threshold
+    /// </summary>
+    public ThresholdEvent onThresholdReach;
+    /// <summary>
+    /// Called when a threshold is passed by adding past the threshold
+    /// </summary>
+    public ThresholdEvent onThresholdPassAdd;
+    /// <summary>
+    /// Called when a threshold is passed by subtracting past the threshold
+    /// </summary>
+    public ThresholdEvent onThresholdPassSubtract;
+    /// <summary>
+    /// When this is true, the progress handler has been touched on this frame
+    /// </summary>
+    private bool touchedOnFrame = false;
+    ProgressManager progressManager;
+
+    public delegate void ThresholdEvent(float value);
+
+    [System.Serializable]
+    public struct ItemAttributeRate
+    {
+        public ItemAttribute attribute;
+        public bool primaryUse;
+        public float modifiedRate;
+    }
+
+    [System.Serializable]
+    public struct ItemRate
+    {
+        public Item item;
+        public bool primaryUse;
+        public float modifiedRate;
+    }
+
+    // For dictionary keys in case the struct lists get really big??? but honestly don't need these
+    public struct ItemUse : IEquatable<ItemUse>
+    {
+        public Item item;
+        public bool primaryUse;
+
+        public ItemUse(Item item, bool primaryUse)
+        {
+            this.item = item;
+            this.primaryUse = primaryUse;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ItemUse use && Equals(use);
+        }
+
+        public bool Equals(ItemUse other)
+        {
+            return EqualityComparer<Item>.Default.Equals(item, other.item) &&
+                   primaryUse == other.primaryUse;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(item, primaryUse);
+        }
+
+        public static bool operator ==(ItemUse left, ItemUse right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ItemUse left, ItemUse right)
+        {
+            return !(left == right);
+        }
+    }
+
+    public struct ItemAttributeUse : IEquatable<ItemAttributeUse>
+    {
+        public ItemAttribute atribute;
+        public bool primaryUse;
+
+        public ItemAttributeUse(ItemAttribute atribute, bool primaryUse)
+        {
+            this.atribute = atribute;
+            this.primaryUse = primaryUse;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ItemAttributeUse use && Equals(use);
+        }
+
+        public bool Equals(ItemAttributeUse other)
+        {
+            return atribute == other.atribute &&
+                   primaryUse == other.primaryUse;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(atribute, primaryUse);
+        }
+
+        public static bool operator ==(ItemAttributeUse left, ItemAttributeUse right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ItemAttributeUse left, ItemAttributeUse right)
+        {
+            return !(left == right);
+        }
+    }
+
+    public override void Spawned()
+    {
+        progressManager = FindAnyObjectByType<ProgressManager>();
+        if (!Runner.IsServer) return;
+        progressManager.AddHandler(this);
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (touchedOnFrame)
+        {
+            touchedOnFrame = false;
+            return;
+        }
+        UntouchedRate();
+    }
+
+    /// <summary>
+    /// Changes progress based on the item, use button, and delta time
+    /// </summary>
+    /// <param name="heldItem"></param>
+    /// <param name="primaryUse"></param>
+    /// <param name="deltaTime"></param>
+    public void ProcessProgress(Item heldItem, bool primaryUse, float deltaTime)
+    {
+        touchedOnFrame = true;
+        // If the player is not holding anything
+        if (heldItem == null)
+        {
+            if (primaryUse)
+            {
+                progress += defaultRate * deltaTime;
+            }
+            else
+            {
+                progress += defaultRateSecondary * deltaTime;
+            }
+            progress = Mathf.Clamp(progress, 0f, 100f);
+            return;
+        }
+        // Check item modified rates
+        foreach (ItemRate itemRate in itemRates)
+        {
+            if (heldItem != itemRate.item) continue;
+            if (primaryUse != itemRate.primaryUse) continue;
+            progress += itemRate.modifiedRate * deltaTime;
+            progress = Mathf.Clamp(progress, 0f, 100f);
+            return;
+        }
+        // Check item attributes
+        foreach (ItemAttributeRate attributeRate in attributeRates)
+        {
+            if (heldItem.attributes == null) break; // if the list is empty
+            if (!heldItem.attributes.Contains(attributeRate.attribute)) continue; // If the item doesn't contain the attribute
+            if (primaryUse != attributeRate.primaryUse) continue;
+            progress += attributeRate.modifiedRate * deltaTime;
+            progress = Mathf.Clamp(progress, 0f, 100f);
+            return;
+        }
+        // If all else fails
+        if (primaryUse)
+        {
+            progress += defaultRate * deltaTime;
+        }
+        else
+        {
+            progress += defaultRateSecondary * deltaTime;
+        }
+        progress = Mathf.Clamp(progress, 0f, 100f);
+    }
+
+    private void UntouchedRate()
+    {
+        progress += untouchedRate * Runner.DeltaTime;
+        progress = Mathf.Clamp(progress, 0f, 100f);
+    }
+}

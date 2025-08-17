@@ -94,8 +94,8 @@ public class ItemUse : NetworkBehaviour
 
     public void UseSecondary()
     {
-        Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
-        if (item == null) return;
+        //Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
+        //if (item == null) return;
         if (inventory.itemComponentObject == null) return;
         inventory.itemComponentObject.SendMessage("OnSecondaryUse", SendMessageOptions.DontRequireReceiver);
     }

@@ -21,6 +21,7 @@ public class Player : NetworkBehaviour
     [HideInInspector] public ItemUse itemUse;
     [HideInInspector] public PlayerClothing playerClothing;
     public PlayerGrab playerGrab;
+    public PlayerProgress playerProgress;
     public PlayerRoom playerRoom;
     public Speaker speaker;
     public ControlPanel connectedPanel;
@@ -123,13 +124,20 @@ public class Player : NetworkBehaviour
             {
                 IncreaseSIAtIndex(data.subInteractableIndex);
             }
-            // Item use and grabbing
+            // Item use, progress, and grabbing
             if (!Runner.IsResimulation)
             {
                 // State change detector
                 bool usePrimary = data.itemUsePrimary;
                 bool useSecondary = data.itemUseSecondary;
+                bool handEmpty = pi.hotbar[pi.equippedSlot].ToString().IsNullOrEmpty();
                 if (dropManager.currentPlacementMode == GizmoMode.Item)
+                {
+                    usePrimary = false;
+                    useSecondary = false;
+                }
+                // Player progress
+                if (playerProgress.progressing)
                 {
                     usePrimary = false;
                     useSecondary = false;
@@ -151,7 +159,6 @@ public class Player : NetworkBehaviour
                     // Item usage, can only be triggered when grabbing doesn't work
                     if (!grabbed)
                     {
-                        bool handEmpty = pi.hotbar[pi.equippedSlot].ToString().IsNullOrEmpty();
                         if (!handEmpty)
                         {
                             if (usePrimary)
@@ -169,13 +176,16 @@ public class Player : NetworkBehaviour
                 if (useSecondary != previousSecondary)
                 {
                     previousSecondary = useSecondary;
-                    if (useSecondary)
+                    if (!handEmpty)
                     {
-                        itemUse.UseSecondary();
-                    }
-                    else
-                    {
-                        itemUse.ReleaseSecondary();
+                        if (useSecondary)
+                        {
+                            itemUse.UseSecondary();
+                        }
+                        else
+                        {
+                            itemUse.ReleaseSecondary();
+                        }
                     }
                 }
                 // Item use hold functions
