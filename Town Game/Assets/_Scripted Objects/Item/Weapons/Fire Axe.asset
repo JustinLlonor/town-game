@@ -13,13 +13,15 @@ MonoBehaviour:
   m_Name: Fire Axe
   m_EditorClassIdentifier: 
   icon: {fileID: 2800000, guid: f0b90e8d6c5d43c4d91b9cf5faa161a9, type: 3}
-  description: It's a fire axe. Could be used as a weapon, or as a destructive tool.
+  description: This has no use other than being a neat testing item.
   customType: 
   dropSettings: {fileID: 11400000, guid: d52bf0b9242b7f1459e92fbd6028e5ef, type: 2}
   placedRotation: {x: 0, y: -90, z: -90}
   itemBehaviourObject: {fileID: 0}
   mesh: {fileID: -7354185949920861747, guid: 67afa0fb94df67d4cbc3dfe48bf0f83e, type: 3}
   texture: {fileID: 2800000, guid: 0738e2d608f3f564ebef95532d118212, type: 3}
+  attributes: feffffff00000000
+  material: {fileID: 0}
   useSounds: []
   equipSounds:
   - Equip1

@@ -15,6 +15,7 @@ public class ItemUIInfo : MonoBehaviour
     public TextMeshProUGUI typeText;
     public TextMeshProUGUI roomText;
     public TextMeshProUGUI descriptionText;
+    public TextMeshProUGUI attributeText;
     public Animator panelAnimator;
     public Billboard billboard;
     public float yOffset = 0.35f;
@@ -84,6 +85,15 @@ public class ItemUIInfo : MonoBehaviour
         }
         roomText.text = ownership;
         descriptionText.text = item.description;
+        string attributes = "";
+        bool firstString = true;
+        foreach (ItemAttribute attribute in item.attributes)
+        {
+            if (!firstString) attributes += ", ";
+            attributes += attribute.ToReadable();
+            if (firstString) firstString = false;
+        }
+        attributeText.text = attributes;
     }
 
     void SetDistance()

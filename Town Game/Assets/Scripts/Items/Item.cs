@@ -15,6 +15,7 @@ public class Item : ScriptableObject
     public GameObject itemBehaviourObject;
     public Mesh mesh; // Mesh of the item
     public Texture2D texture;
+    public ItemAttribute[] attributes = new ItemAttribute[0];
     [Tooltip("If this is set, the material will be used on the placed item instead of the texture")]
     public Material material;
     [Header("Sound")]
@@ -24,10 +25,10 @@ public class Item : ScriptableObject
     public string holdPose = "ArmHoldNormal_f";
     public string gripPose;
     [Tooltip("The client sided use animations for this item. For weapons, index 0 is attack, index 1 is defense, index 2 is engagement, and index 3 is collateral attacks")]
-    public string[] clientUseAnimations; // TO IMPLEMENT
+    public string[] clientUseAnimations; // TODO: IMPLEMENT
     [Header("Character Animation")]
     [Tooltip("The server sided use animations for this item. For weapons, index 0 is attack, index 1 is defense, index 2 is engagement, and index 3 is collateral attacks")]
-    public AnimationState[] useAnimations; // TO IMPLEMENT
+    public AnimationState[] useAnimations; // TODO: IMPLEMENT
     public AnimationState[] holdPoses;
     
     [System.Serializable]
