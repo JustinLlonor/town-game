@@ -9,6 +9,7 @@ using WebSocketSharp;
 /// </summary>
 public class PlayerProgress : NetworkBehaviour
 {
+    public Player player;
     public InteractableFinder inf;
     public float progressDistance = 2f;
     public LayerMask environmentLayer;
@@ -34,6 +35,7 @@ public class PlayerProgress : NetworkBehaviour
         ProgressHandler hitHandler = progressManager.GetProgressHandler(hitObject);
         if (hitHandler == null) return; // if it doesn't have a handler, don't start progressing
         if (!hitHandler.canProgress) return; // if the handler can't progress, then don't start
+        if (hitHandler.ProgressCanSkip(player)) return; // if the progress can be skipped by the player, return.
         Item heldItemObject = null;
         if (!heldItem.IsNullOrEmpty())
         {

@@ -9,8 +9,9 @@ using System.Linq;
 /// </summary>
 [RequireComponent(typeof(Grabbable))]
 [RequireComponent(typeof(ProgressHandler))]
-public class PGEntryPoint : NetworkBehaviour
+public class EntryPoint : NetworkBehaviour
 {
+    [Networked] public bool isOpen { get; set; } = false;
     Grabbable grabbable;
     ProgressHandler progressHandler;
 
@@ -18,7 +19,7 @@ public class PGEntryPoint : NetworkBehaviour
     {
         grabbable = GetComponent<Grabbable>();
         progressHandler = GetComponent<ProgressHandler>();
-        grabbable.DisableGrab();
+        grabbable.EnableGrab();
         progressHandler.onThresholdReach += ProgressThresholdReach;
         progressHandler.onThresholdPassSubtract += ProgressThresholdSubtract;
         if (!progressHandler.eventThresholds.Contains(100f)) Debug.LogError("Progress handler does not contain a threshold event for completion!");
@@ -26,17 +27,11 @@ public class PGEntryPoint : NetworkBehaviour
 
     private void ProgressThresholdReach(float threshold)
     {
-        if (threshold == 100f)
-        {
-            grabbable.EnableGrab();
-        }
+        
     }
 
     private void ProgressThresholdSubtract(float threshold)
     {
-        if (threshold == 100f)
-        {
-            grabbable.DisableGrab();
-        }
+        
     }
 }

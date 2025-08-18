@@ -41,12 +41,19 @@ public class ProgressHandler : NetworkBehaviour
     /// </summary>
     public ThresholdEvent onThresholdPassSubtract;
     /// <summary>
+    /// Check functions to determine if a player can skip progress. 
+    /// If at least one function is true, then the player will skip progress. Otherwise, the player will not skip progress.
+    /// Make the function take a Player parameter, then return a bool.
+    /// </summary>
+    public PlayerCheck playerSkipChecks;
+    /// <summary>
     /// When this is true, the progress handler has been touched on this frame
     /// </summary>
     private bool touchedOnFrame = false;
     ProgressManager progressManager;
 
     public delegate void ThresholdEvent(float value);
+    public delegate bool PlayerCheck(Player player);
 
     [System.Serializable]
     public struct ItemAttributeRate
@@ -254,7 +261,29 @@ public class ProgressHandler : NetworkBehaviour
 
     private void UntouchedRate()
     {
+        if (!canProgress) return;
         progress += untouchedRate * Runner.DeltaTime;
         progress = Mathf.Clamp(progress, 0f, 100f);
+    }
+
+    /// <summary>
+    /// Checks if progress can skip or not for this particular player.
+    /// If at least one check delegate is true, then return true. Otherwise, return false.
+    /// </summary>
+    /// <param name="player"></param>
+    /// <returns></returns>
+    public bool ProgressCanSkip(Player player)
+    {
+        if (playerSkipChecks != null)
+        {
+            // if at least one of the check delegates is true, then return true
+            Delegate[] checkDelegates = playerSkipChecks.GetInvocationList();
+            for (int i = 0; i < checkDelegates.Length; i++)
+            {
+                bool checkValid = (bool)checkDelegates[i].DynamicInvoke(player);
+                if (checkValid) return true;
+            }
+        }
+        return false;
     }
 }

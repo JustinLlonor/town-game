@@ -10,9 +10,7 @@ public class Grabbable : NetworkBehaviour
     [Networked] public Vector3 grabPoint { get; set; }
     [Networked] public PlayerRef grabber { get; set; } = PlayerRef.None;
     /// <summary>
-    /// Called when checking if a grab is valid. Use a Player as a parameter, and return a bool. 
-    /// Returning true means that the grab is valid, returning false means otherwise.
-    /// Multiple functions are allowed
+    /// Called when checking if a grab is valid. The grab is invalid if all functions return false.
     /// </summary>
     public PlayerCheck playerCheck;
 
@@ -27,13 +25,14 @@ public class Grabbable : NetworkBehaviour
     {
         if (playerCheck != null)
         {
-            // if at least one of the check delegates is false, then return false
+            // if at least one of the check delegates is true, then return true
             Delegate[] checkDelegates = playerCheck.GetInvocationList();
             for (int i = 0; i < checkDelegates.Length; i++)
             {
                 bool checkValid = (bool)checkDelegates[i].DynamicInvoke(player);
-                if (!checkValid) return false;
+                if (checkValid) return true;
             }
+            return false;
         }
         return true;
     }

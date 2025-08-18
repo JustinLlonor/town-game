@@ -75,7 +75,7 @@ public class PlayerGrab : NetworkBehaviour
         if ((hit.collider.gameObject.tag != "Grabbable")) return false;
         Grabbable grabbable = hit.collider.GetComponent<Grabbable>();
         if (!grabbable.canGrab) return false;
-        if (!grabbable.GrabIsValid(player)) return false; // if the custom grab conditional is false, then the grab is not valid
+        //if (!grabbable.GrabIsValid(player)) return false; // if the custom grab conditional is false, then the grab is not valid
         grabbedBehaviour = grabbable.Id;
         grabbable.grabber = player.owner;
         grabbedObject = hit.collider.GetComponent<NetworkObject>().Id;
