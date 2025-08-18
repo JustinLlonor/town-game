@@ -58135,12 +58135,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   eventThresholds: []
   defaultRate: 5
-  defaultRateSecondary: 0
+  defaultRateSecondary: -5
+  untouchedRate: 0
   attributeRates:
   - attribute: -2
     primaryUse: 0
     modifiedRate: 50
-  itemRates: []
+  itemRates:
+  - item: {fileID: 11400000, guid: a5d5dffa5b8249d429824aa66f7c6fde, type: 2}
+    primaryUse: 1
+    modifiedRate: -50
   _progress: 0
 --- !u!114 &1956711568
 MonoBehaviour:

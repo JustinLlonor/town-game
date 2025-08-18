@@ -137,7 +137,29 @@ public class Player : NetworkBehaviour
                     useSecondary = false;
                 }
                 // Player progress
-                if (playerProgress.progressing)
+                if (!playerProgress.progressing)
+                {
+                    if (usePrimary && (!previousPrimary))
+                    {
+                        playerProgress.InitialCastCheck(true);
+                    }
+                    else if (useSecondary && (!previousSecondary))
+                    {
+                        playerProgress.InitialCastCheck(false);
+                    }
+                }
+                else
+                {
+                    if ((!usePrimary) && (!useSecondary))
+                    {
+                        playerProgress.StopProgress();
+                    }
+                    else
+                    {
+                        playerProgress.ContinuationCheck(usePrimary, pi.hotbar[pi.equippedSlot].ToString());
+                    }
+                }
+                if (playerProgress.progressing) // if progressing, set use keys to false
                 {
                     usePrimary = false;
                     useSecondary = false;

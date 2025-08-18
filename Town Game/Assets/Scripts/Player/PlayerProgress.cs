@@ -64,6 +64,11 @@ public class PlayerProgress : NetworkBehaviour
             StopProgress();
             return;
         }
+        if (progressPrimaryUse != primaryUse)
+        {
+            StopProgress();
+            return;
+        }
         // It is assumed after this point that the player is still looking at the progress object
         Item heldItemObject = null;
         if (!heldItem.IsNullOrEmpty())
@@ -73,13 +78,9 @@ public class PlayerProgress : NetworkBehaviour
         hitHandler.ProcessProgress(heldItemObject, primaryUse, Runner.DeltaTime);
     }
 
-    public bool CheckProgressMaintanence()
-    {
-        return true;
-    }
-
     public void StartProgress()
     {
+        Debug.Log("Progress Started");
         progressing = true;
     }
 
@@ -89,6 +90,7 @@ public class PlayerProgress : NetworkBehaviour
     /// </summary>
     public void StopProgress()
     {
+        Debug.LogError("Progress Stopped");
         progressing = false;
     }
 }

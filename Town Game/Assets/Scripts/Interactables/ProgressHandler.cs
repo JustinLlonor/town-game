@@ -19,8 +19,6 @@ public class ProgressHandler : NetworkBehaviour
     public ItemAttributeRate[] attributeRates = new ItemAttributeRate[0];
     [Tooltip("Items and their corresponding rate modifications")]
     public ItemRate[] itemRates = new ItemRate[0];
-    [Tooltip("If the progress stays when the player looks away")]
-    public bool retainProgress = true;
     /// <summary>
     /// A number from 0-100 inclusive indicating the progress of this progress handler
     /// </summary>
@@ -163,6 +161,7 @@ public class ProgressHandler : NetworkBehaviour
     /// <param name="deltaTime"></param>
     public void ProcessProgress(Item heldItem, bool primaryUse, float deltaTime)
     {
+        Debug.Log(progress);
         touchedOnFrame = true;
         // If the player is not holding anything
         if (heldItem == null)
