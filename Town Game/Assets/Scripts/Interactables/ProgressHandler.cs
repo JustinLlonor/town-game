@@ -23,6 +23,10 @@ public class ProgressHandler : NetworkBehaviour
     /// A number from 0-100 inclusive indicating the progress of this progress handler
     /// </summary>
     [Networked] public float progress { get; set; }
+    /// <summary>
+    /// If this is disabled, then this progress handler cannot be interacted with
+    /// </summary>
+    [Networked] public bool canProgress { get; set; } = true;
     private float previousProgress;
     /// <summary>
     /// Called when a threshold is reached exactly at the threshold

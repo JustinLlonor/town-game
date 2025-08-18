@@ -35,6 +35,7 @@ public class PlayerProgress : NetworkBehaviour
         GameObject hitObject = hit.collider.gameObject;
         ProgressHandler hitHandler = progressManager.GetProgressHandler(hitObject);
         if (hitHandler == null) return; // if it doesn't have a handler, don't start progressing
+        if (!hitHandler.canProgress) return; // if the handler can't progress, then don't start
         Item heldItemObject = null;
         if (!heldItem.IsNullOrEmpty())
         {
