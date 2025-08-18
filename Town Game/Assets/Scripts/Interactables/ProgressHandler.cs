@@ -23,6 +23,7 @@ public class ProgressHandler : NetworkBehaviour
     /// A number from 0-100 inclusive indicating the progress of this progress handler
     /// </summary>
     [Networked] public float progress { get; set; }
+    private float previousProgress;
     /// <summary>
     /// Called when a threshold is reached exactly at the threshold
     /// </summary>
@@ -139,12 +140,14 @@ public class ProgressHandler : NetworkBehaviour
     public override void Spawned()
     {
         progressManager = FindAnyObjectByType<ProgressManager>();
+        previousProgress = progress;
         if (!Runner.IsServer) return;
         progressManager.AddHandler(this);
     }
 
     public override void FixedUpdateNetwork()
     {
+        ProgressEvents();
         if (touchedOnFrame)
         {
             touchedOnFrame = false;
@@ -161,7 +164,6 @@ public class ProgressHandler : NetworkBehaviour
     /// <param name="deltaTime"></param>
     public void ProcessProgress(Item heldItem, bool primaryUse, float deltaTime)
     {
-        Debug.Log(progress);
         touchedOnFrame = true;
         // If the player is not holding anything
         if (heldItem == null)
@@ -206,6 +208,34 @@ public class ProgressHandler : NetworkBehaviour
             progress += defaultRateSecondary * deltaTime;
         }
         progress = Mathf.Clamp(progress, 0f, 100f);
+    }
+
+    private void ProgressEvents()
+    {
+        if (previousProgress == progress) return;
+        foreach (float threshold in eventThresholds)
+        {
+            // Add pass events
+            if (progress > previousProgress)
+            {
+                if ((progress > threshold) && (previousProgress <= threshold))
+                {
+                    onThresholdPassAdd?.Invoke(threshold);
+                }
+            }
+            else if (progress < previousProgress) // Subtract pass events
+            {
+                if ((progress < threshold) && (previousProgress >= threshold))
+                {
+                    onThresholdPassSubtract?.Invoke(threshold);
+                }
+            }
+            if (progress == threshold) // Reach event
+            {
+                onThresholdReach?.Invoke(threshold);
+            }
+        }
+        previousProgress = progress;
     }
 
     private void UntouchedRate()
