@@ -147,6 +147,7 @@ public class ProgressHandler : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
+        if (!Runner.IsServer) return;
         ProgressEvents();
         if (touchedOnFrame)
         {
@@ -162,31 +163,50 @@ public class ProgressHandler : NetworkBehaviour
     /// <param name="heldItem"></param>
     /// <param name="primaryUse"></param>
     /// <param name="deltaTime"></param>
-    public void ProcessProgress(Item heldItem, bool primaryUse, float deltaTime)
+    /// <returns>True if the progress can continue, false if it can't</returns>
+    public bool ProcessProgress(Item heldItem, bool primaryUse, float deltaTime)
     {
         touchedOnFrame = true;
-        // If the player is not holding anything
+        float rate = GetRate(heldItem, primaryUse);
+        progress += rate * deltaTime;
+        progress = Mathf.Clamp(progress, 0f, 100f);
+        return UseChanges(rate);
+    }
+
+    /// <summary>
+    /// Returns true if the use with the following item and use button can change progress
+    /// </summary>
+    /// <param name="heldItem"></param>
+    /// <param name="primaryUse"></param>
+    /// <returns></returns>
+    public bool UseChanges(Item heldItem, bool primaryUse)
+    {
+        float rate = GetRate(heldItem, primaryUse);
+        return UseChanges(rate);
+    }
+
+    private bool UseChanges(float rate)
+    {
+        if ((rate > 0f) && (progress == 100f)) return false;
+        if ((rate < 0f) && (progress == 0f)) return false;
+        if (rate == 0f) return false;
+        return true;
+    }
+
+    private float GetRate(Item heldItem, bool primaryUse)
+    {
+        // Empty hand
         if (heldItem == null)
         {
-            if (primaryUse)
-            {
-                progress += defaultRate * deltaTime;
-            }
-            else
-            {
-                progress += defaultRateSecondary * deltaTime;
-            }
-            progress = Mathf.Clamp(progress, 0f, 100f);
-            return;
+            if (primaryUse) return defaultRate;
+            return defaultRateSecondary;
         }
-        // Check item modified rates
+        // Item rates
         foreach (ItemRate itemRate in itemRates)
         {
             if (heldItem != itemRate.item) continue;
             if (primaryUse != itemRate.primaryUse) continue;
-            progress += itemRate.modifiedRate * deltaTime;
-            progress = Mathf.Clamp(progress, 0f, 100f);
-            return;
+            return itemRate.modifiedRate;
         }
         // Check item attributes
         foreach (ItemAttributeRate attributeRate in attributeRates)
@@ -194,20 +214,10 @@ public class ProgressHandler : NetworkBehaviour
             if (heldItem.attributes == null) break; // if the list is empty
             if (!heldItem.attributes.Contains(attributeRate.attribute)) continue; // If the item doesn't contain the attribute
             if (primaryUse != attributeRate.primaryUse) continue;
-            progress += attributeRate.modifiedRate * deltaTime;
-            progress = Mathf.Clamp(progress, 0f, 100f);
-            return;
+            return attributeRate.modifiedRate;
         }
-        // If all else fails
-        if (primaryUse)
-        {
-            progress += defaultRate * deltaTime;
-        }
-        else
-        {
-            progress += defaultRateSecondary * deltaTime;
-        }
-        progress = Mathf.Clamp(progress, 0f, 100f);
+        if (primaryUse) return defaultRate;
+        return defaultRateSecondary;
     }
 
     private void ProgressEvents()

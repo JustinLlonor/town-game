@@ -58133,18 +58133,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41d54d6d5ea63eb439437d0ccc3b5b84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  eventThresholds: []
+  eventThresholds:
+  - 100
   defaultRate: 5
   defaultRateSecondary: -5
   untouchedRate: 0
   attributeRates:
   - attribute: -2
-    primaryUse: 0
-    modifiedRate: 50
-  itemRates:
-  - item: {fileID: 11400000, guid: a5d5dffa5b8249d429824aa66f7c6fde, type: 2}
     primaryUse: 1
-    modifiedRate: -50
+    modifiedRate: 50
+  itemRates: []
   _progress: 0
 --- !u!114 &1956711568
 MonoBehaviour:

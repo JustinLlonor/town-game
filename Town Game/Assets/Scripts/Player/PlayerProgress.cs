@@ -26,7 +26,7 @@ public class PlayerProgress : NetworkBehaviour
         objectManager = FindAnyObjectByType<ObjectManager>();
     }
 
-    public void InitialCastCheck(bool primaryUse)
+    public void InitialCastCheck(bool primaryUse, string heldItem)
     {
         Transform castTransform = inf.trackedTransform;
         Vector3 castDirection = inf.forwardDirection;
@@ -35,6 +35,12 @@ public class PlayerProgress : NetworkBehaviour
         GameObject hitObject = hit.collider.gameObject;
         ProgressHandler hitHandler = progressManager.GetProgressHandler(hitObject);
         if (hitHandler == null) return; // if it doesn't have a handler, don't start progressing
+        Item heldItemObject = null;
+        if (!heldItem.IsNullOrEmpty())
+        {
+            heldItemObject = objectManager.itemSearch[heldItem];
+        }
+        if (!hitHandler.UseChanges(heldItemObject, primaryUse)) return; // if the use case can't change anything, return
         targettedHandler = progressManager.GetHandlerId(hitObject);
         progressPrimaryUse = primaryUse;
         StartProgress();
@@ -75,22 +81,24 @@ public class PlayerProgress : NetworkBehaviour
         {
             heldItemObject = objectManager.itemSearch[heldItem];
         }
-        hitHandler.ProcessProgress(heldItemObject, primaryUse, Runner.DeltaTime);
+        bool canProgress = hitHandler.ProcessProgress(heldItemObject, primaryUse, Runner.DeltaTime);
+        if (!canProgress)
+        {
+            StopProgress();
+            return;
+        }
     }
 
     public void StartProgress()
     {
-        Debug.Log("Progress Started");
         progressing = true;
     }
 
     /// <summary>
-    /// Stops the progress of this player. Should trigger when the player looks away, 
-    /// or when the player releases
+    /// Stops the progress of this player
     /// </summary>
     public void StopProgress()
     {
-        Debug.LogError("Progress Stopped");
         progressing = false;
     }
 }

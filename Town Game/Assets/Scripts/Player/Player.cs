@@ -130,7 +130,8 @@ public class Player : NetworkBehaviour
                 // State change detector
                 bool usePrimary = data.itemUsePrimary;
                 bool useSecondary = data.itemUseSecondary;
-                bool handEmpty = pi.hotbar[pi.equippedSlot].ToString().IsNullOrEmpty();
+                string equippedItemName = pi.hotbar[pi.equippedSlot].ToString();
+                bool handEmpty = equippedItemName.IsNullOrEmpty();
                 if (dropManager.currentPlacementMode == GizmoMode.Item)
                 {
                     usePrimary = false;
@@ -141,11 +142,11 @@ public class Player : NetworkBehaviour
                 {
                     if (usePrimary && (!previousPrimary))
                     {
-                        playerProgress.InitialCastCheck(true);
+                        playerProgress.InitialCastCheck(true, equippedItemName);
                     }
                     else if (useSecondary && (!previousSecondary))
                     {
-                        playerProgress.InitialCastCheck(false);
+                        playerProgress.InitialCastCheck(false,equippedItemName);
                     }
                 }
                 else
@@ -156,7 +157,7 @@ public class Player : NetworkBehaviour
                     }
                     else
                     {
-                        playerProgress.ContinuationCheck(usePrimary, pi.hotbar[pi.equippedSlot].ToString());
+                        playerProgress.ContinuationCheck(usePrimary, equippedItemName);
                     }
                 }
                 if (playerProgress.progressing) // if progressing, set use keys to false
