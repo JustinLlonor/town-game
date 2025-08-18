@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using Fusion;
 
@@ -11,6 +12,7 @@ public class Grabbable : NetworkBehaviour
     /// <summary>
     /// Called when checking if a grab is valid. Use a Player as a parameter, and return a bool. 
     /// Returning true means that the grab is valid, returning false means otherwise.
+    /// Multiple functions are allowed
     /// </summary>
     public PlayerCheck playerCheck;
 
@@ -25,7 +27,13 @@ public class Grabbable : NetworkBehaviour
     {
         if (playerCheck != null)
         {
-            return playerCheck.Invoke(player);
+            // if at least one of the check delegates is false, then return false
+            Delegate[] checkDelegates = playerCheck.GetInvocationList();
+            for (int i = 0; i < checkDelegates.Length; i++)
+            {
+                bool checkValid = (bool)checkDelegates[i].DynamicInvoke(player);
+                if (!checkValid) return false;
+            }
         }
         return true;
     }

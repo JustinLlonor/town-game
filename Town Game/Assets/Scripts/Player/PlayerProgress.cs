@@ -18,8 +18,6 @@ public class PlayerProgress : NetworkBehaviour
     ProgressManager progressManager;
     ObjectManager objectManager;
 
-    // Do 1 cast on the initial click, if it hits something, then start a progression.
-
     public override void Spawned()
     {
         progressManager = FindAnyObjectByType<ProgressManager>();
