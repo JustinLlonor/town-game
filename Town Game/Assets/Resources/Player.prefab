@@ -1248,7 +1248,7 @@ MonoBehaviour:
   sprintStaminaConsumption: 8
   groundDrag: 6
   _canMove: 1
-  jumpHeight: 5.5
+  jumpHeight: 400
   jumpCooldown: 0
   jumpStaminaConsumption: 10
   canJump: 1
@@ -1376,7 +1376,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1787190705143953567}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 60
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -1626,16 +1626,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd1539402a8a0644eae341e61f29f92e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player: {fileID: 0}
   inf: {fileID: 8489816749943817623}
   progressDistance: 2
   environmentLayer:
     serializedVersion: 2
     m_Bits: 128
   _progressing: 0
-  targettedHandler:
-    Object:
-      Raw: 0
-    Behaviour: 0
+  _targettedHandler:
+    Raw: 0
+  _progressPrimaryUse: 0
 --- !u!1 &2255715054737852972
 GameObject:
   m_ObjectHideFlags: 0

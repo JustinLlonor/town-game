@@ -16,6 +16,11 @@ public class Grabbable : NetworkBehaviour
 
     public delegate bool PlayerCheck(Player player);
 
+    public bool IsGrabbed()
+    {
+        return grabber != PlayerRef.None;
+    }
+
     /// <summary>
     /// Checks if the grab is valid or not for this particular player.
     /// </summary>
