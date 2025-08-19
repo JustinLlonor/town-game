@@ -12,6 +12,7 @@ using System.Linq;
 public class EntryPoint : NetworkBehaviour
 {
     [Networked] public bool isOpen { get; set; } = false;
+    public GrabPoint grabPoint;
     Grabbable grabbable;
     ProgressHandler progressHandler;
 
@@ -19,19 +20,24 @@ public class EntryPoint : NetworkBehaviour
     {
         grabbable = GetComponent<Grabbable>();
         progressHandler = GetComponent<ProgressHandler>();
-        grabbable.EnableGrab();
-        progressHandler.onThresholdReach += ProgressThresholdReach;
-        progressHandler.onThresholdPassSubtract += ProgressThresholdSubtract;
-        if (!progressHandler.eventThresholds.Contains(100f)) Debug.LogError("Progress handler does not contain a threshold event for completion!");
+        grabbable.playerCheck += GrabCheck;
     }
 
-    private void ProgressThresholdReach(float threshold)
+    public override void FixedUpdateNetwork()
     {
-        
+        CheckGrabPoint();
     }
 
-    private void ProgressThresholdSubtract(float threshold)
+    private void CheckGrabPoint()
     {
-        
+        if (grabPoint.isOpen == isOpen) return;
+        isOpen = grabPoint.isOpen;
+        progressHandler.canProgress = !isOpen;
+    }
+
+    private bool GrabCheck(Player player)
+    {
+        if (progressHandler.progress == 100f) return true;
+        return false;
     }
 }
