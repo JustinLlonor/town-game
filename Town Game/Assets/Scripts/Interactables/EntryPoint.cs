@@ -20,7 +20,7 @@ public class EntryPoint : NetworkBehaviour
     {
         grabbable = GetComponent<Grabbable>();
         progressHandler = GetComponent<ProgressHandler>();
-        grabbable.playerCheck += GrabCheck;
+        grabbable.playerGrabChecks += GrabCheck;
     }
 
     public override void FixedUpdateNetwork()

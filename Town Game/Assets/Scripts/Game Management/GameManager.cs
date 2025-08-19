@@ -56,7 +56,10 @@ public class GameManager : NetworkBehaviour
     PositionManager positionManager;
     [Networked] public bool skippedNight { get; set; } = false;
     bool previousSkippedNight = false;
-    bool startedDay = false;
+    /// <summary>
+    /// If the day state is active or not
+    /// </summary>
+    [Networked] public bool isDay { get; set; } = true;
     /// <summary>
     /// Note: this delegate does not execute on all clients, only the server, and its attached to clock UI
     /// </summary>
@@ -78,6 +81,7 @@ public class GameManager : NetworkBehaviour
     public delegate void Timer(float timer);
     [Networked] public TickTimer nightTimer { get; set; }
     public bool init = false;
+    public static GameManager i;
 
     public enum Position
     {
@@ -135,6 +139,7 @@ public class GameManager : NetworkBehaviour
         OnNightSkipStart += im.SetCurrentToBuildingChoose;
         OnNightSkipEnd += im.SetCurrentToBase;
         init = true;
+        i = this;
     }
 
     public override void FixedUpdateNetwork()
@@ -295,10 +300,10 @@ public class GameManager : NetworkBehaviour
 
     void CheckDayStart()
     {
-        if (startedDay) return;
+        if (isDay) return;
         if (currentPeriod - (currentDay * 24f) > dayStartPeriod)
         {
-            startedDay = true;
+            isDay = true;
             DayStartSequence();
         }
     }
@@ -365,7 +370,7 @@ public class GameManager : NetworkBehaviour
     /// </summary>
     public void NightSkipEvent()
     {
-        startedDay = false;
+        isDay = false;
         OnNightSkipEnd?.Invoke();
     }
 

@@ -470,6 +470,23 @@ public class PlayerManager : NetworkBehaviour
     }
     // ^^
 
+    public void AddKey(PlayerRef player, int key)
+    {
+        if (GetPlayerPropertyHolder(properties[player]).keys.Contains(key)) return;
+        GetPlayerPropertyHolder(properties[player]).keys.Add(key);
+    }
+
+    public void RemoveKey(PlayerRef player, int key)
+    {
+        if (!GetPlayerPropertyHolder(properties[player]).keys.Contains(key)) return;
+        GetPlayerPropertyHolder(properties[player]).keys.Remove(key);
+    }
+
+    public bool PlayerHasKey(PlayerRef player, int key)
+    {
+        return GetPlayerPropertyHolder(properties[player]).keys.Contains(key);
+    }
+
     public void SetEnergy(PlayerRef player, int energy)
     {
         GetPlayerPropertyHolder(properties[player]).energy = energy;

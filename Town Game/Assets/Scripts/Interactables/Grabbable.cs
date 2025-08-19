@@ -12,7 +12,7 @@ public class Grabbable : NetworkBehaviour
     /// <summary>
     /// Called when checking if a grab is valid. The grab is invalid if all functions return false.
     /// </summary>
-    public PlayerCheck playerCheck;
+    public PlayerCheck playerGrabChecks;
 
     public delegate bool PlayerCheck(Player player);
 
@@ -28,10 +28,10 @@ public class Grabbable : NetworkBehaviour
     /// <returns></returns>
     public bool GrabIsValid(Player player)
     {
-        if (playerCheck != null)
+        if (playerGrabChecks != null)
         {
             // if at least one of the check delegates is true, then return true
-            Delegate[] checkDelegates = playerCheck.GetInvocationList();
+            Delegate[] checkDelegates = playerGrabChecks.GetInvocationList();
             for (int i = 0; i < checkDelegates.Length; i++)
             {
                 bool checkValid = (bool)checkDelegates[i].DynamicInvoke(player);
