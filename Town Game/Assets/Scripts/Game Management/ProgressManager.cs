@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
 
+// made this to not call getcomponent every frame, might be useless ngl
 public class ProgressManager : NetworkBehaviour
 {
     [Networked, Capacity(100)] public NetworkLinkedList<NetworkId> progressObjects => default;

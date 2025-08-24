@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
+using UnityEngine.Animations.Rigging;
 
 public class PlayerGrab : NetworkBehaviour
 {
@@ -14,6 +15,7 @@ public class PlayerGrab : NetworkBehaviour
     public Player player;
     public InteractableFinder inf;
     public LayerMask environmentLayer;
+    public Rigidbody rb;
 
     public override void FixedUpdateNetwork()
     {
@@ -31,7 +33,7 @@ public class PlayerGrab : NetworkBehaviour
     private void CheckDistance(Grabbable grabbable)
     {
         if (!isGrabbing) return;
-        float distance = Vector3.Distance(inf.trackedTransform.position, grabbable.transform.position);
+        float distance = Vector3.Distance(new Vector3(rb.position.x, inf.trackedTransform.position.y, rb.position.z), grabbable.transform.position);
         if (distance > grabTerminationDistance)
         {
             ReleaseGrabWithObject(grabbable);
@@ -56,7 +58,7 @@ public class PlayerGrab : NetworkBehaviour
         if (!isGrabbing) return;
         Transform rayTransform = inf.trackedTransform;
         Vector3 rayDirection = inf.forwardDirection;
-        Vector3 grabPoint = rayTransform.position + rayDirection * grabbedDistance;
+        Vector3 grabPoint = new Vector3(rb.position.x, rayTransform.position.y, rb.position.z) + rayDirection * grabbedDistance;
         grabbable.grabPoint = grabPoint;
         Debug.DrawLine(grabPoint, grabPoint + Vector3.up);
     }
@@ -71,7 +73,8 @@ public class PlayerGrab : NetworkBehaviour
         Transform castTransform = inf.trackedTransform;
         Vector3 castDirection = inf.forwardDirection;
         RaycastHit hit;
-        if (!Physics.Raycast(castTransform.position, castDirection, out hit, maxGrabDistance, environmentLayer)) return false;
+        Vector3 castPosition = new Vector3(rb.position.x, castTransform.position.y, rb.position.z);
+        if (!Physics.Raycast(castPosition, castDirection, out hit, maxGrabDistance, environmentLayer)) return false;
         if ((hit.collider.gameObject.tag != "Grabbable")) return false;
         Grabbable grabbable = hit.collider.GetComponent<Grabbable>();
         if (!grabbable.canGrab) return false;

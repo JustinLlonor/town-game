@@ -164,4 +164,14 @@ public class InteractableUI : MonoBehaviour
             yield return null;
         }
     }
+
+    public void DisplayActionHolder(ActionHolder holder, InteractableFinder finder)
+    {
+        if (holder == null)
+        {
+            CrosshairManager.instance.RemoveCrosshair(0);
+            return;
+        }
+        CrosshairManager.instance.AddCrosshair(0, 0);
+    }
 }

@@ -18,6 +18,7 @@ public class PlayerProgress : NetworkBehaviour
     [Networked] public bool progressPrimaryUse { get; set; }
     ProgressManager progressManager;
     ObjectManager objectManager;
+    public Rigidbody rb;
 
     public override void Spawned()
     {
@@ -30,7 +31,8 @@ public class PlayerProgress : NetworkBehaviour
         Transform castTransform = inf.trackedTransform;
         Vector3 castDirection = inf.forwardDirection;
         RaycastHit hit;
-        if (!Physics.Raycast(castTransform.position, castDirection, out hit, progressDistance, environmentLayer)) return;
+        Vector3 castPosition = new Vector3(rb.position.x, castTransform.position.y, rb.position.z);
+        if (!Physics.Raycast(castPosition, castDirection, out hit, progressDistance, environmentLayer)) return;
         GameObject hitObject = hit.collider.gameObject;
         ProgressHandler hitHandler = progressManager.GetProgressHandler(hitObject);
         if (hitHandler == null) return; // if it doesn't have a handler, don't start progressing
@@ -52,7 +54,8 @@ public class PlayerProgress : NetworkBehaviour
         Transform castTransform = inf.trackedTransform;
         Vector3 castDirection = inf.forwardDirection;
         RaycastHit hit;
-        if (!Physics.Raycast(castTransform.position, castDirection, out hit, progressDistance, environmentLayer))
+        Vector3 castPosition = new Vector3(rb.position.x, castTransform.position.y, rb.position.z);
+        if (!Physics.Raycast(castPosition, castDirection, out hit, progressDistance, environmentLayer))
         {
             StopProgress();
             return;

@@ -17,7 +17,6 @@ public class InteractableFinder : NetworkBehaviour
     public InteractableUI iui;
     [Header("Keys")]
     public InputActionReference[] interactActions;
-    [Networked] public bool canInteract { get; set; } = true;
     bool previousCanInteract = true;
 
     [HideInInspector] public bool iValid = true;
@@ -41,6 +40,14 @@ public class InteractableFinder : NetworkBehaviour
     [HideInInspector] public bool menuData = false;
     bool init = false;
 
+    // Interactable revamp variables
+    [Networked] public bool canInteract { get; set; } = true; // If the player has the ability to interact
+    [Networked] public bool lookingAtInteract { get; set; } = false; // If the player is looking at an action holder
+    [Networked] public NetworkBehaviourId viewedActionHolder { get; set; } // The current viewed action holder
+    [Networked] public int interactionIndex { get; set; } = -1; // -1 if interaction key isn't pressed, 0+ if it is pressed on something
+    [Networked] public float interactTime { get; set; } // The amount of time held for the interaction
+    [Networked] public bool pressFinished { get; set; } = false; // if the current action has finished being pressed 
+
     public override void Spawned()
     {
         if (IsProxy) Destroy(this);
@@ -49,6 +56,7 @@ public class InteractableFinder : NetworkBehaviour
         iui = FindFirstObjectByType<InteractableUI>();
         rm = FindFirstObjectByType<RunnerManager>();
         if (!HasInputAuthority) return;
+        // Input manager interaction functions, sent to runner manager and sent back to player
         InputManager inputManager = FindFirstObjectByType<InputManager>();
         inputManager.onInteract1 += OnInteract1;
         inputManager.onInteract2 += OnInteract2;
@@ -63,6 +71,7 @@ public class InteractableFinder : NetworkBehaviour
     public override void Render()
     {
         if (!init) return;
+        // canInteract change detector
         if (canInteract != previousCanInteract)
         {
             previousCanInteract = canInteract;
@@ -79,43 +88,13 @@ public class InteractableFinder : NetworkBehaviour
         {
             if (canInteract)
             {
-                if (!menuData && canInteract) CastRay(); // If the menu isn't open for the player, and we can interact, cast a ray
-                UpdateTracking(); // Tracked hovers for the client
+                CastRay();
             }
             if (currentPressed != previousPressed)
             {
                 previousPressed = currentPressed;
                 OnPressedChange();
             }
-        }
-        CheckInteractable();
-    }
-
-    void CheckInteractable()
-    {
-        if (timerRunning)
-        {
-            if (currentInteraction == null) return;
-            if (currentInteraction.hovers.Length <= heldInteractable) return;
-            if (serverTimer.Expired(Runner))
-            {
-                Interactable.Hover hover = currentInteraction.hovers[heldInteractable];
-                if (Runner.IsServer) InvokeActions(hover.actions, Object.InputAuthority);
-                ResetInteractions();
-                if (HasInputAuthority)
-                {
-                    hover.networkSettings.clientAction.Invoke();
-                }
-            }
-        }
-    }
-
-    void InvokeActions(Interactable.Action[] actions, PlayerRef player)
-    {
-        bool isServer = rm.nRunner.IsServer;
-        foreach (Interactable.Action action in actions)
-        {
-            action.Invoke(player);
         }
     }
 
@@ -157,6 +136,7 @@ public class InteractableFinder : NetworkBehaviour
     /// </summary>
     void CastRay()
     {
+        if (menuData) return; // return if the menu is open
         Vector3 trackedPosition = new Vector3(rb.position.x, trackedTransform.position.y, rb.position.z);
         RaycastHit hit;
         if (Physics.Raycast(trackedPosition, forwardDirection, out hit, range, (int)interactableMask)) // Raycast interactable
@@ -170,23 +150,19 @@ public class InteractableFinder : NetworkBehaviour
                     return;
                 }
             }
-            if (hit.collider.gameObject != currentInteractable) // Executes if we are looking at an interactable
+            ActionHolder foundHolder = hit.collider.GetComponent<ActionHolder>();
+            if (HasInputAuthority) iui.DisplayActionHolder(foundHolder, this);
+            if (foundHolder == null)
             {
-                if (!hit.collider.gameObject.GetComponent<Interactable>().canInteract) return; // Can't interact, return
-                if (currentInteraction != null && HasInputAuthority) currentInteraction.Unlook(); // Stop making the materials glow
-                currentInteractable = hit.collider.gameObject;
-                currentInteraction = currentInteractable.GetComponent<Interactable>();
-                DisplayInteraction(currentInteraction);
-                if (HasInputAuthority)
-                {
-                    CrosshairManager.instance.AddCrosshair(0, 0);
-                    currentInteraction.Look();
-                }
+                ResetInteractions();
                 return;
             }
-            return;
+            NetworkBehaviourId foundHolderId = foundHolder.Id;
+            if (foundHolderId != viewedActionHolder)
+            {
+                viewedActionHolder = foundHolderId;
+            }
         }
-        if (currentInteractable != null) ResetInteractions();
     }
 
     private void ResetInteractionUIOpen(int i)
@@ -194,90 +170,21 @@ public class InteractableFinder : NetworkBehaviour
         ResetInteractions();
     }
 
+    /// <summary>
+    /// Resets interaction variables
+    /// </summary>
     public void ResetInteractions()
     {
-        if (currentInteraction != null && HasInputAuthority) currentInteraction.Unlook();
-        currentInteractable = null;
-        currentInteraction = null;
-        timerRunning = false;
-        serverTimer = TickTimer.None;
-
+        lookingAtInteract = false;
+        // UI stuff
         if (!HasInputAuthority) return; // Client interaction reset
-        StopAllCoroutines();
-        timer = 0f; // Client timer
-        iui.StopHighlight(); // UI
-        iui.ClearInteractions();
-        trackedIndexes.Clear();
-        CrosshairManager.instance.RemoveCrosshair(0);
+        iui.DisplayActionHolder(null, this);
+        //StopAllCoroutines();
     }
 
     void InteractionKey(Interactable.InteractKey key)
     {
-        if (menuData) return;
-        if (timer > 0f) return;
-        if (currentInteraction == null) return;
-        // Checks each interaction key in the current interaction and sees if the key equals the current key
-        int i = 0;
-        foreach (Interactable.Hover h in currentInteraction.hovers)
-        {
-            if (h.interactKey == Interactable.InteractKey.None && h.networkSettings.indiffKey == Interactable.InteractKey.None) continue;
-            if (h.interactKey == key || (h.networkSettings.indiffKey == key && h.networkSettings.indiffKey != Interactable.InteractKey.None))
-            {
-                if (!h.networkSettings.networked)
-                {
-                    if (!HasInputAuthority) return;
-                    ClientInteractionKey(h, i);
-                    return;
-                }
-                if (h.networkSettings.networked)
-                {
-                    if (Runner.IsServer) // If server
-                    {
-                        if (h.delay == 0f) // If the delay is 0, immediately execute the action and return
-                        {
-                            InvokeActions(h.actions, Object.InputAuthority);
-                            ResetInteractions();
-                        }
-                        else if (!timerRunning)
-                        {
-                            heldInteractable = i;
-                            timerRunning = true;
-                            serverTimer = TickTimer.CreateFromSeconds(Runner, h.delay);
-                        }
-                    }
-                    if (HasInputAuthority) // If client
-                    {
-                        ServerInteractionKey(h, iui.transform.GetChild(i)); // Calls server interaction key from client
-                    }
-                    return;
-                }
-            }
-            i++;
-        }
-    }
-
-    void ClientInteractionKey(Interactable.Hover hover, int i)
-    {
-        if (hover.delay == 0f)
-        {
-            InvokeActions(hover.actions, Object.InputAuthority);
-            return;
-        }
-        iui.StartHighlight(iui.transform.GetChild(i), hover.delay);
-        StartCoroutine(StartTimer(hover.delay, hover));
-        return;
-    }
-
-    // Executes for the client, server interaction key display stuff
-    void ServerInteractionKey(Interactable.Hover hover, Transform ui)
-    {
-        if (hover.delay == 0f)
-        {
-            hover.networkSettings.clientAction.Invoke();
-            return;
-        }
-        StartCoroutine(StartServerTimer(ui, hover));
-        return;
+        
     }
 
     // Called when the currentPressed variable changes
@@ -289,130 +196,13 @@ public class InteractableFinder : NetworkBehaviour
         }
         else
         {
-            EndServerInteraction();
+            EndInteraction();
         }
     }
 
-    void EndServerInteraction()
+    void EndInteraction()
     {
-        if (timerRunning)
-        {
-            serverTimer = TickTimer.None;
-            timerRunning = false;
-        }
-    }
-
-    IEnumerator StartServerTimer(Transform interaction, Interactable.Hover h) // For the client
-    {
-        float localTimer = 0f;
-        while (currentPressed)
-        {
-            yield return null;
-            if (!timerRunning)
-            {
-                localTimer += Time.deltaTime;
-                iui.SetHighlight(interaction, localTimer / h.delay);
-            }
-            else
-            {
-                if (serverTimer.Expired(Runner))
-                {
-                    iui.SetHighlight(interaction, 1f);
-                    continue;
-                }
-                float percent = (h.delay - (float)serverTimer.RemainingTime(Runner)) / h.delay;
-                iui.SetHighlight(interaction, percent);
-            }
-        }
-        iui.StopHighlight();
-    }
-
-    IEnumerator StartTimer(float length, Interactable.Hover h) // For the client
-    {
-        while (currentPressed)
-        {
-            yield return null;
-            timer += Time.deltaTime;
-            if (timer > length)
-            {
-                InvokeActions(h.actions, Object.InputAuthority);
-                if (!iValid)
-                {
-                    iValid = true;
-                    break;
-                }
-                timer = 0f;
-                break;
-            }
-        }
-        timer = 0f;
-        iui.StopHighlight();
-    }
-    
-    /// <summary>
-    /// Displays the interaction text on the UI
-    /// </summary>
-    /// <param name="inter"></param>
-    void DisplayInteraction(Interactable inter)
-    {
-        if (!HasInputAuthority) return;
-        // Sets to lore of interaction
-        Interactable.Hover[] hovers = inter.hovers;
-        iui.ClearInteractions();
-        trackedIndexes.Clear();
-        CrosshairManager.instance.RemoveCrosshair(0);
-        int i = 0;
-        foreach (Interactable.Hover h in hovers)
-        {
-            if (h.interactKey != Interactable.InteractKey.None)
-            {
-                InputAction interactAction = ToInteractAction(h.interactKey).action;
-                int bindingIndex = interactAction.GetBindingIndexForControl(interactAction.controls[0]);
-                string interactText = InputControlPath.ToHumanReadableString(
-                    interactAction.bindings[bindingIndex].effectivePath,
-                    InputControlPath.HumanReadableStringOptions.OmitDevice);
-                iui.AddInteraction(interactText, $"{h.lore}\n", h.color, h.fillColor, h.keyColor);
-                if (h.trackColor || h.trackLore) trackedIndexes.Add(i);
-                i++;
-                continue;
-            }
-            iui.AddInteraction("", $"{h.lore}\n", h.color, h.fillColor, h.keyColor);
-            if (h.trackColor || h.trackLore) trackedIndexes.Add(i);
-            i++;
-        }
-    }
-
-    /// <summary>
-    /// Updates the lore for the interactable
-    /// </summary>
-    void UpdateTracking()
-    {
-        if (!HasInputAuthority) return;
-        if (currentInteraction == null || trackedIndexes.Count == 0) return;
-        Interactable.Hover[] hovers = currentInteraction.hovers;
-        foreach (int i in trackedIndexes)
-        {
-            if (hovers[i].trackColor)
-            { 
-                iui.SetInteractionColor(i, hovers[i].color, hovers[i].keyColor);
-            }
-            if (hovers[i].trackLore)
-            {
-                if (hovers[i].interactKey == Interactable.InteractKey.None)
-                {
-                    iui.SetInteractionLore("", i, hovers[i].lore);
-                } 
-                else
-                {
-                    InputAction interactAction = ToInteractAction(hovers[i].interactKey).action;
-                    int bindingIndex = interactAction.GetBindingIndexForControl(interactAction.controls[0]);
-                    string interactText = InputControlPath.ToHumanReadableString(
-                        interactAction.bindings[bindingIndex].effectivePath,
-                        InputControlPath.HumanReadableStringOptions.OmitDevice);
-                    iui.SetInteractionLore(interactText, i, $"{hovers[i].lore}\n");
-                }
-            }
-        }
+        
     }
 
     InputActionReference ToInteractAction(Interactable.InteractKey key)
