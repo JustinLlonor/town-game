@@ -227,18 +227,20 @@ public class InteractableFinder : NetworkBehaviour
                 return;
             }
             NetworkBehaviourId foundHolderId = foundHolder.Id;
+            // This is set to true when the player looks at a different action holder, or when
+            // the player looks at an action holder after having not looked at an action holder
+            bool initiateOnLook = false;
             if (foundHolderId != viewedActionHolder)
             {
                 viewedActionHolder = foundHolderId;
+                initiateOnLook = true;
             }
-            if (!lookingAtInteract)
+            if (!lookingAtInteract) initiateOnLook = true;
+            if (initiateOnLook && HasInputAuthority)
             {
-                if (HasInputAuthority)
-                {
-                    displayPage = 0;
-                    foundHolder.onLook?.Invoke();
-                }
-            }
+                displayPage = 0;
+                foundHolder.onLook?.Invoke();
+            } 
             lookingAtInteract = true;
             SetInteractions(foundHolder);
             SetDisplayInteractions();
