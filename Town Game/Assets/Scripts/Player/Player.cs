@@ -111,8 +111,8 @@ public class Player : NetworkBehaviour
             // Interactable Finder
             inf.menuData = data.menu;
             inf.forwardDirection = Quaternion.Euler(data.camDirectionX, data.camDirection, 0f) * Vector3.forward; // orientation/camDirection is mouse x
-            inf.currentKey = (Interactable.InteractKey)data.interaction;
-            inf.currentPressed = data.interactPressed;
+            inf.interactionIndex = data.interaction;
+            inf.currentPressed = data.interactPressed; // the interactionindex variable determines if pressed
             // Dropping
             dropManager.dropPressed = data.buttons.IsSet(NetworkInputData.Buttons.Drop);
             // Observables

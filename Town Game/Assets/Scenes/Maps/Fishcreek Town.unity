@@ -4508,6 +4508,7 @@ GameObject:
   - component: {fileID: 207509723}
   - component: {fileID: 207509722}
   - component: {fileID: 207509721}
+  - component: {fileID: 207509724}
   - component: {fileID: 207509720}
   - component: {fileID: 207509719}
   - component: {fileID: 207509718}
@@ -4603,12 +4604,57 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   actions:
   - actionName: Interact
-    defaultEnabled: 1
-    defaultLength: 0
+    isClient: 0
+    enabled: 1
     color: {r: 1, g: 1, b: 1, a: 1}
     fillColor: {r: 0, g: 0, b: 0, a: 0.5607843}
     keyColor: {r: 0, g: 0, b: 0, a: 1}
-    actionIndex: 0
+    actionInfoIndex: 0
+    length: 0
+    usePlayerLimiters: 0
+    useTimeModify: 0
+  - actionName: Interact2
+    isClient: 0
+    enabled: 1
+    color: {r: 1, g: 1, b: 1, a: 1}
+    fillColor: {r: 0, g: 0, b: 0, a: 0.5607843}
+    keyColor: {r: 0, g: 0, b: 0, a: 1}
+    actionInfoIndex: 0
+    length: 0
+    usePlayerLimiters: 0
+    useTimeModify: 0
+  - actionName: Interact3
+    isClient: 0
+    enabled: 1
+    color: {r: 1, g: 1, b: 1, a: 1}
+    fillColor: {r: 0, g: 0, b: 0, a: 0.5607843}
+    keyColor: {r: 0, g: 0, b: 0, a: 1}
+    actionInfoIndex: 0
+    length: 0
+    usePlayerLimiters: 0
+    useTimeModify: 0
+  - actionName: Interact4
+    isClient: 0
+    enabled: 1
+    color: {r: 1, g: 1, b: 1, a: 1}
+    fillColor: {r: 0, g: 0, b: 0, a: 0.5607843}
+    keyColor: {r: 0, g: 0, b: 0, a: 1}
+    actionInfoIndex: 0
+    length: 0
+    usePlayerLimiters: 0
+    useTimeModify: 0
+  - actionName: Interact5
+    isClient: 0
+    enabled: 1
+    color: {r: 1, g: 1, b: 1, a: 1}
+    fillColor: {r: 0, g: 0, b: 0, a: 0.5607843}
+    keyColor: {r: 0, g: 0, b: 0, a: 1}
+    actionInfoIndex: 0
+    length: 0
+    usePlayerLimiters: 0
+    useTimeModify: 0
+  canInteract: 1
+  despawned: 0
 --- !u!114 &207509722
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4627,6 +4673,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 207509721}
+  - {fileID: 207509724}
   ForceRemoteRenderTimeframe: 0
 --- !u!4 &207509723
 Transform:
@@ -4643,6 +4690,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 22
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &207509724
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 207509717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7b174fc9903bed478750cb31bae9061, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &208427306
 GameObject:
   m_ObjectHideFlags: 0
@@ -23028,6 +23087,18 @@ PrefabInstance:
       propertyPath: SortKey
       value: 1576415500
       objectReference: {fileID: 0}
+    - target: {fileID: 2385170970280949644, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: NetworkedBehaviours.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2385170970280949644, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: 'NetworkedBehaviours.Array.data[1]'
+      value: 
+      objectReference: {fileID: 922511709}
+    - target: {fileID: 2385170970280949644, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: 'NetworkedBehaviours.Array.data[2]'
+      value: 
+      objectReference: {fileID: 922511708}
     - target: {fileID: 4266447201804198896, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
       propertyPath: m_RootOrder
       value: 18
@@ -23081,6 +23152,28 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+--- !u!114 &922511708 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7982850985370034842, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+  m_PrefabInstance: {fileID: 922511706}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &922511709 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1265039869322422964, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+  m_PrefabInstance: {fileID: 922511706}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0250584647a19cb45875f0b1676289e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &926211799
 GameObject:
   m_ObjectHideFlags: 0
@@ -60376,12 +60469,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1979411231}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1303351295}
+  m_Father: {fileID: 4651078421021443359}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1979411233
@@ -65013,7 +65106,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7710707397463329135, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: NetworkedBehaviours.Array.size
-      value: 13
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 7710707397463329135, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[3]'
@@ -65071,9 +65164,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 466519801941495353, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       insertIndex: -1
       addedObject: {fileID: 25853117}
-    - targetCorrespondingSourceObject: {fileID: 466519801941495353, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1979411232}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5129982233875511372, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       insertIndex: -1
@@ -65990,6 +66080,14 @@ PrefabInstance:
       propertyPath: SortKey
       value: 914708853
       objectReference: {fileID: 0}
+    - target: {fileID: 5796150539774158859, guid: 510253d1d4f227543af658125b506bb6, type: 3}
+      propertyPath: NetworkedBehaviours.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5796150539774158859, guid: 510253d1d4f227543af658125b506bb6, type: 3}
+      propertyPath: 'NetworkedBehaviours.Array.data[2]'
+      value: 
+      objectReference: {fileID: 1979411233}
     - target: {fileID: 6343291171063278774, guid: 510253d1d4f227543af658125b506bb6, type: 3}
       propertyPath: iui
       value: 
@@ -66108,7 +66206,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 924202023757738992, guid: 510253d1d4f227543af658125b506bb6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1979411232}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 510253d1d4f227543af658125b506bb6, type: 3}
 --- !u!114 &4651078421021443357 stripped
@@ -66133,6 +66234,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22544390e261662438459670000f089a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!4 &4651078421021443359 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 924202023757738992, guid: 510253d1d4f227543af658125b506bb6, type: 3}
+  m_PrefabInstance: {fileID: 4651078421021443356}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &5021797308129010842
 MonoBehaviour:
   m_ObjectHideFlags: 0

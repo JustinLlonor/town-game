@@ -138,6 +138,7 @@ public class InputManager : MonoBehaviour
     public InputValueEvent onInteract1;
     public InputValueEvent onInteract2;
     public InputValueEvent onInteract3;
+    public InputEvent onNextPage;
     // Observable
     public InputValueEvent onPrimaryObserve;
     public InputEvent onExitObserve;
@@ -172,6 +173,7 @@ public class InputManager : MonoBehaviour
     private void OnInteract1(InputValue iv) { onInteract1?.Invoke(iv); }
     private void OnInteract2(InputValue iv) { onInteract2?.Invoke(iv); }
     private void OnInteract3(InputValue iv) { onInteract3?.Invoke(iv); }
+    private void OnNextPage() { onNextPage?.Invoke(); }
     private void OnPrimaryObserve(InputValue iv) { onPrimaryObserve?.Invoke(iv); }
     private void OnExit() { onExit?.Invoke(); }
     private void OnPlayerMenu() { onPlayerMenu?.Invoke(); }

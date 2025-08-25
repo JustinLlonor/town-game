@@ -367,6 +367,7 @@ GameObject:
   - component: {fileID: 2385170970280949644}
   - component: {fileID: 878983568128443568}
   - component: {fileID: 5799700709153586727}
+  - component: {fileID: 1265039869322422964}
   - component: {fileID: 6346319758511634961}
   - component: {fileID: 3440494748875919613}
   - component: {fileID: 854971114208257149}
@@ -412,6 +413,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 878983568128443568}
+  - {fileID: 1265039869322422964}
   - {fileID: 7982850985370034842}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &878983568128443568
@@ -471,7 +473,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4422009458430310206}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ab3a0377dd76fa147947abc6ef047b9e, type: 3}
   m_Name: 
@@ -518,6 +520,31 @@ MonoBehaviour:
   renderers:
   - {fileID: 3440494748875919613}
   glowAmount: 1
+--- !u!114 &1265039869322422964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4422009458430310206}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0250584647a19cb45875f0b1676289e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actions:
+  - actionName: Pick up
+    isClient: 0
+    enabled: 1
+    color: {r: 1, g: 1, b: 1, a: 1}
+    fillColor: {r: 0, g: 0, b: 0, a: 0.5607843}
+    keyColor: {r: 0, g: 0, b: 0, a: 1}
+    actionInfoIndex: 0
+    length: 0
+    usePlayerLimiters: 0
+    useTimeModify: 0
+  canInteract: 1
+  despawned: 0
 --- !u!33 &6346319758511634961
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1386,6 +1413,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemPhys: {fileID: 878983568128443568}
   interactable: {fileID: 5799700709153586727}
+  actionHolder: {fileID: 1265039869322422964}
   panelObject: {fileID: 7995524913133621696}
   nameText: {fileID: 7892226227715635787}
   icon: {fileID: 5562506100571286431}

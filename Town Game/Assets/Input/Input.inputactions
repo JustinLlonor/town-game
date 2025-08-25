@@ -336,6 +336,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "Next Page",
+                    "type": "Button",
+                    "id": "2dfb04fa-26d4-448a-8fc0-f0b46d325e54",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -369,6 +378,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Interact 3",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c653bd0b-d418-4f09-9e55-8cec51715680",
+                    "path": "<Keyboard>/x",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Next Page",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

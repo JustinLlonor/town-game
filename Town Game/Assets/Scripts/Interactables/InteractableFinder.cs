@@ -45,8 +45,16 @@ public class InteractableFinder : NetworkBehaviour
     [Networked] public bool lookingAtInteract { get; set; } = false; // If the player is looking at an action holder
     [Networked] public NetworkBehaviourId viewedActionHolder { get; set; } // The current viewed action holder
     [Networked] public int interactionIndex { get; set; } = -1; // -1 if interaction key isn't pressed, 0+ if it is pressed on something
+    private int previousInteractionIndex = -1;
     [Networked] public float interactTime { get; set; } // The amount of time held for the interaction
     [Networked] public bool pressFinished { get; set; } = false; // if the current action has finished being pressed 
+    [Networked] public bool holdAction { get; set; } = false;
+    [Networked, Capacity(10)] public NetworkLinkedList<int> serverInteractions => default; // Indexes of the server interactions in action holder
+    public List<int> clientInteractions = new List<int>(); // Indexes of the client interactions in action holder
+    // The interactions from the server and client that are displayed on this client. 
+    public List<int> displayInteractions = new List<int>();
+    private int displayPage = 0;
+    private bool looking;
 
     public override void Spawned()
     {
@@ -61,6 +69,7 @@ public class InteractableFinder : NetworkBehaviour
         inputManager.onInteract1 += OnInteract1;
         inputManager.onInteract2 += OnInteract2;
         inputManager.onInteract3 += OnInteract3;
+        inputManager.onNextPage += OnNextPage;
     }
 
     public void SetCanInteract(bool interactability)
@@ -90,45 +99,105 @@ public class InteractableFinder : NetworkBehaviour
             {
                 CastRay();
             }
-            if (currentPressed != previousPressed)
+            // Interaction index change detector
+            if (previousInteractionIndex != interactionIndex)
             {
-                previousPressed = currentPressed;
-                OnPressedChange();
+                previousInteractionIndex = interactionIndex;
+                Interact(interactionIndex);
             }
+            InteractHold();
         }
+    }
+
+    private void Interact(int iIndex)
+    {
+        if (!lookingAtInteract) return;
+        pressFinished = false;
+        interactTime = 0f;
+        holdAction = false;
+        if (iIndex == -1)
+        {
+            return;
+        }
+        ActionHolder holder;
+        if (!Runner.TryFindBehaviour(viewedActionHolder, out holder)) return;
+        if (iIndex >= holder.actionInfo.Count) return;
+        IntAction action = holder.actions[iIndex];
+        // Client actions
+        if (action.isClient)
+        {
+            if (HasInputAuthority) action.onInteract?.Invoke(player);
+            return;
+        }
+        NIActionInfo info = holder.actionInfo[action.actionInfoIndex];
+        if (!info.CanInteract(player.owner)) return;
+        // Length 0 server actions
+        float interactLength = info.GetInteractLength(player.owner);
+        if (interactLength == 0f)
+        {
+            action.onInteract?.Invoke(player);
+            return;
+        }
+        // Delayed length server actions
+        holdAction = true;
+    }
+
+    private void InteractHold()
+    {
+        if (pressFinished) return;
+        if (!holdAction) return;
+        if (!lookingAtInteract) return;
+        if (interactionIndex == -1) return;
+        ActionHolder holder;
+        if (!Runner.TryFindBehaviour(viewedActionHolder, out holder)) return;
+        IntAction action = holder.actions[interactionIndex];
+        NIActionInfo info = holder.actionInfo[action.actionInfoIndex];
+        float length = info.GetInteractLength(player.owner);
+        interactTime += Runner.DeltaTime;
+        if (interactTime > length)
+        {
+            pressFinished = true;
+            action.onInteract?.Invoke(player);
+        }
+    }
+
+    private void InteractIndex(int index, float value)
+    {
+        if (value == 1f && lookingAtInteract)
+        {
+            rm.interactionPressed = true;
+            int currentIndex = displayPage * 3 + index;
+            if (currentIndex >= displayInteractions.Count) return;
+            rm.interactIndex = currentIndex;
+            return;
+        }
+        rm.interactionPressed = false;
+        rm.interactIndex = -1;
     }
 
     private void OnInteract1(InputValue iv)
     {
-        if (iv.Get<float>() == 1f)
-        {
-            rm.interactionPressed = true;
-            rm.interactionKey = (int)Interactable.InteractKey.Interact1;
-            return;
-        }
-        rm.interactionPressed = false;
+        InteractIndex(0, iv.Get<float>());
     }
 
     private void OnInteract2(InputValue iv)
     {
-        if (iv.Get<float>() == 1f)
-        {
-            rm.interactionPressed = true;
-            rm.interactionKey = (int)Interactable.InteractKey.Interact2;
-            return;
-        }
-        rm.interactionPressed = false;
+        InteractIndex(1, iv.Get<float>());
     }
 
     private void OnInteract3(InputValue iv)
     {
-        if (iv.Get<float>() == 1f)
-        {
-            rm.interactionPressed = true;
-            rm.interactionKey = (int)Interactable.InteractKey.Interact3;
-            return;
-        }
-        rm.interactionPressed = false;
+        InteractIndex(2, iv.Get<float>());
+    }
+
+    private void OnNextPage()
+    {
+        // Increases next page variable, wraps when it gets too big
+        if (displayInteractions.Count <= 3) return;
+        int maxIndex = Mathf.CeilToInt(displayInteractions.Count / 3f) - 1;
+        displayPage++;
+        if (displayPage > maxIndex) displayPage = 0;
+        rm.interactIndex = -1;
     }
 
     /// <summary>
@@ -162,6 +231,80 @@ public class InteractableFinder : NetworkBehaviour
             {
                 viewedActionHolder = foundHolderId;
             }
+            if (!lookingAtInteract)
+            {
+                if (HasInputAuthority)
+                {
+                    displayPage = 0;
+                    foundHolder.onLook?.Invoke();
+                }
+            }
+            lookingAtInteract = true;
+            SetInteractions(foundHolder);
+            SetDisplayInteractions();
+        }
+        else
+        {
+            ResetInteractions(); // reset if not looking at interactable thingie
+        }
+    }
+
+    /// <summary>
+    /// Sets the server and client interaction variables for this player
+    /// </summary>
+    /// <param name="holder"></param>
+    private void SetInteractions(ActionHolder holder)
+    {
+        if (holder == null) return;
+        if (holder.despawned) return;
+        serverInteractions.Clear();
+        clientInteractions.Clear();
+        for (int i = 0; i < holder.actions.Length; i++)
+        {
+            IntAction action = holder.actions[i];
+            if (!action.isClient)
+            {
+                // Gets the action info from the action index
+                NIActionInfo info = holder.actionInfo[action.actionInfoIndex];
+                if (info.CanInteract(player.owner))
+                {
+                    serverInteractions.Add(i);
+                }
+            }
+            else
+            {
+                if (action.enabled)
+                {
+                    clientInteractions.Add(i);
+                }
+            }
+        }
+    }
+
+    private void SetDisplayInteractions()
+    {
+        if (!HasInputAuthority) return;
+        displayInteractions.Clear();
+        // Code for sorting the client and server interactions from lowest to highset in the display interactions
+        foreach (int interaction in serverInteractions)
+        {
+            int i = 0;
+            while (i < displayInteractions.Count)
+            {
+                if (interaction > displayInteractions[i]) break;
+                i++;
+            }
+            displayInteractions.Insert(i, interaction);
+        }
+        foreach (int interaction in clientInteractions)
+        {
+            int i = 0;
+            while (i < displayInteractions.Count)
+            {
+                if (interaction > displayInteractions[i]) break;
+                i++;
+            }
+            displayInteractions.Insert(i, interaction);
         }
     }
 
@@ -175,34 +318,31 @@ public class InteractableFinder : NetworkBehaviour
     /// </summary>
     public void ResetInteractions()
     {
-        lookingAtInteract = false;
+        displayPage = 0;
+        pressFinished = false;
+        if (lookingAtInteract)
+        {
+            lookingAtInteract = false;
+            if (HasInputAuthority)
+            {
+                ActionHolder holder;
+                if (Runner.TryFindBehaviour(viewedActionHolder, out holder))
+                {
+                    if (!holder.despawned)
+                    {
+                        holder.onUnlook?.Invoke();
+                    }
+                }
+            }
+        }
+        serverInteractions.Clear();
+        clientInteractions.Clear();
+        displayInteractions.Clear();
+        interactTime = 0f;
         // UI stuff
         if (!HasInputAuthority) return; // Client interaction reset
         iui.DisplayActionHolder(null, this);
         //StopAllCoroutines();
-    }
-
-    void InteractionKey(Interactable.InteractKey key)
-    {
-        
-    }
-
-    // Called when the currentPressed variable changes
-    void OnPressedChange()
-    {
-        if (currentPressed)
-        {
-            InteractionKey(currentKey);
-        }
-        else
-        {
-            EndInteraction();
-        }
-    }
-
-    void EndInteraction()
-    {
-        
     }
 
     InputActionReference ToInteractAction(Interactable.InteractKey key)

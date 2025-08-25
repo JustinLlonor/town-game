@@ -8,7 +8,11 @@ public class ActionHolder : NetworkBehaviour
     public IntAction[] actions = new IntAction[0];
     [Networked, Capacity(6)] public NetworkLinkedList<NIActionInfo> actionInfo => default;
     public bool canInteract = true;
+    public bool despawned = false;
+    public ActionHolderEvent onLook;
+    public ActionHolderEvent onUnlook;
 
+    public delegate void ActionHolderEvent();
 
     public override void Spawned()
     {
@@ -18,12 +22,27 @@ public class ActionHolder : NetworkBehaviour
             // not is client is a server action, add server action data
             if (!actions[i].isClient)
             {
-                actions[i].actionIndex = i;
-                actionInfo.Add(new NIActionInfo(actions[i].enabled));
+                actions[i].actionInfoIndex = actionInfo.Count;
+                IntAction action = actions[i];
+                actionInfo.Add(new NIActionInfo(action.enabled, action.usePlayerLimiters, action.useTimeModify, action.length));
                 continue;
             }
-            actions[i].actionIndex = -1;
+            actions[i].actionInfoIndex = -1;
         }
+    }
+
+    public override void Despawned(NetworkRunner runner, bool hasState)
+    {
+        despawned = true;
+    }
+
+    public IntAction GetAction(string actionName)
+    {
+        foreach (IntAction action in actions)
+        {
+            if (action.actionName == actionName) return action;
+        }
+        return null;
     }
 
     [ContextMenu("Add Default Action")]

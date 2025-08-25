@@ -16,6 +16,7 @@ public class InteractableUI : MonoBehaviour
     public AnimationCurve fillCurve;
     Transform interacted = null;
     float iAlpha = 1f;
+    private bool interactableCrosshair = false;
 
     private void Awake()
     {
@@ -169,9 +170,15 @@ public class InteractableUI : MonoBehaviour
     {
         if (holder == null)
         {
+            interactableCrosshair = false;
             CrosshairManager.instance.RemoveCrosshair(0);
             return;
         }
-        CrosshairManager.instance.AddCrosshair(0, 0);
+        
+        if (!interactableCrosshair)
+        {
+            interactableCrosshair = true;
+            CrosshairManager.instance.AddCrosshair(0, 0);
+        }
     }
 }

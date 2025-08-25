@@ -62,7 +62,7 @@ public class ItemPhys : NetworkBehaviour
         gameManager = FindAnyObjectByType<GameManager>();
         gameManager.OnRevealRoles += SetRevealRoles;
     }
-    
+
     private void Update()
     {
         if (interactTimer > 0f)
@@ -99,6 +99,7 @@ public class ItemPhys : NetworkBehaviour
             RenderItem();
         }
         init = true;
+        GetComponent<ActionHolder>().GetAction("Pick up").onInteract += PickUpItem;
     }
 
     public override void Render()
@@ -151,11 +152,13 @@ public class ItemPhys : NetworkBehaviour
 
     }
 
-    public void PickUpItem(PlayerRef player)
+    public void PickUpItem(Player playerObject)
     {
+        if (!Runner.IsServer) return;
+        PlayerRef player = playerObject.owner;
         if (pickedUp) return;
         if (!PlayerCanPickUpItem(player)) return;
-        PlayerInventory inventory = playerManager.GetPlayerNetworkObject(player).GetComponent<PlayerInventory>();
+        PlayerInventory inventory = playerObject.GetComponent<PlayerInventory>();
         if (inventory == null) return;
         string eName = inventory.hotbar[inventory.equippedSlot].ToString();
         if (!eName.IsNullOrEmpty())

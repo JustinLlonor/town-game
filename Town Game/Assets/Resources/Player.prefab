@@ -215,7 +215,6 @@ MonoBehaviour:
   - {fileID: -5521037850191274806, guid: d1a46caebc7ff67479477b2b749f204b, type: 3}
   - {fileID: 724544186050314342, guid: d1a46caebc7ff67479477b2b749f204b, type: 3}
   - {fileID: -5860677679832714288, guid: d1a46caebc7ff67479477b2b749f204b, type: 3}
-  _canInteract: 1
   iValid: 1
   currentInteraction: {fileID: 0}
   player: {fileID: 9069154022521576282}
@@ -226,6 +225,19 @@ MonoBehaviour:
   currentKey: 0
   forwardDirection: {x: 0, y: 0, z: 0}
   menuData: 0
+  _canInteract: 1
+  _lookingAtInteract: 0
+  _viewedActionHolder:
+    Object:
+      Raw: 0
+    Behaviour: 0
+  _interactionIndex: -1
+  _interactTime: 0
+  _pressFinished: 0
+  _holdAction: 0
+  _serverInteractions: 
+  clientInteractions: 
+  displayInteractions: 
 --- !u!1 &1044104633333603519
 GameObject:
   m_ObjectHideFlags: 0
@@ -1614,6 +1626,7 @@ MonoBehaviour:
   environmentLayer:
     serializedVersion: 2
     m_Bits: 128
+  rb: {fileID: 2546787659200004203}
 --- !u!114 &1280967711576261829
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1636,6 +1649,7 @@ MonoBehaviour:
   _targettedHandler:
     Raw: 0
   _progressPrimaryUse: 0
+  rb: {fileID: 2546787659200004203}
 --- !u!1 &2255715054737852972
 GameObject:
   m_ObjectHideFlags: 0

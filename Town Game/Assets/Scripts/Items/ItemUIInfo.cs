@@ -9,6 +9,7 @@ public class ItemUIInfo : MonoBehaviour
 {
     [HideInInspector] public ItemPhys itemPhys;
     [HideInInspector] public Interactable interactable;
+    public ActionHolder actionHolder;
     public GameObject panelObject;
     public TextMeshProUGUI nameText;
     public RawImage icon;
@@ -30,8 +31,12 @@ public class ItemUIInfo : MonoBehaviour
         if (init) return;
         init = true;
         panelObject.SetActive(false);
+        actionHolder.onLook += Look;
+        actionHolder.onUnlook += Unlook;
+        /**
         interactable.onLook += Look;
         interactable.onLookAway += Unlook;
+        */
     }
 
     private void Look()

@@ -25,7 +25,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
     public bool menu = false;
     public int hotbarKey = 1;
     public bool interactionPressed = false;
-    public int interactionKey = 0;
+    public int interactIndex = 0;
     public bool dropPressed = false;
     public bool exitObservePressed = false;
     public int siPressed = -1;
@@ -74,7 +74,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         menu = false;
         hotbarKey = 1;
         interactionPressed = false;
-        interactionKey = 0;
+        interactIndex = -1;
         dropPressed = false;
         exitObservePressed = false;
         siPressed = -1;
@@ -156,7 +156,7 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
         data.menu = menu;
         // Interactables
         data.interactPressed = interactionPressed;
-        data.interaction = interactionKey;
+        data.interaction = interactIndex;
         data.buttons.Set(NetworkInputData.Buttons.ExitObserve, exitObservePressed);
         exitObservePressed = false;
         if (siPressed != -1)

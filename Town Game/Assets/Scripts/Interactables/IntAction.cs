@@ -13,21 +13,24 @@ public class IntAction
     /// </summary>
     [Tooltip("If the action is enabled by default")]
     public bool enabled = true;
-    /// <summary>
-    /// The default length for network interactables. Can be changed directly for client interactables
-    /// </summary>
-    public float length = 0f;
     public Color color = Color.white;
     public Color fillColor = new Color(0, 0, 0, 0.5607843f);
     public Color keyColor = Color.black;
     /// <summary>
-    /// Called when the player interacts with this action
+    /// Called when the player interacts with this action. Called on both the server and client for server actions
     /// </summary>
     public ActionEvent onInteract;
     /// <summary>
     /// The index relating to the information of this interactable action. -1 means this is client-sided
     /// </summary>
-    [HideInInspector] public int actionIndex;
+    [HideInInspector] public int actionInfoIndex;
+    [Header("Server interactable settings")]
+    /// <summary>
+    /// The default length for network interactables. All client actions will have a length of 0.
+    /// </summary>
+    public float length = 0f;
+    public bool usePlayerLimiters;
+    public bool useTimeModify;
 
     public delegate void ActionEvent(Player player);
 }
