@@ -20,6 +20,7 @@ public class InteractableUI : MonoBehaviour
     private List<int> currentDisplay = new List<int>();
     private Dictionary<int, GameObject> interactionObjects = new Dictionary<int, GameObject>();
     private ActionHolder currentHolder = null;
+    private int highlighted = -1;
 
     private void Awake()
     {
@@ -126,22 +127,6 @@ public class InteractableUI : MonoBehaviour
         if (keyUI != null) keyUI.SetKeyColor(keyColor);
     }
 
-    public void ClearInteractions()
-    {
-        StopAllCoroutines();
-        foreach (Transform child in transform)
-        {
-            Destroy(child.gameObject);
-        }
-    }
-
-    public void StartHighlight(Transform interaction, float interactionTime)
-    {
-        interacted = interaction;
-        StopAllCoroutines();
-        StartCoroutine(HighlightAnimation(interaction, interactionTime));
-    }
-
     public void StopHighlight()
     {
         if (interacted != null) ((RectTransform)interacted.GetChild(0).GetChild(0)).sizeDelta = new Vector2(1700f, 0f);
@@ -155,20 +140,6 @@ public class InteractableUI : MonoBehaviour
         RectTransform img = (RectTransform)interaction.GetChild(0).GetChild(0);
         float eval = fillCurve.Evaluate(percent);
         img.sizeDelta = new Vector2(img.sizeDelta.x, eval * fillHeight);
-    }
-
-    IEnumerator HighlightAnimation(Transform interaction, float interactionTime)
-    {
-        float timer = 0f;
-        RectTransform img = (RectTransform)interaction.GetChild(0).GetChild(0);
-        while (timer < interactionTime)
-        {
-            timer += Time.deltaTime;
-            float percent = timer / interactionTime;
-            float eval = fillCurve.Evaluate(percent);
-            img.sizeDelta = new Vector2(img.sizeDelta.x, eval * fillHeight);
-            yield return null;
-        }
     }
 
     public void DisplayActionHolder(ActionHolder holder, InteractableFinder finder)
@@ -194,6 +165,7 @@ public class InteractableUI : MonoBehaviour
                 GameObject displayObject = interactionObjects[d];
                 Destroy(displayObject);
             }
+            highlighted = -1;
             currentDisplay.Clear();
             interactionObjects.Clear();
             return;
@@ -222,5 +194,43 @@ public class InteractableUI : MonoBehaviour
             Canvas.ForceUpdateCanvases();
         }
         currentDisplay = newDisplay;
+        // Highlighting 
+        if (finder.holdAction)
+        {
+            if (!finder.pressFinished)
+            {
+                // Code for when the press is in progress (hold action is always true when this happens)
+                if (interactionObjects.ContainsKey(finder.interactionIndex))
+                {
+                    SetHighlight(interactionObjects[finder.interactionIndex].transform,
+                        finder.interactTime / holder.actions[finder.interactionIndex].length);
+                    if (highlighted != finder.interactionIndex)
+                    {
+                        if (highlighted != -1 && interactionObjects.ContainsKey(highlighted))
+                        {
+                            SetHighlight(interactionObjects[highlighted].transform,
+                                0f);
+                        }
+                        highlighted = finder.interactionIndex;
+                    }
+                }
+            }
+            else if (highlighted != -1) // Highlight resetting
+            {
+                if (interactionObjects.ContainsKey(highlighted))
+                {
+                    SetHighlight(interactionObjects[highlighted].transform, 0f);
+                }
+                highlighted = -1;
+            }
+        }
+        else if (highlighted != -1) // Highlight resetting
+        {
+            if (interactionObjects.ContainsKey(highlighted))
+            {
+                SetHighlight(interactionObjects[highlighted].transform, 0f);
+            }
+            highlighted = -1;
+        }
     }
 }
