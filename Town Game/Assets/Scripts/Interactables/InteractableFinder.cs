@@ -17,25 +17,14 @@ public class InteractableFinder : NetworkBehaviour
     public InteractableUI iui;
     [Header("Keys")]
     public InputActionReference[] interactActions;
+    public InputActionReference nextPageAction;
     bool previousCanInteract = true;
 
-    [HideInInspector] public bool iValid = true;
-    public Interactable currentInteraction;
     [HideInInspector] public Player player;
     [HideInInspector] public Transform trackedTransform;
     [HideInInspector] public Rigidbody rb; // To find rb location because only rb location is accurately networked
-    GameObject currentInteractable = null;
     RunnerManager rm;
-    float timer = 0f;
 
-    [Networked] TickTimer serverTimer { get; set; } // Interaction timer on the server
-    [Networked] public bool timerRunning { get; set; } = false; // If the server timer is running
-    int heldInteractable = 0;
-    [HideInInspector] public bool currentPressed = false; // If the thing is currently pressed
-    bool previousPressed = false;
-    [HideInInspector] public Interactable.InteractKey currentKey = Interactable.InteractKey.None;
-
-    List<int> trackedIndexes = new List<int>();
     [HideInInspector] public Vector3 forwardDirection;
     [HideInInspector] public bool menuData = false;
     bool init = false;
@@ -53,8 +42,7 @@ public class InteractableFinder : NetworkBehaviour
     public List<int> clientInteractions = new List<int>(); // Indexes of the client interactions in action holder
     // The interactions from the server and client that are displayed on this client. 
     public List<int> displayInteractions = new List<int>();
-    private int displayPage = 0;
-    private bool looking;
+    public int displayPage = 0;
 
     public override void Spawned()
     {
@@ -121,7 +109,7 @@ public class InteractableFinder : NetworkBehaviour
         }
         ActionHolder holder;
         if (!Runner.TryFindBehaviour(viewedActionHolder, out holder)) return;
-        if (iIndex >= holder.actionInfo.Count) return;
+        if (iIndex >= holder.actions.Length) return;
         IntAction action = holder.actions[iIndex];
         // Client actions
         if (action.isClient)
@@ -157,7 +145,7 @@ public class InteractableFinder : NetworkBehaviour
         if (interactTime > length)
         {
             pressFinished = true;
-            action.onInteract?.Invoke(player);
+            if (info.CanInteract(player.owner)) action.onInteract?.Invoke(player);
         }
     }
 
@@ -168,7 +156,7 @@ public class InteractableFinder : NetworkBehaviour
             rm.interactionPressed = true;
             int currentIndex = displayPage * 3 + index;
             if (currentIndex >= displayInteractions.Count) return;
-            rm.interactIndex = currentIndex;
+            rm.interactIndex = displayInteractions[currentIndex];
             return;
         }
         rm.interactionPressed = false;
@@ -290,24 +278,13 @@ public class InteractableFinder : NetworkBehaviour
         // Code for sorting the client and server interactions from lowest to highset in the display interactions
         foreach (int interaction in serverInteractions)
         {
-            int i = 0;
-            while (i < displayInteractions.Count)
-            {
-                if (interaction > displayInteractions[i]) break;
-                i++;
-            }
-            displayInteractions.Insert(i, interaction);
+            displayInteractions.Add(interaction);
         }
         foreach (int interaction in clientInteractions)
         {
-            int i = 0;
-            while (i < displayInteractions.Count)
-            {
-                if (interaction > displayInteractions[i]) break;
-                i++;
-            }
-            displayInteractions.Insert(i, interaction);
+            displayInteractions.Add(interaction);
         }
+        displayInteractions.Sort();
     }
 
     private void ResetInteractionUIOpen(int i)
@@ -347,9 +324,14 @@ public class InteractableFinder : NetworkBehaviour
         //StopAllCoroutines();
     }
 
-    InputActionReference ToInteractAction(Interactable.InteractKey key)
+    public string ToInteractKey(int keyIndex)
     {
-        if (key == Interactable.InteractKey.None) return null;
-        return interactActions[(int)key-1];
+        if (keyIndex == -1) return "";
+        InputAction actionRef = interactActions[keyIndex].action;
+        int bindingIndex = actionRef.GetBindingIndexForControl(actionRef.controls[0]);
+        string interactText = InputControlPath.ToHumanReadableString(
+                    actionRef.bindings[bindingIndex].effectivePath,
+                    InputControlPath.HumanReadableStringOptions.OmitDevice);
+        return interactText;
     }
 }

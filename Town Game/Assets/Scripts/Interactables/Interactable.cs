@@ -64,10 +64,10 @@ public class Interactable : MonoBehaviour
 
     public enum InteractKey
     {
-        None = 0,
-        Interact1 = 1,
-        Interact2 = 2,
-        Interact3 = 3,
+        None = -1,
+        Interact1 = 0,
+        Interact2 = 1,
+        Interact3 = 2,
     }
 
     [Serializable]
@@ -92,11 +92,13 @@ public class Interactable : MonoBehaviour
     {
         InteractableFinder ifi = FindFirstObjectByType<InteractableFinder>();
         if (ifi == null) return;
+        /**
         if (ifi.currentInteraction == this)
         {
             CrosshairManager.instance.RemoveCrosshair(0);
             ifi.iui.ClearInteractions();
         }
+        */
     }
 
     /// <summary>

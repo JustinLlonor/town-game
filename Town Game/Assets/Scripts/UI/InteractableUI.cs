@@ -17,6 +17,9 @@ public class InteractableUI : MonoBehaviour
     Transform interacted = null;
     float iAlpha = 1f;
     private bool interactableCrosshair = false;
+    private List<int> currentDisplay = new List<int>();
+    private Dictionary<int, GameObject> interactionObjects = new Dictionary<int, GameObject>();
+    private ActionHolder currentHolder = null;
 
     private void Awake()
     {
@@ -56,9 +59,10 @@ public class InteractableUI : MonoBehaviour
         }
     }
 
-    public void AddInteraction(string key, string text, Color color, Color fillColor, Color keyColor)
+    public GameObject AddInteraction(string key, string text, Color color, Color fillColor, Color keyColor, int iIndex)
     {
         GameObject interaction = Instantiate(interactPrefab, transform);
+        interaction.transform.SetSiblingIndex(iIndex);
         TextMeshProUGUI tex = interaction.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
         tex.text = text;
         tex.color = new Color(color.r, color.g, color.b, maxAlpha);
@@ -78,6 +82,7 @@ public class InteractableUI : MonoBehaviour
         Canvas.ForceUpdateCanvases();
         keyUI.gameObject.SetActive(!keyUI.gameObject.activeSelf);
         Canvas.ForceUpdateCanvases();
+        return interaction;
     }
 
     public void SetInteractionLore(string key, int index, string lore)
@@ -168,17 +173,54 @@ public class InteractableUI : MonoBehaviour
 
     public void DisplayActionHolder(ActionHolder holder, InteractableFinder finder)
     {
+        // Crosshair stuff
         if (holder == null)
         {
             interactableCrosshair = false;
             CrosshairManager.instance.RemoveCrosshair(0);
-            return;
         }
-        
-        if (!interactableCrosshair)
+        else if (!interactableCrosshair)
         {
             interactableCrosshair = true;
             CrosshairManager.instance.AddCrosshair(0, 0);
         }
+        // Logic
+        // If null
+        if (holder == null)
+        {
+            // Code for removing all stuff in current display
+            foreach (int d in currentDisplay)
+            {
+                GameObject displayObject = interactionObjects[d];
+                Destroy(displayObject);
+            }
+            currentDisplay.Clear();
+            interactionObjects.Clear();
+            return;
+        }
+        int count = finder.displayInteractions.Count - finder.displayPage * 3;
+        if (count > 3) count = 3;
+        List<int> newDisplay = finder.displayInteractions.GetRange(finder.displayPage * 3, count);
+        // Detect added stuff
+        int i = 0; // i is the index of the interaction, d is the display index in the action holder
+        foreach (int d in newDisplay)
+        {
+            if (currentDisplay.Contains(d)) continue;
+            IntAction intAction = holder.actions[d]; // Gets the action from action holder, using the display index
+            GameObject newInteraction = AddInteraction(finder.ToInteractKey(i), intAction.actionName,
+                intAction.color, intAction.fillColor, intAction.keyColor, i);
+            interactionObjects.Add(d, newInteraction);
+            i++;
+        }
+        // Detect removed stuff
+        foreach (int d in currentDisplay)
+        {
+            if (newDisplay.Contains(d)) continue;
+            GameObject displayObject = interactionObjects[d];
+            Destroy(displayObject);
+            interactionObjects.Remove(d);
+            Canvas.ForceUpdateCanvases();
+        }
+        currentDisplay = newDisplay;
     }
 }
