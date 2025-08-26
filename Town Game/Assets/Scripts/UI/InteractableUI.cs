@@ -21,6 +21,8 @@ public class InteractableUI : MonoBehaviour
     private Dictionary<int, GameObject> interactionObjects = new Dictionary<int, GameObject>();
     private ActionHolder currentHolder = null;
     private int highlighted = -1;
+    private int previousPage = -1;
+    private GameObject pageScrollObject;
 
     private void Awake()
     {
@@ -89,7 +91,7 @@ public class InteractableUI : MonoBehaviour
     public void SetInteractionLore(string key, int index, string lore)
     {
         bool refreshCanvas = false;
-        Transform interaction = transform.GetChild(index);
+        Transform interaction = interactionObjects[index].transform;
         TextMeshProUGUI iText = interaction.GetChild(1).GetComponent<TextMeshProUGUI>();
         if (iText.text != lore)
         {
@@ -107,6 +109,40 @@ public class InteractableUI : MonoBehaviour
         {
             if (keyUI.gameObject.activeSelf) refreshCanvas = true;
             keyUI.gameObject.SetActive(false);
+        }
+        if (refreshCanvas)
+        {
+            keyUI.gameObject.SetActive(!keyUI.gameObject.activeSelf);
+            Canvas.ForceUpdateCanvases();
+            keyUI.gameObject.SetActive(!keyUI.gameObject.activeSelf);
+            Canvas.ForceUpdateCanvases();
+        }
+    }
+
+    public void SetInteractionLore(Transform interaction, string lore, string key = "blorbl bloop")
+    {
+        bool refreshCanvas = false;
+        TextMeshProUGUI iText = interaction.GetChild(1).GetComponent<TextMeshProUGUI>();
+        if (iText.text != lore)
+        {
+            iText.text = lore;
+            refreshCanvas = true;
+        }
+        // Change key ui if not default value
+        KeyUI keyUI = interaction.GetChild(0).GetComponent<KeyUI>();
+        if (key != "blorbl bloop")
+        {
+            if (!key.IsNullOrEmpty())
+            {
+                if (!keyUI.gameObject.activeSelf) refreshCanvas = true;
+                keyUI.SetKey(key);
+                keyUI.gameObject.SetActive(true);
+            }
+            else
+            {
+                if (keyUI.gameObject.activeSelf) refreshCanvas = true;
+                keyUI.gameObject.SetActive(false);
+            }
         }
         if (refreshCanvas)
         {
@@ -159,16 +195,13 @@ public class InteractableUI : MonoBehaviour
         // If null
         if (holder == null)
         {
-            // Code for removing all stuff in current display
-            foreach (int d in currentDisplay)
-            {
-                GameObject displayObject = interactionObjects[d];
-                Destroy(displayObject);
-            }
-            highlighted = -1;
-            currentDisplay.Clear();
-            interactionObjects.Clear();
+            ResetUI();
             return;
+        }
+        if (holder != currentHolder)
+        {
+            currentHolder = holder;
+            ResetUI();
         }
         int count = finder.displayInteractions.Count - finder.displayPage * 3;
         if (count > 3) count = 3;
@@ -178,6 +211,7 @@ public class InteractableUI : MonoBehaviour
         foreach (int d in newDisplay)
         {
             if (currentDisplay.Contains(d)) continue;
+            Debug.Log(d);
             IntAction intAction = holder.actions[d]; // Gets the action from action holder, using the display index
             GameObject newInteraction = AddInteraction(finder.ToInteractKey(i), intAction.actionName,
                 intAction.color, intAction.fillColor, intAction.keyColor, i);
@@ -232,5 +266,46 @@ public class InteractableUI : MonoBehaviour
             }
             highlighted = -1;
         }
+        // Page scroll
+        bool scrollEnabled = finder.displayInteractions.Count > 3;
+        if (scrollEnabled)
+        {
+            int maxPages = Mathf.CeilToInt(finder.displayInteractions.Count / 3f);
+            if (pageScrollObject == null)
+            {
+                pageScrollObject = AddInteraction(finder.GetScrollKey(), $"Next page ({finder.displayPage + 1}/{maxPages})", 
+                    Color.white, Color.white, Color.black, 99);
+            }
+            else
+            {
+                if (previousPage != finder.displayPage)
+                {
+                    pageScrollObject.transform.SetSiblingIndex(69);
+                    SetInteractionLore(pageScrollObject.transform, $"Next page ({finder.displayPage + 1}/{maxPages})");
+                    previousPage = finder.displayPage;
+                }
+            }
+        }
+        else
+        {
+            if (pageScrollObject != null)
+            {
+                Destroy(pageScrollObject); 
+                pageScrollObject = null;
+            }
+        }
+    }
+
+    private void ResetUI()
+    {
+        foreach (Transform t in transform)
+        {
+            Destroy(t.gameObject);
+        }
+        highlighted = -1;
+        currentDisplay.Clear();
+        interactionObjects.Clear();
+        pageScrollObject = null;
+        previousPage = -1;
     }
 }

@@ -543,6 +543,16 @@ MonoBehaviour:
     length: 0.5
     usePlayerLimiters: 0
     useTimeModify: 0
+  - actionName: Inspect
+    isClient: 1
+    enabled: 1
+    color: {r: 1, g: 1, b: 1, a: 1}
+    fillColor: {r: 0, g: 0, b: 0, a: 0.5607843}
+    keyColor: {r: 0, g: 0, b: 0, a: 1}
+    actionInfoIndex: 0
+    length: 0
+    usePlayerLimiters: 0
+    useTimeModify: 0
   canInteract: 1
   despawned: 0
 --- !u!33 &6346319758511634961

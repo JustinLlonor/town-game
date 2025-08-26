@@ -208,6 +208,24 @@ public class InteractableFinder : NetworkBehaviour
                 }
             }
             ActionHolder foundHolder = hit.collider.GetComponent<ActionHolder>();
+            if (viewedActionHolder != foundHolder.Id)
+            {
+                if (HasInputAuthority)
+                {
+                    displayPage = 0;
+                    ActionHolder viewedHolder;
+                    if (Runner.TryFindBehaviour(viewedActionHolder, out viewedHolder))
+                    {
+                        viewedHolder.onUnlook?.Invoke();
+                    }
+                }
+                interactionIndex = -1;
+                pressFinished = false;
+                interactTime = 0f;
+            }
+            // Set interaction and display interaction lists
+            SetInteractions(foundHolder);
+            if (foundHolder != null) SetDisplayInteractions();
             if (HasInputAuthority) iui.DisplayActionHolder(foundHolder, this);
             if (foundHolder == null)
             {
@@ -230,8 +248,6 @@ public class InteractableFinder : NetworkBehaviour
                 foundHolder.onLook?.Invoke();
             } 
             lookingAtInteract = true;
-            SetInteractions(foundHolder);
-            SetDisplayInteractions();
         }
         else
         {
@@ -328,6 +344,16 @@ public class InteractableFinder : NetworkBehaviour
     {
         if (keyIndex == -1) return "";
         InputAction actionRef = interactActions[keyIndex].action;
+        int bindingIndex = actionRef.GetBindingIndexForControl(actionRef.controls[0]);
+        string interactText = InputControlPath.ToHumanReadableString(
+                    actionRef.bindings[bindingIndex].effectivePath,
+                    InputControlPath.HumanReadableStringOptions.OmitDevice);
+        return interactText;
+    }
+
+    public string GetScrollKey()
+    {
+        InputAction actionRef = nextPageAction.action;
         int bindingIndex = actionRef.GetBindingIndexForControl(actionRef.controls[0]);
         string interactText = InputControlPath.ToHumanReadableString(
                     actionRef.bindings[bindingIndex].effectivePath,

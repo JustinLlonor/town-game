@@ -100,6 +100,7 @@ public class ItemPhys : NetworkBehaviour
         }
         init = true;
         GetComponent<ActionHolder>().GetAction("Pick up").onInteract += PickUpItem;
+        GetComponent<ActionHolder>().GetAction("Inspect").onInteract += InspectItem;
     }
 
     public override void Render()
@@ -133,23 +134,9 @@ public class ItemPhys : NetworkBehaviour
         interactable.hovers[1].lore = "Inspect";
     }
 
-    public void InspectItem()
+    public void InspectItem(Player player)
     {
         iuii.DescriptionReveal();
-        if (iuii.descriptionRevealed)
-        {
-            interactable.hovers[1].lore = "Hide";
-        }
-        else
-        {
-            interactable.hovers[1].lore = "Inspect";
-        }
-        /**
-        //    fingerprintText = "Judging from the cleanliness, no one seems to have used it.";
-        //    fingerprintText = "There are a visible set of fingerprints on the object.";
-        //    fingerprintText = "There seem to be many different smudges and scratches on the object.";
-        **/
-
     }
 
     public void PickUpItem(Player playerObject)
