@@ -13,8 +13,12 @@ public class EntryPoint : NetworkBehaviour
 {
     [Networked] public bool isOpen { get; set; } = false;
     public GrabPoint grabPoint;
+    public EntryPointEvent onOpen;
+    public EntryPointEvent onClose;
     Grabbable grabbable;
     ProgressHandler progressHandler;
+
+    public delegate void EntryPointEvent();
 
     public override void Spawned()
     {
@@ -25,6 +29,7 @@ public class EntryPoint : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
+        if (Runner.IsResimulation) return;
         CheckGrabPoint();
     }
 
@@ -33,6 +38,8 @@ public class EntryPoint : NetworkBehaviour
         if (grabPoint.isOpen == isOpen) return;
         isOpen = grabPoint.isOpen;
         progressHandler.canProgress = !isOpen;
+        if (isOpen) onOpen?.Invoke();
+        else onClose?.Invoke();
     }
 
     private bool GrabCheck(Player player)

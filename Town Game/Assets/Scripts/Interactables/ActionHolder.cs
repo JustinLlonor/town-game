@@ -9,10 +9,11 @@ public class ActionHolder : NetworkBehaviour
     [Networked, Capacity(6)] public NetworkLinkedList<NIActionInfo> actionInfo => default;
     public bool canInteract = true;
     public bool despawned = false;
-    public ActionHolderEvent onLook;
+    public PositionEvent onLook;
     public ActionHolderEvent onUnlook;
 
     public delegate void ActionHolderEvent();
+    public delegate void PositionEvent(Vector3 position);
 
     public override void Spawned()
     {

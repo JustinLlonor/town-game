@@ -245,7 +245,7 @@ public class InteractableFinder : NetworkBehaviour
             if (initiateOnLook && HasInputAuthority)
             {
                 displayPage = 0;
-                foundHolder.onLook?.Invoke();
+                foundHolder.onLook?.Invoke(hit.point);
             } 
             lookingAtInteract = true;
         }

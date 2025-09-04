@@ -73,7 +73,6 @@ public class BarStatsUI : MonoBehaviour
         {
             RectTransform barTransform = (RectTransform)bar.transform;
             float newXPos = i * barSpacing - middleOffset;
-            Debug.Log(newXPos);
             Vector2 targetLocation = new Vector2(newXPos, 0f);
             barTransform.anchoredPosition = Vector2.MoveTowards(barTransform.anchoredPosition, targetLocation, step);
             i++;
@@ -169,7 +168,6 @@ public class BarStatsUI : MonoBehaviour
         NodeInfo nodeInfo = trackedNodes.GetNodeInfo(node.infoIndex);
         if ((nodeInfo.criticalDisplayRange.x <= node.value) && (nodeInfo.criticalDisplayRange.y >= node.value))
         {
-            Debug.LogError("displaying");
             CheckShowNode(node.id);
         }
     }

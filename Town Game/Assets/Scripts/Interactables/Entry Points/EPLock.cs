@@ -10,13 +10,16 @@ public class EPLock : NetworkBehaviour
     public int[] allowedKeys = new int[0];
     Grabbable grabbable;
     ProgressHandler progress;
+    EntryPoint entryPoint;
 
     public override void Spawned()
     {
+        entryPoint = GetComponent<EntryPoint>();
         grabbable = GetComponent<Grabbable>();
         progress = GetComponent<ProgressHandler>();
         grabbable.playerGrabChecks += KeyConditional;
         progress.playerSkipChecks += KeyConditional;
+        entryPoint.onClose += ResetProgressHandler;
     }
 
     /// <summary>
@@ -33,5 +36,9 @@ public class EPLock : NetworkBehaviour
         }
         return false;
     }
-    
+
+    private void ResetProgressHandler()
+    {
+        progress.progress = 0f;
+    }
 }

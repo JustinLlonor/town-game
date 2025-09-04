@@ -9,16 +9,8 @@ public class ProgressHandler : NetworkBehaviour
 {
     [Header("Settings")]
     [Tooltip("Events called on the server side when a certain threshold is reached")]
-    public float[] eventThresholds;
-    [Tooltip("The default rate of progress when a player clicks on the object. How much progress is cleared in a second, with the max progress being 100")]
-    public float defaultRate = 10f;
-    public float defaultRateSecondary = 0f;
-    [Tooltip("The rate of progress when this handler is untouched")]
-    public float untouchedRate = 0f;
-    [Tooltip("Item attributes and their corresponding rate modifications")]
-    public ItemAttributeRate[] attributeRates = new ItemAttributeRate[0];
-    [Tooltip("Items and their corresponding rate modifications")]
-    public ItemRate[] itemRates = new ItemRate[0];
+    public float[] eventThresholds = new float[] { 100f };
+    public ProgressProfile progressProfile;
     /// <summary>
     /// A number from 0-100 inclusive indicating the progress of this progress handler
     /// </summary>
@@ -55,21 +47,6 @@ public class ProgressHandler : NetworkBehaviour
     public delegate void ThresholdEvent(float value);
     public delegate bool PlayerCheck(Player player);
 
-    [System.Serializable]
-    public struct ItemAttributeRate
-    {
-        public ItemAttribute attribute;
-        public bool primaryUse;
-        public float modifiedRate;
-    }
-
-    [System.Serializable]
-    public struct ItemRate
-    {
-        public Item item;
-        public bool primaryUse;
-        public float modifiedRate;
-    }
 
     // For dictionary keys in case the struct lists get really big??? but honestly don't need these
     public struct ItemUse : IEquatable<ItemUse>
@@ -209,26 +186,26 @@ public class ProgressHandler : NetworkBehaviour
         // Empty hand
         if (heldItem == null)
         {
-            if (primaryUse) return defaultRate;
-            return defaultRateSecondary;
+            if (primaryUse) return progressProfile.defaultRate;
+            return progressProfile.defaultRateSecondary;
         }
         // Item rates
-        foreach (ItemRate itemRate in itemRates)
+        foreach (ItemRate itemRate in progressProfile.itemRates)
         {
             if (heldItem != itemRate.item) continue;
             if (primaryUse != itemRate.primaryUse) continue;
             return itemRate.modifiedRate;
         }
         // Check item attributes
-        foreach (ItemAttributeRate attributeRate in attributeRates)
+        foreach (ItemAttributeRate attributeRate in progressProfile.attributeRates)
         {
             if (heldItem.attributes == null) break; // if the list is empty
             if (!heldItem.attributes.Contains(attributeRate.attribute)) continue; // If the item doesn't contain the attribute
             if (primaryUse != attributeRate.primaryUse) continue;
             return attributeRate.modifiedRate;
         }
-        if (primaryUse) return defaultRate;
-        return defaultRateSecondary;
+        if (primaryUse) return progressProfile.defaultRate;
+        return progressProfile.defaultRateSecondary;
     }
 
     private void ProgressEvents()
@@ -262,7 +239,8 @@ public class ProgressHandler : NetworkBehaviour
     private void UntouchedRate()
     {
         if (!canProgress) return;
-        progress += untouchedRate * Runner.DeltaTime;
+        if (progress == 100f) return;
+        progress += progressProfile.untouchedRate * Runner.DeltaTime;
         progress = Mathf.Clamp(progress, 0f, 100f);
     }
 

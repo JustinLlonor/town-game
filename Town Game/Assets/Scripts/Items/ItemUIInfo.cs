@@ -19,6 +19,7 @@ public class ItemUIInfo : MonoBehaviour
     public TextMeshProUGUI attributeText;
     public Animator panelAnimator;
     public Billboard billboard;
+    public Canvas canvas;
     public float yOffset = 0.35f;
 
     Item item;
@@ -39,9 +40,10 @@ public class ItemUIInfo : MonoBehaviour
         */
     }
 
-    private void Look()
+    private void Look(Vector3 position)
     {
-        SetDistance();
+        canvas.enabled = true;
+        SetDistance(position);
         if (!dataInit)
         {
             dataInit = true;
@@ -64,6 +66,7 @@ public class ItemUIInfo : MonoBehaviour
 
     public void HideObject()
     {
+        canvas.enabled = false;
         panelObject.SetActive(false);
         billboard.enabled = false;
     }
@@ -101,11 +104,10 @@ public class ItemUIInfo : MonoBehaviour
         attributeText.text = attributes;
     }
 
-    void SetDistance()
+    void SetDistance(Vector3 newPos)
     {
-        Vector3 itemPosition = itemPhys.transform.position;
         float distance = 0.86f + yOffset;
         transform.rotation = Quaternion.Euler(Vector3.zero);
-        transform.position = new Vector3(itemPosition.x, itemPosition.y + distance, itemPosition.z);
+        transform.position = new Vector3(newPos.x, newPos.y + distance, newPos.z);
     }
 }
