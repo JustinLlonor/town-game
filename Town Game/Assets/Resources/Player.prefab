@@ -234,6 +234,7 @@ MonoBehaviour:
   _serverInteractions: 
   clientInteractions: 
   displayInteractions: 
+  displayPage: 0
 --- !u!1 &1044104633333603519
 GameObject:
   m_ObjectHideFlags: 0
@@ -1307,7 +1308,7 @@ MonoBehaviour:
   - {fileID: 847193838002151960}
   - {fileID: 5432845057157182992}
   stepHeight: 0.4
-  stepSmooth: 30
+  stepSmooth: 0.3
   stepDistance: 0.4
   stepRayLower: {fileID: 6757060838315044995}
   stepRayUpper: {fileID: 6393881673779276614}

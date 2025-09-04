@@ -668,7 +668,7 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
             bool upper = Physics.Raycast(stepRayUpper.position, moveDirection, stepDistance + .05f, environmentMask);
             if (!upper)
             {
-                rb.AddForce(new Vector3(0f, stepSmooth, 0f));
+                rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y + stepSmooth, rb.velocity.z);
             }
         }
     }
