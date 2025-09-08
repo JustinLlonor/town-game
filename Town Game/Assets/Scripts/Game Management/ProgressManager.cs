@@ -16,7 +16,7 @@ public class ProgressManager : NetworkBehaviour
 
     public void AddHandler(ProgressHandler handler)
     {
-        progressObjects.Add(handler.GetComponent<NetworkObject>().Id);
+        progressObjects.Add(handler.Object.Id);
     }
 
     /// <summary>

@@ -225,7 +225,6 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         {
             RaycastHit cInfo;
             bool cHit = Physics.Raycast(origin, castDirection, out cInfo, groundedRadius, environmentMask);
-            Debug.Log("drawing");
             Debug.DrawLine(origin, origin + castDirection * groundedRadius, Color.blue, 1f);
             castDirection = Quaternion.Euler(0f, castRotation, 0f) * castDirection;
             if (!cHit) continue;

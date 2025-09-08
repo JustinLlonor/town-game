@@ -71,7 +71,7 @@ public class JobHandler : NetworkBehaviour
         associatedJob = positionManager.GetJobFromHandler(this);
         if (!Runner.IsServer) return;
         runnerManager.onPlayerLeave += RealFirePlayer;
-        gameManager.OnChangeDay += ClearTasks;
+        //gameManager.OnChangeDay += ClearTasks;
     }
 
     public override void FixedUpdateNetwork()
@@ -272,17 +272,13 @@ public class JobHandler : NetworkBehaviour
     /// </summary>
     private void AutoAssignTasks()
     {
-        Debug.Log("2");
         if (hiredPlayers.Count == 0) return;
-        Debug.Log("3");
         if (hiredPlayers.Count == 1)
         {
-            Debug.Log("4");
             // Assign all unassinged tasks to the player
             foreach (Task task in activeTasks)
             {
                 if (assignedPlayers.ContainsKey(task.id)) continue;
-                Debug.Log("5");
                 AssignTask(task.id, hiredPlayers[0]);
             }
             return;
