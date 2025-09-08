@@ -31,6 +31,16 @@ public class IntAction
     public float length = 0f;
     public bool usePlayerLimiters;
     public bool useTimeModify;
+    public bool useFilters = false;
+    public ItemFilter[] filters;
+    [Tooltip("AND means all the filters must be true in order for the action to be revealed. OR means that at least one filter must be true for the action to be revealed")]
+    public FilterLogic filterLogic;
+    
+    public enum FilterLogic
+    {
+        Or = 0,
+        And = 1
+    }
 
     public delegate void ActionEvent(Player player);
 }
