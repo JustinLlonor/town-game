@@ -206,12 +206,16 @@ public class InteractableUI : MonoBehaviour
         int count = finder.displayInteractions.Count - finder.displayPage * 3;
         if (count > 3) count = 3;
         List<int> newDisplay = finder.displayInteractions.GetRange(finder.displayPage * 3, count);
+        newDisplay.Sort();
         // Detect added stuff
         int i = 0; // i is the index of the interaction, d is the display index in the action holder
         foreach (int d in newDisplay)
         {
-            if (currentDisplay.Contains(d)) continue;
-            Debug.Log(d);
+            if (currentDisplay.Contains(d))
+            {
+                i++;
+                continue;
+            }
             IntAction intAction = holder.actions[d]; // Gets the action from action holder, using the display index
             GameObject newInteraction = AddInteraction(finder.ToInteractKey(i), intAction.actionName,
                 intAction.color, intAction.fillColor, intAction.keyColor, i);

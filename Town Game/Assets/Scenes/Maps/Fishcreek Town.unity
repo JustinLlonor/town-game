@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.14712596, g: 0.17876688, b: 0.11010601, a: 1}
+  m_IndirectSpecularColor: {r: 0.14712575, g: 0.17876674, b: 0.11010596, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -4397,20 +4397,7 @@ MonoBehaviour:
     useFilters: 0
     filters: []
     filterLogic: 0
-  - actionName: Client
-    isClient: 1
-    enabled: 0
-    color: {r: 1, g: 1, b: 1, a: 1}
-    fillColor: {r: 0, g: 0, b: 0, a: 0.5607843}
-    keyColor: {r: 0, g: 0, b: 0, a: 1}
-    actionInfoIndex: 0
-    length: 0
-    usePlayerLimiters: 0
-    useTimeModify: 0
-    useFilters: 0
-    filters: []
-    filterLogic: 0
-  - actionName: Interact2
+  - actionName: Axe!
     isClient: 0
     enabled: 1
     color: {r: 1, g: 1, b: 1, a: 1}
@@ -4420,47 +4407,9 @@ MonoBehaviour:
     length: 2
     usePlayerLimiters: 0
     useTimeModify: 0
-    useFilters: 0
-    filters: []
-    filterLogic: 0
-  - actionName: Interact3
-    isClient: 0
-    enabled: 1
-    color: {r: 1, g: 1, b: 1, a: 1}
-    fillColor: {r: 0, g: 0, b: 0, a: 0.5607843}
-    keyColor: {r: 0, g: 0, b: 0, a: 1}
-    actionInfoIndex: 0
-    length: 0
-    usePlayerLimiters: 0
-    useTimeModify: 0
-    useFilters: 0
-    filters: []
-    filterLogic: 0
-  - actionName: Interact4
-    isClient: 0
-    enabled: 1
-    color: {r: 1, g: 1, b: 1, a: 1}
-    fillColor: {r: 0, g: 0, b: 0, a: 0.5607843}
-    keyColor: {r: 0, g: 0, b: 0, a: 1}
-    actionInfoIndex: 0
-    length: 0
-    usePlayerLimiters: 0
-    useTimeModify: 0
-    useFilters: 0
-    filters: []
-    filterLogic: 0
-  - actionName: Interact5
-    isClient: 0
-    enabled: 1
-    color: {r: 1, g: 1, b: 1, a: 1}
-    fillColor: {r: 0, g: 0, b: 0, a: 0.5607843}
-    keyColor: {r: 0, g: 0, b: 0, a: 1}
-    actionInfoIndex: 0
-    length: 0
-    usePlayerLimiters: 0
-    useTimeModify: 0
-    useFilters: 0
-    filters: []
+    useFilters: 1
+    filters:
+    - {fileID: 11400000, guid: e36c8533942279143a2a2745497f37c0, type: 2}
     filterLogic: 0
   canInteract: 1
   despawned: 0

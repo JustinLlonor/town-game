@@ -463,4 +463,16 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     {
         itemData.Set(itemIndex, new ItemData(data.metadata, data.fingerprints));
     }
+
+    public Item GetHeldItem()
+    {
+        string itemName = hotbar[equippedSlot].ToString();
+        if (itemName.IsNullOrEmpty()) return null;
+        return ObjectManager.i.itemSearch[itemName];
+    }
+
+    public ItemData GetHeldItemData()
+    {
+        return itemData[equippedSlot];
+    }
 }

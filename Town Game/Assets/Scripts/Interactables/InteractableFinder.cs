@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Fusion;
@@ -15,6 +14,7 @@ public class InteractableFinder : NetworkBehaviour
     public float range = 2f;
     [Header("References")]
     public InteractableUI iui;
+    public PlayerInventory inventory;
     [Header("Keys")]
     public InputActionReference[] interactActions;
     public InputActionReference nextPageAction;
@@ -272,7 +272,9 @@ public class InteractableFinder : NetworkBehaviour
             {
                 // Gets the action info from the action index
                 NIActionInfo info = holder.actionInfo[action.actionInfoIndex];
-                if (info.CanInteract(player.owner))
+                Item heldItem = inventory.GetHeldItem();
+                ItemData heldItemData = inventory.GetHeldItemData();
+                if (action.FiltersValid(heldItem, heldItemData) && info.CanInteract(player.owner))
                 {
                     serverInteractions.Add(i);
                 }
