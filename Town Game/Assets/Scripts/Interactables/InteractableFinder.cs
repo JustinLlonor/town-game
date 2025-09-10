@@ -118,7 +118,9 @@ public class InteractableFinder : NetworkBehaviour
             return;
         }
         NIActionInfo info = holder.actionInfo[action.actionInfoIndex];
-        if (!info.CanInteract(player.owner)) return;
+        Item heldItem = inventory.GetHeldItem();
+        ItemData heldItemData = inventory.GetHeldItemData(); // filters and interactions must be valid
+        if (!(action.FiltersValid(heldItem, heldItemData) && info.CanInteract(player.owner))) return;
         // Length 0 server actions
         float interactLength = info.GetInteractLength(player.owner);
         if (interactLength == 0f)
@@ -142,10 +144,12 @@ public class InteractableFinder : NetworkBehaviour
         NIActionInfo info = holder.actionInfo[action.actionInfoIndex];
         float length = info.GetInteractLength(player.owner);
         interactTime += Runner.DeltaTime;
-        if (interactTime > length)
+        if (interactTime > length) // Length > 0 interactions
         {
             pressFinished = true;
-            if (info.CanInteract(player.owner)) action.onInteract?.Invoke(player);
+            Item heldItem = inventory.GetHeldItem();
+            ItemData heldItemData = inventory.GetHeldItemData(); // filters and interactions must be valid
+            if (action.FiltersValid(heldItem, heldItemData) && info.CanInteract(player.owner)) action.onInteract?.Invoke(player);
         }
     }
 
