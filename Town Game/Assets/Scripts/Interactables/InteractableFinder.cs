@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Fusion;
+using Unity.VisualScripting;
 
 public class InteractableFinder : NetworkBehaviour
 {
@@ -192,6 +193,12 @@ public class InteractableFinder : NetworkBehaviour
         rm.interactIndex = -1;
     }
 
+    private void ClampPage()
+    {
+        int maxIndex = Mathf.CeilToInt(displayInteractions.Count / 3f) - 1;
+        displayPage = Mathf.Clamp(displayPage, 0, maxIndex);
+    }
+
     /// <summary>
     /// Sets the current interaction
     /// </summary>
@@ -307,6 +314,7 @@ public class InteractableFinder : NetworkBehaviour
             displayInteractions.Add(interaction);
         }
         displayInteractions.Sort();
+        ClampPage();
     }
 
     private void ResetInteractionUIOpen(int i)

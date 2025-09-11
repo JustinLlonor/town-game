@@ -88,7 +88,32 @@ public class InteractableUI : MonoBehaviour
         return interaction;
     }
 
-    public void SetInteractionLore(string key, int index, string lore)
+    public void SetInteractionKey(int index, string key)
+    {
+        bool refreshCanvas = false;
+        Transform interaction = interactionObjects[index].transform;
+        KeyUI keyUI = interaction.GetChild(0).GetComponent<KeyUI>();
+        if (!key.IsNullOrEmpty())
+        {
+            if (!keyUI.gameObject.activeSelf) refreshCanvas = true;
+            keyUI.SetKey(key);
+            keyUI.gameObject.SetActive(true);
+        }
+        else
+        {
+            if (keyUI.gameObject.activeSelf) refreshCanvas = true;
+            keyUI.gameObject.SetActive(false);
+        }
+        if (refreshCanvas)
+        {
+            keyUI.gameObject.SetActive(!keyUI.gameObject.activeSelf);
+            Canvas.ForceUpdateCanvases();
+            keyUI.gameObject.SetActive(!keyUI.gameObject.activeSelf);
+            Canvas.ForceUpdateCanvases();
+        }
+    }
+
+    public void SetInteractionLore(int index, string lore, string key)
     {
         bool refreshCanvas = false;
         Transform interaction = interactionObjects[index].transform;
@@ -110,6 +135,26 @@ public class InteractableUI : MonoBehaviour
             if (keyUI.gameObject.activeSelf) refreshCanvas = true;
             keyUI.gameObject.SetActive(false);
         }
+        if (refreshCanvas)
+        {
+            keyUI.gameObject.SetActive(!keyUI.gameObject.activeSelf);
+            Canvas.ForceUpdateCanvases();
+            keyUI.gameObject.SetActive(!keyUI.gameObject.activeSelf);
+            Canvas.ForceUpdateCanvases();
+        }
+    }
+
+    public void SetInteractionLore(int index, string lore)
+    {
+        bool refreshCanvas = false;
+        Transform interaction = interactionObjects[index].transform;
+        TextMeshProUGUI iText = interaction.GetChild(1).GetComponent<TextMeshProUGUI>();
+        if (iText.text != lore)
+        {
+            iText.text = lore;
+            refreshCanvas = true;
+        }
+        KeyUI keyUI = interaction.GetChild(0).GetComponent<KeyUI>();
         if (refreshCanvas)
         {
             keyUI.gameObject.SetActive(!keyUI.gameObject.activeSelf);
@@ -207,6 +252,7 @@ public class InteractableUI : MonoBehaviour
         if (count > 3) count = 3;
         List<int> newDisplay = finder.displayInteractions.GetRange(finder.displayPage * 3, count);
         newDisplay.Sort();
+        bool updateKeys = false;
         // Detect added stuff
         int i = 0; // i is the index of the interaction, d is the display index in the action holder
         foreach (int d in newDisplay)
@@ -217,9 +263,10 @@ public class InteractableUI : MonoBehaviour
                 continue;
             }
             IntAction intAction = holder.actions[d]; // Gets the action from action holder, using the display index
-            GameObject newInteraction = AddInteraction(finder.ToInteractKey(i), intAction.actionName,
+            GameObject newInteraction = AddInteraction("W", intAction.actionName, // finder.ToInteractKey(i)
                 intAction.color, intAction.fillColor, intAction.keyColor, i);
             interactionObjects.Add(d, newInteraction);
+            updateKeys = true;
             i++;
         }
         // Detect removed stuff
@@ -230,7 +277,9 @@ public class InteractableUI : MonoBehaviour
             Destroy(displayObject);
             interactionObjects.Remove(d);
             Canvas.ForceUpdateCanvases();
+            updateKeys = true;
         }
+        if (updateKeys) SetKeys(finder);
         currentDisplay = newDisplay;
         // Highlighting 
         if (finder.holdAction)
@@ -311,5 +360,15 @@ public class InteractableUI : MonoBehaviour
         interactionObjects.Clear();
         pageScrollObject = null;
         previousPage = -1;
+    }
+
+    void SetKeys(InteractableFinder finder)
+    {
+        List<int> interactions = new List<int>(interactionObjects.Keys);
+        interactions.Sort();
+        for (int i = 0; i < interactions.Count; i++)
+        {
+            SetInteractionKey(interactions[i], finder.ToInteractKey(i));
+        }
     }
 }

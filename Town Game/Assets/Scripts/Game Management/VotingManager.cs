@@ -278,7 +278,6 @@ public class VotingManager : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
     public void RPC_ReceiveInstance([RpcTarget] PlayerRef player, ClientVoteInstance nVote, NetworkBool canVote)
     {
-        Debug.Log("Hey");
         onReceiveVote?.Invoke(nVote, canVote);
     }
 
