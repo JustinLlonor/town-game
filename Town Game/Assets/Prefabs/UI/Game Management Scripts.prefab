@@ -45,6 +45,215 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   activeVotes: []
+--- !u!1 &961727104527728078
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3734671862256379037}
+  - component: {fileID: 769254926555171222}
+  - component: {fileID: 1900029145114168547}
+  m_Layer: 0
+  m_Name: Cutscene Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3734671862256379037
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 961727104527728078}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 8516040166941595418}
+  m_Father: {fileID: 466519801941495353}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &769254926555171222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 961727104527728078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2356fd56adc3a194fbcf6424008bbb2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  endLength: 0.5
+  _cutsceneProgress: -1
+  editingIndex: 0
+  sequenceSceneRefs:
+  - name: 
+    sceneElements:
+    - rid: 4125388838336462932
+    - rid: 4125388838336462933
+    - rid: 4125388857389350930
+    - rid: 4125388905307439147
+  cutsceneReader: {fileID: 1900029145114168547}
+  _timelineLength: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 4125388838336462932
+      type: {class: BlackScreenEffect, ns: , asm: Assembly-CSharp}
+      data:
+        time: 0
+        length: 1
+        screenColor: {r: 0, g: 0, b: 0, a: 1}
+        fadeCurve:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 1
+            inSlope: -1
+            outSlope: -1
+            tangentMode: 34
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0.33333334
+          - serializedVersion: 3
+            time: 1
+            value: 0
+            inSlope: -1
+            outSlope: -1
+            tangentMode: 34
+            weightedMode: 0
+            inWeight: 0.33333334
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+    - rid: 4125388838336462933
+      type: {class: TextEffect, ns: , asm: Assembly-CSharp}
+      data:
+        time: 0
+        length: 4
+        text: Test text!
+        anchoredPosition: {x: 0, y: 0}
+        textRevealLength: 1.5
+        color: {r: 1, g: 0, b: 0, a: 1}
+        cutsceneAnchor: 4
+        textAlignment: 1
+    - rid: 4125388857389350930
+      type: {class: ZoomEffect, ns: , asm: Assembly-CSharp}
+      data:
+        time: 0
+        length: 4
+        startDistance: 0
+        endDistance: -3
+        zoomCurve:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 1
+            outSlope: 1
+            tangentMode: 34
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 1
+            tangentMode: 34
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+    - rid: 4125388905307439147
+      type: {class: BlackScreenEffect, ns: , asm: Assembly-CSharp}
+      data:
+        time: 3
+        length: 1
+        screenColor: {r: 0, g: 0, b: 0, a: 1}
+        fadeCurve:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 1
+            outSlope: 1
+            tangentMode: 34
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 1
+            tangentMode: 34
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+--- !u!114 &1900029145114168547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 961727104527728078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94f79a98c05ecf04ea8672dc91358524, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cutsceneManager: {fileID: 769254926555171222}
+  cutsceneCamTransform: {fileID: 8516040166941595418}
+  cutsceneTextPrefab: {fileID: 672075698961129719, guid: 0fe85aebaee56794da9fc6a466daddf6, type: 3}
+--- !u!1 &1134486843299358826
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8516040166941595418}
+  m_Layer: 0
+  m_Name: Cutscene Camera Transform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8516040166941595418
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1134486843299358826}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3734671862256379037}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1395259030610307795
 GameObject:
   m_ObjectHideFlags: 0
@@ -110,6 +319,7 @@ MonoBehaviour:
   timeSkipPeriod: 21
   timeSkippedPeriod: 1.75
   dayStartPeriod: 6.75
+  cultistEvents: {fileID: 0}
   days:
   - Monday
   - Tuesday
@@ -122,7 +332,9 @@ MonoBehaviour:
   - Civilian
   - Guard
   - Mayor
+  testTransform: {fileID: 0}
   _skippedNight: 0
+  _isDay: 1
   init: 0
 --- !u!114 &1646914702507024258
 MonoBehaviour:
@@ -339,6 +551,7 @@ MonoBehaviour:
     leadPositionName: Mayor
     jobs:
     - handler: {fileID: 2146126489367553974}
+      associatedEventHandlers: []
       name: Chef
       shortName: Chef
       description: Cook stuff
@@ -452,6 +665,8 @@ Transform:
   - {fileID: 5669130914447257882}
   - {fileID: 1969580155241344749}
   - {fileID: 3681454433896459048}
+  - {fileID: 3734671862256379037}
+  - {fileID: 2710942887154936597}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -481,6 +696,9 @@ MonoBehaviour:
   - {fileID: 1053691298493993009}
   - {fileID: 4147978146374963560}
   - {fileID: 7417685722815587393}
+  - {fileID: 769254926555171222}
+  - {fileID: 1900029145114168547}
+  - {fileID: 3161651464751010387}
   ForceRemoteRenderTimeframe: 0
 --- !u!1 &7555040181656547813
 GameObject:
@@ -547,6 +765,50 @@ MonoBehaviour:
   - 15
   - 19
   appLength: 3.834
+--- !u!1 &7797494893832952512
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2710942887154936597}
+  - component: {fileID: 3161651464751010387}
+  m_Layer: 0
+  m_Name: Sequence Reference Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2710942887154936597
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7797494893832952512}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 466519801941495353}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3161651464751010387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7797494893832952512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96451151baa63d24a834b47420467dfd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8397003756874805080
 GameObject:
   m_ObjectHideFlags: 0
