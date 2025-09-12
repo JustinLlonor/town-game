@@ -79,7 +79,10 @@ public class IntAction
         else fLogicBool = false;
         foreach (ItemFilter filter in filters)
         {
-            if (filter.ItemIsValid(item, data, out filterCause) == fLogicBool) return fLogicBool;
+            if (filter.ItemIsValid(item, data, out filterCause) == fLogicBool)
+            {
+                return fLogicBool;
+            }
         }
         return !fLogicBool;
     }

@@ -359,11 +359,15 @@ public class InteractableFinder : NetworkBehaviour
         serverInteractions.Clear();
         clientInteractions.Clear();
         displayInteractions.Clear();
-        filterInfo.Clear();
         interactTime = 0f;
         // UI stuff
         if (!HasInputAuthority) return; // Client interaction reset
         iui.DisplayActionHolder(null, this);
+        if (filterInfo.Count > 0)
+        {
+            filterInfo.Clear();
+            iui.UpdateFilterIcons(this);
+        }
         //StopAllCoroutines();
     }
 
@@ -390,17 +394,25 @@ public class InteractableFinder : NetworkBehaviour
 
     private void AddFilterCause(int index, FilterInfo cause)
     {
+        if (cause.IsNone()) return;
         if (!filterInfo.ContainsKey(index))
         {
             filterInfo.Add(index, cause);
             return;
         }
-        filterInfo[index] = cause;
+        if (!filterInfo[index].Equals(cause))
+        {
+            filterInfo[index] = cause;
+        }
     }
 
     private void RemoveFilterCause(int index)
     {
-        if (filterInfo.ContainsKey(index)) filterInfo.Remove(index);
+        if (filterInfo.ContainsKey(index))
+        {
+            filterInfo.Remove(index);
+            iui.UpdateFilterIcons(this);
+        }
     }
 
     public FilterInfo GetFilterInfo(int index)

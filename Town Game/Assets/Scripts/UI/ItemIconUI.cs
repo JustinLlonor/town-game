@@ -15,7 +15,7 @@ public class ItemIconUI : MonoBehaviour
 
     public void SetItemIcon(Item item)
     {
-        uiIcon.texture = item.texture;
+        uiIcon.texture = item.icon;
         if (iconText != null)
         {
             iconText.text = item.name;

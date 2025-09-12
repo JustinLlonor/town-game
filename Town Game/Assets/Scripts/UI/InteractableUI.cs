@@ -27,6 +27,7 @@ public class InteractableUI : MonoBehaviour
     private void Awake()
     {
         iAlpha = maxAlpha;
+        
     }
 
     private void Update()
@@ -44,6 +45,21 @@ public class InteractableUI : MonoBehaviour
             iAlpha = Mathf.Lerp(iAlpha, maxAlpha, alphaLerp * Time.deltaTime);
             SetAlphas(iAlpha);
         }
+    }
+
+    /// <summary>
+    /// Updates the filter icons for every stored action
+    /// </summary>
+    /// <param name="finder"></param>
+    public void UpdateFilterIcons(InteractableFinder finder)
+    {
+        foreach (int i in interactionObjects.Keys)
+        {
+            FilterInfo info = finder.GetFilterInfo(i);
+            InteractionIconUI iiui = interactionObjects[i].GetComponent<InteractionIconUI>();
+            iiui.DisplayFilterInfo(info);
+        }
+        Canvas.ForceUpdateCanvases();
     }
 
     void SetAlphas(float alpha)
@@ -279,7 +295,11 @@ public class InteractableUI : MonoBehaviour
             Canvas.ForceUpdateCanvases();
             updateKeys = true;
         }
-        if (updateKeys) SetKeys(finder);
+        if (updateKeys)
+        {
+            UpdateFilterIcons(finder);
+            SetKeys(finder);
+        }
         currentDisplay = newDisplay;
         // Highlighting 
         if (finder.holdAction)

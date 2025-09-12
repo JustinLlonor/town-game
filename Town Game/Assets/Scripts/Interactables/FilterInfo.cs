@@ -1,7 +1,8 @@
+using System;
 using System.Collections.Generic;
 using WebSocketSharp;
 
-public struct FilterInfo
+public struct FilterInfo : IEquatable<FilterInfo>
 {
     public Item filteredItem;
     public List<ItemAttribute> filteredAttributes;
@@ -18,7 +19,6 @@ public struct FilterInfo
         filteredItem = null;
     }
 
-
     public static FilterInfo None
     {
         get
@@ -28,6 +28,27 @@ public struct FilterInfo
             info.filteredAttributes = null;
             return info;
         }
+    }
+
+    public override bool Equals(object obj)
+    {
+        return obj is FilterInfo info && Equals(info);
+    }
+
+    public bool Equals(FilterInfo other)
+    {
+        return EqualityComparer<Item>.Default.Equals(filteredItem, other.filteredItem) &&
+               EqualityComparer<List<ItemAttribute>>.Default.Equals(filteredAttributes, other.filteredAttributes);
+    }
+
+    public static bool operator ==(FilterInfo left, FilterInfo right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(FilterInfo left, FilterInfo right)
+    {
+        return !(left == right);
     }
 }
 

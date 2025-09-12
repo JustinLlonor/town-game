@@ -162,6 +162,7 @@ GameObject:
   - component: {fileID: 2373283560891300693}
   - component: {fileID: 2745537292380317195}
   - component: {fileID: 7874733325878948682}
+  - component: {fileID: 8970486218291237461}
   m_Layer: 5
   m_Name: Interact
   m_TagString: Untagged
@@ -239,6 +240,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 2
   m_VerticalFit: 0
+--- !u!114 &8970486218291237461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4696979987020189785}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1bb0e61e315fcf48be752f720005226, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  iconPrefab: {fileID: 1366621107093960780, guid: f4f573c592264104abe282f2815516b6, type: 3}
 --- !u!1 &6598643624302530363
 GameObject:
   m_ObjectHideFlags: 0
