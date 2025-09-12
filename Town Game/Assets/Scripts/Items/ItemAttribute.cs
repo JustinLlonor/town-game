@@ -11,9 +11,10 @@ public enum ItemAttribute
     Blunt = -1,
     Sharp = -2,
     Pointy = -3,
-    StraightLockpick = 0,
-    CurvyLockpick = 1,
-    AngledLockpick = 2
+    None = 0,
+    StraightLockpick = 1,
+    CurvyLockpick = 2,
+    AngledLockpick = 3
 }
 
 public static class ItemAttributeExtensions

@@ -15,4 +15,15 @@ public class SpecificItemFilter : ItemFilter
     {
         return allowedItems.Contains(item); // Returns true if the item is contained within allowed items
     }
+
+    public override bool ItemIsValid(Item item, ItemData data, out FilterInfo filterCause)
+    {
+        filterCause = FilterInfo.None;
+        if (allowedItems.Contains(item))
+        {
+            filterCause = new FilterInfo(item);
+            return true;
+        }
+        return false;
+    }
 }

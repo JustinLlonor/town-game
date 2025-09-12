@@ -19,4 +19,20 @@ public class ItemAttributeFilter : ItemFilter
         }
         return false;
     }
+
+    public override bool ItemIsValid(Item item, ItemData data, out FilterInfo filterCause)
+    {
+        filterCause = FilterInfo.None;
+        bool returnVal = false;
+        foreach (ItemAttribute attribute in item.attributes)
+        {
+            if (allowedAttributes.Contains(attribute))
+            {
+                if (filterCause.filteredAttributes == null) filterCause.filteredAttributes = new List<ItemAttribute>();
+                filterCause.filteredAttributes.Add(attribute);
+                returnVal = true;
+            }
+        }
+        return returnVal;
+    }
 }

@@ -4,7 +4,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Fusion;
-using Unity.VisualScripting;
 
 public class InteractableFinder : NetworkBehaviour
 {
@@ -43,6 +42,10 @@ public class InteractableFinder : NetworkBehaviour
     public List<int> clientInteractions = new List<int>(); // Indexes of the client interactions in action holder
     // The interactions from the server and client that are displayed on this client. 
     public List<int> displayInteractions = new List<int>();
+    /// <summary>
+    /// Defines the filter info for certain indices, if those actions appeared out of a filter
+    /// </summary>
+    private Dictionary<int, FilterInfo> filterInfo = new Dictionary<int, FilterInfo>();
     public int displayPage = 0;
 
     public override void Spawned()
@@ -285,9 +288,18 @@ public class InteractableFinder : NetworkBehaviour
                 NIActionInfo info = holder.actionInfo[action.actionInfoIndex];
                 Item heldItem = inventory.GetHeldItem();
                 ItemData heldItemData = inventory.GetHeldItemData();
-                if (action.FiltersValid(heldItem, heldItemData) && info.CanInteract(player.owner))
+                FilterInfo filterCause = FilterInfo.None;
+                if (action.FiltersValid(heldItem, heldItemData, out filterCause) && info.CanInteract(player.owner))
                 {
                     serverInteractions.Add(i);
+                    if (HasInputAuthority && !filterCause.IsNone())
+                    {
+                        AddFilterCause(i, filterCause);
+                    }
+                }
+                else if (HasInputAuthority)
+                {
+                    RemoveFilterCause(i);
                 }
             }
             else
@@ -347,6 +359,7 @@ public class InteractableFinder : NetworkBehaviour
         serverInteractions.Clear();
         clientInteractions.Clear();
         displayInteractions.Clear();
+        filterInfo.Clear();
         interactTime = 0f;
         // UI stuff
         if (!HasInputAuthority) return; // Client interaction reset
@@ -373,5 +386,26 @@ public class InteractableFinder : NetworkBehaviour
                     actionRef.bindings[bindingIndex].effectivePath,
                     InputControlPath.HumanReadableStringOptions.OmitDevice);
         return interactText;
+    }
+
+    private void AddFilterCause(int index, FilterInfo cause)
+    {
+        if (!filterInfo.ContainsKey(index))
+        {
+            filterInfo.Add(index, cause);
+            return;
+        }
+        filterInfo[index] = cause;
+    }
+
+    private void RemoveFilterCause(int index)
+    {
+        if (filterInfo.ContainsKey(index)) filterInfo.Remove(index);
+    }
+
+    public FilterInfo GetFilterInfo(int index)
+    {
+        if (!filterInfo.ContainsKey(index)) return FilterInfo.None;
+        return filterInfo[index];
     }
 }

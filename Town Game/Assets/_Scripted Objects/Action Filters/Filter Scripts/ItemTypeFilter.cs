@@ -15,4 +15,15 @@ public class ItemTypeFilter : ItemFilter
     {
         return allowedTypes.Contains(item.GetItemType()); // returns true if the allowed types equal the item type
     }
+
+    public override bool ItemIsValid(Item item, ItemData data, out FilterInfo filterCause)
+    {
+        filterCause = FilterInfo.None;
+        if (allowedTypes.Contains(item.GetItemType()))
+        {
+            filterCause = new FilterInfo(item.GetItemType());
+            return true;
+        }
+        return false;
+    }
 }

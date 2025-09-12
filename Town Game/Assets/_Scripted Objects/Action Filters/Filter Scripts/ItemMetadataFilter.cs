@@ -42,4 +42,10 @@ public class ItemMetadataFilter : ItemFilter
                 return false;
         }
     }
+
+    public override bool ItemIsValid(Item item, ItemData data, out FilterInfo filterCause)
+    {
+        filterCause = FilterInfo.None;
+        return ItemIsValid(item, data);
+    }
 }

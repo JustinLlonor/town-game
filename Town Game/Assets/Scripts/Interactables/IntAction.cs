@@ -67,4 +67,20 @@ public class IntAction
         }
         return !fLogicBool;
     }
+
+    // Maybe change this to return an array of filter causes in the future
+    public bool FiltersValid(Item item, ItemData data, out FilterInfo filterCause)
+    {
+        filterCause = FilterInfo.None;
+        if (!useFilters) return true; // If we are not using filters, return true
+        if (item == null) return false;
+        bool fLogicBool;
+        if (filterLogic == FilterLogic.Or) fLogicBool = true;
+        else fLogicBool = false;
+        foreach (ItemFilter filter in filters)
+        {
+            if (filter.ItemIsValid(item, data, out filterCause) == fLogicBool) return fLogicBool;
+        }
+        return !fLogicBool;
+    }
 }
