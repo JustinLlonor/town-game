@@ -8,6 +8,15 @@ public class KeyUI : MonoBehaviour
 {
     public TextMeshProUGUI keyText;
     public Image key;
+    public RawImage rawImage;
+    public CustomKey[] customKeys;
+
+    [System.Serializable]
+    public struct CustomKey
+    {
+        public string name;
+        public Texture2D customTex;
+    }
 
     public void SetKeyAlpha(float alpha)
     {
@@ -19,8 +28,19 @@ public class KeyUI : MonoBehaviour
         keyText.color = color;
     }
 
-    public void SetKey(string key)
+    public void SetKey(string keyName)
     {
-        keyText.text = key;
+        foreach (CustomKey cKey in customKeys)
+        {
+            if (cKey.name == keyName)
+            {
+                rawImage.enabled = true;
+                rawImage.texture = cKey.customTex;
+                keyText.enabled = false;
+                key.enabled = false;
+                return;
+            }
+        }
+        keyText.text = keyName;
     }
 }
