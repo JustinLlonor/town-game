@@ -21,7 +21,7 @@ public class ItemTypeFilter : ItemFilter
         filterCause = FilterInfo.None;
         if (allowedTypes.Contains(item.GetItemType()))
         {
-            filterCause = new FilterInfo(item.GetItemType());
+            filterCause = new FilterInfo(item);
             return true;
         }
         return false;
