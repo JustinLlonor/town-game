@@ -15,7 +15,7 @@ public class KeyUI : MonoBehaviour
     public struct CustomKey
     {
         public string name;
-        public Texture2D customTex;
+        public Sprite customSpr;
     }
 
     public void SetKeyAlpha(float alpha)
@@ -34,13 +34,12 @@ public class KeyUI : MonoBehaviour
         {
             if (cKey.name == keyName)
             {
-                rawImage.enabled = true;
-                rawImage.texture = cKey.customTex;
                 keyText.enabled = false;
-                key.enabled = false;
+                key.sprite = cKey.customSpr;
                 return;
             }
         }
+        keyText.enabled = true;
         keyText.text = keyName;
     }
 }

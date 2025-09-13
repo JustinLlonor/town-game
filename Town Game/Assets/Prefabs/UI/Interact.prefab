@@ -451,9 +451,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4363084929504369642, guid: 979f62be08ce8a8459da99ce7efa4831, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1727458193632693104}
-    - targetCorrespondingSourceObject: {fileID: 4363084929504369642, guid: 979f62be08ce8a8459da99ce7efa4831, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2993269118994575835}
   m_SourcePrefab: {fileID: 100100000, guid: 979f62be08ce8a8459da99ce7efa4831, type: 3}
 --- !u!224 &2103308042955349722 stripped
 RectTransform:
@@ -478,18 +475,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 1
---- !u!114 &2993269118994575835
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4455318375836230979}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.83137256}
-  m_EffectDistance: {x: 0.74, y: -0.74}
-  m_UseGraphicAlpha: 1
