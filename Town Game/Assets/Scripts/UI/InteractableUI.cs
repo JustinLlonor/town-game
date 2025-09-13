@@ -371,14 +371,18 @@ public class InteractableUI : MonoBehaviour
 
     private void ResetUI()
     {
-        foreach (Transform t in transform)
+        foreach (GameObject go in interactionObjects.Values)
         {
-            Destroy(t.gameObject);
+            Destroy(go);
         }
         highlighted = -1;
         currentDisplay.Clear();
         interactionObjects.Clear();
-        pageScrollObject = null;
+        if (pageScrollObject != null)
+        {
+            Destroy(pageScrollObject);
+            pageScrollObject = null;
+        }
         previousPage = -1;
     }
 

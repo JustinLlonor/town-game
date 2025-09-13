@@ -7,7 +7,9 @@ public class ProgressProfile : ScriptableObject
 {
     [Tooltip("The default rate of progress when a player clicks on the object. How much progress is cleared in a second, with the max progress being 100")]
     public float defaultRate = 10f;
+    public string progressAddAction;
     public float defaultRateSecondary = 0f;
+    public string progressSubtractAction;
     [Tooltip("The rate of progress when this handler is untouched")]
     public float untouchedRate = 0f;
     [Tooltip("Item attributes and their corresponding rate modifications")]

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
 using WebSocketSharp;
+using Mono.Cecil.Cil;
 
 /// <summary>
 /// Deals with progress handlers
@@ -19,11 +20,25 @@ public class PlayerProgress : NetworkBehaviour
     ProgressManager progressManager;
     ObjectManager objectManager;
     public Rigidbody rb;
+    private InteractableUI iui;
 
     public override void Spawned()
     {
         progressManager = FindAnyObjectByType<ProgressManager>();
         objectManager = FindAnyObjectByType<ObjectManager>();
+        if (!HasInputAuthority) return;
+        iui = FindFirstObjectByType<InteractableUI>();
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        ProgressVisualCheck();
+    }
+
+    private void ProgressVisualCheck()
+    {
+        if (!HasInputAuthority) return;
+        if (Runner.IsResimulation) return;
     }
 
     public void InitialCastCheck(bool primaryUse, string heldItem)

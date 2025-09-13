@@ -4,6 +4,7 @@ using UnityEngine;
 using Fusion;
 using System;
 using System.Linq;
+using WebSocketSharp;
 
 public class ProgressHandler : NetworkBehaviour
 {
@@ -125,6 +126,28 @@ public class ProgressHandler : NetworkBehaviour
         }
     }
 
+    public struct ProgressModifierInfo
+    {
+        public FilterInfo filterInfo;
+        public string actionName;
+        public int progressDelta;
+
+        public ProgressModifierInfo(FilterInfo filterInfo, int progressDelta, string actionName = null)
+        {
+            this.filterInfo = filterInfo;
+            this.progressDelta = progressDelta;
+            this.actionName = actionName;
+        }
+
+        public static ProgressModifierInfo None
+        {
+            get
+            {
+                return new ProgressModifierInfo(FilterInfo.None, -99);
+            }
+        }
+    }
+
     public override void Spawned()
     {
         progressManager = FindAnyObjectByType<ProgressManager>();
@@ -189,23 +212,68 @@ public class ProgressHandler : NetworkBehaviour
             if (primaryUse) return progressProfile.defaultRate;
             return progressProfile.defaultRateSecondary;
         }
-        // Item rates
+        // Item rates, prioritized over item attributes
         foreach (ItemRate itemRate in progressProfile.itemRates)
         {
             if (heldItem != itemRate.item) continue;
             if (primaryUse != itemRate.primaryUse) continue;
             return itemRate.modifiedRate;
         }
-        // Check item attributes
+        // Check item attributes, attribute rates stack
+        float modifiedSum = 0f;
         foreach (ItemAttributeRate attributeRate in progressProfile.attributeRates)
         {
             if (heldItem.attributes == null) break; // if the list is empty
             if (!heldItem.attributes.Contains(attributeRate.attribute)) continue; // If the item doesn't contain the attribute
             if (primaryUse != attributeRate.primaryUse) continue;
-            return attributeRate.modifiedRate;
+            modifiedSum += attributeRate.modifiedRate;
+        }
+        if (modifiedSum != 0f)
+        {
+            return modifiedSum;
         }
         if (primaryUse) return progressProfile.defaultRate;
         return progressProfile.defaultRateSecondary;
+    }
+
+    public ProgressModifierInfo GetModifierInfo(Item heldItem, bool primaryUse)
+    {
+        float foundRate = GetRate(heldItem, primaryUse);
+        int modifierDelta = Mathf.Clamp(Mathf.RoundToInt((-foundRate) / 30f), -3, 3); // Negative, because displayed progress in ui is inverted
+        ProgressModifierInfo output = new ProgressModifierInfo(FilterInfo.None, modifierDelta);
+        // Set default action name. This will be overrided if an itemrate action name is set to something
+        if (foundRate > 0f) output.actionName = progressProfile.progressAddAction;
+        else output.actionName = progressProfile.progressSubtractAction;
+        // returns the output with filter info set to none and action name to default
+        if (heldItem == null)
+        {
+            return output;
+        }
+        // Item rates
+        foreach (ItemRate itemRate in progressProfile.itemRates)
+        {
+            if (heldItem != itemRate.item) continue;
+            if (primaryUse != itemRate.primaryUse) continue;
+            output.filterInfo = new FilterInfo(heldItem);
+            if (!itemRate.actionName.IsNullOrEmpty()) output.actionName = itemRate.actionName;
+            return output;
+        }
+        // Check item attributes
+        List<ItemAttribute> filteredAttributes = new List<ItemAttribute>();
+        float modifiedSum = 0f;
+        foreach (ItemAttributeRate attributeRate in progressProfile.attributeRates)
+        {
+            if (heldItem.attributes == null) break; // if the list is empty
+            if (!heldItem.attributes.Contains(attributeRate.attribute)) continue; // If the item doesn't contain the attribute
+            if (primaryUse != attributeRate.primaryUse) continue;
+            filteredAttributes.Add(attributeRate.attribute);
+            modifiedSum += attributeRate.modifiedRate;
+        }
+        if ((filteredAttributes.Count > 0) && (modifiedSum != 0f))
+        {
+            output.filterInfo = new FilterInfo(filteredAttributes);
+        }
+        return output;
     }
 
     private void ProgressEvents()

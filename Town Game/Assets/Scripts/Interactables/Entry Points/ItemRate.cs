@@ -8,4 +8,5 @@ public struct ItemRate
     public Item item;
     public bool primaryUse;
     public float modifiedRate;
+    public string actionName;
 }

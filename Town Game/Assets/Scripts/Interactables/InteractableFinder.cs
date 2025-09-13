@@ -18,6 +18,8 @@ public class InteractableFinder : NetworkBehaviour
     [Header("Keys")]
     public InputActionReference[] interactActions;
     public InputActionReference nextPageAction;
+    public InputActionReference primaryProgress;
+    public InputActionReference secondaryProgress;
     bool previousCanInteract = true;
 
     [HideInInspector] public Player player;
@@ -53,9 +55,9 @@ public class InteractableFinder : NetworkBehaviour
         if (IsProxy) Destroy(this);
         if (HasInputAuthority) UIManager.instance.OnUIOpen += ResetInteractionUIOpen;
         init = true;
-        iui = FindFirstObjectByType<InteractableUI>();
         rm = FindFirstObjectByType<RunnerManager>();
         if (!HasInputAuthority) return;
+        iui = FindFirstObjectByType<InteractableUI>();
         // Input manager interaction functions, sent to runner manager and sent back to player
         InputManager inputManager = FindFirstObjectByType<InputManager>();
         inputManager.onInteract1 += OnInteract1;
