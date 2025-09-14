@@ -205,10 +205,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactableMask:
     serializedVersion: 2
-    m_Bits: 4096
-  environmentMask:
-    serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 4224
   range: 2
   iui: {fileID: 0}
   inventory: {fileID: 1106844264840172896}
@@ -217,8 +214,6 @@ MonoBehaviour:
   - {fileID: 3431623533596201616, guid: 6f2a2a3d5b1cccd4e88046785cd2ce93, type: 3}
   - {fileID: -8121304250643153810, guid: 6f2a2a3d5b1cccd4e88046785cd2ce93, type: 3}
   nextPageAction: {fileID: -1096692449537577257, guid: 6f2a2a3d5b1cccd4e88046785cd2ce93, type: 3}
-  primaryProgress: {fileID: 2092282702203068900, guid: 6f2a2a3d5b1cccd4e88046785cd2ce93, type: 3}
-  secondaryProgress: {fileID: -1543426132239217450, guid: 6f2a2a3d5b1cccd4e88046785cd2ce93, type: 3}
   player: {fileID: 9069154022521576282}
   trackedTransform: {fileID: 8806967224018203518}
   rb: {fileID: 2546787659200004203}
@@ -1641,6 +1636,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 9069154022521576282}
   inf: {fileID: 8489816749943817623}
+  inventory: {fileID: 1106844264840172896}
+  primaryProgress: {fileID: 2092282702203068900, guid: 6f2a2a3d5b1cccd4e88046785cd2ce93, type: 3}
+  secondaryProgress: {fileID: -1543426132239217450, guid: 6f2a2a3d5b1cccd4e88046785cd2ce93, type: 3}
   progressDistance: 2
   environmentLayer:
     serializedVersion: 2

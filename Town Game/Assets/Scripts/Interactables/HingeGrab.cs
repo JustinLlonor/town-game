@@ -93,7 +93,6 @@ public class HingeGrab : GrabPoint
         //float newAngle = Mathf.MoveTowardsAngle(rb.rotation.eulerAngles.y, -targetAngle, grabSpeed * Runner.DeltaTime);
         float angleDelta = Mathf.DeltaAngle(rb.rotation.eulerAngles.y, targetAngle) * grabVel; // increase toward max, decrease toward min
         //newAngle = ClampAngle(newAngle, closeAngle, maxAngle, angleDelta);
-        Debug.Log(angleDelta);
         rb.angularVelocity = new Vector3(0f, angleDelta, 0f);
     }
 

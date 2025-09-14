@@ -33,7 +33,7 @@ public class ItemIconUI : MonoBehaviour
 
     public void SetArrowImages(int arrowDelta)
     {
-        if (arrowDelta > 3 || arrowDelta < 3) return;
+        if (arrowDelta > 3 || arrowDelta < -3) return;
         // If there is no arrow delta, then hide the images
         if (arrowDelta == 0)
         {

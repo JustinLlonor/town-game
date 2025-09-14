@@ -16,4 +16,6 @@ public class ProgressProfile : ScriptableObject
     public ItemAttributeRate[] attributeRates = new ItemAttributeRate[0];
     [Tooltip("Items and their corresponding rate modifications")]
     public ItemRate[] itemRates = new ItemRate[0];
+    [Tooltip("The x axis is the input rate (-100)-(100) scaled down to (-1.0)-(1.0), the y axis is the ")]
+    public AnimationCurve rateCurve;
 }

@@ -126,28 +126,6 @@ public class ProgressHandler : NetworkBehaviour
         }
     }
 
-    public struct ProgressModifierInfo
-    {
-        public FilterInfo filterInfo;
-        public string actionName;
-        public int progressDelta;
-
-        public ProgressModifierInfo(FilterInfo filterInfo, int progressDelta, string actionName = null)
-        {
-            this.filterInfo = filterInfo;
-            this.progressDelta = progressDelta;
-            this.actionName = actionName;
-        }
-
-        public static ProgressModifierInfo None
-        {
-            get
-            {
-                return new ProgressModifierInfo(FilterInfo.None, -99);
-            }
-        }
-    }
-
     public override void Spawned()
     {
         progressManager = FindAnyObjectByType<ProgressManager>();
@@ -236,10 +214,16 @@ public class ProgressHandler : NetworkBehaviour
         return progressProfile.defaultRateSecondary;
     }
 
+    private int GetDelta(float rate)
+    {
+        return (int)(Mathf.Sign(rate) * Mathf.CeilToInt(Mathf.Abs(progressProfile.rateCurve.Evaluate(rate))));
+    }
+
     public ProgressModifierInfo GetModifierInfo(Item heldItem, bool primaryUse)
     {
-        float foundRate = GetRate(heldItem, primaryUse);
-        int modifierDelta = Mathf.Clamp(Mathf.RoundToInt((-foundRate) / 30f), -3, 3); // Negative, because displayed progress in ui is inverted
+        float foundRate = GetRate(heldItem, primaryUse); // Negative, because displayed progress in ui is inverted
+        int delta = GetDelta(-foundRate);
+        int modifierDelta = Mathf.Clamp(delta, -3, 3);
         ProgressModifierInfo output = new ProgressModifierInfo(FilterInfo.None, modifierDelta);
         // Set default action name. This will be overrided if an itemrate action name is set to something
         if (foundRate > 0f) output.actionName = progressProfile.progressAddAction;
@@ -247,6 +231,10 @@ public class ProgressHandler : NetworkBehaviour
         // returns the output with filter info set to none and action name to default
         if (heldItem == null)
         {
+            if (output.progressDelta == 0f)
+            {
+                return ProgressModifierInfo.None;
+            }
             return output;
         }
         // Item rates
@@ -269,11 +257,13 @@ public class ProgressHandler : NetworkBehaviour
             filteredAttributes.Add(attributeRate.attribute);
             modifiedSum += attributeRate.modifiedRate;
         }
-        if ((filteredAttributes.Count > 0) && (modifiedSum != 0f))
+        if ((filteredAttributes.Count > 0))
         {
+            if (modifiedSum == 0f) return ProgressModifierInfo.None;
             output.filterInfo = new FilterInfo(filteredAttributes);
+            return output;
         }
-        return output;
+        return ProgressModifierInfo.None;
     }
 
     private void ProgressEvents()

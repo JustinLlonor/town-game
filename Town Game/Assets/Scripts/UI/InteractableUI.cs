@@ -23,6 +23,10 @@ public class InteractableUI : MonoBehaviour
     private int highlighted = -1;
     private int previousPage = -1;
     private GameObject pageScrollObject;
+    private GameObject primaryProgressObject;
+    private ProgressModifierInfo currentPrimary;
+    private GameObject secondaryProgressObject;
+    private ProgressModifierInfo currentSecondary;
 
     private void Awake()
     {
@@ -45,6 +49,83 @@ public class InteractableUI : MonoBehaviour
             iAlpha = Mathf.Lerp(iAlpha, maxAlpha, alphaLerp * Time.deltaTime);
             SetAlphas(iAlpha);
         }
+    }
+
+    public void DisplayProgressInteraction(ProgressModifierInfo primaryInfo, ProgressModifierInfo secondaryInfo, 
+        bool looking, PlayerProgress progress)
+    {
+        if (!looking)
+        {
+            if (!currentPrimary.IsNone()) currentPrimary = ProgressModifierInfo.None;
+            if (!currentSecondary.IsNone()) currentSecondary = ProgressModifierInfo.None;
+        }
+        // yeah this is kinda spaghetti lol
+        if (!primaryInfo.IsNone())
+        {
+            if (!currentPrimary.Equals(primaryInfo))
+            {
+                Debug.Log("Placing primary");
+                if (primaryProgressObject != null)
+                {
+                    Destroy(primaryProgressObject);
+                    primaryProgressObject = null;
+                }
+                // Add interaction object
+                primaryProgressObject = AddInteraction(progress.ToInteractKey(progress.primaryProgress),
+                    primaryInfo.actionName, Color.white, Color.white, Color.black, 0);
+                // Add filter ui info
+                primaryProgressObject.GetComponent<InteractionIconUI>().DisplayFilterInfo(primaryInfo.filterInfo, 
+                    primaryInfo.progressDelta);
+            }
+        }
+        else
+        {
+            if (primaryProgressObject != null)
+            {
+                Destroy(primaryProgressObject);
+                primaryProgressObject = null;
+            }
+        }
+        // secondary check
+        if (!secondaryInfo.IsNone())
+        {
+            if (!currentSecondary.Equals(secondaryInfo))
+            {
+                Debug.Log("Placing secondary");
+                if (secondaryProgressObject != null)
+                {
+                    Destroy(secondaryProgressObject);
+                    secondaryProgressObject = null;
+                }
+                // Add interaction object
+                int index = 0;
+                if (primaryProgressObject != null) index = 1;
+                secondaryProgressObject = AddInteraction(progress.ToInteractKey(progress.secondaryProgress),
+                    secondaryInfo.actionName, Color.white, Color.white, Color.black, index);
+                // Add filter ui info
+                secondaryProgressObject.GetComponent<InteractionIconUI>().DisplayFilterInfo(secondaryInfo.filterInfo,
+                    secondaryInfo.progressDelta);
+            }
+            else Debug.Log("equals");
+        }
+        else
+        {
+            if (secondaryProgressObject != null)
+            {
+                Destroy(secondaryProgressObject);
+                secondaryProgressObject = null;
+            }
+        }
+        currentPrimary = primaryInfo;
+        currentSecondary = secondaryInfo;
+    }
+
+    private int GetProgressLength()
+    {
+        int output = 0;
+        if (primaryProgressObject != null) output++;
+        if (secondaryProgressObject != null) output++;
+        return output;
     }
 
     /// <summary>
@@ -271,6 +352,7 @@ public class InteractableUI : MonoBehaviour
         bool updateKeys = false;
         // Detect added stuff
         int i = 0; // i is the index of the interaction, d is the display index in the action holder
+        int progressLength = GetProgressLength();
         foreach (int d in newDisplay)
         {
             if (currentDisplay.Contains(d))
@@ -279,8 +361,8 @@ public class InteractableUI : MonoBehaviour
                 continue;
             }
             IntAction intAction = holder.actions[d]; // Gets the action from action holder, using the display index
-            GameObject newInteraction = AddInteraction("W", intAction.actionName, // finder.ToInteractKey(i)
-                intAction.color, intAction.fillColor, intAction.keyColor, i);
+            GameObject newInteraction = AddInteraction("", intAction.actionName, // finder.ToInteractKey(i)
+                intAction.color, intAction.fillColor, intAction.keyColor, i + progressLength);
             interactionObjects.Add(d, newInteraction);
             updateKeys = true;
             i++;

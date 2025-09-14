@@ -6,7 +6,7 @@ public class InteractionIconUI : MonoBehaviour
 {
     public GameObject iconPrefab;
 
-    public void DisplayFilterInfo(FilterInfo info)
+    public void DisplayFilterInfo(FilterInfo info, int delta = 0)
     {
         foreach (Transform child in transform)
         {
@@ -15,28 +15,30 @@ public class InteractionIconUI : MonoBehaviour
         }
         if (info.filteredItem != null)
         {
-            InstantiateItem(info.filteredItem);
+            InstantiateItem(info.filteredItem, delta);
         }
         if (info.filteredAttributes != null)
         {
-            InstantiateAttributes(info.filteredAttributes);
+            InstantiateAttributes(info.filteredAttributes, delta);
         }
     }
 
-    private void InstantiateItem(Item item)
+    private void InstantiateItem(Item item, int delta)
     {
         GameObject go = Instantiate(iconPrefab, transform);
         ItemIconUI iiui = go.GetComponent<ItemIconUI>();
         iiui.SetItemIcon(item);
+        iiui.SetArrowImages(delta);
     }
 
-    private void InstantiateAttributes(List<ItemAttribute> attributes)
+    private void InstantiateAttributes(List<ItemAttribute> attributes, int delta)
     {
         foreach (ItemAttribute attribute in attributes)
         {
             GameObject go = Instantiate(iconPrefab);
             ItemIconUI iiui = go.GetComponent<ItemIconUI>();
             iiui.SetAttributeIcon(attribute);
+            iiui.SetArrowImages(delta);
         }
     }
 }

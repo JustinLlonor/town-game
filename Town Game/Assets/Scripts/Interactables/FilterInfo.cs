@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using UnityEngine;
 using WebSocketSharp;
 
 public struct FilterInfo : IEquatable<FilterInfo>
@@ -37,8 +39,8 @@ public struct FilterInfo : IEquatable<FilterInfo>
 
     public bool Equals(FilterInfo other)
     {
-        return EqualityComparer<Item>.Default.Equals(filteredItem, other.filteredItem) &&
-               EqualityComparer<List<ItemAttribute>>.Default.Equals(filteredAttributes, other.filteredAttributes);
+        return filteredItem == other.filteredItem &&
+               filteredAttributes.AttributeListEquals(other.filteredAttributes);
     }
 
     public static bool operator ==(FilterInfo left, FilterInfo right)
@@ -58,6 +60,18 @@ public static class FilterInfoExtensions
     {
         if (info.filteredItem != null) return false;
         if (info.filteredAttributes != null) return false;
+        return true;
+    }
+
+    public static bool AttributeListEquals(this List<ItemAttribute> firstList, List<ItemAttribute> secondList)
+    {
+        if (firstList == null && secondList == null) return true;
+        if (firstList == null || secondList == null) return false;
+        if (firstList.Count != secondList.Count) return false;
+        foreach (var item in firstList)
+        {
+            if (!secondList.Contains(item)) return false;
+        }
         return true;
     }
 }

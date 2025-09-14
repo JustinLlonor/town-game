@@ -4,6 +4,7 @@ using UnityEngine;
 using Fusion;
 using WebSocketSharp;
 using Mono.Cecil.Cil;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// Deals with progress handlers
@@ -12,6 +13,9 @@ public class PlayerProgress : NetworkBehaviour
 {
     public Player player;
     public InteractableFinder inf;
+    public PlayerInventory inventory;
+    public InputActionReference primaryProgress;
+    public InputActionReference secondaryProgress;
     public float progressDistance = 2f;
     public LayerMask environmentLayer;
     [Networked] public bool progressing { get; set; }
@@ -35,10 +39,45 @@ public class PlayerProgress : NetworkBehaviour
         ProgressVisualCheck();
     }
 
+    public string ToInteractKey(InputActionReference inputAction)
+    {
+        InputAction actionRef = inputAction.action;
+        int bindingIndex = actionRef.GetBindingIndexForControl(actionRef.controls[0]);
+        string interactText = InputControlPath.ToHumanReadableString(
+                    actionRef.bindings[bindingIndex].effectivePath,
+                    InputControlPath.HumanReadableStringOptions.OmitDevice);
+        return interactText;
+    }
+
     private void ProgressVisualCheck()
     {
         if (!HasInputAuthority) return;
         if (Runner.IsResimulation) return;
+        ProgressModifierInfo primaryInfo;
+        ProgressModifierInfo secondaryInfo;
+        bool looking = ProgressVisualCast(out primaryInfo, out secondaryInfo);
+        iui.DisplayProgressInteraction(primaryInfo, secondaryInfo, looking, this);
+    }
+
+    private bool ProgressVisualCast(out ProgressModifierInfo primaryInfo, out ProgressModifierInfo secondaryInfo)
+    {
+        Transform castTransform = inf.trackedTransform;
+        Vector3 castDirection = inf.forwardDirection;
+        RaycastHit hit;
+        Vector3 castPosition = new Vector3(rb.position.x, castTransform.position.y, rb.position.z);
+        // Set primary and secondary info
+        primaryInfo = ProgressModifierInfo.None; 
+        secondaryInfo = ProgressModifierInfo.None;
+        if (!Physics.Raycast(castPosition, castDirection, out hit, progressDistance, environmentLayer)) return false;
+        GameObject hitObject = hit.collider.gameObject;
+        ProgressHandler hitHandler = progressManager.GetProgressHandler(hitObject);
+        if (hitHandler == null) return false; // if it doesn't have a handler, don't show visuals
+        if (!hitHandler.canProgress) return false; // if the handler can't progress, then don't show visuals
+        if (hitHandler.ProgressCanSkip(player)) return false; // if the progress can be skipped by the player, return.
+        Item heldItemObject = inventory.GetHeldItem();
+        primaryInfo = hitHandler.GetModifierInfo(heldItemObject, true);
+        secondaryInfo = hitHandler.GetModifierInfo(heldItemObject, false);
+        return true;
     }
 
     public void InitialCastCheck(bool primaryUse, string heldItem)

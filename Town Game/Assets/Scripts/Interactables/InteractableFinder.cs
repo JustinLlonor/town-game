@@ -9,7 +9,6 @@ public class InteractableFinder : NetworkBehaviour
 {
     [Header("Masks")]
     public LayerMask interactableMask;
-    public LayerMask environmentMask;
     [Header("Settings")]
     public float range = 2f;
     [Header("References")]
@@ -18,8 +17,6 @@ public class InteractableFinder : NetworkBehaviour
     [Header("Keys")]
     public InputActionReference[] interactActions;
     public InputActionReference nextPageAction;
-    public InputActionReference primaryProgress;
-    public InputActionReference secondaryProgress;
     bool previousCanInteract = true;
 
     [HideInInspector] public Player player;
@@ -212,18 +209,14 @@ public class InteractableFinder : NetworkBehaviour
         if (menuData) return; // return if the menu is open
         Vector3 trackedPosition = new Vector3(rb.position.x, trackedTransform.position.y, rb.position.z);
         RaycastHit hit;
-        if (Physics.Raycast(trackedPosition, forwardDirection, out hit, range, (int)interactableMask)) // Raycast interactable
+        if (Physics.Raycast(trackedPosition, forwardDirection, out hit, range, interactableMask)) // Raycast interactable
         {
-            RaycastHit eHit;
-            if (Physics.Raycast(trackedPosition, forwardDirection, out eHit, range, (int)environmentMask))
-            {
-                if (eHit.distance < hit.distance) // Raycast environment, if the environment blocks the interactable, reset interactions and stop
-                {
-                    ResetInteractions();
-                    return;
-                }
-            }
             ActionHolder foundHolder = hit.collider.GetComponent<ActionHolder>();
+            if (foundHolder == null)
+            {
+                ResetInteractions();
+                return;
+            }
             if (viewedActionHolder != foundHolder.Id)
             {
                 if (HasInputAuthority)
