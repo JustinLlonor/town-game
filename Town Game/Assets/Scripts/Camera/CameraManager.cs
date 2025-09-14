@@ -11,6 +11,7 @@ public class CameraManager : MonoBehaviour
     public Transform trackedFPSTransform;
     public Transform trackedCinematicTransform;
     public Transform trackedObservableTransform;
+    public CameraMovement cm;
     [SerializeField] private Observable currentObservable;
     UIManager uiManager;
 
@@ -86,7 +87,7 @@ public class CameraManager : MonoBehaviour
         trackedCinematicTransform = transform;
     }
 
-    void Update()
+    void LateUpdate()
     {
         SetPositions();
     }

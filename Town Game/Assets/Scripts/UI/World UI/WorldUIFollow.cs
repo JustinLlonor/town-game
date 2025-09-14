@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class WorldUIFollow : MonoBehaviour
 {
-    public float yOffset;
+    public float yOffset = 0.88f;
     private Vector3 followTarget;
-    public float speed = 10f;
+    public float speed = 3f;
 
     private void Update()
     {

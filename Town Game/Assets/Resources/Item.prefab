@@ -1441,7 +1441,6 @@ MonoBehaviour:
   panelAnimator: {fileID: 8087953089567049405}
   billboard: {fileID: 3276509499928819380}
   canvas: {fileID: 3524861111505335847}
-  yOffset: 1.01
   follow: {fileID: 3725864447436133333}
   descriptionRevealed: 0
 --- !u!114 &3276509499928819380
@@ -1468,5 +1467,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7721c873864fd874c83ae06def8c6f66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  yOffset: 1.01
-  speed: 10
+  yOffset: 0.88
+  speed: 3

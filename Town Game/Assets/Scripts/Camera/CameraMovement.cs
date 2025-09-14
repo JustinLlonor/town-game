@@ -61,6 +61,11 @@ public class CameraMovement : MonoBehaviour
 
     private void LateUpdate()
     {
+        CameraBehaviours();
+    }
+
+    public void CameraBehaviours()
+    {
         if (lockedPlayer != null)
         {
             LockLerp();

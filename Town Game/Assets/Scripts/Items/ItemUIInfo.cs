@@ -20,7 +20,6 @@ public class ItemUIInfo : MonoBehaviour
     public Animator panelAnimator;
     public Billboard billboard;
     public Canvas canvas;
-    public float yOffset = 0.35f;
     public WorldUIFollow follow;
 
     Item item;
