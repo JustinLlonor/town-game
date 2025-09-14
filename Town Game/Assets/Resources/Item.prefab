@@ -543,6 +543,9 @@ MonoBehaviour:
     length: 0.5
     usePlayerLimiters: 0
     useTimeModify: 0
+    useFilters: 0
+    filters: []
+    filterLogic: 0
   - actionName: Inspect
     isClient: 1
     enabled: 1
@@ -553,6 +556,9 @@ MonoBehaviour:
     length: 0
     usePlayerLimiters: 0
     useTimeModify: 0
+    useFilters: 0
+    filters: []
+    filterLogic: 0
   canInteract: 1
   despawned: 0
 --- !u!33 &6346319758511634961
@@ -1318,6 +1324,7 @@ GameObject:
   - component: {fileID: 6605237354889145660}
   - component: {fileID: 68000415256877264}
   - component: {fileID: 3276509499928819380}
+  - component: {fileID: 3725864447436133333}
   m_Layer: 19
   m_Name: Canvas
   m_TagString: Untagged
@@ -1434,7 +1441,8 @@ MonoBehaviour:
   panelAnimator: {fileID: 8087953089567049405}
   billboard: {fileID: 3276509499928819380}
   canvas: {fileID: 3524861111505335847}
-  yOffset: 0.15
+  yOffset: 1.01
+  follow: {fileID: 3725864447436133333}
   descriptionRevealed: 0
 --- !u!114 &3276509499928819380
 MonoBehaviour:
@@ -1448,3 +1456,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bcf896e12e274942919cfaeee079d6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3725864447436133333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8865945272585780287}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7721c873864fd874c83ae06def8c6f66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  yOffset: 1.01
+  speed: 10

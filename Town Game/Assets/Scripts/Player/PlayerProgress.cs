@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
 using WebSocketSharp;
-using Mono.Cecil.Cil;
 using UnityEngine.InputSystem;
 
 /// <summary>

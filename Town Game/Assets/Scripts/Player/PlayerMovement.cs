@@ -84,6 +84,7 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
     CameraBobbing bobbing;
     CameraShake shake;
     RunnerManager runnerManager;
+    CameraManager camManager;
     float sprintGain = 1f;
     float crouchMinus = 1f;
     //float jumpTimer = 0f;
@@ -140,12 +141,13 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
             return; 
         }
         CameraMovement cm = playerManager.camTransform.GetComponent<CameraMovement>();
+        camManager = playerManager.camTransform.GetComponent<CameraManager>();
         cm.player = transform;
         cm.orientation = orientation;
         cm.headAim = headAim;
         bobbing = playerManager.camBobbing;
         shake = playerManager.camShake;
-        playerManager.camTransform.GetComponent<CameraManager>().SetTrackedFPSTransform(cameraPosition);
+        playerManager.camTransform.GetComponent<CameraManager>().SetTrackedFPS(rb, cameraPosition);
         InputManager inputManager = FindFirstObjectByType<InputManager>();
         inputManager.onMove += OnMove;
         inputManager.onSprint += OnSprint;
@@ -161,6 +163,11 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         if (!runnerManager.nRunner.IsServer && !no.HasInputAuthority) return; // If not the server or the inputter, then return
         //if (jumpTimer > 0f && isGrounded) jumpTimer -= Time.deltaTime;
         if (no.HasInputAuthority) Bobbing();
+    }
+
+    private void LateUpdate()
+    {
+        
     }
 
     public override void Spawned()
@@ -202,6 +209,7 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
     {
         SetGrounded();
         Sprint();
+        //if (HasInputAuthority && camManager != null) camManager.SetPositions();
     }
 
     public void SetGrounded()

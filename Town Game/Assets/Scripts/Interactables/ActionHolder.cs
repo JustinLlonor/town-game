@@ -9,7 +9,17 @@ public class ActionHolder : NetworkBehaviour
     [Networked, Capacity(6)] public NetworkLinkedList<NIActionInfo> actionInfo => default;
     public bool canInteract = true;
     public bool despawned = false;
+    /// <summary>
+    /// Called on the client when the player looks at this action holder initially
+    /// </summary>
     public PositionEvent onLook;
+    /// <summary>
+    /// Called every frame the client looks at this action holder
+    /// </summary>
+    public PositionEvent onLookContinue;
+    /// <summary>
+    /// Called on the client when the player stops looking at this action holder
+    /// </summary>
     public ActionHolderEvent onUnlook;
 
     public delegate void ActionHolderEvent();

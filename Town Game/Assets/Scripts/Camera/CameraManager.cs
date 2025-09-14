@@ -7,6 +7,7 @@ public class CameraManager : MonoBehaviour
     public Camera mainCamera;
     public Camera uiFront;
     public CameraMode mode;
+    public Rigidbody trackedFPSRigidbody;
     public Transform trackedFPSTransform;
     public Transform trackedCinematicTransform;
     public Transform trackedObservableTransform;
@@ -49,7 +50,7 @@ public class CameraManager : MonoBehaviour
         mode = newMode;
         if (newMode == CameraMode.FirstPerson)
         {
-            transform.rotation = trackedFPSTransform.rotation;
+            transform.rotation = trackedFPSRigidbody.rotation;
         }
         if (newMode == CameraMode.Cinematic)
         {
@@ -71,12 +72,13 @@ public class CameraManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Sets the transform the camera is tracking during fps mode
+    /// Sets the transform and rigidbody the camera is tracking during fps mode
     /// </summary>
-    /// <param name="transform"></param>
-    public void SetTrackedFPSTransform(Transform transform)
+    /// <param name="rb"></param>
+    public void SetTrackedFPS(Rigidbody rb, Transform cameraPosition)
     {
-        trackedFPSTransform = transform;
+        trackedFPSRigidbody = rb;
+        trackedFPSTransform = cameraPosition;
     }
 
     public void SetTrackedCinematicTransform(Transform transform)
@@ -86,10 +88,19 @@ public class CameraManager : MonoBehaviour
 
     void Update()
     {
+        SetPositions();
+    }
+
+    public void SetPositions()
+    {
         if (isTransitioning) return;
         if (mode == CameraMode.FirstPerson)
         {
-            if (trackedFPSTransform != null) transform.position = trackedFPSTransform.position;
+            if (trackedFPSRigidbody != null)
+            {
+                transform.position = new Vector3(trackedFPSRigidbody.position.x, trackedFPSTransform.position.y, 
+                    trackedFPSRigidbody.position.z);
+            }
         }
         if (mode == CameraMode.Cinematic)
         {
@@ -122,7 +133,7 @@ public class CameraManager : MonoBehaviour
     public void StartModeTransition(float duration, CameraMode newMode)
     {
         if (mode == newMode) return;
-        if (newMode != CameraMode.FirstPerson) trackedFPSTransform.rotation = transform.rotation;
+        if (newMode != CameraMode.FirstPerson) trackedFPSRigidbody.rotation = transform.rotation;
         onStartCameraTransition?.Invoke(newMode);
         StopAllCoroutines();
         StartCoroutine(TransitionToMode(duration, newMode));

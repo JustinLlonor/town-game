@@ -114,6 +114,7 @@ public class FlowchartUI : MonoBehaviour
 
     private void OnEnable()
     {
+        if (PlayerManager.i == null) return;
         if (PlayerManager.i.currentPlayer == null) return;
         uiGrid = new NodeGrid(gridSize);
         if (playerNodes == null)

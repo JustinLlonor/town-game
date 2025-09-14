@@ -21,6 +21,7 @@ public class ItemUIInfo : MonoBehaviour
     public Billboard billboard;
     public Canvas canvas;
     public float yOffset = 0.35f;
+    public WorldUIFollow follow;
 
     Item item;
     bool init = false;
@@ -33,6 +34,7 @@ public class ItemUIInfo : MonoBehaviour
         init = true;
         panelObject.SetActive(false);
         actionHolder.onLook += Look;
+        actionHolder.onLookContinue += LookContinue;
         actionHolder.onUnlook += Unlook;
         /**
         interactable.onLook += Look;
@@ -43,7 +45,8 @@ public class ItemUIInfo : MonoBehaviour
     private void Look(Vector3 position)
     {
         canvas.enabled = true;
-        SetDistance(position);
+        follow.enabled = true;
+        follow.SetPosition(position);
         if (!dataInit)
         {
             dataInit = true;
@@ -58,8 +61,14 @@ public class ItemUIInfo : MonoBehaviour
         panelAnimator.SetBool("DescriptionShown", false);
     }
 
+    private void LookContinue(Vector3 position)
+    {
+        follow.SetTarget(position);
+    }
+
     private void Unlook()
     {
+        follow.enabled = false;
         panelAnimator.SetBool("IsLooking", false);
         panelAnimator.SetBool("DescriptionShown", false);
     }
@@ -102,12 +111,5 @@ public class ItemUIInfo : MonoBehaviour
             if (firstString) firstString = false;
         }
         attributeText.text = attributes;
-    }
-
-    void SetDistance(Vector3 newPos)
-    {
-        float distance = 0.86f + yOffset;
-        transform.rotation = Quaternion.Euler(Vector3.zero);
-        transform.position = new Vector3(newPos.x, newPos.y + distance, newPos.z);
     }
 }

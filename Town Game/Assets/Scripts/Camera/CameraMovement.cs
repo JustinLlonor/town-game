@@ -59,7 +59,7 @@ public class CameraMovement : MonoBehaviour
         Invoke("EnableCanMove", 1f);
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         if (lockedPlayer != null)
         {
