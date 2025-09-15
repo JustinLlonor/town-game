@@ -6,7 +6,7 @@ public class ProgressUIManager : MonoBehaviour
 {
     public GameObject progressUIPrefab;
     public WorldUIManager worldUIManager;
-    public float destroyTime = 1f;
+    public float fadeTime = .25f;
     private Dictionary<ProgressHandler, int> handlerIds = new Dictionary<ProgressHandler, int>();
     // Increases to destroyTime while looking, decreases while not looking
     private Dictionary<string, float> destroyTimers = new Dictionary<string, float>();
@@ -29,6 +29,9 @@ public class ProgressUIManager : MonoBehaviour
             foundUI.doFollow = (currentHandler == handlerId); // Follow only if looking
             EntryPointUI epUI = foundUI.gameObject.GetComponent<EntryPointUI>();
             epUI.SetHandlerInfo(handler);
+            AlphaGroup alphaGroup = foundUI.gameObject.GetComponent<AlphaGroup>();
+            float percent = destroyTimers[handlerId] / fadeTime;
+            alphaGroup.alpha = percent;
         }
     }
 
@@ -40,7 +43,7 @@ public class ProgressUIManager : MonoBehaviour
             if (id == currentHandler)
             {
                 destroyTimers[id] += Time.deltaTime;
-                if (destroyTimers[id] > destroyTime) destroyTimers[id] = destroyTime;
+                if (destroyTimers[id] > fadeTime) destroyTimers[id] = fadeTime;
                 continue;
             }
             destroyTimers[id] -= Time.deltaTime; 

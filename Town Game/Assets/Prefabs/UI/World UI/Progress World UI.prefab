@@ -565,6 +565,7 @@ GameObject:
   - component: {fileID: 6653335081219787381}
   - component: {fileID: 5123126397728619498}
   - component: {fileID: 8839431009930822721}
+  - component: {fileID: 248972651421924731}
   m_Layer: 0
   m_Name: Progress World UI
   m_TagString: Untagged
@@ -619,7 +620,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   doFollow: 1
   yOffset: 0.88
+  followTarget: {x: 0, y: 0, z: 0}
   speed: 3
+--- !u!114 &248972651421924731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8592671651049011691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99a2f61d599b1e14989cfd7b9f41945d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  checkAlpha: 1
+  alpha: 1
+  graphics:
+  - {fileID: 3739638544344816648}
+  - {fileID: 9123136627029515467}
+  - {fileID: 554285451377853716}
+  - {fileID: 6074415260294989020}
+  texts:
+  - {fileID: 8903496179009783347}
+  useOriginalAlpha: 1
 --- !u!1 &8777529395862224173
 GameObject:
   m_ObjectHideFlags: 0
