@@ -8,6 +8,7 @@ using WebSocketSharp;
 
 public class ProgressHandler : NetworkBehaviour
 {
+    public string progressableName;
     [Header("Settings")]
     [Tooltip("Events called on the server side when a certain threshold is reached")]
     public float[] eventThresholds = new float[] { 100f };
@@ -214,15 +215,10 @@ public class ProgressHandler : NetworkBehaviour
         return progressProfile.defaultRateSecondary;
     }
 
-    private int GetDelta(float rate)
-    {
-        return (int)(Mathf.Sign(rate) * Mathf.CeilToInt(Mathf.Abs(progressProfile.rateCurve.Evaluate(rate))));
-    }
-
     public ProgressModifierInfo GetModifierInfo(Item heldItem, bool primaryUse)
     {
         float foundRate = GetRate(heldItem, primaryUse); // Negative, because displayed progress in ui is inverted
-        int delta = GetDelta(-foundRate);
+        int delta = progressProfile.GetDelta(-foundRate);
         int modifierDelta = Mathf.Clamp(delta, -3, 3);
         ProgressModifierInfo output = new ProgressModifierInfo(FilterInfo.None, modifierDelta);
         // Set default action name. This will be overrided if an itemrate action name is set to something

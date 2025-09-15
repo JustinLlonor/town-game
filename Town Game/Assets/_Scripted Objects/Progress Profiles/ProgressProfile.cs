@@ -18,4 +18,9 @@ public class ProgressProfile : ScriptableObject
     public ItemRate[] itemRates = new ItemRate[0];
     [Tooltip("The x axis is the input rate (-100)-(100) scaled down to (-1.0)-(1.0), the y axis is the ")]
     public AnimationCurve rateCurve;
+
+    public int GetDelta(float rate)
+    {
+        return (int)(Mathf.Sign(rate) * Mathf.CeilToInt(Mathf.Abs(rateCurve.Evaluate(rate))));
+    }
 }

@@ -2,14 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WorldUIFollow : MonoBehaviour
+public class WorldUI : MonoBehaviour
 {
+    public bool doFollow = true;
     public float yOffset = 0.88f;
-    private Vector3 followTarget;
+    [SerializeField] private Vector3 followTarget;
     public float speed = 3f;
 
     private void Update()
     {
+        if (!doFollow) return;
         if (transform.position != followTarget)
         {
             transform.position = Vector3.MoveTowards(transform.position, followTarget, speed * Time.deltaTime);

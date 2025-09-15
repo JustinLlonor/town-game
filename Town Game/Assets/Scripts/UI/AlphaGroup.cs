@@ -62,6 +62,10 @@ public class AlphaGroup : MonoBehaviour
             float newAlpha = percent * originalAlpha[graphic];
             graphic.color = new Color(graphic.color.r, graphic.color.g, graphic.color.b, newAlpha);
         }
+        foreach (TextMeshProUGUI text in texts) // Sets text without the alpha percent feature (yet)
+        {
+            text.color = new Color(text.color.r, text.color.g, text.color.b, percent);
+        }
     }
 
     public void SetAlpha(float newAlpha)

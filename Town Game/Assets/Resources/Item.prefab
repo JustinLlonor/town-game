@@ -1324,7 +1324,7 @@ GameObject:
   - component: {fileID: 6605237354889145660}
   - component: {fileID: 68000415256877264}
   - component: {fileID: 3276509499928819380}
-  - component: {fileID: 3725864447436133333}
+  - component: {fileID: 4654312282888609940}
   m_Layer: 19
   m_Name: Canvas
   m_TagString: Untagged
@@ -1441,7 +1441,7 @@ MonoBehaviour:
   panelAnimator: {fileID: 8087953089567049405}
   billboard: {fileID: 3276509499928819380}
   canvas: {fileID: 3524861111505335847}
-  follow: {fileID: 3725864447436133333}
+  follow: {fileID: 4654312282888609940}
   descriptionRevealed: 0
 --- !u!114 &3276509499928819380
 MonoBehaviour:
@@ -1455,17 +1455,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bcf896e12e274942919cfaeee079d6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &3725864447436133333
+--- !u!114 &4654312282888609940
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8865945272585780287}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7721c873864fd874c83ae06def8c6f66, type: 3}
+  m_Script: {fileID: 11500000, guid: 9031cb1c7fd39504890fb784fabfbfac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  doFollow: 1
   yOffset: 0.88
+  followTarget: {x: 0, y: 0, z: 0}
   speed: 3

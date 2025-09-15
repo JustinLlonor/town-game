@@ -20,7 +20,7 @@ public class ItemUIInfo : MonoBehaviour
     public Animator panelAnimator;
     public Billboard billboard;
     public Canvas canvas;
-    public WorldUIFollow follow;
+    public WorldUI follow;
 
     Item item;
     bool init = false;
@@ -44,7 +44,7 @@ public class ItemUIInfo : MonoBehaviour
     private void Look(Vector3 position)
     {
         canvas.enabled = true;
-        follow.enabled = true;
+        follow.doFollow = true;
         follow.SetPosition(position);
         if (!dataInit)
         {
@@ -67,7 +67,7 @@ public class ItemUIInfo : MonoBehaviour
 
     private void Unlook()
     {
-        follow.enabled = false;
+        follow.doFollow = false;
         panelAnimator.SetBool("IsLooking", false);
         panelAnimator.SetBool("DescriptionShown", false);
     }

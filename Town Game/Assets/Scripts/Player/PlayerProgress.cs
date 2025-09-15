@@ -22,6 +22,7 @@ public class PlayerProgress : NetworkBehaviour
     [Networked] public bool progressPrimaryUse { get; set; }
     ProgressManager progressManager;
     ObjectManager objectManager;
+    ProgressUIManager pUIM;
     public Rigidbody rb;
     private InteractableUI iui;
 
@@ -31,6 +32,7 @@ public class PlayerProgress : NetworkBehaviour
         objectManager = FindAnyObjectByType<ObjectManager>();
         if (!HasInputAuthority) return;
         iui = FindFirstObjectByType<InteractableUI>();
+        pUIM = FindFirstObjectByType<ProgressUIManager>();
     }
 
     public override void FixedUpdateNetwork()
@@ -56,6 +58,7 @@ public class PlayerProgress : NetworkBehaviour
         ProgressModifierInfo secondaryInfo;
         bool looking = ProgressVisualCast(out primaryInfo, out secondaryInfo);
         iui.DisplayProgressInteraction(primaryInfo, secondaryInfo, looking, this);
+        if (!looking) pUIM.SendProgressInfo(null); // sends null to puim, if we aren't looking at anything
     }
 
     private bool ProgressVisualCast(out ProgressModifierInfo primaryInfo, out ProgressModifierInfo secondaryInfo)
@@ -76,6 +79,7 @@ public class PlayerProgress : NetworkBehaviour
         Item heldItemObject = inventory.GetHeldItem();
         primaryInfo = hitHandler.GetModifierInfo(heldItemObject, true);
         secondaryInfo = hitHandler.GetModifierInfo(heldItemObject, false);
+        pUIM.SendProgressInfo(hitHandler, hit.point); // sends the handler and hit point to puim
         return true;
     }
 
