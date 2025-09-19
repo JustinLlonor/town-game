@@ -15,6 +15,7 @@ public class InputManager : MonoBehaviour
     private bool cinematicDisable = true;
     private string[] enabledUIMaps = new string[0];
 
+    public delegate void IntEvent(int value);
     public delegate void InputEvent();
     public delegate void InputValueEvent(InputValue iv);
 
@@ -128,7 +129,7 @@ public class InputManager : MonoBehaviour
     public InputValueEvent onSprint;
     public InputValueEvent onCrouch;
     public InputValueEvent onDropItem;
-    public InputValueEvent onEquipItem;
+    public IntEvent onEquipItem;
     public InputValueEvent onPrimaryFire;
     public InputValueEvent onSecondaryFire;
     public InputValueEvent onCamera;
@@ -164,7 +165,12 @@ public class InputManager : MonoBehaviour
     private void OnSprint(InputValue iv) { onSprint?.Invoke(iv); }
     private void OnCrouch(InputValue iv) { onCrouch?.Invoke(iv); }
     private void OnDropItem(InputValue iv) { onDropItem?.Invoke(iv); }
-    private void OnEquipItem(InputValue iv) { onEquipItem?.Invoke(iv); }
+    //private void OnEquipItem(InputValue iv) { onEquipItem?.Invoke(iv); }
+    private void OnEquip1() { onEquipItem?.Invoke(1); }
+    private void OnEquip2() { onEquipItem?.Invoke(2); }
+    private void OnEquip3() { onEquipItem?.Invoke(3); }
+    private void OnEquip4() { onEquipItem?.Invoke(4); }
+
     private void OnPrimaryFire(InputValue iv) { onPrimaryFire?.Invoke(iv); }
     private void OnSecondaryFire(InputValue iv) { onSecondaryFire?.Invoke(iv); }
     private void OnCamera(InputValue iv) { onCamera?.Invoke(iv); }

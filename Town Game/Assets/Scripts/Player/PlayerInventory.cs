@@ -216,9 +216,8 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         }
     }
 
-    private void OnEquipItem(InputValue iv)
+    private void OnEquipItem(int slot)
     {
-        int slot = (int)iv.Get<float>();
         if (slot == 0) return;
         runnerManager.hotbarKey = slot;
     }

@@ -60,6 +60,42 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "Equip4",
+                    "type": "Button",
+                    "id": "5773a0e2-6d50-478e-ae5a-5b4d5846f0f3",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Equip3",
+                    "type": "Button",
+                    "id": "63422903-f417-4b99-8239-01476dff6c7b",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Equip2",
+                    "type": "Button",
+                    "id": "8c75fb5c-e6e5-4809-8ce0-bb3597298c32",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Equip1",
+                    "type": "Button",
+                    "id": "e8076584-a5b7-4552-ba09-6f3726e32b31",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Primary Fire",
                     "type": "Value",
                     "id": "82e6b616-5383-4f18-a59c-87c709b6eb2c",
@@ -301,6 +337,50 @@
                     "processors": "",
                     "groups": "",
                     "action": "Rotate Mode",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c6b678f4-f3af-456a-829e-dee82cab2500",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Equip1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "663ec3b4-aea5-4a05-a7e6-e634e3d6c61d",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Equip2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3c9ef56e-288c-4c24-9a90-4513d8908e24",
+                    "path": "<Keyboard>/3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Equip3",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c5ea0636-1c03-4538-af2a-3a537f202f53",
+                    "path": "<Keyboard>/4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Equip4",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
