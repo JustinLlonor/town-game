@@ -5,10 +5,8 @@ using UnityEngine.UI;
 
 public class SlotAnimUI : MonoBehaviour
 {
+    public SlotUI slotUI;
     public Transform slotHolder;
-    public RawImage panel;
-    public Color equipColor;
-    public Color unequipColor;
     public float equipHeight = 0f;
     public float unequipHeight = -100f;
     public AnimationCurve equipCurve;
@@ -29,7 +27,8 @@ public class SlotAnimUI : MonoBehaviour
         if (equipped && !animationStarted)
         {
             isEquipped = true;
-            panel.color = equipColor;
+            //panel.color = equipColor;
+            slotUI.SetHighlighted(true);
             animationStarted = true;
             StartHeightAnimation(equipHeight, equipSpeed, equipCurve);
             StartCoroutine(ResetHeight(hideTimer));
@@ -38,7 +37,8 @@ public class SlotAnimUI : MonoBehaviour
         if (!equipped && isEquipped)
         {
             isEquipped = false;
-            panel.color = unequipColor;
+            slotUI.SetHighlighted(false);
+            //panel.color = unequipColor;
             animationStarted = false;
             StartHeightAnimation(unequipHeight, equipSpeed, equipCurve);
         }

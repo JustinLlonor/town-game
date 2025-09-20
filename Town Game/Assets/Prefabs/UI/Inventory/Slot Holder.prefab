@@ -50,6 +50,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac8dcf6916258c94fa12422cbdbfd671, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  slotUI: {fileID: 8623080128990117679}
   slotHolder: {fileID: 352379649807124353}
   panel: {fileID: 8500387078169523367}
   equipColor: {r: 1, g: 1, b: 1, a: 0.3764706}
@@ -90,6 +91,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7473548370686328348}
     m_Modifications:
+    - target: {fileID: 1780902295126995353, guid: 952870b869215334e9a860ce6a20c012, type: 3}
+      propertyPath: m_PixelsPerUnitMultiplier
+      value: 12.79
+      objectReference: {fileID: 0}
     - target: {fileID: 6699279364469288184, guid: 952870b869215334e9a860ce6a20c012, type: 3}
       propertyPath: m_Name
       value: Slot
@@ -197,5 +202,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8623080128990117679 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1922257066323919182, guid: 952870b869215334e9a860ce6a20c012, type: 3}
+  m_PrefabInstance: {fileID: 7856088846358265441}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5b00ef667fad424684f7b8a4484cf74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

@@ -7,6 +7,9 @@ using UnityEngine.UI;
 public class SlotUI : MonoBehaviour
 {
     public RawImage icon;
+    public RawImage panel;
+    public Color regColor;
+    public Color highlightColor;
 
     public void SetIcon(Texture2D texture)
     {
@@ -17,6 +20,16 @@ public class SlotUI : MonoBehaviour
         }
         icon.enabled = true;
         icon.texture = texture;
+    }
+
+    public void SetHighlighted(bool highlighted)
+    {
+        if (highlighted)
+        {
+            panel.color = highlightColor;
+            return;
+        }
+        panel.color = regColor;
     }
 
     /**
