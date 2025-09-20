@@ -154,8 +154,8 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         for (int i = 0; i < hotbarLength; i++)
         {
             GameObject slotObject = Instantiate(hotbarSlot, hotbarUI);
-            SlotUI slotUI = slotObject.GetComponent<SlotUI>();
-            slotUI.SetIndex(i + 1);
+            //SlotUI slotUI = slotObject.GetComponent<SlotUI>();
+            //slotUI.SetIndex(i + 1);
         }
         hotbarUI.anchoredPosition -= new Vector2((hotbar.Count - 1) * 50f, 0f); //For centering
     }
@@ -179,7 +179,8 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         if (!uiSetup) return;
         for (int i = 0; i < hotbar.Count; i++)
         {
-            SlotUI slotUI = hotbarUI.GetChild(i).GetComponent<SlotUI>();
+            SlotAnimUI sAnimUI = hotbarUI.GetChild(i).GetComponent<SlotAnimUI>();
+            SlotUI slotUI = hotbarUI.GetChild(i).GetChild(0).GetComponent<SlotUI>();
             //Sets icons
             if (hotbar[i].ToString().IsNullOrEmpty())
             {
@@ -189,7 +190,8 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
             {
                 slotUI.SetIcon(itemManager.itemSearch[hotbar[i].ToString()].icon);
             }
-            slotUI.SetEquipped(equippedSlot == i);
+            sAnimUI.SetEquipped(equippedSlot == i);
+            //slotUI.SetEquipped(equippedSlot == i);
             /**
             RawImage panel = hotbarUI.GetChild(i).GetChild(0).GetComponent<RawImage>(); // WHAT THE FUCK
             RawImage icon = hotbarUI.GetChild(i).GetChild(0).GetChild(0).GetComponent<RawImage>();

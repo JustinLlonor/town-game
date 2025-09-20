@@ -138,9 +138,9 @@ public class BarStatsUI : MonoBehaviour
             if (!gotMinHeight)
             {
                 gotMinHeight = true;
-                shMinHeight = child.GetComponent<SlotUI>().unequipHeight * hotbarScale;
+                shMinHeight = child.GetComponent<SlotAnimUI>().unequipHeight * hotbarScale;
             }
-            slotHolders.Add(child.GetComponent<SlotUI>().slotHolder);
+            slotHolders.Add(child.GetComponentInChildren<SlotAnimUI>().slotHolder);
         }
     }
     

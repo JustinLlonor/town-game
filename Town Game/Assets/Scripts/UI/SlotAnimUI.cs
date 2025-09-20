@@ -1,25 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SlotUI : MonoBehaviour
+public class SlotAnimUI : MonoBehaviour
 {
-    public RawImage icon;
+    public Transform slotHolder;
+    public RawImage panel;
+    public Color equipColor;
+    public Color unequipColor;
+    public float equipHeight = 0f;
+    public float unequipHeight = -100f;
+    public AnimationCurve equipCurve;
+    public float equipSpeed = 4f;
+    public float hideTimer = 5f;
+    bool isEquipped = false;
+    bool animationStarted = false;
 
-    public void SetIcon(Texture2D texture)
-    {
-        if (texture == null)
-        {
-            icon.enabled = false;
-            return;
-        }
-        icon.enabled = true;
-        icon.texture = texture;
-    }
-
-    /**
     public void OnEnable()
     {
         StopAllCoroutines();
@@ -75,5 +72,4 @@ public class SlotUI : MonoBehaviour
         yield return new WaitForSeconds(duration);
         StartCoroutine(HeightAnimation(unequipHeight, equipSpeed, equipCurve));
     }
-    **/
 }
