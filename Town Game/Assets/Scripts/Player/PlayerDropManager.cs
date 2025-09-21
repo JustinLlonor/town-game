@@ -202,7 +202,7 @@ public class PlayerDropManager : NetworkBehaviour
     {
         Item item = GetCurrentItem();
         if (item == null) return;
-        if (inventory.hotbar[inventory.equippedSlot].ToString().IsNullOrEmpty()) return;
+        if (inventory.items[inventory.equippedSlot].ToString().IsNullOrEmpty()) return;
         if (!Runner.IsServer && HasInputAuthority) inventory.RemoveItem(inventory.equippedSlot);
         if (!Runner.IsServer) return;
 
@@ -223,7 +223,7 @@ public class PlayerDropManager : NetworkBehaviour
     {
         Item item = GetCurrentItem();
         if (item == null) return;
-        if (inventory.hotbar[inventory.equippedSlot].ToString().IsNullOrEmpty()) return;
+        if (inventory.items[inventory.equippedSlot].ToString().IsNullOrEmpty()) return;
         if (!Runner.IsServer && HasInputAuthority) inventory.RemoveItem(inventory.equippedSlot);
         if (!Runner.IsServer) return;
         if (!(item as Device)) return;

@@ -154,12 +154,12 @@ public class ConflictManager : NetworkBehaviour
         // Get attacker's weapon power
         int attackPower = attackWeapon.strength;
         int defensePower = 0;
-        int defenseSlot = GetStrongestDefenseWeapon(victimInventory.hotbar);
+        int defenseSlot = GetStrongestDefenseWeapon(victimInventory.items);
         if (defenseSlot >= 0)
         {
             Debug.Log("Equipping strongest");
             victimInventory.EquipItem(defenseSlot);
-            Weapon foundWeapon = (Weapon)objectManager.itemSearch[victimInventory.hotbar[defenseSlot].ToString()]; // The weapon found in the slot defenseSlot of the victim's inventory.
+            Weapon foundWeapon = (Weapon)objectManager.itemSearch[victimInventory.items[defenseSlot].ToString()]; // The weapon found in the slot defenseSlot of the victim's inventory.
             defensePower = foundWeapon.defense;
         }
 

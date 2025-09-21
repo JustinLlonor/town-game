@@ -146,10 +146,10 @@ public class ItemPhys : NetworkBehaviour
         if (!PlayerCanPickUpItem(player)) return;
         PlayerInventory inventory = playerObject.GetComponent<PlayerInventory>();
         if (inventory == null) return;
-        string eName = inventory.hotbar[inventory.equippedSlot].ToString();
+        string eName = inventory.items[inventory.equippedSlot].ToString();
         if (!eName.IsNullOrEmpty())
         {
-            Item item = om.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
+            Item item = om.itemSearch[inventory.items[inventory.equippedSlot].ToString()];
             /**
             if (item.large)
             {

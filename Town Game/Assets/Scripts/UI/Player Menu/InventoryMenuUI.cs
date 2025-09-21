@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -82,6 +83,7 @@ public class InventoryMenuUI : MonoBehaviour
         // Swap with hovered slot
         if (pickedSlot != hoveredSlot)
         {
+            if (!inventory.CanSwap((int)pickedSlot, (int)hoveredSlot)) return;
             Swap((int)pickedSlot, true);
             pickedSlot = null;
             SetPickImage(null);
@@ -119,6 +121,7 @@ public class InventoryMenuUI : MonoBehaviour
     {
         if (hoveredSlot == null) return;
         if (hoveredSlot == slotID) return;
+        if (!inventory.CanSwap(slotID, (int)hoveredSlot)) return;
         VisualSwap(slotID, (int)hoveredSlot, pickedItem);
         inventory.RPC_SendSwap(slotID, (int)hoveredSlot);
     }

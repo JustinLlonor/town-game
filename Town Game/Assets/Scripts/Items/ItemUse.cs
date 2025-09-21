@@ -64,7 +64,7 @@ public class ItemUse : NetworkBehaviour
     
     public void UsePrimary()
     {
-        Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
+        Item item = itemManager.itemSearch[inventory.items[inventory.equippedSlot].ToString()];
         if (item == null) return; // If item doesn't exist
         if (item as Weapon)
         {
