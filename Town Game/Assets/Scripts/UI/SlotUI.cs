@@ -22,6 +22,30 @@ public class SlotUI : MonoBehaviour
         icon.texture = texture;
     }
 
+    public void SetIcon(Texture texture)
+    {
+        if (texture == null)
+        {
+            icon.enabled = false;
+            return;
+        }
+        icon.enabled = true;
+        icon.texture = texture;
+    }
+
+    public void SetIconItem(Item item)
+    {
+        Texture2D texture = null;
+        if (item != null) texture = item.icon;
+        if (texture == null)
+        {
+            icon.enabled = false;
+            return;
+        }
+        icon.enabled = true;
+        icon.texture = texture;
+    }
+
     public void SetHighlighted(bool highlighted)
     {
         if (highlighted)

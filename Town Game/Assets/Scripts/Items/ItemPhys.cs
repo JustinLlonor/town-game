@@ -158,13 +158,12 @@ public class ItemPhys : NetworkBehaviour
             }
             **/
         }
-        int givenSlot = inventory.GiveItem(itemName.ToString(), true);
+        int givenSlot = inventory.GiveItem(itemName.ToString(), true, itemData);
         if (givenSlot == -1) return; // If inventory is full, return
-        inventory.CollectItemData(itemData, givenSlot);
         pickedUp = true;
         pickedPlayer = player;
         gameObject.GetComponent<MeshRenderer>().enabled = false;
-        gameObject.GetComponent<Interactable>().canInteract = false;
+        //gameObject.GetComponent<Interactable>().canInteract = false;
         if (HasStateAuthority) Runner.Despawn(Object);
     }
 

@@ -115,6 +115,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
                     ShowItem(hotbar[equippedSlot].ToString());
                     break;
                 case nameof(hotbar):
+                    if (HasInputAuthority) UpdateHotbarUI(true);
                     if (hotbar[equippedSlot].ToString().IsNullOrEmpty())
                     {
                         HideItem();
@@ -174,7 +175,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         }
     }
 
-    public void UpdateHotbarUI()
+    public void UpdateHotbarUI(bool doEquip = true)
     {
         if (!uiSetup) return;
         for (int i = 0; i < hotbar.Count; i++)
@@ -190,7 +191,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
             {
                 slotUI.SetIcon(itemManager.itemSearch[hotbar[i].ToString()].icon);
             }
-            sAnimUI.SetEquipped(equippedSlot == i);
+            if (doEquip) sAnimUI.SetEquipped(equippedSlot == i);
             //slotUI.SetEquipped(equippedSlot == i);
             /**
             RawImage panel = hotbarUI.GetChild(i).GetChild(0).GetComponent<RawImage>(); // WHAT THE FUCK
@@ -363,9 +364,12 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     /// <summary>
     /// Gives an item to this player.
     /// </summary>
-    /// <param name="itemName">Name of item</param>
-    /// <param name="slot">Slot to put item in, automatically finds a slot by default</param>
-    public int GiveItem(string itemName, bool equipItem = false, int slot = -1)
+    /// <param name="itemName">Name of the item</param>
+    /// <param name="equipItem">If the player should equip it upon receiving</param>
+    /// <param name="data">The data of the item, if applicable</param>
+    /// <param name="slot"></param>
+    /// <returns></returns>
+    public int GiveItem(string itemName, bool equipItem = false, ItemData? data = null, int slot = -1)
     {
         int emptySlot;
         if (IsInventoryFull(out emptySlot))
@@ -384,6 +388,8 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
             if (!equipItem) EquipItem(equippedSlot, slot == equippedSlot);
             if (Runner.IsServer) reequipTick = !reequipTick;
         }
+        // Get the item data
+        if (data != null) SetItemMetadata((ItemData)data, slot);
         if (HasInputAuthority) UpdateHotbarUI();
         RPC_ShowItem();
         return slot;
@@ -429,10 +435,65 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     {
         if (hotbar[slot].ToString().IsNullOrEmpty()) return;
         hotbar.Set(slot, "");
+        ClearItemMetadata(slot);
         EquipItem(equippedSlot, slot == equippedSlot);
         if (Runner.IsServer) reequipTick = !reequipTick;
 
         if (HasInputAuthority) UpdateHotbarUI();
+    }
+
+    /// <summary>
+    /// Swaps items in 2 slots
+    /// </summary>
+    /// <param name="slot1"></param>
+    /// <param name="slot2"></param>
+    public void SwapItems(int slot1, int slot2)
+    {
+        if (slot1 == slot2) return;
+        bool slot1Empty = hotbar[slot1].ToString().IsNullOrEmpty();
+        bool slot2Empty = hotbar[slot2].ToString().IsNullOrEmpty();
+        if (slot1Empty && slot2Empty) return; // Both empty, return
+        if (equippedSlot == slot1 || equippedSlot == slot2)
+        {
+            reequipTick = !reequipTick;
+        }
+        // If only one of the slots is empty
+        if (slot1Empty)
+        {
+            MoveSlotToEmpty(slot1, slot2);
+            return;
+        }
+        if (slot2Empty)
+        {
+            MoveSlotToEmpty(slot2, slot1);
+            return;
+        }
+        // Swapping code
+        NetworkString<_32> slot1Name = hotbar[slot1];
+        ItemData slot1Data = itemData[slot1];
+        hotbar.Set(slot1, hotbar[slot2]);
+        SetItemMetadata(itemData[slot2], slot1);
+        hotbar.Set(slot2, slot1Name);
+        SetItemMetadata(slot1Data, slot2);
+    }
+
+    /// <summary>
+    /// Moves an item slot to an empty slot.
+    /// </summary>
+    /// <param name="emptySlot"></param>
+    /// <param name="itemSlot"></param>
+    private void MoveSlotToEmpty(int emptySlot, int itemSlot)
+    {
+        hotbar.Set(emptySlot, hotbar[itemSlot]);
+        SetItemMetadata(itemData[itemSlot], emptySlot);
+        hotbar.Set(itemSlot, "");
+        ClearItemMetadata(itemSlot);
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_SendSwap(int slot1, int slot2)
+    {
+        SwapItems(slot1, slot2);
     }
 
     public void DropItem(int itemIndex)
@@ -460,9 +521,14 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         //if (!itemData[itemIndex].fingerprints.Contains(view.Owner)) itemData[itemIndex].fingerprints.Add(view.Owner); // Photon syncing
     }
 
-    public void CollectItemData(ItemData data, int itemIndex)
+    private void SetItemMetadata(ItemData data, int itemIndex)
     {
         itemData.Set(itemIndex, new ItemData(data.metadata, data.fingerprints));
+    }
+
+    private void ClearItemMetadata(int itemIndex)
+    {
+        itemData.Set(itemIndex, new ItemData());
     }
 
     public Item GetHeldItem()
@@ -475,5 +541,18 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     public ItemData GetHeldItemData()
     {
         return itemData[equippedSlot];
+    }
+
+    /// <summary>
+    /// Gets the item at the slot. Negative values mean attire.
+    /// </summary>
+    /// <param name="slot"></param>
+    /// <returns></returns>
+    public Item GetItemAtSlot(int slot)
+    {
+        if (slot < 0) return null;
+        string itemName = hotbar[slot].ToString();
+        if (itemName.IsNullOrEmpty()) return null;
+        return ObjectManager.i.itemSearch[itemName];
     }
 }

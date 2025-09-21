@@ -60,18 +60,9 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Equip4",
+                    "name": "Equip1",
                     "type": "Button",
-                    "id": "5773a0e2-6d50-478e-ae5a-5b4d5846f0f3",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Equip3",
-                    "type": "Button",
-                    "id": "63422903-f417-4b99-8239-01476dff6c7b",
+                    "id": "e8076584-a5b7-4552-ba09-6f3726e32b31",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -87,9 +78,18 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Equip1",
+                    "name": "Equip3",
                     "type": "Button",
-                    "id": "e8076584-a5b7-4552-ba09-6f3726e32b31",
+                    "id": "63422903-f417-4b99-8239-01476dff6c7b",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Equip4",
+                    "type": "Button",
+                    "id": "5773a0e2-6d50-478e-ae5a-5b4d5846f0f3",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -342,6 +342,17 @@
                 },
                 {
                     "name": "",
+                    "id": "c5ea0636-1c03-4538-af2a-3a537f202f53",
+                    "path": "<Keyboard>/4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Equip4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "c6b678f4-f3af-456a-829e-dee82cab2500",
                     "path": "<Keyboard>/1",
                     "interactions": "",
@@ -370,17 +381,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "Equip3",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "c5ea0636-1c03-4538-af2a-3a537f202f53",
-                    "path": "<Keyboard>/4",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Equip4",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -599,8 +599,110 @@
         {
             "name": "InventoryUI",
             "id": "4b536cd4-526a-43e9-aa1d-f47b54e3b4ad",
-            "actions": [],
-            "bindings": []
+            "actions": [
+                {
+                    "name": "Slot Switch",
+                    "type": "Button",
+                    "id": "792e33e7-7156-4b59-b471-e9c819668fc7",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Swap4",
+                    "type": "Button",
+                    "id": "ee06855e-ec59-4b3b-a1b8-d31efb3b5609",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Swap3",
+                    "type": "Button",
+                    "id": "d2a22567-3e73-484f-9eca-86f165f5ceef",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Swap2",
+                    "type": "Button",
+                    "id": "b47b1a6d-0959-430f-9d29-591bbf14f4be",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Swap1",
+                    "type": "Button",
+                    "id": "d61412c9-9fb6-4bf4-89cc-ad979a1534cb",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "a079e57e-6271-4789-8fb7-09ebfc2f1f43",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Slot Switch",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f7a170eb-fadc-4aed-a4c3-ae6310030ee1",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Swap1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ca4e139c-158c-4c1a-b3aa-87f0dac9afc9",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Swap2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9bb0bbac-451e-40c3-9b5a-12589bbdc949",
+                    "path": "<Keyboard>/3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Swap3",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c09649a4-af22-4bc3-aacc-d12a8c6f7939",
+                    "path": "<Keyboard>/4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Swap4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         },
         {
             "name": "SettingsUI",

@@ -19,6 +19,10 @@ public class UIManager : MonoBehaviour
     public UIPlayerList uip;
     public PositionUI pui;
     public MapMenuUI mapMenuUI;
+    /// <summary>
+    /// The player object whose UI we need to display
+    /// </summary>
+    public Player trackedPlayer;
     [Header("Menus")]
     public GameObject[] uiMenus;
     public int menuOpened = -1;
@@ -51,6 +55,12 @@ public class UIManager : MonoBehaviour
         uip.Init();
         if (pui != null) pui.Init();
         foreach (var menu in uiMenus) menu.SetActive(false);
+        pm.onInstantiatePlayer += InstantiatePlayer;
+    }
+
+    private void InstantiatePlayer(GameObject playerObject)
+    {
+        trackedPlayer = playerObject.GetComponent<Player>();
     }
 
     private void UIOpen(int menu)

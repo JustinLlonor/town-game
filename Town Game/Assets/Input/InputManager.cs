@@ -159,6 +159,12 @@ public class InputManager : MonoBehaviour
     // MapUI
     public InputValueEvent onMapZoom;
     public InputValueEvent onMapDrag;
+    // InventoryUI
+    public InputEvent onSlotSwitch;
+    public InputEvent onSwap1;
+    public InputEvent onSwap2;
+    public InputEvent onSwap3;
+    public InputEvent onSwap4;
 
     private void OnJump() { onJump?.Invoke(); }
     private void OnMove(InputValue iv) { onMove?.Invoke(iv); }
@@ -193,4 +199,9 @@ public class InputManager : MonoBehaviour
     private void OnVoice(InputValue iv) { onVoice?.Invoke(iv); }
     private void OnMapZoom(InputValue iv) { onMapZoom?.Invoke(iv); }
     private void OnMapDrag(InputValue iv) { onMapDrag?.Invoke(iv);  }
+    private void OnSlotSwitch() { onSlotSwitch?.Invoke(); }
+    private void OnSwap1() { onSwap1?.Invoke(); }
+    private void OnSwap2() { onSwap2?.Invoke(); }
+    private void OnSwap3() { onSwap3?.Invoke(); }
+    private void OnSwap4() { onSwap4?.Invoke(); }
 }
