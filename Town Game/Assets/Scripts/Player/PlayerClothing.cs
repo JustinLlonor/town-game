@@ -159,6 +159,7 @@ public class PlayerClothing : NetworkBehaviour
     {
         if (attire.clothing == null) return;
         attire.renderer.material.mainTexture = attire.clothing.texture;
+        Debug.Log("rendering attire for " + attire.clothing.bodyPart);
         if (isMale)
         {
             if (attire.clothing.maleArmModel != null && HasInputAuthority) fps.ChangeArmMesh(attire.clothing.maleArmModel);
@@ -168,7 +169,6 @@ public class PlayerClothing : NetworkBehaviour
                 return;
             }
             ((SkinnedMeshRenderer)attire.renderer).sharedMesh = attire.clothing.maleModel;
-            return;
         }
         else
         {
@@ -179,7 +179,6 @@ public class PlayerClothing : NetworkBehaviour
                 return;
             }
             ((SkinnedMeshRenderer)attire.renderer).sharedMesh = attire.clothing.femaleModel;
-            return;
         }
     }
 
