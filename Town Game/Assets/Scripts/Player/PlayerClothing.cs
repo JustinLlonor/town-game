@@ -30,6 +30,14 @@ public class PlayerClothing : NetworkBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            RenderAllClothing();
+        }
+    }
+
     public override void Spawned()
     {
         fps = FindFirstObjectByType<FirstPerson>();
