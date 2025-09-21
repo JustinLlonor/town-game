@@ -73,7 +73,7 @@ public class PlayerClothing : NetworkBehaviour
         foreach (int clothingIndex in nAttires)
         {
             if (clothingIndex == -1) continue;
-            //SetClothing(om.clothings[clothingIndex]);
+            SetAttireClothing(om.clothings[clothingIndex]);
             foreach (Attire attire in attires)
             {
                 RenderClothing(attire);
@@ -108,7 +108,11 @@ public class PlayerClothing : NetworkBehaviour
         if (HasStateAuthority) nAttires.Set(i, Array.IndexOf(om.clothings, clothing)); // Sets the networked array clotyhing to the name of the clothing
     }
 
-    public void SetClothing(Clothing clothing)
+    /// <summary>
+    /// Sets the attire clothing object
+    /// </summary>
+    /// <param name="clothing"></param>
+    public void SetAttireClothing(Clothing clothing)
     {
         int i = 0;
 
@@ -157,9 +161,10 @@ public class PlayerClothing : NetworkBehaviour
 
     void RenderClothing(Attire attire)
     {
-        if (attire.clothing == null) return;
-        attire.renderer.material.mainTexture = attire.clothing.texture;
         Debug.Log("rendering attire for " + attire.clothing.bodyPart);
+        if (attire.clothing == null) return;
+        Debug.Log("Past return");
+        attire.renderer.material.mainTexture = attire.clothing.texture;
         if (isMale)
         {
             if (attire.clothing.maleArmModel != null && HasInputAuthority) fps.ChangeArmMesh(attire.clothing.maleArmModel);
