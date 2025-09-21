@@ -10,7 +10,7 @@ public class PlayerClothing : NetworkBehaviour
     public bool isCorpse = false;
     [Tooltip("Change the capacity in code when adding/removing attires")]
     public Attire[] attires;
-    [Networked, Capacity(6)] public NetworkArray<int> nAttires { get; } = MakeInitializer(new int[] { -1, -1, -1, -1, -1}); // Change this number as you add more clothes
+    [Networked, Capacity(6)] public NetworkArray<int> nAttires { get; } = MakeInitializer(new int[] { -1, -1, -1, -1, -1 }); // Change this number as you add more clothes
     public RandomizedClothing[] randomizedClothing;
     [Networked] public int skinTone { get; set; } = -1;
     public Material[] skinTones;
@@ -22,19 +22,11 @@ public class PlayerClothing : NetworkBehaviour
 
     private void Start()
     {
-        //RenderAllClothing();
+        RenderAll();
         if (skinTone != -1)
         {
             updatedMat = skinTones[skinTone];
             SetAllAttireMaterials(updatedMat);
-        }
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.J))
-        {
-            RenderAllClothing();
         }
     }
 
@@ -66,6 +58,16 @@ public class PlayerClothing : NetworkBehaviour
                     break;
             }
         }
+    }
+
+    /// <summary>
+    /// Renders everything, including skin tone and clothing
+    /// </summary>
+    private void RenderAll()
+    {
+        RenderAllClothing();
+        SetAllAttireMaterials(updatedMat);
+        if (HasInputAuthority) fps.ChangeArmMaterials(skinTones[skinTone]);
     }
 
     void RenderAllClothing()
@@ -132,7 +134,7 @@ public class PlayerClothing : NetworkBehaviour
     {
         isMale = male;
     }
-    
+
     public void RandomizeGender()
     {
         int randomGender = UnityEngine.Random.Range((int)0, (int)2);
@@ -161,9 +163,7 @@ public class PlayerClothing : NetworkBehaviour
 
     void RenderClothing(Attire attire)
     {
-        Debug.Log("rendering attire for " + attire.clothing.bodyPart);
         if (attire.clothing == null) return;
-        Debug.Log("Past return");
         attire.renderer.material.mainTexture = attire.clothing.texture;
         if (isMale)
         {
