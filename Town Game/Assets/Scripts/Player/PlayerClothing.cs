@@ -10,7 +10,7 @@ public class PlayerClothing : NetworkBehaviour
     public bool isCorpse = false;
     [Tooltip("Change the capacity in code when adding/removing attires")]
     public Attire[] attires;
-    [Networked, Capacity(6)] public NetworkArray<int> nAttires { get; } = MakeInitializer(new int[5]); // Change this number as you add more clothes
+    [Networked, Capacity(6)] public NetworkArray<int> nAttires { get; } = MakeInitializer(new int[] { -1, -1, -1, -1, -1}); // Change this number as you add more clothes
     public RandomizedClothing[] randomizedClothing;
     [Networked] public int skinTone { get; set; } = -1;
     public Material[] skinTones;
@@ -22,7 +22,7 @@ public class PlayerClothing : NetworkBehaviour
 
     private void Start()
     {
-        RenderAllClothing();
+        //RenderAllClothing();
         if (skinTone != -1)
         {
             updatedMat = skinTones[skinTone];
@@ -48,7 +48,7 @@ public class PlayerClothing : NetworkBehaviour
         {
             switch (change)
             {
-                case nameof(nAttires): // goofy ahh code
+                case nameof(nAttires):
                     RenderAllClothing();
                     break;
                 case nameof(skinTone):
@@ -65,7 +65,7 @@ public class PlayerClothing : NetworkBehaviour
         foreach (int clothingIndex in nAttires)
         {
             if (clothingIndex == -1) continue;
-            SetClothing(om.clothings[clothingIndex]);
+            //SetClothing(om.clothings[clothingIndex]);
             foreach (Attire attire in attires)
             {
                 RenderClothing(attire);
@@ -99,6 +99,7 @@ public class PlayerClothing : NetworkBehaviour
         attires[i].clothing = clothing;
         if (HasStateAuthority) nAttires.Set(i, Array.IndexOf(om.clothings, clothing)); // Sets the networked array clotyhing to the name of the clothing
     }
+
     public void SetClothing(Clothing clothing)
     {
         int i = 0;
@@ -111,7 +112,7 @@ public class PlayerClothing : NetworkBehaviour
             }
             i++;
         }
-
+        // Sets attire to the clothing
         attires[i].clothing = clothing;
     }
 

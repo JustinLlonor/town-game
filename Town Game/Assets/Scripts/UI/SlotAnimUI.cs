@@ -24,6 +24,7 @@ public class SlotAnimUI : MonoBehaviour
 
     public void SetEquipped(bool equipped)
     {
+        if (!gameObject.activeInHierarchy) return;
         if (equipped && !animationStarted)
         {
             isEquipped = true;
