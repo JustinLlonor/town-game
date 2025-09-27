@@ -19,8 +19,8 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
     /// The list of item names representing the player's inventory. Indices below hotbarLength represent the hotbar, and indices above
     /// hotbarLength represent armor.
     /// </summary>
-    [Networked, Capacity(7)]public NetworkLinkedList<NetworkString<_32>> items { get; }
-    [Networked, Capacity(7)]public NetworkLinkedList<ItemData> itemData { get; }// Item metadata
+    [Networked, Capacity(7)] public NetworkLinkedList<NetworkString<_32>> items { get; }
+    [Networked, Capacity(7)] public NetworkLinkedList<ItemData> itemData { get; }// Item metadata
     public GameObject hotbarSlot;
     public RectTransform hotbarUI;
     public GameObject largeUI;
@@ -629,7 +629,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         return armorSlot;
     }
 
-    private ClothingGroup GetClothingGroup(int slot)
+    public ClothingGroup GetClothingGroup(int slot)
     {
         if (slot >= 0) return ClothingGroup.None;
         ClothingGroup output = armorClothingGroups[Mathf.Abs(slot) - 1];

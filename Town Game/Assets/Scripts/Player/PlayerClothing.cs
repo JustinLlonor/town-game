@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using Fusion;
+using Unity.VisualScripting;
+using System.Linq;
 
 public class PlayerClothing : NetworkBehaviour
 {
@@ -14,6 +16,8 @@ public class PlayerClothing : NetworkBehaviour
     public RandomizedClothing[] randomizedClothing;
     [Networked] public int skinTone { get; set; } = -1;
     public Material[] skinTones;
+    // The player armor object, use SetDefaultAttire function to set the default attire
+    public PlayerArmor playerArmor;
     ObjectManager om;
     ChangeDetector changeDetector;
     FirstPerson fps;
@@ -39,6 +43,7 @@ public class PlayerClothing : NetworkBehaviour
         if (!HasStateAuthority) return;
         RandomizeGender();
         RandomizeClothing();
+        SetDefaultAttire(); // Change this later if there is character customization
         RandomizeSkinColor();
     }
 
@@ -72,22 +77,35 @@ public class PlayerClothing : NetworkBehaviour
 
     void RenderAllClothing()
     {
+        // Set attire objects
+        int i = 0;
         foreach (int clothingIndex in nAttires)
         {
-            if (clothingIndex == -1) continue;
-            SetAttireClothing(om.clothings[clothingIndex]);
-            foreach (Attire attire in attires)
+            if (clothingIndex == -1)
             {
-                RenderClothing(attire);
+                attires[i].clothing = null;
+                i++;
+                continue;
             }
+            SetAttireClothing(om.clothings[clothingIndex]);
+            i++;
         }
+        // Render all attire objectsz
+        foreach (Attire attire in attires)
+        {
+            RenderClothing(attire);
+        }
+
     }
 
+    /// <summary>
+    /// Sets the player's clothing to the clothing object corresponding to the name
+    /// </summary>
+    /// <param name="clothingName"></param>
     public void SetClothing(string clothingName)
     {
         Clothing clothing = om.clothingSearch[clothingName];
         int i = 0;
-
         foreach (Attire attire in attires)
         {
             if (attire.bodyPart == clothing.bodyPart)
@@ -110,6 +128,60 @@ public class PlayerClothing : NetworkBehaviour
         if (HasStateAuthority) nAttires.Set(i, Array.IndexOf(om.clothings, clothing)); // Sets the networked array clotyhing to the name of the clothing
     }
 
+    public void NullifyNAttire(Clothing.BodyPart bodyPart)
+    {
+        int i = 0;
+        foreach (Attire attire in attires)
+        {
+            if (attire.bodyPart == bodyPart)
+            {
+                break;
+            }
+            i++;
+        }
+        if (HasStateAuthority) nAttires.Set(i, -1);
+    }
+
+    /// <summary>
+    /// Nullifies the clothing at the specified body part
+    /// </summary>
+    /// <param name="bodyPart"></param>
+    public void NullifyClothing(Clothing.BodyPart bodyPart)
+    {
+        int i = 0;
+        foreach (Attire attire in attires)
+        {
+            if (attire.bodyPart == bodyPart)
+            {
+                break;
+            }
+            i++;
+        }
+        if (HasStateAuthority) nAttires.Set(i, -1); // Sets the networked array clotyhing to the name of the clothing
+    }
+
+    /// <summary>
+    /// Resets a body part based on a integer list of default clothing parts
+    /// </summary>
+    /// <param name="part"></param>
+    /// <param name="defaultParts"></param>
+    public void ResetBodyPart(Clothing.BodyPart part, int[] defaultParts)
+    {
+        int i = 0;
+        foreach (Attire attire in attires)
+        {
+            if (attire.bodyPart == part)
+            {
+                break;
+            }
+            i++;
+        }
+
+        Debug.LogError("Setting " + i + " to " + defaultParts[i]);
+
+        nAttires.Set(i, defaultParts[i]);
+    }
+
     /// <summary>
     /// Sets the attire clothing object
     /// </summary>
@@ -117,7 +189,6 @@ public class PlayerClothing : NetworkBehaviour
     public void SetAttireClothing(Clothing clothing)
     {
         int i = 0;
-
         foreach (Attire attire in attires)
         {
             if (attire.bodyPart == clothing.bodyPart)
@@ -128,6 +199,20 @@ public class PlayerClothing : NetworkBehaviour
         }
         // Sets attire to the clothing
         attires[i].clothing = clothing;
+    }
+
+    public void NullifyAttire(Clothing.BodyPart part)
+    {
+        int i = 0;
+        foreach (Attire attire in attires)
+        {
+            if (attire.bodyPart == part)
+            {
+                break;
+            }
+            i++;
+        }
+        attires[i].clothing = null;
     }
 
     public void SetSex(bool male)
@@ -148,11 +233,28 @@ public class PlayerClothing : NetworkBehaviour
         {
             if (rc.nullChance != 0f)
             {
-                if (UnityEngine.Random.value <= rc.nullChance) continue;
+                if (UnityEngine.Random.value <= rc.nullChance)
+                {
+                    NullifyNAttire(rc.bodyPart);
+                    continue;
+                }
             }
             Clothing selectedClothing = rc.clothings[UnityEngine.Random.Range(0, rc.clothings.Length)];
             SetClothing(selectedClothing.name);
         }
+    }
+
+    /// <summary>
+    /// Sets default attire of playerArmor (if it exists) to the attire of this clothing object
+    /// </summary>
+    private void SetDefaultAttire()
+    {
+        if (playerArmor == null) return;
+        for (int i = 0; i < nAttires.Length; i++)
+        {
+            playerArmor.defaultAttires.Set(i, nAttires[i]);
+        }
+        playerArmor.init = true;
     }
 
     public void RandomizeSkinColor()
@@ -163,14 +265,24 @@ public class PlayerClothing : NetworkBehaviour
 
     void RenderClothing(Attire attire)
     {
-        if (attire.clothing == null) return;
-        attire.renderer.material.mainTexture = attire.clothing.texture;
+        Debug.Log("attire: " + attire.clothing + " body part: " + attire.bodyPart);
+        MeshFilter attireFilter = attire.renderer.transform.GetComponent<MeshFilter>();
+        if (attire.clothing == null)
+        {
+            if (attire.canNull)
+            {
+                Debug.Log("Body part being nulled: " + attire.bodyPart.ToString());
+                attireFilter.mesh = null;
+            }
+            return;
+        }
+        //attire.renderer.material.mainTexture = attire.clothing.texture;
         if (isMale)
         {
             if (attire.clothing.maleArmModel != null && HasInputAuthority) fps.ChangeArmMesh(attire.clothing.maleArmModel);
-            if (attire.renderer.transform.GetComponent<MeshFilter>() != null)
+            if (attireFilter != null)
             {
-                attire.renderer.transform.GetComponent<MeshFilter>().mesh = attire.clothing.maleModel;
+                attireFilter.mesh = attire.clothing.maleModel;
                 return;
             }
             ((SkinnedMeshRenderer)attire.renderer).sharedMesh = attire.clothing.maleModel;
@@ -178,9 +290,9 @@ public class PlayerClothing : NetworkBehaviour
         else
         {
             if (attire.clothing.femaleArmModel != null && HasInputAuthority) fps.ChangeArmMesh(attire.clothing.femaleArmModel);
-            if (attire.renderer.transform.GetComponent<MeshFilter>() != null)
+            if (attireFilter != null)
             {
-                attire.renderer.transform.GetComponent<MeshFilter>().mesh = attire.clothing.femaleModel;
+                attireFilter.mesh = attire.clothing.femaleModel;
                 return;
             }
             ((SkinnedMeshRenderer)attire.renderer).sharedMesh = attire.clothing.femaleModel;
@@ -194,6 +306,7 @@ public class PlayerClothing : NetworkBehaviour
 
     public void SetAllAttireMaterials(Material material)
     {
+        Debug.LogError("Setting attire materials");
         foreach (Attire attire in attires)
         {
             attire.renderer.material = material;
@@ -208,7 +321,9 @@ public class PlayerClothing : NetworkBehaviour
         public Renderer renderer;
         public Clothing clothing;
         public Clothing.BodyPart[] hiddenParts;
+        public bool canNull;
 
+        /**
         public Attire(Clothing.BodyPart bodyPart, Renderer renderer, Clothing clothing, Clothing.BodyPart[] hiddenParts)
         {
             this.bodyPart = bodyPart;
@@ -216,11 +331,13 @@ public class PlayerClothing : NetworkBehaviour
             this.clothing = clothing;
             this.hiddenParts = hiddenParts;
         }
+        **/
     }
 
     [System.Serializable]
     public struct RandomizedClothing
     {
+        public Clothing.BodyPart bodyPart;
         public Clothing[] clothings;
         [Range(0f, 1f)]
         public float nullChance;
