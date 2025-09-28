@@ -120,7 +120,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
                     ShowItem(items[equippedSlot].ToString());
                     break;
                 case nameof(items):
-                    if (HasInputAuthority) UpdateHotbarUI(true);
+                    if (HasInputAuthority) UpdateHotbarUI(false);
                     if (items[equippedSlot].ToString().IsNullOrEmpty())
                     {
                         HideItem();
@@ -188,7 +188,6 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         if (!uiSetup) return;
         for (int i = 0; i < hotbarLength; i++)
         {
-            SlotAnimUI sAnimUI = hotbarUI.GetChild(i).GetComponent<SlotAnimUI>();
             SlotUI slotUI = hotbarUI.GetChild(i).GetChild(0).GetComponent<SlotUI>();
             //Sets icons
             if (items[i].ToString().IsNullOrEmpty())
@@ -199,6 +198,7 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
             {
                 slotUI.SetIcon(itemManager.itemSearch[items[i].ToString()].icon);
             }
+            SlotAnimUI sAnimUI = hotbarUI.GetChild(i).GetComponent<SlotAnimUI>();
             if (doEquip) sAnimUI.SetEquipped(equippedSlot == i);
             //slotUI.SetEquipped(equippedSlot == i);
             /**

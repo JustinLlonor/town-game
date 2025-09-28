@@ -69,7 +69,6 @@ public class PlayerArmor : NetworkBehaviour
     /// <param name="armor"></param>
     private void SetArmor(Armor armor)
     {
-        Debug.LogError("setting armor");
         foreach (Clothing clothingObj in armor.clothing)
         {
             clothing.SetClothing(clothingObj.name);
