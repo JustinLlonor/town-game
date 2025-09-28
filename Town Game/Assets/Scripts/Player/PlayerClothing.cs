@@ -177,8 +177,6 @@ public class PlayerClothing : NetworkBehaviour
             i++;
         }
 
-        Debug.LogError("Setting " + i + " to " + defaultParts[i]);
-
         nAttires.Set(i, defaultParts[i]);
     }
 
@@ -265,13 +263,11 @@ public class PlayerClothing : NetworkBehaviour
 
     void RenderClothing(Attire attire)
     {
-        Debug.Log("attire: " + attire.clothing + " body part: " + attire.bodyPart);
         MeshFilter attireFilter = attire.renderer.transform.GetComponent<MeshFilter>();
         if (attire.clothing == null)
         {
             if (attire.canNull)
             {
-                Debug.Log("Body part being nulled: " + attire.bodyPart.ToString());
                 attireFilter.mesh = null;
             }
             return;

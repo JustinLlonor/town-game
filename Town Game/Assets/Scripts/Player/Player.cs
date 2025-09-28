@@ -20,13 +20,14 @@ public class Player : NetworkBehaviour
     [HideInInspector] public InteractableFinder inf;
     [HideInInspector] public ItemUse itemUse;
     [HideInInspector] public PlayerClothing playerClothing;
+    public Rigidbody rb;
     public PlayerGrab playerGrab;
     public PlayerProgress playerProgress;
     public PlayerRoom playerRoom;
     public Speaker speaker;
     public ControlPanel connectedPanel;
     public ControlPanel connectedClientPanel;
-    Transform playerGFX;
+    public Transform playerGFX;
     Transform cameraPosition;
     PlayerManager playerManager;
     VotingManager votingManager;
@@ -48,7 +49,6 @@ public class Player : NetworkBehaviour
     private void Awake()
     {
         playerManager = FindFirstObjectByType<PlayerManager>();
-        playerGFX = pm.graphics;
         cameraPosition = pm.cameraPosition;
     }
 

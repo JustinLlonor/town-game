@@ -56,7 +56,6 @@ public class PlayerArmor : NetworkBehaviour
     /// <param name="group"></param>
     private void SetDefaultClothing(ClothingGroup group)
     {
-        Debug.LogError("setting default");
         Clothing.BodyPart[] parts = group.GetBodyParts();
         foreach (Clothing.BodyPart part in parts)
         {
