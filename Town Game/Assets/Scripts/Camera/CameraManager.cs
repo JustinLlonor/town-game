@@ -9,6 +9,7 @@ public class CameraManager : MonoBehaviour
     public CameraMode mode;
     public Rigidbody trackedFPSRigidbody;
     public Transform trackedFPSTransform;
+    public CameraLevel trackedCamLevel;
     public Transform trackedCinematicTransform;
     public Transform trackedObservableTransform;
     public CameraMovement cm;
@@ -76,10 +77,12 @@ public class CameraManager : MonoBehaviour
     /// Sets the transform and rigidbody the camera is tracking during fps mode
     /// </summary>
     /// <param name="rb"></param>
-    public void SetTrackedFPS(Rigidbody rb, Transform cameraPosition)
+    public void SetTrackedFPS(Rigidbody rb, Transform trackedTransform, CameraLevel camLevel)
     {
         trackedFPSRigidbody = rb;
-        trackedFPSTransform = cameraPosition;
+        trackedFPSTransform = trackedTransform;
+        Debug.LogError(camLevel);
+        trackedCamLevel = camLevel;
     }
 
     public void SetTrackedCinematicTransform(Transform transform)
@@ -99,7 +102,7 @@ public class CameraManager : MonoBehaviour
         {
             if (trackedFPSRigidbody != null)
             {
-                transform.position = new Vector3(trackedFPSRigidbody.position.x, trackedFPSTransform.position.y, 
+                transform.position = new Vector3(trackedFPSRigidbody.position.x, trackedFPSRigidbody.position.y + trackedCamLevel.yLevel, 
                     trackedFPSRigidbody.position.z);
             }
         }

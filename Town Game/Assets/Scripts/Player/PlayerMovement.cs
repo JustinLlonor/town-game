@@ -70,6 +70,8 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
     public Transform crouchPos;
     public Transform orientation;
     public Transform itemComponentHolder;
+    // stores the level of the camera, to remove jitter. May want to rework this code so that there is no cameraposition dependency in player movement
+    public CameraLevel camLevel; 
 
     public MovementEvent OnLeap;
 
@@ -147,7 +149,8 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         cm.headAim = headAim;
         bobbing = playerManager.camBobbing;
         shake = playerManager.camShake;
-        playerManager.camTransform.GetComponent<CameraManager>().SetTrackedFPS(rb, cameraPosition);
+        camLevel = new CameraLevel(cameraPosition.localPosition.y, cameraPosition.localPosition.y);
+        playerManager.camTransform.GetComponent<CameraManager>().SetTrackedFPS(rb, cameraPosition, camLevel);
         InputManager inputManager = FindFirstObjectByType<InputManager>();
         inputManager.onMove += OnMove;
         inputManager.onSprint += OnSprint;
@@ -398,6 +401,11 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
         StartCoroutine(LifeTimer(newFrom.gameObject));
         float lerpTime = 0f;
         float lerpMax = crouchTime;
+        float camLevelStart = camLevel.yLevel;
+        float camLevelEnd;
+        if (to == standPos) camLevelEnd = standOffset.y;
+        else if (to == crouchPos) camLevelEnd = crouchOffset.y;
+        else camLevelEnd = to.localPosition.y;
         while (lerpTime < crouchTime)
         {
             yield return null;
@@ -407,8 +415,10 @@ public class PlayerMovement : NetworkBehaviour//PunCallbacks
             Vector3 newPosHolder = Vector3.Lerp(newFrom.position, rb.position + toRb, lerpPercent);
             cameraPosition.position = newPos;
             itemComponentHolder.position = newPosHolder;
+            camLevel.yLevel = Mathf.Lerp(camLevelStart, camLevelEnd, lerpPercent);
             lerpTime += Time.deltaTime;
         }
+        camLevel.yLevel = camLevelEnd;
         cameraPosition.position = to.position;
         itemComponentHolder.position = rb.position + toRb;
     }

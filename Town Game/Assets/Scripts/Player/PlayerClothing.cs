@@ -302,7 +302,6 @@ public class PlayerClothing : NetworkBehaviour
 
     public void SetAllAttireMaterials(Material material)
     {
-        Debug.LogError("Setting attire materials");
         foreach (Attire attire in attires)
         {
             attire.renderer.material = material;
