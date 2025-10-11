@@ -29,12 +29,13 @@ public class GizmoManager : MonoBehaviour
     [HideInInspector] public Transform camTransform;
     [HideInInspector] public bool gizmoEnabled = false;
     private GizmoSettings currentSettings;
-    private DeviceVolume currentDeviceVolume;
+    //private DeviceVolume currentDeviceVolume;
     private RunnerManager rm;
     private PositionManager positionManager;
     private bool graphicsShown = false;
     private bool unparentedGFX = false;
     private bool onSurface = false;
+    private bool isGrabbable = false;
     private Vector3 surfaceNormal = Vector3.zero;
 
     private struct GizmoPlacementInfo
@@ -43,13 +44,15 @@ public class GizmoManager : MonoBehaviour
         public Quaternion rotation;
         public bool gizmoOnSurface;
         public Vector3 surfaceNormal;
+        public bool surfaceIsGrabbable;
 
-        public GizmoPlacementInfo(Vector3 position, Quaternion rotation, bool gizmoOnSurface, Vector3 surfaceNormal)
+        public GizmoPlacementInfo(Vector3 position, Quaternion rotation, bool gizmoOnSurface, Vector3 surfaceNormal, bool surfaceIsGrabbable)
         {
             this.position = position;
             this.rotation = rotation;
             this.gizmoOnSurface = gizmoOnSurface;
             this.surfaceNormal = surfaceNormal;
+            this.surfaceIsGrabbable = surfaceIsGrabbable;
         }
     }
 
@@ -83,6 +86,7 @@ public class GizmoManager : MonoBehaviour
             float localCamY = rm.orientation;
             PlaceGraphics(Quaternion.Euler(localCamX, localCamY, 0f) * Vector3.forward);
         }
+        /**
         if (gizmoEnabled && currentSettings.gizmoMode == GizmoMode.Device)
         {
             if (attachedPlayer.connectedPanel == null)
@@ -94,6 +98,7 @@ public class GizmoManager : MonoBehaviour
                 currentDeviceVolume = attachedPlayer.connectedPanel.connectedVolume;
             }
         }
+        **/
     }
 
     public void EnterLookMode(Mesh gizmoMesh, GizmoSettings settings, bool showGraphics)
@@ -124,7 +129,7 @@ public class GizmoManager : MonoBehaviour
 
     public void ExitLookMode()
     {
-        currentDeviceVolume = null;
+        //currentDeviceVolume = null;
         gizmoEnabled = false;
         DisableGizmo();
     }
@@ -140,6 +145,7 @@ public class GizmoManager : MonoBehaviour
         transform.position = placementInfo.position;
         transform.rotation = placementInfo.rotation;
         onSurface = placementInfo.gizmoOnSurface;
+        isGrabbable = placementInfo.surfaceIsGrabbable;
         surfaceNormal = placementInfo.surfaceNormal;
         UpdateIndicator();
     }
@@ -203,6 +209,7 @@ public class GizmoManager : MonoBehaviour
                 Debug.DrawLine(transform.position, transform.position + hit.normal, Color.red);
             }
             output.gizmoOnSurface = true;
+            output.surfaceIsGrabbable = hit.collider.gameObject.tag == "Grabbable";
             return output;
         }
         output.position = camTransform.position + (direction.normalized * currentSettings.placementRange);
@@ -247,6 +254,8 @@ public class GizmoManager : MonoBehaviour
         if (gizmoCollider.ColliderTouchingEnvironment()) return false;
         // if not attached to a surface, then return false
         if (!onSurface) return false;
+        // if attached surface is a grabbable, then don't continue
+        if (isGrabbable) return false;
         // Surface normal angle check
         float normalAngle = Mathf.Acos(Mathf.Clamp(Vector3.Dot(surfaceNormal, Vector3.up), -1f, 1f)) * Mathf.Rad2Deg;
         if (!currentSettings.rotationSettings.surfaceRotationLimit.RotationWithinLimit(normalAngle)) return false;
@@ -260,11 +269,11 @@ public class GizmoManager : MonoBehaviour
             }
             else return false;
         }
-        else if (currentSettings.gizmoMode == GizmoMode.Device) // Device volume check
-        {
-            if (currentDeviceVolume == null) return false;
-            if (!gizmoCollider.ColliderInDeviceVolume(currentDeviceVolume.volumeCollider)) return false;
-        }
+        //else if (currentSettings.gizmoMode == GizmoMode.Device) // Device volume check
+        //{
+        //    if (currentDeviceVolume == null) return false;
+        //    if (!gizmoCollider.ColliderInDeviceVolume(currentDeviceVolume.volumeCollider)) return false;
+        //}
         return true;
     }
 

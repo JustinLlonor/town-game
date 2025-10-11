@@ -449,7 +449,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentRoom: {fileID: 0}
-  deviceVolumes: []
   deviceVolumeTag: Device Volume
   roomTag: Room
 --- !u!136 &9151465664628427954
@@ -596,8 +595,6 @@ MonoBehaviour:
   playerProgress: {fileID: 1280967711576261829}
   playerRoom: {fileID: 3246050477725740936}
   speaker: {fileID: 4245333172940040223}
-  connectedPanel: {fileID: 0}
-  connectedClientPanel: {fileID: 0}
   playerGFX: {fileID: 1342524613149204641}
   _camDirection: 0
   _camDirectionX: 0
@@ -1560,7 +1557,7 @@ MonoBehaviour:
   dropDistance: 4
   environmentMask:
     serializedVersion: 2
-    m_Bits: 8192
+    m_Bits: 8320
   surfaceTolerance: 0.95
   gizmoPrefab: {fileID: 4146309737813505359, guid: 811531e6281c5a747b50bf8f7426525f, type: 3}
   physItem:

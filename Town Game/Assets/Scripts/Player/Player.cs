@@ -25,8 +25,8 @@ public class Player : NetworkBehaviour
     public PlayerProgress playerProgress;
     public PlayerRoom playerRoom;
     public Speaker speaker;
-    public ControlPanel connectedPanel;
-    public ControlPanel connectedClientPanel;
+    //public ControlPanel connectedPanel;
+    //public ControlPanel connectedClientPanel;
     public Transform playerGFX;
     Transform cameraPosition;
     PlayerManager playerManager;

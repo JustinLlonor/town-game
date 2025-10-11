@@ -6,7 +6,7 @@ using Fusion;
 public class PlayerRoom : NetworkBehaviour
 {
     public MapRoom currentRoom;
-    public List<DeviceVolume> deviceVolumes = new List<DeviceVolume>();
+    //public List<DeviceVolume> deviceVolumes = new List<DeviceVolume>();
     public string deviceVolumeTag;
     public string roomTag;
     public EnterRoom OnEnterRoom;
@@ -38,7 +38,7 @@ public class PlayerRoom : NetworkBehaviour
         if (Runner == null) return;
         if (!Runner.IsServer) return;
         if (other.gameObject.tag != deviceVolumeTag) return;
-        other.GetComponent<DeviceVolume>().OnPlayerEnter(player);
+        //other.GetComponent<DeviceVolume>().OnPlayerEnter(player);
     }
 
     private void DVExitCheck(Collider other)
@@ -46,7 +46,7 @@ public class PlayerRoom : NetworkBehaviour
         if (Runner == null) return;
         if (!Runner.IsServer) return;
         if (other.gameObject.tag != deviceVolumeTag) return;
-        other.GetComponent<DeviceVolume>().OnPlayerExit(player);
+        //other.GetComponent<DeviceVolume>().OnPlayerExit(player);
     }
 
     private void RoomEnterCheck(Collider other)

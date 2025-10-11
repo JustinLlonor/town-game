@@ -19265,9 +19265,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _HP: 0
   room: {fileID: 8319684603829213906}
-  connectedPlayers: []
-  connectedVolume: {fileID: 981082589}
-  interactable: {fileID: 1600950690}
 --- !u!114 &822062818
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58017,35 +58014,35 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 878983568128443568, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
       propertyPath: _itemName._length
-      value: 7
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 878983568128443568, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
       propertyPath: '_itemName._data.Data.Array.data[0]'
-      value: 71
+      value: 67
       objectReference: {fileID: 0}
     - target: {fileID: 878983568128443568, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
       propertyPath: '_itemName._data.Data.Array.data[1]'
-      value: 108
-      objectReference: {fileID: 0}
-    - target: {fileID: 878983568128443568, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
-      propertyPath: '_itemName._data.Data.Array.data[2]'
       value: 97
       objectReference: {fileID: 0}
     - target: {fileID: 878983568128443568, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: '_itemName._data.Data.Array.data[2]'
+      value: 109
+      objectReference: {fileID: 0}
+    - target: {fileID: 878983568128443568, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
       propertyPath: '_itemName._data.Data.Array.data[3]'
-      value: 115
-      objectReference: {fileID: 0}
-    - target: {fileID: 878983568128443568, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
-      propertyPath: '_itemName._data.Data.Array.data[4]'
-      value: 115
-      objectReference: {fileID: 0}
-    - target: {fileID: 878983568128443568, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
-      propertyPath: '_itemName._data.Data.Array.data[5]'
       value: 101
       objectReference: {fileID: 0}
     - target: {fileID: 878983568128443568, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: '_itemName._data.Data.Array.data[4]'
+      value: 114
+      objectReference: {fileID: 0}
+    - target: {fileID: 878983568128443568, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
+      propertyPath: '_itemName._data.Data.Array.data[5]'
+      value: 97
+      objectReference: {fileID: 0}
+    - target: {fileID: 878983568128443568, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
       propertyPath: '_itemName._data.Data.Array.data[6]'
-      value: 115
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 878983568128443568, guid: ed8544e501428ac408be6a749e03b2d4, type: 3}
       propertyPath: '_itemName._data.Data.Array.data[7]'

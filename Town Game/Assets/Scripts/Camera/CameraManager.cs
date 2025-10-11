@@ -81,7 +81,6 @@ public class CameraManager : MonoBehaviour
     {
         trackedFPSRigidbody = rb;
         trackedFPSTransform = trackedTransform;
-        Debug.LogError(camLevel);
         trackedCamLevel = camLevel;
     }
 

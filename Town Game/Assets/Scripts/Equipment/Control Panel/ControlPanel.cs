@@ -9,6 +9,7 @@ using UnityEngine;
 /// </summary>
 public class ControlPanel : Equipment
 {
+    /**
     public List<PlayerRef> connectedPlayers;
     public DeviceVolume connectedVolume;
     public Interactable interactable;
@@ -245,4 +246,5 @@ public class ControlPanel : Equipment
         }
         SetConnect();
     }
+    **/
 }

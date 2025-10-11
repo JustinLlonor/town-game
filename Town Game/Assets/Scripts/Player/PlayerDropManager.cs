@@ -193,7 +193,7 @@ public class PlayerDropManager : NetworkBehaviour
         }
         else if (placeInfo.mode == GizmoMode.Device)
         {
-            PlaceDevice(placeInfo.position, placeInfo.rotation, player.connectedPanel.connectedVolume);
+            PlaceDevice(placeInfo.position, placeInfo.rotation);
         }
         // Play an error sfx
     }
@@ -219,7 +219,7 @@ public class PlayerDropManager : NetworkBehaviour
         //RemoveItem(hotbar[equippedSlot].ToString(), equippedSlot);
     }
 
-    private void PlaceDevice(Vector3 position, Quaternion rotation, DeviceVolume deviceVolume)
+    private void PlaceDevice(Vector3 position, Quaternion rotation)
     {
         Item item = GetCurrentItem();
         if (item == null) return;
@@ -231,7 +231,7 @@ public class PlayerDropManager : NetworkBehaviour
         // Device spawning
         Device device = (Device)item;
         NetworkObject deviceObject = Runner.Spawn(device.devicePrefab, position, rotation);
-        deviceVolume.AddDevice(deviceObject);
+        //deviceVolume.AddDevice(deviceObject);
 
         inventory.RemoveItem(inventory.equippedSlot);
     }
