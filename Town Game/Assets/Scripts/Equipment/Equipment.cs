@@ -5,6 +5,8 @@ using Fusion;
 
 public class Equipment : NetworkBehaviour
 {
-    [Networked] public float HP { get; set; }
-    public MapRoom room;
+    [Tooltip("The power consumption of this piece of equipment in kWh. " +
+        "If this is less than or equal to zero, this equipment will not require an outlet.")]
+    [Networked] public float energyConsumption { get; set; }
+    [Networked] public NetworkBool powered { get; set; }
 }
