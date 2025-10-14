@@ -26,7 +26,7 @@ public class Outlet : NetworkBehaviour
             throw new InvalidOperationException("This method can only be called on the server.");
         if (IsFull()) return false; // returns if outlet is full
         equipments.Add(equipment.Id);
-        breaker.AddEquipmentToPriority(this, equipment);
+        breaker.AddEquipmentToPoweredList(this, equipment);
         return true;
     }
 
@@ -35,7 +35,7 @@ public class Outlet : NetworkBehaviour
         NetworkBehaviourId eId = equipment.Id;
         if (!equipments.Contains(eId)) return false;
         equipments.Remove(eId);
-        breaker.RemoveEquipmentFromPriority(eId);
+        breaker.RemoveEquipmentFromPoweredList(eId);
         return true;
     }
 }
