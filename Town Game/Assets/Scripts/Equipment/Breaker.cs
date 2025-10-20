@@ -54,14 +54,131 @@ public class Breaker : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Sets the power reception of this breaker.
+    /// </summary>
+    /// <param name="newPower"></param>
+    public void SetPowerReception(float newPower)
+    {
+        powerReception = newPower;
+        UpdateEquipmentPowered();
+    }
+
+    /// <summary>
+    /// Updates the powered state of connected equipment depending on the value of this breaker's power reception
+    /// </summary>
+    private void UpdateEquipmentPowered()
+    {
+        int poweredIndex = 0;
+        float remainingPower = powerReception;
+        // Sets equipment to powered
+        while (remainingPower > 0f && poweredIndex < equipmentPowerPriority.Count)
+        {
+            Equipment foundEquipment = GetEquipmentFromRef(equipmentPowerPriority[poweredIndex]);
+            remainingPower -= foundEquipment.energyConsumption;
+            foundEquipment.powered = true;
+            poweredIndex++;
+        }
+        // Depowers remaining equipment
+        while (poweredIndex < equipmentPowerPriority.Count)
+        {
+            Equipment foundEquipment = GetEquipmentFromRef(equipmentPowerPriority[poweredIndex]);
+            foundEquipment.powered = false;
+            poweredIndex++;
+        }
+    }
+
+    /// <summary>
+    /// Swaps two groups. Make this function have a cooldown, since it's pretty expensive
+    /// </summary>
+    /// <param name="groupIndex1"></param>
+    /// <param name="groupIndex2"></param>
     public void SwapGroups(int groupIndex1, int groupIndex2)
     {
         if (groupIndex1 == 0 || groupIndex2 == 0) return; // Can't swap with groupless group
+        int groupCount1 = GetGroupCount(groupIndex1);
+        int groupCount2 = GetGroupCount(groupIndex2);
+        if (groupCount1 == -1 || groupCount2 == -1) return;
+        // Set biggerStartIndex to the start index of the group that has more items, and smaller to be the other.
+        int biggerStartIndex;
+        int smallerStartIndex;
+        int smallerCount;
+        int biggerCount;
+        int smallerGroupIndex;
+        if (groupCount1 > groupCount2)
+        {
+            biggerStartIndex = GetPowerPriorityStartIndex(groupIndex1);
+            smallerStartIndex = GetPowerPriorityStartIndex(groupIndex2);
+            biggerCount = groupCount1;
+            smallerCount = groupCount2;
+            smallerGroupIndex = groupIndex2;
+        }
+        else
+        {
+            biggerStartIndex = GetPowerPriorityStartIndex(groupIndex2);
+            smallerStartIndex = GetPowerPriorityStartIndex(groupIndex1);
+            biggerCount = groupCount2;
+            smallerCount = groupCount1;
+            smallerGroupIndex = groupIndex1;
+        }
+        // Iterate over the overlap between the smaller group and bigger group
+        for (int i = 0; i < smallerCount; i++)
+        {
+            // The indices to swap
+            int sIndex = smallerStartIndex + i;
+            int bIndex = biggerStartIndex + i;
+            // swap
+            NetworkBehaviourId smallerBehaviour = equipmentPowerPriority.Get(sIndex);
+            equipmentPowerPriority.Set(sIndex, equipmentPowerPriority.Get(bIndex));
+            equipmentPowerPriority.Set(bIndex, smallerBehaviour);
+        }
+        // Get leftover elements to insert in the bigger list
+        List<NetworkBehaviourId> insertedBehaviours = new List<NetworkBehaviourId>();
+        for (int i = smallerCount; i < biggerCount; i++)
+        {
+            int bIndex = biggerStartIndex + i;
+            insertedBehaviours.Add(equipmentPowerPriority.Get(bIndex));
+        }
+        // remove all leftover elements
+        foreach (NetworkBehaviourId behaviour in insertedBehaviours)
+        {
+            equipmentPowerPriority.Remove(behaviour);
+        }
+        // Insert the remaining to the end of the smaller group
+        int insertionIndex = GetPowerPriorityStartIndex(smallerGroupIndex) + smallerCount;
+        for (int i = insertedBehaviours.Count - 1; i >= 0; i--)
+        {
+            InsertIntoPriority(insertionIndex, insertedBehaviours[i]);
+        }
+        // Swap the groups in group order
+        int group1OrderIndex = GetGroupOrderIndex(groupIndex1);
+        int group2OrderIndex = GetGroupOrderIndex(groupIndex2);
+        Vector2Int group1Value = groupOrder.Get(group1OrderIndex);
+        groupOrder.Set(group1OrderIndex, groupOrder.Get(group2OrderIndex));
+        groupOrder.Set(group2OrderIndex, group1Value);
     }
 
-    public void SwapEquipment(int groupId, int localIndex1, int localIndex2)
+    /// <summary>
+    /// Swaps two equipment in the power priority list
+    /// </summary>
+    /// <param name="groupIndex"></param>
+    /// <param name="localIndex1"></param>
+    /// <param name="localIndex2"></param>
+    public void SwapEquipment(int groupIndex, int localIndex1, int localIndex2)
     {
-
+        int groupLength = GetGroupCount(groupIndex);
+        if (groupLength == -1)
+            throw new ArgumentException("Group index does not exist");
+        if (localIndex1 >= groupLength || localIndex2 >= groupLength) 
+            throw new ArgumentOutOfRangeException("Local index out of range of group");
+        // get swap indices
+        int startIndex = GetPowerPriorityStartIndex(groupIndex);
+        int swap1 = startIndex + localIndex1;
+        int swap2 = startIndex + localIndex2;
+        // perform the swap
+        NetworkBehaviourId value1 = equipmentPowerPriority.Get(swap1);
+        equipmentPowerPriority.Set(swap1, equipmentPowerPriority.Get(swap2));
+        equipmentPowerPriority.Set(swap2, value1);
     }
 
     /// <summary>
@@ -129,36 +246,6 @@ public class Breaker : NetworkBehaviour
         return -1;
     }
 
-    public void SetPowerReception(float newPower)
-    {
-        powerReception = newPower;
-        UpdateEquipmentPowered();
-    }
-
-    /// <summary>
-    /// Updates the powered state of connected equipment depending on the value of this breaker's power reception
-    /// </summary>
-    private void UpdateEquipmentPowered()
-    {
-        int poweredIndex = 0;
-        float remainingPower = powerReception;
-        // Sets equipment to powered
-        while (remainingPower > 0f && poweredIndex < equipmentPowerPriority.Count)
-        {
-            Equipment foundEquipment = GetEquipmentFromRef(equipmentPowerPriority[poweredIndex]);
-            remainingPower -= foundEquipment.energyConsumption;
-            foundEquipment.powered = true;
-            poweredIndex++;
-        }
-        // Depowers remaining equipment
-        while (poweredIndex < equipmentPowerPriority.Count)
-        {
-            Equipment foundEquipment = GetEquipmentFromRef(equipmentPowerPriority[poweredIndex]);
-            foundEquipment.powered = false;
-            poweredIndex++;
-        }
-    }
-
     /// <summary>
     /// Gets equipment object from the ref
     /// </summary>
@@ -209,6 +296,45 @@ public class Breaker : NetworkBehaviour
             }
         }
         return returnIndex;
+    }
+
+    /// <summary>
+    /// Gets the first index in a group within the power priority list
+    /// </summary>
+    /// <param name="groupIndex"></param>
+    /// <returns></returns>
+    private int GetPowerPriorityStartIndex(int groupIndex)
+    {
+        int returnIndex = 0;
+        for (int i = 0; i < groupOrder.Count; i++)
+        {
+            if (groupOrder[i].x == groupIndex) break;
+            returnIndex += groupOrder[i].y;
+        }
+        return returnIndex;
+    }
+
+    /// <summary>
+    /// Gets the number of items in a certain group index
+    /// </summary>
+    /// <param name="groupIndex"></param>
+    /// <returns></returns>
+    private int GetGroupCount(int groupIndex)
+    {
+        for (int i = 0; i < groupOrder.Count; i++)
+        {
+            if (groupOrder[i].x == groupIndex) return groupOrder[i].y;
+        }
+        return -1;
+    }
+
+    private int GetGroupOrderIndex(int groupIndex)
+    {
+        for (int i = 0; i < groupOrder.Count; i++)
+        {
+            if (groupOrder[i].x == groupIndex) return i;
+        }
+        return -1;
     }
 
     /// <summary>
