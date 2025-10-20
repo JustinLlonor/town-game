@@ -11,7 +11,6 @@ public class Breaker : NetworkBehaviour
     /// The amount of power this breaker receives. Set this with the SetPowerReception function.
     /// </summary>
     [Networked] public float powerReception { get; set; }
-    public Outlet[] outlets;
     /// <summary>
     /// Defines the priority that each equipment holds. Higher priorities get power first.
     /// The x value is the outlet index, the y value is the equipment index.
@@ -25,6 +24,7 @@ public class Breaker : NetworkBehaviour
     /// All outlet groups must have the groupless group by default
     /// </summary>
     public OutletGroup[] outletGroups = new OutletGroup[] { new OutletGroup("Groupless", new List<Outlet>()) };
+    private List<Outlet> outlets;
 
     [System.Serializable]
     public class OutletGroup
@@ -42,15 +42,15 @@ public class Breaker : NetworkBehaviour
     public override void Spawned()
     {
         if (outletGroups[0].name != "Groupless") Debug.LogError("Groupless outlet group does not exist on this object!");
-        foreach (Outlet outlet in outlets)
-        {
-            outlet.breaker = this;
-        }
         int i = 0;
         foreach (OutletGroup group in outletGroups)
         {
             groupOrder.Add(new Vector2Int(i, group.outlets.Count));
             i++;
+        }
+        foreach (OutletGroup group in outletGroups)
+        {
+            outlets.AddRange(group.outlets);
         }
     }
 

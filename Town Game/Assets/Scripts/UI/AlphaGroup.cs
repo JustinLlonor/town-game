@@ -55,11 +55,9 @@ public class AlphaGroup : MonoBehaviour
     public void SetAlphaPercent(float percent)
     {
         if (!useOriginalAlpha) return;
-        Debug.Log("setting alpha percent");
         foreach (MaskableGraphic graphic in graphics)
         {
             if (!originalAlpha.ContainsKey(graphic)) continue;
-            Debug.Log("setting");
             float newAlpha = percent * originalAlpha[graphic];
             graphic.color = new Color(graphic.color.r, graphic.color.g, graphic.color.b, newAlpha);
         }

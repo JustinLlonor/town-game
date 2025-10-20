@@ -7,7 +7,7 @@ using UnityEngine;
 public class Outlet : NetworkBehaviour
 {
     [Networked, Capacity(2)] public NetworkLinkedList<NetworkBehaviourId> equipments => default;
-    [HideInInspector] public Breaker breaker;
+    public Breaker breaker;
 
     public bool IsFull()
     {
