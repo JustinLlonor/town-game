@@ -209,7 +209,7 @@ public class GameManager : NetworkBehaviour
         if (!Runner.IsServer) return;
         //if (Input.GetKeyDown(KeyCode.Backspace)) SetTime(testTime.x, testTime.y);
         PhaseProperties();
-        //CheckNightSkip();
+        CheckNightSkip();
         CheckNightTimer();
     }
 
