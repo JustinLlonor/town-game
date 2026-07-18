@@ -76,6 +76,11 @@ public class PositionManager : NetworkBehaviour
         AddPlayerToBranch(player, branch);
     }
 
+    /// <summary>
+    /// Adds a player to a branch with index
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="branchIndex"></param>
     public void AddPlayerToBranch(PlayerRef player, int branchIndex)
     {
         Branch branch = GetBranchFromIndex(branchIndex);
@@ -83,6 +88,11 @@ public class PositionManager : NetworkBehaviour
         AddPlayerToBranch(player, branch);
     }
 
+    /// <summary>
+    /// Adds a player to a branch with the branch object
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="branch"></param>
     public void AddPlayerToBranch(PlayerRef player, Branch branch)
     {
         int branchIndex = Array.IndexOf(branches, branch);

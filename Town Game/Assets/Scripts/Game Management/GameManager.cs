@@ -75,10 +75,15 @@ public class GameManager : NetworkBehaviour
     public GameEvent OnDayStart;
     public GameEvent OnTimeStop;
     public GameEvent OnTimeResume;
+    /// <summary>
+    /// Called when a player is removed, either by elimination or by leaving
+    /// </summary>
+    public PlayerEvent onPlayerRemove;
     public Timer onUpdateNightTimer;
     public delegate void GameEvent();
     public delegate void RevealRoles(bool isCultist);
     public delegate void Timer(float timer);
+    public delegate void PlayerEvent(PlayerRef player);
     [Networked] public TickTimer nightTimer { get; set; }
     public bool init = false;
     public static GameManager i;
@@ -130,6 +135,7 @@ public class GameManager : NetworkBehaviour
     void RemoveAlivePlayer(PlayerRef player)
     {
         alivePlayers.Remove(player);
+        onPlayerRemove?.Invoke(player);
     }
 
     public override void Spawned()

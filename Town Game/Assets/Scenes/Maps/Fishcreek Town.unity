@@ -7694,7 +7694,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh229466
+  m_Name: pb_Mesh35610
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -38241,6 +38241,93 @@ Transform:
   m_Father: {fileID: 833409270}
   m_RootOrder: -2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1492774286
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1492774287}
+  - component: {fileID: 1492774288}
+  m_Layer: 0
+  m_Name: Job/Branch Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1492774287
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1492774286}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2033324895}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1492774288
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1492774286}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 298b58fef484d9d44a6eaaeb718d181d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  branches:
+  - name: Town Hall
+    description: 
+    icon: {fileID: 0}
+    color: {r: 0.61209506, g: 0.990566, b: 0.690578, a: 1}
+    category: 2
+    positionNames:
+    - Town Hall Manager
+    - Town Hall Supervisor
+    - Town Hall Worker
+    positionLimits:
+    - 1
+    - 2
+    - -1
+    jobHandler: {fileID: 0}
+  - name: Security
+    description: 
+    icon: {fileID: 0}
+    color: {r: 0.6117647, g: 0.83508587, b: 0.99215686, a: 1}
+    category: 4
+    positionNames:
+    - Chief of Security
+    - Assistant Chief
+    - Security Worker
+    positionLimits:
+    - 1
+    - 2
+    - -1
+    jobHandler: {fileID: 0}
+  - name: Electricity
+    description: 
+    icon: {fileID: 0}
+    color: {r: 0.99215686, g: 0.7981002, b: 0.6117647, a: 1}
+    category: 3
+    positionNames:
+    - Hydro Plant Manager
+    - Assistant Plant Manager
+    - Plant Worker
+    positionLimits:
+    - 1
+    - 2
+    - -1
+    jobHandler: {fileID: 0}
 --- !u!1 &1493229483
 GameObject:
   m_ObjectHideFlags: 0
@@ -56610,6 +56697,11 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2016674593}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &2033324895 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 466519801941495353, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+  m_PrefabInstance: {fileID: 110649284601070364}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2034494698
 GameObject:
   m_ObjectHideFlags: 0
@@ -57846,7 +57938,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh230488
+  m_Name: pb_Mesh36632
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -58183,7 +58275,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh230278
+  m_Name: pb_Mesh36422
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -59751,7 +59843,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7710707397463329135, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: NetworkedBehaviours.Array.size
-      value: 12
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: 7710707397463329135, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[3]'
@@ -59792,7 +59884,7 @@ PrefabInstance:
     - target: {fileID: 7710707397463329135, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: 'NetworkedBehaviours.Array.data[12]'
       value: 
-      objectReference: {fileID: 1979411233}
+      objectReference: {fileID: 1492774288}
     - target: {fileID: 8939135918072450520, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       propertyPath: sceneViewId
       value: 8
@@ -59802,7 +59894,10 @@ PrefabInstance:
     - {fileID: 0}
     - {fileID: 0}
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 466519801941495353, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1492774287}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5129982233875511372, guid: 4df89e93fffd90748bfe2ecb87ff0963, type: 3}
       insertIndex: -1
