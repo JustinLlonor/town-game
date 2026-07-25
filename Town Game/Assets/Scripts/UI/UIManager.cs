@@ -56,6 +56,8 @@ public class UIManager : MonoBehaviour
         if (pui != null) pui.Init();
         foreach (var menu in uiMenus) menu.SetActive(false);
         pm.onInstantiatePlayer += InstantiatePlayer;
+        // Adds the device to player menu UI
+        pm.onDeviceAdd += mapMenuUI.AddDeviceButton;
     }
 
     private void InstantiatePlayer(GameObject playerObject)

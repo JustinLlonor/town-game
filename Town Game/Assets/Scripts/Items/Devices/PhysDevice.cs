@@ -12,8 +12,6 @@ public class PhysDevice : NetworkBehaviour
     public bool takesInput = false;
     [Networked, Capacity(15)] public NetworkDictionary<PlayerRef, NetworkId> playerInputs => default;
     public NetworkPrefabRef deviceInputPrefab;
-    [Tooltip("If this property is not null, then the game automatically adds this device to the specified volume")]
-    //public DeviceVolume defaultVolume;
 
     public override void Spawned()
     {

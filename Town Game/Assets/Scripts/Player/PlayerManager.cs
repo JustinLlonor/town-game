@@ -47,8 +47,13 @@ public class PlayerManager : NetworkBehaviour
     /// Called when this client's player is destroyed
     /// </summary>
     public PlayerEvent onDestroyPlayer; // NOT PROGRAMMED YET, ATTACH TO OnDespawn
+    /// <summary>
+    /// Called when this client's player has a new device added
+    /// </summary>
+    public DeviceEvent onDeviceAdd;
     public delegate void InstantiatePlayer(GameObject player);
     public delegate void PlayerEvent();
+    public delegate void DeviceEvent(PhysDevice device);
 
     private NetworkRunner networkRunner;
 
@@ -406,6 +411,12 @@ public class PlayerManager : NetworkBehaviour
         return -1;
     }
 
+    public NetworkLinkedList<NetworkId>? GetDevices(PlayerRef player)
+    {
+        if (properties.ContainsKey(player)) return GetPlayerPropertyHolder(properties[player]).devices;
+        return null;
+    }
+
     public void SetNickname(PlayerRef player, string name)
     {
         if (properties.ContainsKey(player)) GetPlayerPropertyHolder(properties[player]).nickname = name;
@@ -485,6 +496,46 @@ public class PlayerManager : NetworkBehaviour
     public bool PlayerHasKey(PlayerRef player, int key)
     {
         return GetPlayerPropertyHolder(properties[player]).keys.Contains(key);
+    }
+
+    /// <summary>
+    /// Adds device ownership to a player, and sets up device input
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="device"></param>
+    public void AddDevice(PlayerRef player, NetworkId deviceId)
+    {
+        PlayerPropertyHolder pHolder = GetPlayerPropertyHolder(properties[player]);
+        NetworkObject deviceObject = Runner.FindObject(deviceId);
+        PhysDevice physDevice = deviceObject.GetComponent<PhysDevice>();
+        physDevice.AddPlayerInput(player);
+        if (!pHolder.devices.Contains(deviceId)) pHolder.devices.Add(deviceId);
+        RPC_SendDevice(player, deviceId);
+    }
+
+    /// <summary>
+    /// (NOT IMPLEMENTED YET) Remove device ownership from a player
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="device"></param>
+    public void RemoveDevice(PlayerRef player, NetworkId device)
+    {
+
+    }
+
+    /// <summary>
+    /// Sends the information that a new device was added to the player
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="deviceId"></param>
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_SendDevice([RpcTarget] PlayerRef player, NetworkId deviceId)
+    {
+        NetworkObject deviceObject = null; 
+        Runner.TryFindObject(deviceId, out deviceObject);
+        if (deviceObject == null) return;
+        PhysDevice physDevice = deviceObject.GetComponent<PhysDevice>();
+        onDeviceAdd?.Invoke(physDevice);
     }
 
     public void SetEnergy(PlayerRef player, int energy)

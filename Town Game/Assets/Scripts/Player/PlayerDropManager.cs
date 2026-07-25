@@ -231,8 +231,8 @@ public class PlayerDropManager : NetworkBehaviour
         // Device spawning
         Device device = (Device)item;
         NetworkObject deviceObject = Runner.Spawn(device.devicePrefab, position, rotation);
+        PlayerManager.i.AddDevice(player.owner, deviceObject);
         //deviceVolume.AddDevice(deviceObject);
-
         inventory.RemoveItem(inventory.equippedSlot);
     }
 
