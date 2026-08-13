@@ -583,6 +583,10 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         itemData.Set(itemIndex, new ItemData());
     }
 
+    /// <summary>
+    /// Gets the held item of this player
+    /// </summary>
+    /// <returns></returns>
     public Item GetHeldItem()
     {
         string itemName = items[equippedSlot].ToString();
@@ -590,9 +594,43 @@ public class PlayerInventory : NetworkBehaviour//PunCallbacks, IPunObservable
         return ObjectManager.i.itemSearch[itemName];
     }
 
+    /// <summary>
+    /// Gets the held item data of this player
+    /// </summary>
+    /// <returns></returns>
     public ItemData GetHeldItemData()
     {
         return itemData[equippedSlot];
+    }
+
+    /// <summary>
+    /// Gets the item types of every slot in the player's inventory
+    /// </summary>
+    /// <returns></returns>
+    public Item[] GetInventory()
+    {
+        Item[] output = new Item[items.Count];
+        for (int i = 0; i < output.Length; i++)
+        {
+            string itemName = items[equippedSlot].ToString();
+            if (itemName.IsNullOrEmpty()) continue;
+            output[i] = ObjectManager.i.itemSearch[itemName];
+        }
+        return output;
+    }
+
+    /// <summary>
+    /// Gets the item data of every slot in the player's inventory
+    /// </summary>
+    /// <returns></returns>
+    public ItemData[] GetInventoryItemData()
+    {
+        ItemData[] output = new ItemData[itemData.Count];
+        for (int i = 0; i < output.Length; i++)
+        {
+            output[i] = itemData.Get(i);
+        }
+        return output;
     }
 
     /// <summary>

@@ -14,8 +14,8 @@ public class Player : NetworkBehaviour
     public PlayerEvent Init;
     public LayerMask glitchLayer;
     public GameObject serverItem;
-    [HideInInspector] public PlayerMovement pm;
-    [HideInInspector] public PlayerInventory pi;
+    [HideInInspector] public PlayerMovement playerMovement;
+    [HideInInspector] public PlayerInventory playerInventory;
     [HideInInspector] public PlayerDropManager dropManager;
     [HideInInspector] public InteractableFinder inf;
     [HideInInspector] public ItemUse itemUse;
@@ -49,7 +49,7 @@ public class Player : NetworkBehaviour
     private void Awake()
     {
         playerManager = FindFirstObjectByType<PlayerManager>();
-        cameraPosition = pm.cameraPosition;
+        cameraPosition = playerMovement.cameraPosition;
     }
 
     private void Start()
@@ -82,12 +82,12 @@ public class Player : NetworkBehaviour
     {
         if (GetInput(out NetworkInputData data))
         {
-            pm.horizontalMovement = data.direction.X; // Horizontal and vertical movement inputs
-            pm.verticalMovement = data.direction.Y;
+            playerMovement.horizontalMovement = data.direction.X; // Horizontal and vertical movement inputs
+            playerMovement.verticalMovement = data.direction.Y;
             if (!HasInputAuthority) // Syncs player rotation, rotates player models
             {
                 playerGFX.rotation = Quaternion.Euler(0f, data.camDirection, 0f);
-                pm.orientation.rotation = Quaternion.Euler(0f, data.camDirection, 0f); // Orientation transform points toward the direction the player moves in
+                playerMovement.orientation.rotation = Quaternion.Euler(0f, data.camDirection, 0f); // Orientation transform points toward the direction the player moves in
                 cameraPosition.rotation = Quaternion.Euler(camDirectionX, camDirection, 0f);
             }
             if (HasStateAuthority) // Sets properties
@@ -99,10 +99,10 @@ public class Player : NetworkBehaviour
             // Player movement
             if (data.buttons.IsSet(NetworkInputData.Buttons.Jump))
             {
-                pm.Jump();
+                playerMovement.Jump();
             }
             CrouchSet(data.buttons.IsSet(NetworkInputData.Buttons.Crouch)); // Crouching stuff, executes functions on first press
-            pm.sprintPressed = data.buttons.IsSet(NetworkInputData.Buttons.Sprint);
+            playerMovement.sprintPressed = data.buttons.IsSet(NetworkInputData.Buttons.Sprint);
             // Player inventory
             if (!(data.hotbarKey <= 0))
             {
@@ -129,7 +129,7 @@ public class Player : NetworkBehaviour
                 // State change detector
                 bool usePrimary = data.itemUsePrimary;
                 bool useSecondary = data.itemUseSecondary;
-                string equippedItemName = pi.items[pi.equippedSlot].ToString();
+                string equippedItemName = playerInventory.items[playerInventory.equippedSlot].ToString();
                 bool handEmpty = equippedItemName.IsNullOrEmpty();
                 if (dropManager.currentPlacementMode == GizmoMode.Item)
                 {
@@ -314,34 +314,34 @@ public class Player : NetworkBehaviour
 
     void CrouchSet(bool crouchPressed)
     {
-        if (!crouchPressed) pm.ExitCrouch();
+        if (!crouchPressed) playerMovement.ExitCrouch();
         if (crouchPressed == previousCrouchSet) return; // If they don't need to change, return
         previousCrouchSet = crouchPressed;
         if (crouchPressed)
         {
-            pm.EnterCrouch();
+            playerMovement.EnterCrouch();
         }
     }
 
     private void PlayerInventory(int slot)
     {
-        if (!pi.canSwitchSlots) return; // If can't switch slots, return
-        if (!pi.items[pi.equippedSlot].ToString().IsNullOrEmpty())
+        if (!playerInventory.canSwitchSlots) return; // If can't switch slots, return
+        if (!playerInventory.items[playerInventory.equippedSlot].ToString().IsNullOrEmpty())
         {
             // if (pi.equippedItem.large) return; Do later, if the equipped item is large then return
         }
-        pi.EquipItem(slot - 1);
-        if (HasInputAuthority) pi.UpdateHotbarUI();
+        playerInventory.EquipItem(slot - 1);
+        if (HasInputAuthority) playerInventory.UpdateHotbarUI();
     }
 
     private void Simulate()
     {
-        pm.SetIsMoving();
-        pm.Inputs();
-        pm.MovePlayer();
-        pm.CapAirVelocity();
-        pm.StepClimb();
-        pm.GroundSim();
+        playerMovement.SetIsMoving();
+        playerMovement.Inputs();
+        playerMovement.MovePlayer();
+        playerMovement.CapAirVelocity();
+        playerMovement.StepClimb();
+        playerMovement.GroundSim();
     }
 
     //Prediction for the player movement, executed on proxies
@@ -349,7 +349,7 @@ public class Player : NetworkBehaviour
     {
         playerGFX.rotation = Quaternion.Euler(0f, camDirection, 0f);
         cameraPosition.rotation = Quaternion.Euler(camDirectionX, camDirection, 0f);
-        pm.SetDirection(direction);
+        playerMovement.SetDirection(direction);
     }
 
     public void EnableUIFront()
