@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
+using Palmmedia.ReportGenerator.Core.Parser.Analysis;
 
 public class JobManager : NetworkBehaviour
 {
@@ -47,7 +48,7 @@ public class JobManager : NetworkBehaviour
     }
 
     /// <summary>
-    /// Sets the branch of the player
+    /// Sets the branch of the player, and resets position and performance
     /// </summary>
     /// <param name="player"></param>
     /// <param name="branch"></param>
@@ -59,6 +60,10 @@ public class JobManager : NetworkBehaviour
             return;
         }
         playerBranches.Set(player, branch);
+        // Set performance to lowest possible
+        SetPerformance(player, 0);
+        // Set position to lowest possible
+        SetPosition(player, branches[branch].GetLowestPosition());
     }
 
     /// <summary>
@@ -70,6 +75,11 @@ public class JobManager : NetworkBehaviour
         if (playerBranches.ContainsKey(player)) playerBranches.Remove(player);
     }
 
+    /// <summary>
+    /// Gets a player's position
+    /// </summary>
+    /// <param name="player"></param>
+    /// <returns></returns>
     public int GetPosition(PlayerRef player)
     {
         if (!playerPositions.ContainsKey(player)) return -1;
@@ -86,12 +96,22 @@ public class JobManager : NetworkBehaviour
         playerPositions.Set(player, position);
     }
 
+    /// <summary>
+    /// Get the performance score of a player
+    /// </summary>
+    /// <param name="player"></param>
+    /// <returns></returns>
     public int GetPerformance(PlayerRef player)
     {
         if (!playerPerformance.ContainsKey(player)) return 0;
         return playerPerformance[player];
     }
 
+    /// <summary>
+    /// Set the performance score of a player
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="performance"></param>
     public void SetPerformance(PlayerRef player, int performance)
     {
         if (!playerPerformance.ContainsKey(player))
@@ -100,6 +120,31 @@ public class JobManager : NetworkBehaviour
             return;
         }
         playerPositions.Set(player, performance);
+    }
+
+    /// <summary>
+    /// Add player performance
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="performance"></param>
+    public void AddPerformance(PlayerRef player, int performance)
+    {
+        int newPerformance = GetPerformance(player);
+        newPerformance += performance;
+        SetPerformance(player, newPerformance);
+    }
+
+    /// <summary>
+    /// Remove player performance
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="performance"></param>
+    public void RemovePerformance(PlayerRef player, int performance)
+    {
+        int newPerformance = GetPerformance(player);
+        newPerformance -= performance;
+        if (newPerformance < 0) newPerformance = 0;
+        SetPerformance(player, newPerformance);
     }
 
     /// <summary>
@@ -119,7 +164,7 @@ public class JobManager : NetworkBehaviour
         }
 
         // Check if there is space to promote
-        for (int i = positionCounts.Length-2; i >= 0; i--)
+        for (int i = positionCounts.Length - 2; i >= 0; i--)
         {
             // How many positions can be promoted to this level
             int newPositions = targetBranch.positionLimits[i] - positionCounts[i];
@@ -145,7 +190,84 @@ public class JobManager : NetworkBehaviour
                 newPositions--;
             }
         }
+    }
 
+    /// <summary>
+    /// Balances the player counts within each branch so that the distribution is even
+    /// </summary>
+    public void UpdateBranchCounts()
+    {
+        int[] branchCounts = GetBranchCounts();
+        /**
+         * A branch can only transfer players if it has more than 1 player
+         * Take the max and minimum branches. If the difference is more than 1, then transfer a player from max to min.
+         * Repeat until the difference is <= 1.
+        **/
+
+        // Initialize indices of largest/smallest branches
+        int maxBranchIndex = -1;
+        int minBranchIndex = -1;
+        // The difference between the branch with largest and branch with lowest players
+        int maxMinDifference = UpdateMaxMinBranches(branchCounts, out maxBranchIndex, out minBranchIndex);
+        // Transfer players from max to min as long as the difference is greater than 1
+        while (maxMinDifference > 1)
+        {
+            if (maxBranchIndex == minBranchIndex) break;
+            // Transfer players, lowest player in max branch to min branch
+            PlayerRef transferredPlayer = GetLowestRankedPlayer(maxBranchIndex);
+            if (transferredPlayer == PlayerRef.None)
+            {
+                Debug.LogError("Player transfer could not be completed");
+                return;
+            }
+            SetBranch(transferredPlayer, minBranchIndex);
+            // Update the branch counts for max and min
+            branchCounts[maxBranchIndex]--;
+            branchCounts[minBranchIndex]++;
+            // Update diff
+            maxMinDifference = UpdateMaxMinBranches(branchCounts, out maxBranchIndex, out minBranchIndex);
+        }
+    }
+
+    private int UpdateMaxMinBranches(int[] branchCounts, out int maxBranch, out int minBranch)
+    {
+        // Initialize max and min branch values
+        maxBranch = -1;
+        int maxCount = int.MinValue;
+        minBranch = -1;
+        int minCount = int.MaxValue;
+        // Iterate over every branch to find the values
+        for (int i = 0; i < branchCounts.Length; i++)
+        {
+            if (branchCounts[i] > maxCount)
+            {
+                maxBranch = i; 
+                maxCount = branchCounts[i];
+            }
+            if (branchCounts[i] < minCount)
+            {
+                minBranch = i; 
+                minCount = branchCounts[i];
+            }
+        }
+        // Return the diff
+        return maxCount - minCount;
+    }
+
+    /// <summary>
+    /// Gets an array of the amount of players in each branch. Each index corresponds to its respective branch
+    /// </summary>
+    /// <returns></returns>
+    private int[] GetBranchCounts()
+    {
+        // Iterate over every player in branches
+        int[] branchCounts = new int[branches.Length];
+        foreach (KeyValuePair<PlayerRef, int> kvp in playerBranches)
+        {
+            if (kvp.Value < 0) continue;
+            branchCounts[kvp.Value]++;
+        }
+        return branchCounts;
     }
 
     private void PromotePlayer(PlayerRef player, int newPosition)
@@ -157,5 +279,43 @@ public class JobManager : NetworkBehaviour
     public void DemotePlayer(PlayerRef player)
     {
 
+    }
+
+    /// <summary>
+    /// Gets the lowest ranked player in a branch
+    /// </summary>
+    /// <param name="branch"></param>
+    /// <returns></returns>
+    private PlayerRef GetLowestRankedPlayer(int branch)
+    {
+        List<PlayerRef> branchPlayers = GetAllPlayersFromBranch(branch);
+        PlayerRef lowestRanked = PlayerRef.None;
+        int lowestPerformance = int.MaxValue;
+        int lowestPosition = int.MinValue;
+        foreach (PlayerRef player in branchPlayers)
+        {
+            // Get the current player pos and perform
+            int position = GetPosition(player);
+            int performance = GetPerformance(player);
+            // continue if player is ranked higher than lowest ranked
+            if (position < lowestPosition) continue;
+            // check position first
+            if (position > lowestPosition)
+            {
+                lowestPosition = position;
+                lowestRanked = player;
+                lowestPerformance = performance;
+                continue;
+            }
+            // check performance if both are equal
+            if (performance < lowestPerformance)
+            {
+                lowestPosition = position;
+                lowestRanked = player;
+                lowestPerformance = performance;
+                continue;
+            }
+        }
+        return lowestRanked;
     }
 }

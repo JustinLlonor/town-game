@@ -16,4 +16,13 @@ public class JobBranch
     [Tooltip("The max amount of players per each position. -1 means there are infinitely many players")]
     public int[] positionLimits = new int[] { };
     public JobHandler jobHandler;
+
+    /// <summary>
+    /// Returns the index of the lowest position
+    /// </summary>
+    /// <returns></returns>
+    public int GetLowestPosition()
+    {
+        return positionNames.Length - 1;
+    }
 }
