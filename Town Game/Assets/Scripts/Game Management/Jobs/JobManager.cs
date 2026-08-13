@@ -94,6 +94,7 @@ public class JobManager : NetworkBehaviour
             return;
         }
         playerPositions.Set(player, position);
+        SetPerformance(player, 0);
     }
 
     /// <summary>
@@ -175,7 +176,7 @@ public class JobManager : NetworkBehaviour
                 int highestScore = -1;
                 foreach (PlayerRef player in players)
                 {
-                    // continue if not in the level above
+                    // continue if not in the level below
                     if (GetPosition(player) != i + 1) continue;
                     int currentPerformance = GetPerformance(player);
                     if (currentPerformance > highestScore)
@@ -186,7 +187,7 @@ public class JobManager : NetworkBehaviour
                 }
                 // Break if there is no one else in the previous level
                 if (highestPerformer == PlayerRef.None) break;
-                PromotePlayer(highestPerformer, i);
+                SetPosition(highestPerformer, i);
                 newPositions--;
             }
         }
@@ -268,17 +269,6 @@ public class JobManager : NetworkBehaviour
             branchCounts[kvp.Value]++;
         }
         return branchCounts;
-    }
-
-    private void PromotePlayer(PlayerRef player, int newPosition)
-    {
-        SetPerformance(player, 0);
-        SetPosition(player, newPosition);
-    }
-
-    public void DemotePlayer(PlayerRef player)
-    {
-
     }
 
     /// <summary>
