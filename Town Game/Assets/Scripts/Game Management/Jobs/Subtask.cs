@@ -10,6 +10,9 @@ public abstract class Subtask : ScriptableObject
     /// </summary>
     public string displayName;
     public Texture2D icon;
+    [Tooltip("If enabled, the next subtask must always have this subtask completed for it to be active." +
+        "If disabled, this subtask only needs to be completed once for the next subtask to activate")]
+    public bool requireCompleted = false;
 
     /// <summary>
     /// Called when the current active subtask is this (CLIENT SIDE)

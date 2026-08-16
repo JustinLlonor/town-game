@@ -12,6 +12,9 @@ public class PlayerManager : NetworkBehaviour
 {
     public bool spawnPlayersOnJoin = true;
     [Networked, Capacity(20)] public NetworkDictionary<PlayerRef, NetworkId> playerObjects => default;
+    // Dictionaries for the mapping of players to their game ids and vice versa
+    [Networked, Capacity(20)] public NetworkDictionary<PlayerRef, int> playerGameId => default;
+    [Networked, Capacity(20)] public NetworkDictionary<int, PlayerRef> gameIdPlayer => default;
     public Dictionary<PlayerRef, Observable> playerObservables = new Dictionary<PlayerRef, Observable>();
     //public Dictionary<PlayerRef, PlayerProperties> playerProperties = new Dictionary<PlayerRef, PlayerProperties>();
     [Networked, Capacity(20)] public NetworkDictionary<PlayerRef, NetworkId> properties => default;
@@ -367,12 +370,31 @@ public class PlayerManager : NetworkBehaviour
     #region
     public void CreatePlayerProperties()
     {
+        int globalId = 0;
+        gameIdPlayer.Clear();
+        playerGameId.Clear();
         foreach (PlayerRef player in Runner.ActivePlayers)
         {
             NetworkObject propertyHolder = Runner.Spawn(propertyHolderPrefab);
             properties.Add(player, propertyHolder);
             propertyHolder.SetPlayerAlwaysInterested(player, true);
+            // Set the game id of each player
+            gameIdPlayer.Add(globalId, player);
+            playerGameId.Add(player, globalId);
+            globalId++;
         }
+    }
+
+    public int GetGameId(PlayerRef player)
+    {
+        if (!playerGameId.ContainsKey(player)) return -1;
+        return playerGameId.Get(player);
+    }
+
+    public PlayerRef GetPlayerFromGameId(int gameId)
+    {
+        if (!gameIdPlayer.ContainsKey(gameId)) return PlayerRef.None;
+        return gameIdPlayer.Get(gameId);
     }
     
     public string GetNickname(PlayerRef player)

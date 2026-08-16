@@ -2,9 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
-using Palmmedia.ReportGenerator.Core.Parser.Analysis;
 
-public class JobManager : NetworkBehaviour
+/// <summary>
+/// Manages branches and players within them
+/// </summary>
+public class BranchManager : NetworkBehaviour
 {
     public JobBranch[] branches;
     /// <summary>
