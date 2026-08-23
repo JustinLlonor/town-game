@@ -14,7 +14,7 @@ public class ItemFilterSubtask : Subtask
 
     public override void OnDeactivateClient() { }
 
-    public override bool IsCompleted(Player player)
+    public override bool IsCompleted(Player player = null)
     {
         Item[] inventory = player.playerInventory.GetInventory();
         ItemData[] itemDatas = player.playerInventory.GetInventoryItemData();

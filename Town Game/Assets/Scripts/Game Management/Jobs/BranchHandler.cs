@@ -35,6 +35,8 @@ public class BranchHandler : MonoBehaviour
     /// </summary>
     [Networked, Capacity(16)]
     public NetworkDictionary<NetworkString<_8>, float> deadlines => default;
+    [Networked, Capacity(16)]
+    public NetworkDictionary<NetworkString<_8>, int> subtaskStage => default;
     /// <summary>
     /// # of tasks assigned to each player
     /// </summary>
