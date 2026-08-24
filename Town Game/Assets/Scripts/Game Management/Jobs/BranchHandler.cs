@@ -37,7 +37,7 @@ public class BranchHandler : NetworkBehaviour
     [Networked, Capacity(16)]
     public NetworkDictionary<NetworkString<_8>, float> deadlines => default;
     [Networked, Capacity(16)]
-    public NetworkDictionary<NetworkString<_8>, int> subtaskStage => default;
+    public NetworkDictionary<NetworkString<_8>, int> subtaskStages => default;
     /// <summary>
     /// # of tasks assigned to each player
     /// </summary>
@@ -48,7 +48,62 @@ public class BranchHandler : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
+        CheckSubtasks();
+    }
 
+    /// <summary>
+    /// Updates subtask stages based on subtask completion
+    /// </summary>
+    private void CheckSubtasks()
+    {
+        foreach (KeyValuePair<NetworkString<_8>, int> kvp in activeTasks)
+        {
+            string taskId = (string)kvp.Key;
+            DynamicTask task = GetTask(taskId);
+            int stage = subtaskStages.Get(kvp.Key);
+            if (stage >= task.subtasks.Length) continue; // Don't do subtask checking 
+            List<Player> assignedPlayers = GetPlayerObjects(taskId);
+            // Iterate over previous subtasks to see if level goes down
+            bool stageSet = false; // if we need to go back to a previous subtask
+            for (int i = 0; i < stage; i++)
+            {
+                Subtask subtask = task.subtasks[i];
+                if (stage >= subtask.completeUntil || subtask.completeUntil == -1) continue;
+                if (SubtaskCompleted(subtask, assignedPlayers)) continue;
+                // The stage is valid to be checked, and the subtask is incomplete, so set subtask stage to this
+                subtaskStages.Set(taskId, i);
+                stageSet = true;
+            }
+            if (stageSet) continue;
+            // Check current subtask to see if level can go up
+            if (SubtaskCompleted(task.subtasks[stage], assignedPlayers))
+            {
+                subtaskStages.Set(taskId, stage + 1);
+            }
+        }
+    }
+
+    private bool SubtaskCompleted(Subtask subtask, List<Player> assignedPlayers)
+   {
+        switch (subtask.completionMode)
+        {
+            case Subtask.CheckMode.None:
+                return subtask.IsCompleted();
+            case Subtask.CheckMode.AtLeastOne:
+                foreach (Player player in assignedPlayers)
+                {
+                    if (subtask.IsCompleted(player)) return true;
+                }
+                return false;
+            case Subtask.CheckMode.AllPlayers:
+                foreach (Player player in assignedPlayers)
+                {
+                    if (!subtask.IsCompleted(player)) return false;
+                }
+                return true;
+            default:
+                return false;
+        }
     }
 
     /// <summary>
@@ -60,6 +115,7 @@ public class BranchHandler : NetworkBehaviour
     {
         if (activeTasks.ContainsKey(id)) return false;
         activeTasks.Add(id, 0);
+        subtaskStages.Add(id, 1);
         UpdateAssignment(id);
         return true;
     }
@@ -73,6 +129,7 @@ public class BranchHandler : NetworkBehaviour
     {
         if (activeTasks.ContainsKey(id)) return false;
         activeTasks.Add(id, 0);
+        subtaskStages.Add(id, 1);
         deadlines.Add(id, deadline);
         UpdateAssignment(id);
         return true;
@@ -87,6 +144,7 @@ public class BranchHandler : NetworkBehaviour
     {
         if (!activeTasks.ContainsKey(id)) return false;
         activeTasks.Remove(id);
+        subtaskStages.Remove(id);
         if (deadlines.ContainsKey(id)) deadlines.Remove(id);
         return true;
     }
@@ -270,6 +328,15 @@ public class BranchHandler : NetworkBehaviour
             return;
         }
         taskPlayerObjects[taskId] = updatedObjects;
+    }
+
+    private List<Player> GetPlayerObjects(string taskId)
+    {
+        if (!taskPlayerObjects.ContainsKey(taskId))
+        {
+            return new List<Player>();
+        }
+        return taskPlayerObjects[taskId];
     }
 
     /// <summary>

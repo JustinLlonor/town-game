@@ -9,7 +9,6 @@ using UnityEngine;
 public class ItemFilterSubtask : Subtask
 {
     public ItemFilter itemFilter;
-    public CheckMode checkMode = CheckMode.AllPlayers;
 
     public override void OnActivateClient() { }
 
