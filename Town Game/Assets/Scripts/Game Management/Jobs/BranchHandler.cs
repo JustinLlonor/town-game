@@ -12,15 +12,9 @@ using Photon.Realtime;
 public class BranchHandler : NetworkBehaviour
 {
     /// <summary>
-    /// The struct for an assignable task
+    /// The number of tasks that can be assigned to a position below until it is assigned to a position above
     /// </summary>
-    [System.Serializable]
-    public struct Assignable
-    {
-        [Tooltip("The ID of this task, should be 8 characters or less")]
-        public string id;
-        public DynamicTask task;
-    }
+    private static float tasksUntilNextLevel = 2f;
 
     public Assignable[] branchTasks;
     /// <summary>
@@ -45,6 +39,17 @@ public class BranchHandler : NetworkBehaviour
     public NetworkDictionary<PlayerRef, int> taskCounts => default;
     public int branch;
     public BranchManager branchManager;
+
+    /// <summary>
+    /// The struct for an assignable task
+    /// </summary>
+    [System.Serializable]
+    public struct Assignable
+    {
+        [Tooltip("The ID of this task, should be 8 characters or less")]
+        public string id;
+        public DynamicTask task;
+    }
 
     public override void FixedUpdateNetwork()
     {
@@ -197,9 +202,9 @@ public class BranchHandler : NetworkBehaviour
 
         // Sort players first by highest to lowest position index, then by lowest to highest task count
         filteredPlayers.Sort((a, b) => 
-            branchManager.GetPosition(b) + (1f - (GetTaskCount(b) / 100f))
+            branchManager.GetPosition(b) + (0.99f - (GetTaskCount(b) / tasksUntilNextLevel))
             .CompareTo(
-            branchManager.GetPosition(a) + (1f - (GetTaskCount(b) / 100f))
+            branchManager.GetPosition(a) + (0.99f - (GetTaskCount(b) / tasksUntilNextLevel))
             ));
 
         // Assign the players while there is still space to assign
