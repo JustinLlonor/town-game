@@ -9,7 +9,7 @@ using Photon.Realtime;
 /// <summary>
 /// Manages tasks and subtasks for a branch
 /// </summary>
-public class BranchHandler : MonoBehaviour
+public class BranchHandler : NetworkBehaviour
 {
     /// <summary>
     /// The struct for an assignable task
@@ -30,6 +30,7 @@ public class BranchHandler : MonoBehaviour
     /// </summary>
     [Networked, Capacity(16)]
     public NetworkDictionary<NetworkString<_8>, int> activeTasks => default;
+    private Dictionary<string, List<Player>> taskPlayerObjects;
     /// <summary>
     /// The set deadlines of each task. Not all tasks have deadlines
     /// </summary>
@@ -45,6 +46,10 @@ public class BranchHandler : MonoBehaviour
     public int branch;
     public BranchManager branchManager;
 
+    public override void FixedUpdateNetwork()
+    {
+
+    }
 
     /// <summary>
     /// Activates a task to be automatically assigned to players
@@ -178,6 +183,7 @@ public class BranchHandler : MonoBehaviour
         if (GetBit(taskBitmask, gameId)) return;
         // Set the bit corresponding to the player's game id to true
         activeTasks.Set(id, SetBit(taskBitmask, gameId, true));
+        UpdatePlayerObjects(id);
         // Increase task count
         IncreaseTaskCount(player);
     }
@@ -190,6 +196,7 @@ public class BranchHandler : MonoBehaviour
         if (!GetBit(taskBitmask, gameId)) return;
         // Set the bit corresponding to the player's game id to false
         activeTasks.Set(id, SetBit(taskBitmask, gameId, false));
+        UpdatePlayerObjects(id);
         // decrease task count
         DecreaseTaskCount(player);
     }
@@ -232,6 +239,37 @@ public class BranchHandler : MonoBehaviour
             if (assignable.id == id) return assignable.task;
         }
         return null;
+    }
+
+    /// <summary>
+    /// Updates the player objects to be accessed by the server.
+    /// Should be called whenever an active task assignment is updated.
+    /// </summary>
+    /// <param name="taskId"></param>
+    private void UpdatePlayerObjects(string taskId)
+    {
+        // If task is not active clear and return
+        if (!activeTasks.ContainsKey(taskId))
+        {
+            if (taskPlayerObjects.ContainsKey(taskId)) taskPlayerObjects.Remove(taskId); 
+            return;
+        }
+        // Construct player object list using bitmask
+        int bitmask = activeTasks.Get(taskId);
+        List<Player> updatedObjects = new List<Player>();
+        for (int i = 0; i < 30; i++)
+        {
+            if (!GetBit(bitmask, i)) continue;
+            PlayerRef foundPlayer = PlayerManager.i.GetPlayerFromGameId(i);
+            updatedObjects.Add(PlayerManager.i.GetPlayerObject(foundPlayer).GetComponent<Player>());
+        }
+        // Add to task player objects
+        if (!taskPlayerObjects.ContainsKey(taskId))
+        {
+            taskPlayerObjects.Add(taskId, updatedObjects);
+            return;
+        }
+        taskPlayerObjects[taskId] = updatedObjects;
     }
 
     /// <summary>

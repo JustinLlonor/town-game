@@ -24,7 +24,7 @@ public abstract class Subtask : ScriptableObject
         "If set to none, the Player parameter in IsCompleted will be passed in as null. " +
         "If set to AtLeastOne, then at least one player assigned must fulfill the subtask requirements. " +
         "If set to AllPlayers, then all players assigned must fulfill subtask requirements.")]
-    public CheckMode completionMode;
+    public CheckMode completionMode; // Can set a default value in child classes
 
     /// <summary>
     /// Called when the current active subtask is this (CLIENT SIDE)
