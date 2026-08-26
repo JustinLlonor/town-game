@@ -223,7 +223,7 @@ public class BranchHandler : NetworkBehaviour
     }
 
     /// <summary>
-    /// Clears all tasks for the specified player
+    /// Clears all tasks for the specified player and reassigns them
     /// </summary>
     /// <param name="player"></param>
     public void ClearAssignment(PlayerRef player)
@@ -238,6 +238,11 @@ public class BranchHandler : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Assigns a player to a task
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="player"></param>
     private void AssignPlayer(string id, PlayerRef player)
     {
         if (!activeTasks.ContainsKey(id)) return;
@@ -251,6 +256,11 @@ public class BranchHandler : NetworkBehaviour
         IncreaseTaskCount(player);
     }
 
+    /// <summary>
+    /// Unassigns a player from a task
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="player"></param>
     private void UnassignPlayer(string id, PlayerRef player)
     {
         if (!activeTasks.ContainsKey(id)) return;
@@ -288,6 +298,38 @@ public class BranchHandler : NetworkBehaviour
     {
         if (!taskCounts.ContainsKey(player)) return;
         taskCounts.Remove(player);
+    }
+
+    /// <summary>
+    /// Checks over every task. If this player is assigned to a task that exceeds their position,
+    /// they will be unassigned from it.
+    /// </summary>
+    /// <param name="player"></param>
+    public void CheckTasks(PlayerRef player)
+    {
+        int gameId = PlayerManager.i.GetGameId(player);
+        int position = branchManager.GetPosition(player);
+        List<string> unassignedTasks = new List<string>();
+        foreach (KeyValuePair<NetworkString<_8>, int> kvp in activeTasks)
+        {
+            if (GetBit(kvp.Value, gameId))
+            {
+                // If the player's position exceeds the level,
+                // they are a lower position than the task and should be unassigned
+                DynamicTask taskObj = GetTask((string)kvp.Key);
+                if (position > taskObj.level || position == -1)
+                {
+                    unassignedTasks.Add((string)kvp.Key);
+                }
+            }
+        }
+
+        // Unassign the player from their task and update the assignment
+        foreach (string task in unassignedTasks)
+        {
+            UnassignPlayer(task, player);
+            UpdateAssignment(task);
+        }
     }
 
     /// <summary>

@@ -87,6 +87,8 @@ public class BranchManager : NetworkBehaviour
         if (playerBranches.ContainsKey(player))
         {
             int branch = playerBranches.Get(player);
+            JobBranch branchRef = branches[branch];
+            branchRef.branchHandler.ClearAssignment(player);
             playerBranches.Remove(player);
             UpdatePositions(branch);
         }
@@ -154,6 +156,9 @@ public class BranchManager : NetworkBehaviour
         // Promote highest performer and demote the current player.
         SetPosition(highestPerformer, playerPos);
         SetPosition(player, playerPos + 1);
+
+        // Remove tasks that exceed the demoted player's level
+        branches[branch].branchHandler.CheckTasks(player);
     }
 
     /// <summary>

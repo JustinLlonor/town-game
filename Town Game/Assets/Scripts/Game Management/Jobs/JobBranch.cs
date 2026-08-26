@@ -15,7 +15,7 @@ public class JobBranch
     public string[] positionNames = new string[] { };
     [Tooltip("The max amount of players per each position. -1 means there are infinitely many players")]
     public int[] positionLimits = new int[] { };
-    public BranchHandler jobHandler;
+    public BranchHandler branchHandler;
 
     /// <summary>
     /// Returns the index of the lowest position
