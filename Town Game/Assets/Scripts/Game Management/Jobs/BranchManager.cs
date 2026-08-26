@@ -24,6 +24,16 @@ public class BranchManager : NetworkBehaviour
     [Networked, Capacity(20)] NetworkDictionary<PlayerRef, int> playerPerformance => default;
 
     /// <summary>
+    /// To be called when a player is removed
+    /// </summary>
+    /// <param name="player"></param>
+    private void PlayerRemovalEvent(PlayerRef player)
+    {
+        RemovePlayer(player);
+        // Code for removing from tasks
+    }
+
+    /// <summary>
     /// Gets all the players in a branch
     /// </summary>
     /// <param name="branch"></param>
@@ -74,7 +84,14 @@ public class BranchManager : NetworkBehaviour
     /// <param name="player"></param>
     public void RemovePlayer(PlayerRef player)
     {
-        if (playerBranches.ContainsKey(player)) playerBranches.Remove(player);
+        if (playerBranches.ContainsKey(player))
+        {
+            int branch = playerBranches.Get(player);
+            playerBranches.Remove(player);
+            UpdatePositions(branch);
+        }
+        if (playerPositions.ContainsKey(player)) playerPositions.Remove(player);
+        if (playerPerformance.ContainsKey(player)) playerPerformance.Remove(player);
     }
 
     /// <summary>
@@ -88,6 +105,11 @@ public class BranchManager : NetworkBehaviour
         return playerPositions[player];
     }
 
+    /// <summary>
+    /// Sets the position of the player and resets the performance
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="position"></param>
     public void SetPosition(PlayerRef player, int position)
     {
         if (!playerPositions.ContainsKey(player))
@@ -97,6 +119,41 @@ public class BranchManager : NetworkBehaviour
         }
         playerPositions.Set(player, position);
         SetPerformance(player, 0);
+    }
+
+    /// <summary>
+    /// Demotes a player and promotes the highest performing player in the level below.
+    /// If there is no one in the level below, nothing happens
+    /// </summary>
+    /// <param name="player"></param>
+    public void DemotePlayer(PlayerRef player)
+    {
+        int branch = GetBranch(player);
+        int lowestPos = branches[branch].GetLowestPosition();
+        int playerPos = GetPosition(player);
+        if (playerPos == lowestPos || playerPos == -1) return;
+
+        // Find the highest performing player in the position below
+        List<PlayerRef> players = GetAllPlayersFromBranch(branch);
+        PlayerRef highestPerformer = PlayerRef.None;
+        int highestScore = int.MinValue;
+        foreach (PlayerRef cPlayer in players)
+        {
+            // continue if not in the level below
+            if (GetPosition(cPlayer) != playerPos + 1) continue;
+            int currentPerformance = GetPerformance(cPlayer);
+            if (currentPerformance > highestScore)
+            {
+                highestPerformer = cPlayer;
+                highestScore = currentPerformance;
+            }
+        }
+        // Return if there is no one else in the level below, the player will not be demoted since there is no one else
+        if (highestPerformer == PlayerRef.None) return;
+
+        // Promote highest performer and demote the current player.
+        SetPosition(highestPerformer, playerPos);
+        SetPosition(player, playerPos + 1);
     }
 
     /// <summary>
@@ -175,7 +232,7 @@ public class BranchManager : NetworkBehaviour
             {
                 // Get the highest performer in the position below
                 PlayerRef highestPerformer = PlayerRef.None;
-                int highestScore = -1;
+                int highestScore = int.MinValue;
                 foreach (PlayerRef player in players)
                 {
                     // continue if not in the level below
