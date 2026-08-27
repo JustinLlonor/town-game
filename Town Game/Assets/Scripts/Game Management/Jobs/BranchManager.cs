@@ -23,6 +23,11 @@ public class BranchManager : NetworkBehaviour
     /// </summary>
     [Networked, Capacity(20)] NetworkDictionary<PlayerRef, int> playerPerformance => default;
 
+    private void Awake()
+    {
+        GameManager.i.onPlayerRemove += PlayerRemovalEvent;
+    }
+
     /// <summary>
     /// To be called when a player is removed
     /// </summary>
