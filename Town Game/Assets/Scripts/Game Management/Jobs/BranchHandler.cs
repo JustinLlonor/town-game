@@ -15,6 +15,14 @@ public class BranchHandler : NetworkBehaviour
     /// The number of tasks that can be assigned to a position below until it is assigned to a position above
     /// </summary>
     private static float tasksUntilNextLevel = 2f;
+    /// <summary>
+    /// The maximum amount of money that can be subtracted from a task if it is finished late
+    /// </summary>
+    private static float maxMoneyReduction = 0.5f;
+    /// <summary>
+    /// How long after a task deadline until the money punishment reaches 0.5f
+    /// </summary>
+    private static float moneyPunishLength = 3f;
 
     public Assignable[] branchTasks;
     /// <summary>
@@ -26,12 +34,14 @@ public class BranchHandler : NetworkBehaviour
     public NetworkDictionary<NetworkString<_8>, int> activeTasks => default;
     private Dictionary<string, List<Player>> taskPlayerObjects;
     /// <summary>
-    /// The set deadlines of each task. Not all tasks have deadlines
+    /// The set deadlines (period) of each task. Not all tasks have deadlines
     /// </summary>
     [Networked, Capacity(16)]
     public NetworkDictionary<NetworkString<_8>, float> deadlines => default;
     [Networked, Capacity(16)]
     public NetworkDictionary<NetworkString<_8>, int> subtaskStages => default;
+    [Networked, Capacity(16)]
+    public NetworkDictionary<NetworkString<_8>, float> moneyRewards => default;
     /// <summary>
     /// # of tasks assigned to each player
     /// </summary>
@@ -116,11 +126,12 @@ public class BranchHandler : NetworkBehaviour
     /// </summary>
     /// <param name="id"></param>
     /// <returns>False if the task is already activated</returns>
-    public bool ActivateTask(string id)
+    public bool ActivateTask(string id, float moneyReward = 100f)
     {
         if (activeTasks.ContainsKey(id)) return false;
         activeTasks.Add(id, 0);
         subtaskStages.Add(id, 1);
+        moneyRewards.Add(id, moneyReward);
         UpdateAssignment(id);
         return true;
     }
@@ -130,12 +141,13 @@ public class BranchHandler : NetworkBehaviour
     /// </summary>
     /// <param name="id"></param>
     /// <returns>False if the task is already activated</returns>
-    public bool ActivateTask(string id, float deadline)
+    public bool ActivateTask(string id, float deadline, float moneyReward = 100f)
     {
         if (activeTasks.ContainsKey(id)) return false;
         activeTasks.Add(id, 0);
         subtaskStages.Add(id, 1);
         deadlines.Add(id, deadline);
+        moneyRewards.Add(id, moneyReward);
         UpdateAssignment(id);
         return true;
     }
@@ -148,8 +160,15 @@ public class BranchHandler : NetworkBehaviour
     public bool DeactivateTask(string id)
     {
         if (!activeTasks.ContainsKey(id)) return false;
+        // Decrease task count
+        List<PlayerRef> players = branchManager.GetAllPlayersFromBranch(branch);
+        foreach (PlayerRef player in players)
+        {
+            UnassignPlayer(id, player);
+        }
         activeTasks.Remove(id);
         subtaskStages.Remove(id);
+        moneyRewards.Remove(id);
         if (deadlines.ContainsKey(id)) deadlines.Remove(id);
         return true;
     }
@@ -159,14 +178,77 @@ public class BranchHandler : NetworkBehaviour
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public bool CompleteTask(string id)
+    public bool CompleteTask(string id, Reward reward = Reward.ScaleWithDeadline)
     {
-        bool deactivated = DeactivateTask(id);
-        if (deactivated)
+        if (!activeTasks.ContainsKey(id)) return false;
+        float deadline = -1f;
+        if (deadlines.ContainsKey(id)) deadline = deadlines.Get(id);
+        // Process rewards and punishments for all players with this task
+        List<PlayerRef> players = branchManager.GetAllPlayersFromBranch(branch);
+        foreach (PlayerRef player in players)
         {
-            // Code for rewarding/punishing players based on deadline
+            int gameId = PlayerManager.i.GetGameId(player);
+            if (GetBit(activeTasks.Get(id), gameId))
+            {
+                ProcessReward(player, reward, deadline, moneyRewards.Get(id));
+            }
         }
-        return deactivated;
+        DeactivateTask(id);
+        return false;
+    }
+
+    /// <summary>
+    /// Processes the reward for a player
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="reward"></param>
+    /// <param name="deadline"></param>
+    /// <param name="money"></param>
+    private void ProcessReward(PlayerRef player, Reward reward, float deadline, float money)
+    {
+        switch (reward)
+        {
+            case Reward.ScaleWithDeadline:
+                if (deadline == -1f)
+                {
+                    ChangePerformance(player, 2);
+                    PlayerManager.i.AddMoney(player, money);
+                    break;
+                }
+                // Scale performance and money gain based on time
+                float currentPeriod = GameManager.i.currentPeriod;
+                if (currentPeriod > deadline)
+                {
+                    int performanceDecrease = Mathf.Clamp(Mathf.FloorToInt(deadline - currentPeriod), -2, -1);
+                    ChangePerformance(player, performanceDecrease);
+                    // Scale money punishment based on time
+                    // percentage of money that is subtracted
+                    float punishScale = (Mathf.Clamp(currentPeriod - deadline, 0f, moneyPunishLength) / moneyPunishLength)
+                         * maxMoneyReduction;
+                    float finalMoneyReward = money - Mathf.RoundToInt(punishScale * money);
+                    PlayerManager.i.AddMoney(player, finalMoneyReward);
+                }
+                else
+                {
+                    int performanceIncrease = Mathf.Clamp(Mathf.CeilToInt(deadline - currentPeriod), 1, 2);
+                    ChangePerformance(player, performanceIncrease);
+                    PlayerManager.i.AddMoney(player, money);
+                }
+                break;
+            case Reward.FullReward:
+                ChangePerformance(player, 2);
+                PlayerManager.i.AddMoney(player, money);
+                break;
+            case Reward.HalfReward:
+                PlayerManager.i.AddMoney(player, money);
+                break;
+            case Reward.Punish:
+                ChangePerformance(player, -2);
+                PlayerManager.i.AddMoney(player, money - (money * maxMoneyReduction));
+                break;
+            default:
+                break;
+        }
     }
 
     /// <summary>
@@ -230,11 +312,17 @@ public class BranchHandler : NetworkBehaviour
     {
         // iterate over every task, if player is assigned to it unassign them
         int gameId = PlayerManager.i.GetGameId(player);
+        List<string> unassignedTasks = new List<string>();
         foreach (KeyValuePair<NetworkString<_8>, int> kvp in activeTasks)
         {
             int bitmask = kvp.Value;
-            if (GetBit(bitmask, gameId)) UnassignPlayer((string)kvp.Key, player);
-            UpdateAssignment((string)kvp.Key); // Update the assignment after the player is done
+            if (GetBit(bitmask, gameId)) unassignedTasks.Add((string)kvp.Key);
+        }
+        // Iterate over every task and unassign/reassign them
+        foreach (string task in unassignedTasks)
+        {
+            UnassignPlayer(task, player); // Unassign the player from the task
+            UpdateAssignment(task); // Update the assignment after the player is done
         }
     }
 
@@ -292,6 +380,17 @@ public class BranchHandler : NetworkBehaviour
         int count = taskCounts.Get(player);
         if (count <= 0) return;
         taskCounts.Set(player, count - 1);
+    }
+
+    private void ChangePerformance(PlayerRef player, int performanceDelta)
+    {
+        if (performanceDelta > 0)
+        {
+            branchManager.AddPerformance(player, performanceDelta);
+        } else
+        {
+            branchManager.RemovePerformance(player, -performanceDelta);
+        }
     }
 
     private void ClearTaskCount(PlayerRef player)

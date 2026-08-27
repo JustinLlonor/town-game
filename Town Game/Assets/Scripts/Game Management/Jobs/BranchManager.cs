@@ -60,7 +60,7 @@ public class BranchManager : NetworkBehaviour
     }
 
     /// <summary>
-    /// Sets the branch of the player, and resets position and performance
+    /// Sets the branch of the player, and resets position, task assignment, and performance
     /// </summary>
     /// <param name="player"></param>
     /// <param name="branch"></param>
@@ -71,6 +71,7 @@ public class BranchManager : NetworkBehaviour
             playerBranches.Add(player, branch);
             return;
         }
+        branches[branch].branchHandler.ClearAssignment(player);
         playerBranches.Set(player, branch);
         // Set performance to lowest possible
         SetPerformance(player, 0);
@@ -208,7 +209,7 @@ public class BranchManager : NetworkBehaviour
     {
         int newPerformance = GetPerformance(player);
         newPerformance -= performance;
-        if (newPerformance < 0) newPerformance = 0;
+        if (newPerformance < -5) newPerformance = -5; // performance cannot be lower than -5
         SetPerformance(player, newPerformance);
     }
 
