@@ -214,7 +214,10 @@ public class BranchManager : NetworkBehaviour
     {
         int newPerformance = GetPerformance(player);
         newPerformance -= performance;
-        if (newPerformance < -5) newPerformance = -5; // performance cannot be lower than -5
+        if (newPerformance < 0)
+        {
+            DemotePlayer(player); // demote the player if their performance becomes negative
+        }
         SetPerformance(player, newPerformance);
     }
 
