@@ -23,6 +23,8 @@ public class BranchManager : NetworkBehaviour
     /// </summary>
     [Networked, Capacity(20)] NetworkDictionary<PlayerRef, int> playerPerformance => default;
 
+    public static int PerformanceScoreCeiling = 3;
+
     private void Awake()
     {
         GameManager.i.onPlayerRemove += PlayerRemovalEvent;
@@ -202,6 +204,7 @@ public class BranchManager : NetworkBehaviour
     {
         int newPerformance = GetPerformance(player);
         newPerformance += performance;
+        if (newPerformance > PerformanceScoreCeiling) newPerformance = PerformanceScoreCeiling;
         SetPerformance(player, newPerformance);
     }
 
