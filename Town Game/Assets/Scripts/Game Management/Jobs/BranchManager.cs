@@ -25,7 +25,7 @@ public class BranchManager : NetworkBehaviour
 
     public static int PerformanceScoreCeiling = 3;
 
-    private void Awake()
+    private void OnEnable()
     {
         GameManager.i.onPlayerRemove += PlayerRemovalEvent;
     }

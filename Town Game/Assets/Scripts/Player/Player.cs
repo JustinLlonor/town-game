@@ -14,12 +14,13 @@ public class Player : NetworkBehaviour
     public PlayerEvent Init;
     public LayerMask glitchLayer;
     public GameObject serverItem;
-    [HideInInspector] public PlayerMovement playerMovement;
-    [HideInInspector] public PlayerInventory playerInventory;
-    [HideInInspector] public PlayerDropManager dropManager;
-    [HideInInspector] public InteractableFinder inf;
-    [HideInInspector] public ItemUse itemUse;
-    [HideInInspector] public PlayerClothing playerClothing;
+    [Header("References")]
+    public PlayerMovement playerMovement;
+    public PlayerInventory playerInventory;
+    public PlayerDropManager dropManager;
+    public InteractableFinder inf;
+    public ItemUse itemUse;
+    public PlayerClothing playerClothing;
     public Rigidbody rb;
     public PlayerGrab playerGrab;
     public PlayerProgress playerProgress;

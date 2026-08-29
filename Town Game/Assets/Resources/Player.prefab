@@ -584,8 +584,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 32768
   serverItem: {fileID: 8761597498468105624}
-  pm: {fileID: 6160271850420175375}
-  pi: {fileID: 1106844264840172896}
+  playerMovement: {fileID: 6160271850420175375}
+  playerInventory: {fileID: 1106844264840172896}
   dropManager: {fileID: 8777106030094182887}
   inf: {fileID: 8489816749943817623}
   itemUse: {fileID: 2378964989146487730}
@@ -1268,7 +1268,6 @@ MonoBehaviour:
   groundCheck: {fileID: 4579068949193498039}
   jumpShake: {fileID: 11400000, guid: 75956f023138a7244a7a58663cb0ed13, type: 2}
   groundedRadius: 0.25
-  snapStrength: 100
   groundChecks: 8
   groundCheckDegree: 45
   _isGrounded: 0
