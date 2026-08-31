@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
 
+[System.Serializable]
 public struct CompletionInfo : INetworkStruct
 {
     public NetworkString<_8> id;
