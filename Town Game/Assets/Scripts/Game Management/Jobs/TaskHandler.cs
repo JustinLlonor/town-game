@@ -9,7 +9,7 @@ using Photon.Realtime;
 /// <summary>
 /// Manages tasks and subtasks for a branch
 /// </summary>
-public class BranchHandler : NetworkBehaviour
+public class TaskHandler : NetworkBehaviour
 {
     /// <summary>
     /// The number of tasks that can be assigned to a position below until it is assigned to a position above
@@ -20,7 +20,7 @@ public class BranchHandler : NetworkBehaviour
     /// </summary>
     private static float maxMoneyReduction = 0.5f;
     /// <summary>
-    /// How long after a task deadline until the money punishment reaches 0.5f
+    /// How long after a task deadline until the money punishment reaches max money reduction
     /// </summary>
     private static float moneyPunishLength = 3f;
 
@@ -50,6 +50,10 @@ public class BranchHandler : NetworkBehaviour
     public int branch;
     public BranchManager branchManager;
 
+    public TaskEvent onAssignTask;
+    public TaskEvent onUnassignTask;
+    public CompletionEvent onCompleteTask;
+
     /// <summary>
     /// The struct for an assignable task
     /// </summary>
@@ -60,6 +64,9 @@ public class BranchHandler : NetworkBehaviour
         public string id;
         public DynamicTask task;
     }
+
+    public delegate void TaskEvent(PlayerRef player, string task);
+    public delegate void CompletionEvent(PlayerRef player, CompletionInfo info);
 
     public override void FixedUpdateNetwork()
     {
@@ -156,8 +163,9 @@ public class BranchHandler : NetworkBehaviour
     /// Deactivates a task without any awards/punishments
     /// </summary>
     /// <param name="id"></param>
+    /// <param name="cancelEvent">If true, onTaskComplete will be invoked to notify a cancelled event</param>
     /// <returns>False if the task is already inactive</returns>
-    public bool DeactivateTask(string id)
+    public bool DeactivateTask(string id, bool cancelledEvent = true)
     {
         if (!activeTasks.ContainsKey(id)) return false;
         // Decrease task count
@@ -165,6 +173,8 @@ public class BranchHandler : NetworkBehaviour
         foreach (PlayerRef player in players)
         {
             UnassignPlayer(id, player);
+            // notifies the players that the event was cancelled
+            if (cancelledEvent) onCompleteTask?.Invoke(player, new CompletionInfo(id, -1, -1f, -1f, true));
         }
         activeTasks.Remove(id);
         subtaskStages.Remove(id);
@@ -190,10 +200,10 @@ public class BranchHandler : NetworkBehaviour
             int gameId = PlayerManager.i.GetGameId(player);
             if (GetBit(activeTasks.Get(id), gameId))
             {
-                ProcessReward(player, reward, deadline, moneyRewards.Get(id));
+                ProcessReward(player, reward, deadline, moneyRewards.Get(id), id);
             }
         }
-        DeactivateTask(id);
+        DeactivateTask(id, false);
         return false;
     }
 
@@ -204,8 +214,9 @@ public class BranchHandler : NetworkBehaviour
     /// <param name="reward"></param>
     /// <param name="deadline"></param>
     /// <param name="money"></param>
-    private void ProcessReward(PlayerRef player, Reward reward, float deadline, float money)
+    private void ProcessReward(PlayerRef player, Reward reward, float deadline, float money, string id)
     {
+        CompletionInfo completionInfo = new CompletionInfo(id, 0, money, 0f, false);
         switch (reward)
         {
             case Reward.ScaleWithDeadline:
@@ -213,6 +224,7 @@ public class BranchHandler : NetworkBehaviour
                 {
                     ChangePerformance(player, 2);
                     PlayerManager.i.AddMoney(player, money);
+                    completionInfo.performanceChange = 2;
                     break;
                 }
                 // Scale performance and money gain based on time
@@ -227,17 +239,24 @@ public class BranchHandler : NetworkBehaviour
                          * maxMoneyReduction;
                     float finalMoneyReward = money - Mathf.RoundToInt(punishScale * money);
                     PlayerManager.i.AddMoney(player, finalMoneyReward);
+                    // update completion info
+                    completionInfo.performanceChange = performanceDecrease;
+                    completionInfo.moneyChange = finalMoneyReward;
+                    completionInfo.punishmentPercentage = punishScale;
                 }
                 else
                 {
                     int performanceIncrease = Mathf.Clamp(Mathf.CeilToInt(deadline - currentPeriod), 1, 2);
                     ChangePerformance(player, performanceIncrease);
                     PlayerManager.i.AddMoney(player, money);
+
+                    completionInfo.performanceChange = performanceIncrease;
                 }
                 break;
             case Reward.FullReward:
                 ChangePerformance(player, 2);
                 PlayerManager.i.AddMoney(player, money);
+                completionInfo.performanceChange = 2;
                 break;
             case Reward.HalfReward:
                 PlayerManager.i.AddMoney(player, money);
@@ -245,10 +264,16 @@ public class BranchHandler : NetworkBehaviour
             case Reward.Punish:
                 ChangePerformance(player, -2);
                 PlayerManager.i.AddMoney(player, money - (money * maxMoneyReduction));
+
+                completionInfo.performanceChange = -2;
+                completionInfo.moneyChange = money - (money * maxMoneyReduction);
+                completionInfo.punishmentPercentage = maxMoneyReduction;
                 break;
             default:
                 break;
         }
+        // invoke task completion
+        onCompleteTask?.Invoke(player, completionInfo);
     }
 
     /// <summary>
@@ -300,6 +325,7 @@ public class BranchHandler : NetworkBehaviour
                 continue;
             }
             AssignPlayer(id, filteredPlayers[0]);
+            filteredPlayers.RemoveAt(0);
             toAssign--;
         }
     }
@@ -342,6 +368,8 @@ public class BranchHandler : NetworkBehaviour
         UpdatePlayerObjects(id);
         // Increase task count
         IncreaseTaskCount(player);
+        // invoke the assign task event
+        onAssignTask?.Invoke(player, id);
     }
 
     /// <summary>
@@ -360,6 +388,8 @@ public class BranchHandler : NetworkBehaviour
         UpdatePlayerObjects(id);
         // decrease task count
         DecreaseTaskCount(player);
+        // invoke unassign task event
+        onUnassignTask?.Invoke(player, id);
     }
 
     private int GetTaskCount(PlayerRef player)
