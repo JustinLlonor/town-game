@@ -24,6 +24,7 @@ public class DynamicTaskUI : MonoBehaviour
     public GameObject nextHolder;
     public KeyUI keyUI;
     public TextMeshProUGUI nextText;
+    public GameObject panelObject;
     [Header("Manager References")]
     public TaskCEventManager eventManager;
     public InputManager inputManager;
@@ -55,6 +56,7 @@ public class DynamicTaskUI : MonoBehaviour
             }
             return;
         }
+        panelObject.SetActive(true);
         // Activate task change event
         if (currentTask != assignedTasks[viewedTask])
         {
@@ -108,7 +110,8 @@ public class DynamicTaskUI : MonoBehaviour
     /// </summary>
     private void SetTaskEmpty()
     {
-
+        panelObject.SetActive(false);
+        nextHolder.SetActive(false);
     }
 
     private void CycleTask()
