@@ -41,7 +41,7 @@ public class TaskHandler : NetworkBehaviour
     [Networked, Capacity(16)]
     public NetworkDictionary<NetworkString<_8>, int> subtaskStages => default;
     [Networked, Capacity(16)]
-    public NetworkDictionary<NetworkString<_8>, float> moneyRewards => default;
+    public NetworkDictionary<NetworkString<_8>, int> moneyRewards => default;
     /// <summary>
     /// # of tasks assigned to each player
     /// </summary>
@@ -133,7 +133,7 @@ public class TaskHandler : NetworkBehaviour
     /// </summary>
     /// <param name="id"></param>
     /// <returns>False if the task is already activated</returns>
-    public bool ActivateTask(string id, float moneyReward = 100f)
+    public bool ActivateTask(string id, int moneyReward = 100)
     {
         if (activeTasks.ContainsKey(id)) return false;
         activeTasks.Add(id, 0);
@@ -148,7 +148,7 @@ public class TaskHandler : NetworkBehaviour
     /// </summary>
     /// <param name="id"></param>
     /// <returns>False if the task is already activated</returns>
-    public bool ActivateTask(string id, float deadline, float moneyReward = 100f)
+    public bool ActivateTask(string id, float deadline, int moneyReward = 100)
     {
         if (activeTasks.ContainsKey(id)) return false;
         activeTasks.Add(id, 0);
@@ -565,5 +565,17 @@ public class TaskHandler : NetworkBehaviour
         }
 
         return count;
+    }
+
+    public int GetReward(string task)
+    {
+        if (!moneyRewards.ContainsKey(task)) return -1;
+        return moneyRewards.Get(task);
+    }
+
+    public int GetTaskStage(string task)
+    {
+        if (!subtaskStages.ContainsKey(task)) return -1;
+        return subtaskStages.Get(task);
     }
 }
