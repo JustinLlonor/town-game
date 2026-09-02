@@ -25,14 +25,20 @@ public class DynamicTaskUI : MonoBehaviour
     public KeyUI keyUI;
     public TextMeshProUGUI nextText;
     public GameObject panelObject;
+    public GameObject completePanel;
+    public TextMeshProUGUI completedText;
+    public TextMeshProUGUI moneyCText;
+    public TextMeshProUGUI performanceCText;
     [Header("Manager References")]
     public TaskCEventManager eventManager;
     public InputManager inputManager;
     public BranchManager branchManager;
+    public GameManager gameManager;
 
     private string currentTask;
     private int currentSubtask;
     TaskHandler currentHandler;
+    private float completeTimer = 0;
 
     private void Start()
     {
@@ -40,10 +46,12 @@ public class DynamicTaskUI : MonoBehaviour
         eventManager.onUnassignTask += RemoveTask;
         eventManager.onCompleteTask += CompleteTask;
         inputManager.onScheduleSwap += CycleTask;
+        SetTaskEmpty();
     }
 
     private void Update()
     {
+        CompleteTimer();
         // Iterate over every task, get info
         if (assignedTasks.Count == 0)
         {
@@ -87,6 +95,15 @@ public class DynamicTaskUI : MonoBehaviour
         // Change text info
         taskText.text = taskData.displayName;
         moneyText.text = "+" + currentHandler.GetReward(assignedTasks[viewedTask]);
+        if (currentHandler.deadlines.ContainsKey(assignedTasks[viewedTask]))
+        {
+            deadlineText.text = "Due " +
+                        gameManager.PeriodToClockString(currentHandler.deadlines.Get(assignedTasks[viewedTask]));
+        }
+        else
+        {
+            deadlineText.text = "";
+        }
     }
 
     private void CheckSubtaskStage()
@@ -151,6 +168,43 @@ public class DynamicTaskUI : MonoBehaviour
 
     private void CompleteTask(CompletionInfo info)
     {
+        completedTasks.Add(info);
+        if (completedTasks.Count == 1)
+        {
+            DisplayComplete();
+        }
+    }
 
+    private void DisplayComplete()
+    {
+        if (completedTasks.Count == 0)
+        {
+            completePanel.SetActive(false);
+            return;
+        }
+        completePanel.SetActive(true);
+        // reset duration timer
+        completeTimer = completedViewDuration;
+        // Set to currently viewed info
+        CompletionInfo info = completedTasks[0];
+        DynamicTask taskInfo = currentHandler.GetTask((string)info.id);
+        completedText.text = "Task completed: " + taskInfo.displayName;
+        int punishPercent = Mathf.RoundToInt(info.punishmentPercentage * 100f);
+        string moneyText = "+" + info.moneyChange + "$";
+        if (punishPercent > 0) moneyText = moneyText + " (-" + punishPercent + "%)";
+        moneyCText.text = moneyText;
+        performanceCText.text = info.performanceChange + " perf.";
+    }
+
+    private void CompleteTimer()
+    {
+        if (completeTimer <= 0) return;
+        completeTimer -= Time.deltaTime;
+        if (completeTimer < 0)
+        {
+            completeTimer = 0;
+            completedTasks.RemoveAt(0);
+            DisplayComplete();
+        }
     }
 }
