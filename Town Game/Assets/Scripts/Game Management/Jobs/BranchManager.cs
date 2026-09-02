@@ -9,6 +9,7 @@ using Fusion;
 public class BranchManager : NetworkBehaviour
 {
     public JobBranch[] branches;
+    public GameManager gm;
     /// <summary>
     /// The branches that each player is in
     /// </summary>
@@ -27,7 +28,8 @@ public class BranchManager : NetworkBehaviour
 
     private void OnEnable()
     {
-        GameManager.i.onPlayerRemove += PlayerRemovalEvent;
+        gm.onPlayerRemove += PlayerRemovalEvent;
+        gm.OnGameStart += AssignBranches;
     }
 
     /// <summary>
@@ -67,6 +69,21 @@ public class BranchManager : NetworkBehaviour
     }
 
     /// <summary>
+    /// Automatically assigns all alive players to each branch, distributed evenly
+    /// </summary>
+    /// <param name="players"></param>
+    private void AssignBranches()
+    {
+        List<PlayerRef> players = new List<PlayerRef>(gm.alivePlayers);
+        while (players.Count > 0)
+        {
+            int assignedPlayer = Random.Range(0, players.Count);
+            SetBranch(players[assignedPlayer], Random.Range(0, branches.Length));
+            players.RemoveAt(assignedPlayer);
+        }
+    }
+
+    /// <summary>
     /// Sets the branch of the player, and resets position, task assignment, and performance
     /// </summary>
     /// <param name="player"></param>
@@ -80,6 +97,7 @@ public class BranchManager : NetworkBehaviour
         }
         branches[branch].branchHandler.ClearAssignment(player);
         playerBranches.Set(player, branch);
+        Debug.Log("Set branch to " + branch);
         // Set performance to lowest possible
         SetPerformance(player, 0);
         // Set position to lowest possible

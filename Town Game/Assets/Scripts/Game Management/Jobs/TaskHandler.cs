@@ -31,17 +31,17 @@ public class TaskHandler : NetworkBehaviour
     /// Value = bitmask of players who are assigned to this task (game ids)
     /// </summary>
     [Networked, Capacity(16)]
-    public NetworkDictionary<NetworkString<_8>, int> activeTasks => default;
+    public NetworkDictionary<NetworkString<_2>, int> activeTasks => default;
     private Dictionary<string, List<Player>> taskPlayerObjects;
     /// <summary>
     /// The set deadlines (period) of each task. Not all tasks have deadlines
     /// </summary>
     [Networked, Capacity(16)]
-    public NetworkDictionary<NetworkString<_8>, float> deadlines => default;
+    public NetworkDictionary<NetworkString<_2>, float> deadlines => default;
     [Networked, Capacity(16)]
-    public NetworkDictionary<NetworkString<_8>, int> subtaskStages => default;
+    public NetworkDictionary<NetworkString<_2>, int> subtaskStages => default;
     [Networked, Capacity(16)]
-    public NetworkDictionary<NetworkString<_8>, int> moneyRewards => default;
+    public NetworkDictionary<NetworkString<_2>, int> moneyRewards => default;
     /// <summary>
     /// # of tasks assigned to each player
     /// </summary>
@@ -60,7 +60,6 @@ public class TaskHandler : NetworkBehaviour
     [System.Serializable]
     public struct Assignable
     {
-        [Tooltip("The ID of this task, should be 8 characters or less")]
         public string id;
         public DynamicTask task;
     }
@@ -78,7 +77,7 @@ public class TaskHandler : NetworkBehaviour
     /// </summary>
     private void CheckSubtasks()
     {
-        foreach (KeyValuePair<NetworkString<_8>, int> kvp in activeTasks)
+        foreach (KeyValuePair<NetworkString<_2>, int> kvp in activeTasks)
         {
             string taskId = (string)kvp.Key;
             DynamicTask task = GetTask(taskId);
@@ -339,7 +338,7 @@ public class TaskHandler : NetworkBehaviour
         // iterate over every task, if player is assigned to it unassign them
         int gameId = PlayerManager.i.GetGameId(player);
         List<string> unassignedTasks = new List<string>();
-        foreach (KeyValuePair<NetworkString<_8>, int> kvp in activeTasks)
+        foreach (KeyValuePair<NetworkString<_2>, int> kvp in activeTasks)
         {
             int bitmask = kvp.Value;
             if (GetBit(bitmask, gameId)) unassignedTasks.Add((string)kvp.Key);
@@ -439,7 +438,7 @@ public class TaskHandler : NetworkBehaviour
         int gameId = PlayerManager.i.GetGameId(player);
         int position = branchManager.GetPosition(player);
         List<string> unassignedTasks = new List<string>();
-        foreach (KeyValuePair<NetworkString<_8>, int> kvp in activeTasks)
+        foreach (KeyValuePair<NetworkString<_2>, int> kvp in activeTasks)
         {
             if (GetBit(kvp.Value, gameId))
             {

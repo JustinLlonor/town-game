@@ -17,7 +17,7 @@ public class GameManager : NetworkBehaviour
     public PlayerRef leader;
     public PlayerRef[] cultists = new PlayerRef[] { };
     [Networked] public int cultistsLeft { get; set; }
-    public List<PlayerRef> alivePlayers = new List<PlayerRef>(); // doesn't update with alive players yet
+    public List<PlayerRef> alivePlayers = new List<PlayerRef>();
     public Dictionary<string, Position> playerPositions = new Dictionary<string, Position>();
     public Dictionary<PlayerRef, string> chosenBuildings = new Dictionary<PlayerRef, string>();
     [Networked] public float gameTime { get; set; } = 0f;
@@ -75,6 +75,7 @@ public class GameManager : NetworkBehaviour
     public GameEvent OnDayStart;
     public GameEvent OnTimeStop;
     public GameEvent OnTimeResume;
+    public GameEvent OnGameStart;
     /// <summary>
     /// Called when a player is removed, either by elimination or by leaving
     /// </summary>
@@ -285,6 +286,7 @@ public class GameManager : NetworkBehaviour
         SetProperties(); // Sets the default currency of each player
         SpawnPositions(); // Spawns each player
         AssignRoles(); // Assigns the roles of each player (and reveals)
+        OnGameStart?.Invoke();
         SetTime(startTime.x, startTime.y);
     }
 
@@ -518,9 +520,11 @@ public class GameManager : NetworkBehaviour
 
     public void SpawnPositions()
     {
+        alivePlayers = new List<PlayerRef>();
         if (SessionData.isTesting && testTransform != null)
         {
             pm.SpawnPlayerAtTransform(Runner, Runner.LocalPlayer, testTransform);
+            alivePlayers.Add(Runner.LocalPlayer);
             return;
         }
         // Invokes reveal roles delegate for the role reveal sequence
@@ -528,6 +532,7 @@ public class GameManager : NetworkBehaviour
         {
             Transform roomT = rm.playerRooms[pm.GetRoom(player)].spawnTransform;
             GameObject playerObject = pm.SpawnPlayerAtTransform(Runner, player, roomT);
+            alivePlayers.Add(player);
             if (!SessionData.isTesting) playerObject.GetComponent<PlayerMovement>().Freeze();
         }
         //OnRevealRoles?.Invoke((bool)PhotonNetwork.LocalPlayer.CustomProperties["isCultist"]);

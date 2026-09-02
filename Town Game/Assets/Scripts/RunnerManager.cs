@@ -127,11 +127,11 @@ public class RunnerManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
-        onPlayerLeave?.Invoke(player);
         if (nRunner.LocalPlayer == player) SteamMatchmaking.LeaveLobby((CSteamID)SessionData.steamIdLobby); // Leaves steam lobby
         if (runner.IsServer)
         {
             pm.RemovePlayer(player);
+            onPlayerLeave?.Invoke(player);
             //pm.RemovePlayer(player); // annihalates the palyer
         }
     }
