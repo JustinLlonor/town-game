@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Fusion;
 
 public class MinimapRoomText : MonoBehaviour
 {
@@ -13,14 +14,14 @@ public class MinimapRoomText : MonoBehaviour
     {
         text = gameObject.GetComponent<TextMeshProUGUI>();
         animator = gameObject.GetComponent<Animator>();
-        PlayerManager pm = FindObjectOfType<PlayerManager>();
-        pm.OnInstantiatePlayer += AddReferences;
+        PlayerManager pm = FindFirstObjectByType<PlayerManager>();
+        pm.onInstantiatePlayer += AddReferences;
         if (trackedPM != null) trackedPM.OnEnterRoom += PlayRoomText;
     }
 
     void AddReferences(GameObject player)
     {
-        trackedPM = player.GetComponent<PlayerRoom>();
+        trackedPM = player.GetComponent<Player>().playerRoom;
         trackedPM.OnEnterRoom += PlayRoomText;
     }
 

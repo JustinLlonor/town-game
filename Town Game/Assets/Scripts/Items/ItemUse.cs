@@ -1,74 +1,118 @@
-using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using WebSocketSharp;
 using UnityEngine.EventSystems;
+using Fusion;
+using UnityEngine.InputSystem;
 
-public class ItemUse : MonoBehaviour
+/// <summary>
+/// Item use code
+/// </summary>
+public class ItemUse : NetworkBehaviour
 {
-    [Header("Keybinds")]
-    public KeyCode useKey;
-    public KeyCode secondaryUseKey;
-
     [HideInInspector] public Animator animator;
     [HideInInspector] public PlayerInventory inventory;
     [HideInInspector] public AttackManager attackManager;
     ObjectManager itemManager;
-    PhotonView view;
+    //PhotonView view;
     CursorManager cm;
+    RunnerManager runnerManager;
 
     private void Awake()
     {
-        cm = FindObjectOfType<CursorManager>();
-        view = gameObject.GetComponent<PhotonView>();
-        itemManager = FindObjectOfType<ObjectManager>();
+        cm = FindFirstObjectByType<CursorManager>();
+        //view = gameObject.GetComponent<PhotonView>();
+        itemManager = FindFirstObjectByType<ObjectManager>();
     }
 
     private void Update()
     {
-        if (!view.IsMine) return;
+        // Update to new input system later
+        //if (!view.IsMine) return;
         if (!cm.isLocked) return;
-        if (Input.GetKey(useKey))
-        {
-            UseItem();
-        }
-        if (Input.GetKey(secondaryUseKey))
-        {
-            UseSecondary();
-        }
     }
 
-    void UseItem()
+    public override void Spawned()
     {
-        if (inventory.hotbar[inventory.equippedSlot].IsNullOrEmpty()) return;
-        Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot]];
+        if (!HasInputAuthority) return;
+        InputManager inputManager = FindFirstObjectByType<InputManager>();
+        inputManager.onPrimaryFire += OnPrimaryItem;
+        inputManager.onSecondaryFire += OnSecondaryItem;
+        runnerManager = FindFirstObjectByType<RunnerManager>();
+    }
+
+    private void OnPrimaryItem(InputValue iv)
+    {
+        if (iv.Get<float>() == 1f)
+        {
+            runnerManager.itemUsePrimary = true;
+            return;
+        }
+        runnerManager.itemUsePrimary = false;
+    }
+
+    private void OnSecondaryItem(InputValue iv)
+    {
+        if (iv.Get<float>() == 1f)
+        {
+            runnerManager.itemUseSecondary = true;
+            return;
+        }
+        runnerManager.itemUseSecondary = false;
+    }
+    
+    public void UsePrimary()
+    {
+        Item item = itemManager.itemSearch[inventory.items[inventory.equippedSlot].ToString()];
+        if (item == null) return; // If item doesn't exist
         if (item as Weapon)
         {
             Weapon weapon = (Weapon)item;
-            attackManager.Attack(weapon);
+            attackManager.Attack(weapon); // called on client and server
             return;
         }
-        if (inventory.hotbar[inventory.equippedSlot].IsNullOrEmpty()) return;
-        if (!item.useMethod.IsNullOrEmpty())
-        {
-            Invoke(item.useMethod, 0f);
-        }
+        if (inventory.itemComponentObject == null) return;
+        inventory.itemComponentObject.SendMessage("OnPrimaryUse", SendMessageOptions.DontRequireReceiver); // Sends the message OnPrimaryUse to every component in the item component holder
     }
 
-    void UseSecondary()
+    public void HoldPrimary()
     {
-        if (inventory.hotbar[inventory.equippedSlot].IsNullOrEmpty()) return;
-        Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot]];
-        if (item == null) return;
-        if (!item.secondaryUseMethod.IsNullOrEmpty())
-        {
-            Invoke(item.secondaryUseMethod, 0f);
-        }
+        //Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
+        //if (item == null) return; // If item doesn't exist
+        if (inventory.itemComponentObject == null) return;
+        inventory.itemComponentObject.SendMessage("OnPrimaryHold", SendMessageOptions.DontRequireReceiver); 
     }
 
-    void Empty()
+    public void ReleasePrimary()
     {
-        Debug.Log("Empty"); 
+        //Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
+        //if (item == null) return; // If item doesn't exist
+        if (inventory.itemComponentObject == null) return;
+        inventory.itemComponentObject.SendMessage("OnPrimaryRelease", SendMessageOptions.DontRequireReceiver);
+    }
+
+    public void UseSecondary()
+    {
+        //Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
+        //if (item == null) return;
+        if (inventory.itemComponentObject == null) return;
+        inventory.itemComponentObject.SendMessage("OnSecondaryUse", SendMessageOptions.DontRequireReceiver);
+    }
+
+    public void HoldSecondary()
+    {
+        //Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
+        //if (item == null) return; // If item doesn't exist
+        if (inventory.itemComponentObject == null) return;
+        inventory.itemComponentObject.SendMessage("OnSecondaryHold", SendMessageOptions.DontRequireReceiver);
+    }
+
+    public void ReleaseSecondary()
+    {
+        //Item item = itemManager.itemSearch[inventory.hotbar[inventory.equippedSlot].ToString()];
+        //if (item == null) return; // If item doesn't exist
+        if (inventory.itemComponentObject == null) return;
+        inventory.itemComponentObject.SendMessage("OnSecondaryRelease", SendMessageOptions.DontRequireReceiver);
     }
 }

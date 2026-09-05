@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d585f5674804f1745a2c92520ed4f880, type: 3}
+  m_Name: Torso Armor
+  m_EditorClassIdentifier: 
+  icon: {fileID: 2800000, guid: 90098cdd26974764684c00fe6dcf8b1d, type: 3}
+  description: Test Armor!
+  customType: 
+  dropSettings: {fileID: 11400000, guid: bbf9399a27f0a724bbde1d8404e911a9, type: 2}
+  placedRotation: {x: 0, y: 0, z: 0}
+  itemBehaviourObject: {fileID: 0}
+  mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  texture: {fileID: 10309, guid: 0000000000000000f000000000000000, type: 0}
+  attributes: 
+  material: {fileID: 0}
+  useSounds: []
+  equipSounds:
+  - Equip1
+  - Equip2
+  - Equip3
+  holdPose: ArmHoldNormal_f
+  gripPose: 
+  clientUseAnimations: []
+  useAnimations: []
+  holdPoses: []
+  clothingGroup: 1
+  clothing:
+  - {fileID: 11400000, guid: 8e20efef5041e8e44855268b4786bb93, type: 2}

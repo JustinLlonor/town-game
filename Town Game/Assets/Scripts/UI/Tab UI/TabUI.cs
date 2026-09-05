@@ -17,6 +17,11 @@ public class TabUI : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        UpdatePlayerList();
+    }
+
     public void UpdatePlayerList()
     {
         playerList.UpdatePlayerList();

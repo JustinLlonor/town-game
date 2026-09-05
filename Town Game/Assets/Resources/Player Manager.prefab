@@ -24,13 +24,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2984718625898795549}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+  m_RootOrder: -2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6953661347052619856
 MonoBehaviour:
@@ -44,11 +44,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38b8182a1f2d2a2438ddfbdb8a89e85f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 1787190705143953567, guid: c95f5f72671cf3e45ac91a88a1fdb528, type: 3}
+  spawnPlayersOnJoin: 1
+  currentPlayer: {fileID: 0}
+  playerPrefab:
+    RawGuidValue: c95f5f72671cf3e45ac91a88a1fdb528
+  propertyHolderPrefab:
+    RawGuidValue: 8ab7b0bf36b502e48bf1f2b986712ce9
   spawn: {fileID: 0}
   playerSettings:
-    speed: 3
-    airspeed: 2.5
+    speed: 2.4
     canJump: 1
   camTransform: {fileID: 0}
   camBobbing: {fileID: 0}
+  camShake: {fileID: 0}
+  hotbar: {fileID: 0}
+  largeUI: {fileID: 0}
+  cm: {fileID: 0}
+  fps: {fileID: 0}
+  removePlayers: 0
+  _playerObjects:
+    _items: []

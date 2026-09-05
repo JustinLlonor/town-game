@@ -4,14 +4,27 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
+    public Camera mainCamera;
+    public Camera uiFront;
     public CameraMode mode;
+    public Rigidbody trackedFPSRigidbody;
     public Transform trackedFPSTransform;
+    public CameraLevel trackedCamLevel;
     public Transform trackedCinematicTransform;
     public Transform trackedObservableTransform;
-    public float observableGive;
+    public CameraMovement cm;
+    [SerializeField] private Observable currentObservable;
+    UIManager uiManager;
 
-    public SwitchCameraMode OnSwitchCameraMode;
-    public delegate void SwitchCameraMode(CameraMode mode);
+    /// <summary>
+    /// Called when the camera switches modes
+    /// </summary>
+    public CameraModeEvent onSwitchCameraMode;
+    /// <summary>
+    /// Called when a camera transition starts
+    /// </summary>
+    public CameraModeEvent onStartCameraTransition;
+    public delegate void CameraModeEvent(CameraMode mode);
 
     public bool isTransitioning = false;
 
@@ -22,15 +35,28 @@ public class CameraManager : MonoBehaviour
         Observe = 2
     }
 
+    private void Awake()
+    {
+        uiManager = FindAnyObjectByType<UIManager>();
+    }
+
+    public void SetCurrentObservable(Observable observable)
+    {
+        currentObservable = observable;
+    }
+
+    public Observable GetCurrentObservable() { return currentObservable; }
+
     public void ChangeCameraMode(CameraMode newMode)
     {
         mode = newMode;
         if (newMode == CameraMode.FirstPerson)
         {
-            transform.rotation = trackedFPSTransform.rotation;
+            transform.rotation = trackedFPSRigidbody.rotation;
         }
         if (newMode == CameraMode.Cinematic)
         {
+            uiManager.ExitUI();
             if (trackedCinematicTransform != null) transform.position = trackedCinematicTransform.position;
         }
         if (newMode == CameraMode.Observe)
@@ -40,17 +66,22 @@ public class CameraManager : MonoBehaviour
                 transform.position = trackedObservableTransform.position;
                 transform.rotation = trackedObservableTransform.rotation;
             }
+        } else
+        {
+            currentObservable = null;
         }
-        OnSwitchCameraMode?.Invoke(mode);
+        onSwitchCameraMode?.Invoke(mode);
     }
 
     /// <summary>
-    /// Sets the transform the camera is tracking during fps mode
+    /// Sets the transform and rigidbody the camera is tracking during fps mode
     /// </summary>
-    /// <param name="transform"></param>
-    public void SetTrackedFPSTransform(Transform transform)
+    /// <param name="rb"></param>
+    public void SetTrackedFPS(Rigidbody rb, Transform trackedTransform, CameraLevel camLevel)
     {
-        trackedFPSTransform = transform;
+        trackedFPSRigidbody = rb;
+        trackedFPSTransform = trackedTransform;
+        trackedCamLevel = camLevel;
     }
 
     public void SetTrackedCinematicTransform(Transform transform)
@@ -58,12 +89,21 @@ public class CameraManager : MonoBehaviour
         trackedCinematicTransform = transform;
     }
 
-    void Update()
+    void LateUpdate()
+    {
+        SetPositions();
+    }
+
+    public void SetPositions()
     {
         if (isTransitioning) return;
         if (mode == CameraMode.FirstPerson)
         {
-            if (trackedFPSTransform != null) transform.position = trackedFPSTransform.position;
+            if (trackedFPSRigidbody != null)
+            {
+                transform.position = new Vector3(trackedFPSRigidbody.position.x, trackedFPSRigidbody.position.y + trackedCamLevel.yLevel, 
+                    trackedFPSRigidbody.position.z);
+            }
         }
         if (mode == CameraMode.Cinematic)
         {
@@ -87,6 +127,7 @@ public class CameraManager : MonoBehaviour
     public void StartFPSTransition(float duration)
     {
         if (mode == CameraMode.FirstPerson) return;
+        onStartCameraTransition?.Invoke(CameraMode.FirstPerson);
         StopAllCoroutines();
         StartCoroutine(TransitionToMode(duration, CameraMode.FirstPerson));
     }
@@ -95,7 +136,8 @@ public class CameraManager : MonoBehaviour
     public void StartModeTransition(float duration, CameraMode newMode)
     {
         if (mode == newMode) return;
-        if (newMode != CameraMode.FirstPerson) trackedFPSTransform.rotation = transform.rotation;
+        if (newMode != CameraMode.FirstPerson) trackedFPSRigidbody.rotation = transform.rotation;
+        onStartCameraTransition?.Invoke(newMode);
         StopAllCoroutines();
         StartCoroutine(TransitionToMode(duration, newMode));
     }

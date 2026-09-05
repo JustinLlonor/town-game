@@ -10,6 +10,7 @@ namespace Photon.Voice.Fusion
     using UnityEngine;
     using Unity;
     using System;
+    using LogLevel = Photon.Voice.LogLevel;
 
     [AddComponentMenu("Photon Voice/Fusion/Fusion Voice Client")]
     [RequireComponent(typeof(NetworkRunner))]
@@ -28,6 +29,7 @@ namespace Photon.Voice.Fusion
             RoomOptions = new RoomOptions { IsVisible = false }
         };
 
+        bool voiceFollowClientStarted = false;
 #endregion
 
 #region Properties
@@ -57,6 +59,16 @@ namespace Photon.Voice.Fusion
             {
                 return;
             }
+            // Actual start code if the runner is already connecting
+            VoiceFollowClientStart();
+        }
+
+        // Starts the VoiceFollowClient and add the recorder.
+        //  Can be either be called from Start, or once the local player has joined the session, if the NetworkRunner was not yet starting during the Start() call
+        void VoiceFollowClientStart() {
+            if (voiceFollowClientStarted) return;
+
+            voiceFollowClientStarted = true;
             base.Start();
 
             if (this.UsePrimaryRecorder)
@@ -67,7 +79,7 @@ namespace Photon.Voice.Fusion
                 }
                 else
                 {
-                    this.Logger.LogError("Primary Recorder is not set.");
+                    this.Logger.Log(LogLevel.Error, "Primary Recorder is not set.");
                 }
             }
         }
@@ -89,29 +101,29 @@ namespace Photon.Voice.Fusion
         {
             if (userData == null) // Recorder w/o VoiceNetworkObject: probably created due to this.UsePrimaryRecorder = true
             {
-                this.Logger.LogInfo("Creating Speaker for remote voice {0}/{1} FusionVoiceClient Primary Recorder (userData == null).", playerId, voiceId);
+                this.Logger.Log(LogLevel.Info, "Creating Speaker for remote voice {0}/{1} FusionVoiceClient Primary Recorder (userData == null).", playerId, voiceId);
                 return this.InstantiateSpeakerPrefab(this.gameObject, true);
             }
 
             if (!(userData is NetworkId))
             {
-                this.Logger.LogWarning("UserData ({0}) is not of type NetworkId. Remote voice {1}/{2} not linked. Do you have a Recorder not used with a VoiceNetworkObject? is this expected?",
+                this.Logger.Log(LogLevel.Warning, "UserData ({0}) is not of type NetworkId. Remote voice {1}/{2} not linked. Do you have a Recorder not used with a VoiceNetworkObject? is this expected?",
                     userData == null ? "null" : userData.ToString(), playerId, voiceId);
                 return null;
             }
             NetworkId networkId = (NetworkId)userData;
             if (!networkId.IsValid)
             {
-                this.Logger.LogWarning("NetworkId is not valid ({0}). Remote voice {1}/{2} not linked.", networkId, playerId, voiceId);
+                this.Logger.Log(LogLevel.Warning, "NetworkId is not valid ({0}). Remote voice {1}/{2} not linked.", networkId, playerId, voiceId);
                 return null;
             }
             VoiceNetworkObject voiceNetworkObject = this.networkRunner.TryGetNetworkedBehaviourFromNetworkedObjectRef<VoiceNetworkObject>(networkId);
             if (ReferenceEquals(null, voiceNetworkObject) || !voiceNetworkObject)
             {
-                this.Logger.LogWarning("No voiceNetworkObject found with ID {0}. Remote voice {1}/{2} not linked.", networkId, playerId, voiceId);
+                this.Logger.Log(LogLevel.Warning, "No voiceNetworkObject found with ID {0}. Remote voice {1}/{2} not linked.", networkId, playerId, voiceId);
                 return null;
             }
-            this.Logger.LogInfo("Using VoiceNetworkObject {0} Speaker for remote voice  p#{1} v#{2}.", userData, playerId, voiceId);
+            this.Logger.Log(LogLevel.Info, "Using VoiceNetworkObject {0} Speaker for remote voice  p#{1} v#{2}.", userData, playerId, voiceId);
             return voiceNetworkObject.SpeakerInUse;
         }
 
@@ -122,7 +134,7 @@ namespace Photon.Voice.Fusion
             {
                 if (fusionOfflineVoiceRoomName == null)
                 {
-                    fusionOfflineVoiceRoomName = string.Format("fusion_oflline_{0}_voice", Guid.NewGuid());
+                    fusionOfflineVoiceRoomName = string.Format("fusion_offline_{0}_voice", Guid.NewGuid());
                 }
                 return fusionOfflineVoiceRoomName;
             }
@@ -142,6 +154,21 @@ namespace Photon.Voice.Fusion
             AppSettings settings = new AppSettings();
             if (this.UseFusionAppSettings)
             {
+#if FUSION2
+                settings.AppIdVoice = PhotonAppSettings.Global.AppSettings.AppIdVoice;
+                settings.AppVersion = PhotonAppSettings.Global.AppSettings.AppVersion;
+                settings.FixedRegion = PhotonAppSettings.Global.AppSettings.FixedRegion;
+                settings.UseNameServer = PhotonAppSettings.Global.AppSettings.UseNameServer;
+                settings.Server = PhotonAppSettings.Global.AppSettings.Server;
+                settings.Port = PhotonAppSettings.Global.AppSettings.Port;
+                settings.ProxyServer = PhotonAppSettings.Global.AppSettings.ProxyServer;
+                settings.BestRegionSummaryFromStorage = PhotonAppSettings.Global.AppSettings.BestRegionSummaryFromStorage;
+                settings.EnableLobbyStatistics = false;
+                settings.EnableProtocolFallback = PhotonAppSettings.Global.AppSettings.EnableProtocolFallback;
+                settings.Protocol = PhotonAppSettings.Global.AppSettings.Protocol;
+                settings.AuthMode = (AuthModeOption)(int)PhotonAppSettings.Global.AppSettings.AuthMode;
+                settings.NetworkLogging = PhotonAppSettings.Global.AppSettings.NetworkLogging;
+#else
                 settings.AppIdVoice = PhotonAppSettings.Instance.AppSettings.AppIdVoice;
                 settings.AppVersion = PhotonAppSettings.Instance.AppSettings.AppVersion;
                 settings.FixedRegion = PhotonAppSettings.Instance.AppSettings.FixedRegion;
@@ -155,6 +182,7 @@ namespace Photon.Voice.Fusion
                 settings.Protocol = PhotonAppSettings.Instance.AppSettings.Protocol;
                 settings.AuthMode = (AuthModeOption)(int)PhotonAppSettings.Instance.AppSettings.AuthMode;
                 settings.NetworkLogging = PhotonAppSettings.Instance.AppSettings.NetworkLogging;
+#endif
             }
             else
             {
@@ -163,10 +191,10 @@ namespace Photon.Voice.Fusion
             string fusionRegion = this.networkRunner.SessionInfo.Region;
             if (string.IsNullOrEmpty(fusionRegion))
             {
-                this.Logger.LogWarning("Unexpected: fusion region is empty.");
+                this.Logger.Log(LogLevel.Warning, "Unexpected: fusion region is empty.");
                 if (!string.IsNullOrEmpty(settings.FixedRegion))
                 {
-                    this.Logger.LogWarning("Unexpected: fusion region is empty while voice region is set to \"{0}\". Setting it to null now.", settings.FixedRegion);
+                    this.Logger.Log(LogLevel.Warning, "Unexpected: fusion region is empty while voice region is set to \"{0}\". Setting it to null now.", settings.FixedRegion);
                     settings.FixedRegion = null;
                 }
             }
@@ -174,11 +202,11 @@ namespace Photon.Voice.Fusion
             {
                 if (string.IsNullOrEmpty(settings.FixedRegion))
                 {
-                    this.Logger.LogInfo("Setting voice region to \"{0}\" to match fusion region.", fusionRegion);
+                    this.Logger.Log(LogLevel.Info, "Setting voice region to \"{0}\" to match fusion region.", fusionRegion);
                 }
                 else
                 {
-                    this.Logger.LogInfo("Switching voice region to \"{0}\" from \"{1}\" to match fusion region.", fusionRegion, settings.FixedRegion);
+                    this.Logger.Log(LogLevel.Info, "Switching voice region to \"{0}\" from \"{1}\" to match fusion region.", fusionRegion, settings.FixedRegion);
                 }
                 settings.FixedRegion = fusionRegion;
             }
@@ -291,20 +319,22 @@ namespace Photon.Voice.Fusion
 
         void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
-            this.Logger.LogInfo("OnPlayerJoined {0}", player);
+            this.Logger.Log(LogLevel.Info, "OnPlayerJoined {0}", player);
             if (runner.LocalPlayer == player)
             {
-                this.Logger.LogInfo("Local player joined, calling VoiceConnectOrJoinRoom");
+                // Will call the VoicefollowClient start code if the runner was not yet connecting during start (not needed in normal cases)
+                VoiceFollowClientStart();
+                this.Logger.Log(LogLevel.Info, "Local player joined, calling VoiceConnectOrJoinRoom");
                 LeaderStateChanged(ClientState.Joined);
             }
         }
 
         void INetworkRunnerCallbacks.OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
-            this.Logger.LogInfo("OnPlayerLeft {0}", player);
+            this.Logger.Log(LogLevel.Info, "OnPlayerLeft {0}", player);
             if (runner.LocalPlayer == player)
             {
-                this.Logger.LogInfo("Local player left, calling VoiceDisconnect");
+                this.Logger.Log(LogLevel.Info, "Local player left, calling VoiceDisconnect");
                 LeaderStateChanged(ClientState.Disconnected);
             }
         }
@@ -326,7 +356,11 @@ namespace Photon.Voice.Fusion
             LeaderStateChanged(ClientState.ConnectedToMasterServer);
         }
 
+#if FUSION2
+        void INetworkRunnerCallbacks.OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
+#else
         void INetworkRunnerCallbacks.OnDisconnectedFromServer(NetworkRunner runner)
+#endif
         {
             LeaderStateChanged(ClientState.Disconnected);
         }
@@ -355,9 +389,6 @@ namespace Photon.Voice.Fusion
         {
         }
 
-        void INetworkRunnerCallbacks.OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data)
-        {
-        }
 
         void INetworkRunnerCallbacks.OnSceneLoadDone(NetworkRunner runner)
         {
@@ -367,6 +398,28 @@ namespace Photon.Voice.Fusion
         {
         }
 
+ #if FUSION2
+        public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
+        {
+        }
+
+        public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
+        {
+        }
+
+        void INetworkRunnerCallbacks.OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey reliableKey, ArraySegment<byte> data)
+        {
+        }
+
+        void INetworkRunnerCallbacks.OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey reliableKey, float progress)
+        {
+        }
+
+#else
+        void INetworkRunnerCallbacks.OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data)
+        {
+        }
+#endif
 #endregion
     }
 }

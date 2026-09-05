@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
+//using Photon.Pun;
 
-public class Ragdoller : MonoBehaviourPunCallbacks  
+public class Ragdoller : MonoBehaviour//PunCallbacks  
 {
     public Transform currentRig; // The rig on the ragdoll
     private Transform targetRig;
@@ -13,7 +13,7 @@ public class Ragdoller : MonoBehaviourPunCallbacks
     /// <summary>
     /// Sets the corpse's bones positions to the target rig's bone positions
     /// </summary>
-    [PunRPC]
+    //[PunRPC]
     public void SetPositionsToTarget(Transform tRig)
     {
         targetRig = tRig;

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using Photon.Pun;
+//using Photon.Pun;
 
 public class MoneyUI : MonoBehaviour
 {
@@ -10,8 +10,8 @@ public class MoneyUI : MonoBehaviour
 
     private void Update()
     {
-        if (!PhotonNetwork.InRoom) return;
+        //if (!PhotonNetwork.InRoom) return;
         if (text == null) return;
-        text.text = $"{PhotonNetwork.LocalPlayer.CustomProperties["money"]}";
+        //text.text = $"{PhotonNetwork.LocalPlayer.CustomProperties["money"]}";
     }
 }

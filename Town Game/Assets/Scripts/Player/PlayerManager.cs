@@ -1,17 +1,35 @@
-using Photon.Pun;
+using Fusion;
+using Fusion.Sockets;
 using Photon.Realtime;
+using Steamworks;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class PlayerManager : MonoBehaviourPunCallbacks
+public class PlayerManager : NetworkBehaviour
 {
+    public bool spawnPlayersOnJoin = true;
+    [Networked, Capacity(20)] public NetworkDictionary<PlayerRef, NetworkId> playerObjects => default;
+    // Dictionaries for the mapping of players to their game ids and vice versa
+    [Networked, Capacity(20)] public NetworkDictionary<PlayerRef, int> playerGameId => default;
+    [Networked, Capacity(20)] public NetworkDictionary<int, PlayerRef> gameIdPlayer => default;
+    public Dictionary<PlayerRef, Observable> playerObservables = new Dictionary<PlayerRef, Observable>();
+    //public Dictionary<PlayerRef, PlayerProperties> playerProperties = new Dictionary<PlayerRef, PlayerProperties>();
+    [Networked, Capacity(20)] public NetworkDictionary<PlayerRef, NetworkId> properties => default;
+    //public PlayerProperties currentPlayerProperties = new PlayerProperties("", false, 0, 0);
+    private Dictionary<PlayerRef, TeleportInfo> teleportQueue = new Dictionary<PlayerRef, TeleportInfo>();
+    [Networked, Capacity(20)] public NetworkDictionary<int, NetworkString<_32>> playerRefNames => default;
+    
     public GameObject currentPlayer;
-    public GameObject playerPrefab;
+    public NetworkPrefabRef playerPrefab;
+    public NetworkPrefabRef propertyHolderPrefab;
     public Transform spawn;
 
     public PlayerSettings playerSettings;
     [Header("Assignables")]
+    public BarStatsUI bsUI;
     public Transform camTransform;
     public CameraBobbing camBobbing;
     public CameraShake camShake;
@@ -20,11 +38,31 @@ public class PlayerManager : MonoBehaviourPunCallbacks
     public CleanupMaster cm;
     public FirstPerson fps;
 
-    // Delegate for when the player gets spawned
-    public InstantiatePlayer OnInstantiatePlayer;
-    public PlayerEvent OnTeleportPlayer;
+    /// <summary>
+    /// Called when the player is spawned on the client
+    /// </summary>
+    public InstantiatePlayer onInstantiatePlayer;
+    /// <summary>
+    /// Called when the player is teleported on this client
+    /// </summary>
+    public PlayerEvent onTeleportPlayer;
+    /// <summary>
+    /// Called when this client's player is destroyed
+    /// </summary>
+    public PlayerEvent onDestroyPlayer; // NOT PROGRAMMED YET, ATTACH TO OnDespawn
+    /// <summary>
+    /// Called when this client's player has a new device added
+    /// </summary>
+    public DeviceEvent onDeviceAdd;
     public delegate void InstantiatePlayer(GameObject player);
     public delegate void PlayerEvent();
+    public delegate void DeviceEvent(PhysDevice device);
+
+    private NetworkRunner networkRunner;
+
+    public bool removePlayers = false;
+
+    public static PlayerManager i;
 
     [System.Serializable]
     public class PlayerSettings
@@ -33,39 +71,528 @@ public class PlayerManager : MonoBehaviourPunCallbacks
         public bool canJump = true;
     }
 
-    private void Start()
+    /// <summary>
+    /// Properties of players that are not constantly streamed or networked, properties that are mainly private
+    /// </summary>
+    public class PlayerProperties
     {
-        if (!PhotonNetwork.IsConnected) return;
-        if (PhotonNetwork.CurrentRoom == null) return;
-        GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawn.position, spawn.rotation);
-        OnInstantiatePlayer?.Invoke(player);
+        public string nickname;
+        public bool isCultist;
+        public int room;
+        public int currency;
+        public List<int> groups; // -1 = Cultist, -2 = Innocent, 0 and above are job indices
+        public int energy; // More private, attach to property holder
+
+        public PlayerProperties(string nickname, bool isCultist, int room, int currency)
+        {
+            this.nickname = nickname;
+            this.isCultist = isCultist;
+            this.room = room;
+            this.currency = currency;
+        }
+
+        public void SetIsCultist(bool newIsCultist)
+        {
+            isCultist = newIsCultist;
+        }
+        public void SetRoom(int newRoom)
+        {
+            this.room = newRoom;
+        }
+
+        public void SetCurrency(int newCurrency)
+        {
+            currency = newCurrency;
+        }
+
+        public void SetEnergy(int newEnergy)
+        {
+            energy = newEnergy;
+        }
+
+        /// <summary>
+        /// Checks if this player is part of a list of groups
+        /// </summary>
+        /// <param name="groups"></param>
+        /// <returns></returns>
+        public bool IsPartOfGroups(List<int> groups)
+        {
+            if (groups == null) return true;
+            foreach (int group in groups)
+            {
+                if (this.groups.Contains(group)) return true; // If the groups in this instance contain a group in the gorups instance, return true
+            }
+            return false;
+        }
+
+        public bool IsPartOfGroup(int group)
+        {
+            return (this.groups.Contains(group));
+        }
+    }
+
+    private struct TeleportInfo
+    {
+        public Vector3 location;
+        public Quaternion rotation;
+
+        public TeleportInfo(Vector3 location, Quaternion rotation)
+        {
+            this.location = location;
+            this.rotation = rotation;
+        }
+    }
+
+    private void Awake()
+    {
+        i = this;
+    }
+
+    //private void Start()
+    //{
+    //if (!PhotonNetwork.IsConnected) return;
+    //if (PhotonNetwork.CurrentRoom == null) return;
+    //GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawn.position, spawn.rotation);
+    //OnInstantiatePlayer?.Invoke(player);
+    //PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
+    //PlayerInventory playerInventory = player.GetComponent<PlayerInventory>();
+    //playerInventory.camTransform = camTransform;
+    //playerInventory.hotbarUI = hotbar;
+    //playerInventory.largeUI = largeUI;
+    //playerMovement.speed = playerSettings.speed;
+    //playerMovement.canJump = playerSettings.canJump;
+
+    //currentPlayer = player;
+    //}
+
+    public override void Spawned()
+    {
+        networkRunner = FindFirstObjectByType<NetworkRunner>();
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (!networkRunner.IsServer) return;
+        CheckTPQueue();
+        if (removePlayers)
+        {
+            removePlayers = false;
+            RemoveLeftPlayers();
+        }
+    }
+
+    private void Update()
+    {
+    }
+
+    #region
+    public void SetupMovementSettings(GameObject player)
+    {
         PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
+        playerMovement.speed = playerSettings.speed;
+        playerMovement.canJump = playerSettings.canJump;
+    }
+
+    public void SetupOnClient(GameObject player)
+    {
+        onInstantiatePlayer?.Invoke(player);
         PlayerInventory playerInventory = player.GetComponent<PlayerInventory>();
         playerInventory.camTransform = camTransform;
         playerInventory.hotbarUI = hotbar;
         playerInventory.largeUI = largeUI;
-        playerMovement.speed = playerSettings.speed;
-        playerMovement.canJump = playerSettings.canJump;
+        playerInventory.Setup();
+        if (bsUI != null) bsUI.InitializeSlotHolders();
 
         currentPlayer = player;
     }
 
-    [PunRPC]
-    public void Teleport(Vector3 location, Quaternion rotation)
+    public void SpawnPlayer(NetworkRunner runner, PlayerRef player)
     {
-        if (currentPlayer == null) return;
+        NetworkObject playerObject = runner.Spawn(playerPrefab, spawn.position, Quaternion.identity, player);
+        playerObject.GetComponent<Player>().owner = player;
+        playerObjects.Add(player, playerObject);
+        // Add OnInstantiate later
+    }
 
-        Rigidbody rb = currentPlayer.GetComponent<Rigidbody>();
-        PlayerMovement pm = currentPlayer.GetComponent<PlayerMovement>();
-        CameraMovement cm = FindObjectOfType<CameraMovement>();
-        currentPlayer.transform.position = location;
-        currentPlayer.transform.rotation = rotation;
-        pm.cameraPosition.eulerAngles = new Vector3 (0, rotation.eulerAngles.y, 0);
-        rb.velocity = Vector3.zero;
+    public GameObject SpawnPlayerAtTransform(NetworkRunner runner, PlayerRef player, Transform transform)
+    {
+        NetworkObject playerObject = runner.Spawn(playerPrefab, transform.position, Quaternion.identity, player);
+        playerObject.GetComponent<Player>().owner = player;
+        playerObjects.Add(player, playerObject);
+        if (playerObject == null) return null;
+        return playerObject.gameObject;
+    }
+
+    public void RemoveLeftPlayers()
+    {
+        List<PlayerRef> removedPlayers = new List<PlayerRef>();
+        foreach (KeyValuePair<PlayerRef, NetworkId> kvp in playerObjects)
+        {
+            if (!Runner.ActivePlayers.ToList().Contains(kvp.Key)) // active players doesnt contain the player object
+            {
+                removedPlayers.Add(kvp.Key);
+            }
+        }
+        foreach (PlayerRef player in removedPlayers) playerObjects.Remove(player);
+    }
+
+    public void RemovePlayer(PlayerRef player)
+    {
+        // Make this less spaghetti later (by attaching removal to removeplayers variable and accessing playerobjects dict through that)
+        NetworkObject obj = null;
+        NetworkObject[] playerNObjects = Resources.FindObjectsOfTypeAll(typeof(NetworkObject)) as NetworkObject[];
+        foreach (NetworkObject nObj in playerNObjects)
+        {
+            Player playerComponent = nObj.GetComponent<Player>();
+            if (playerComponent == null) continue;
+            if (playerComponent.owner == player)
+            {
+                obj = nObj;
+                break;
+            }
+        }
+        if (obj == null) return;
+        NetworkObject gizmoObj = obj.GetComponent<PlayerDropManager>().gizmo.GetComponent<NetworkObject>();
+        if (gizmoObj != null) networkRunner.Despawn(gizmoObj); // Removes the item gizmo
+        networkRunner.Despawn(obj);
+        removePlayers = true; // So that its modified only on fixedupdatenetwork
+        //playerObjects.Remove(player);
+        // Removes the player from observable dictionary if they are observing something
+        if (playerObservables.ContainsKey(player))
+        {
+            GetPlayerNetworkObject(player).GetComponent<Player>().inf.SetCanInteract(true);
+            playerObservables.Remove(player);
+            Object.AssignInputAuthority(PlayerRef.None);
+            playerObservables[player].currentPlayer = PlayerRef.None;
+        }
+    }
+
+    /// <summary>
+    /// Teleports the specified player to the location with the rotation
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="location"></param>
+    /// <param name="rotation"></param>
+    public void Teleport(PlayerRef player, Vector3 location, Quaternion rotation)
+    {
+        TeleportInfo tpInfo = new TeleportInfo(location, rotation);
+        if (teleportQueue.ContainsKey(player))
+        {
+            teleportQueue[player] = tpInfo;
+        }
+        else
+        {
+            teleportQueue.Add(player, tpInfo);
+        }
+    }
+
+    /// <summary>
+    /// Checks the TP queue for players
+    /// </summary>
+    private void CheckTPQueue()
+    {
+        foreach (KeyValuePair<PlayerRef, TeleportInfo> kvp in  teleportQueue)
+        {
+            MovePlayer(kvp.Key, kvp.Value);
+        }
+        // Removes all players in teleport queue
+        teleportQueue.Clear();
+    }
+
+    private void MovePlayer(PlayerRef player, TeleportInfo tpInfo)
+    {
+        Vector3 location = tpInfo.location;
+        Quaternion rotation = tpInfo.rotation;
+        if (!Runner.IsServer) return;
+        GameObject tpPlayer = GetPlayerObject(player);
+        Rigidbody rb = tpPlayer.GetComponent<Rigidbody>();
+        PlayerMovement pm = tpPlayer.GetComponent<PlayerMovement>();
+        CameraMovement cm = FindFirstObjectByType<CameraMovement>();
         rb.position = location;
         rb.rotation = rotation;
+        tpPlayer.transform.position = location;
+        tpPlayer.transform.rotation = rotation;
+        pm.cameraPosition.eulerAngles = new Vector3 (0, rotation.eulerAngles.y, 0);
+        rb.velocity = Vector3.zero;
         cm.yRotation = rotation.eulerAngles.y;
         cm.xRotation = rotation.eulerAngles.x;
-        OnTeleportPlayer?.Invoke();
+        onTeleportPlayer?.Invoke();
+    }
+
+    public GameObject GetPlayerObject(PlayerRef player)
+    {
+        if (!playerObjects.ContainsKey(player)) return null;
+        NetworkObject nObj;
+        bool foundObject = Runner.TryFindObject(playerObjects[player], out nObj);
+        if (!foundObject) return null;
+        return nObj.gameObject;
+    }
+
+    public NetworkObject GetPlayerNetworkObject(PlayerRef player)
+    {
+        if (!playerObjects.ContainsKey(player)) return null;
+        NetworkObject nObj;
+        bool foundObject = Runner.TryFindObject(playerObjects[player], out nObj);
+        if (!foundObject) return null;
+        return nObj;
+    }
+
+    public PlayerPropertyHolder GetPlayerPropertyHolder(NetworkId id)
+    {
+        NetworkObject nObj;
+        bool foundObject = Runner.TryFindObject(id, out nObj);
+        if (!foundObject) return null;
+        return nObj.GetComponent<PlayerPropertyHolder>();
+    }
+
+    public void FreezeAll()
+    {
+        foreach (KeyValuePair<PlayerRef, NetworkId> kvp in playerObjects)
+        {
+            NetworkObject player = GetPlayerNetworkObject(kvp.Key);
+            GameObject playerObject = player.gameObject;
+            playerObject.GetComponent<PlayerMovement>().Freeze();
+        }
+    }
+
+    public void UnfreezeAll()
+    {
+        foreach (KeyValuePair<PlayerRef, NetworkId> kvp in playerObjects)
+        {
+            NetworkObject player = GetPlayerNetworkObject(kvp.Key);
+            GameObject playerObject = player.gameObject;
+            playerObject.GetComponent<PlayerMovement>().Unfreeze();
+        }
+    }
+    #endregion
+
+    // Properties
+    #region
+    public void CreatePlayerProperties()
+    {
+        int globalId = 0;
+        gameIdPlayer.Clear();
+        playerGameId.Clear();
+        foreach (PlayerRef player in Runner.ActivePlayers)
+        {
+            NetworkObject propertyHolder = Runner.Spawn(propertyHolderPrefab);
+            properties.Add(player, propertyHolder);
+            propertyHolder.SetPlayerAlwaysInterested(player, true);
+            // Set the game id of each player
+            gameIdPlayer.Add(globalId, player);
+            playerGameId.Add(player, globalId);
+            globalId++;
+        }
+    }
+
+    public int GetGameId(PlayerRef player)
+    {
+        if (!playerGameId.ContainsKey(player)) return -1;
+        return playerGameId.Get(player);
+    }
+
+    public PlayerRef GetPlayerFromGameId(int gameId)
+    {
+        if (!gameIdPlayer.ContainsKey(gameId)) return PlayerRef.None;
+        return gameIdPlayer.Get(gameId);
+    }
+    
+    public string GetNickname(PlayerRef player)
+    {
+        if (properties.ContainsKey(player)) return GetPlayerPropertyHolder(properties[player]).nickname.ToString();
+        return null;
+    }
+
+    public bool GetIsCultist(PlayerRef player)
+    {
+        if (properties.ContainsKey(player)) return GetPlayerPropertyHolder(properties[player]).isCultist;
+        return false;
+    }
+
+    public int GetRoom(PlayerRef player)
+    {
+        if (properties.ContainsKey(player)) return GetPlayerPropertyHolder(properties[player]).room;
+        return -1;
+    }
+
+    public float GetMoney(PlayerRef player)
+    {
+        if (properties.ContainsKey(player)) return GetPlayerPropertyHolder(properties[player]).money;
+        return -1;
+    }
+
+    public NetworkLinkedList<int>? GetGroups(PlayerRef player)
+    {
+        if (properties.ContainsKey(player)) return GetPlayerPropertyHolder(properties[player]).groups;
+        return null;
+    }
+
+    public int GetEnergy(PlayerRef player)
+    {
+        if (properties.ContainsKey(player)) return GetPlayerPropertyHolder(properties[player]).energy;
+        return -1;
+    }
+
+    public NetworkLinkedList<NetworkId>? GetDevices(PlayerRef player)
+    {
+        if (properties.ContainsKey(player)) return GetPlayerPropertyHolder(properties[player]).devices;
+        return null;
+    }
+
+    public void SetNickname(PlayerRef player, string name)
+    {
+        if (properties.ContainsKey(player)) GetPlayerPropertyHolder(properties[player]).nickname = name;
+        SetPlayerRefName(player, name);
+    }
+
+    public void SetIsCultist(PlayerRef player, bool isCultist)
+    {
+        GetPlayerPropertyHolder(properties[player]).isCultist = isCultist;
+    }
+
+    public void SetRoom(PlayerRef player, int room)
+    {
+        GetPlayerPropertyHolder(properties[player]).room = room;
+    }
+
+    public void SetMoney(PlayerRef player, float money)
+    {
+        GetPlayerPropertyHolder(properties[player]).money = money;
+    }
+
+    public void AddMoney(PlayerRef player, float amount)
+    {
+        GetPlayerPropertyHolder(properties[player]).money += amount;
+    }
+
+    public void RemoveMoney(PlayerRef player, float amount)
+    {
+        float newMoney = GetPlayerPropertyHolder(properties[player]).money - amount;
+        if (newMoney < 0f) newMoney = 0f;
+        GetPlayerPropertyHolder(properties[player]).money = newMoney;
+    }
+
+    public void AddPlayerToGroup(PlayerRef player, int group)
+    {
+        if (GetPlayerPropertyHolder(properties[player]).groups.Contains(group)) return;
+        GetPlayerPropertyHolder(properties[player]).groups.Add(group);
+    }
+
+    public void RemovePlayerFromGroup(PlayerRef player, int group)
+    {
+        if (!GetPlayerPropertyHolder(properties[player]).groups.Contains(group)) return;
+        GetPlayerPropertyHolder(properties[player]).groups.Remove(group);
+    }
+
+    public bool PlayerIsPartOfGroup(PlayerRef player, int group)
+    {
+        return GetPlayerPropertyHolder(properties[player]).groups.Contains(group);
+    }
+
+    public List<PlayerRef> GetPlayersInGroup(int group)
+    {
+        List<PlayerRef> output = new List<PlayerRef>();
+        foreach (var kvp in properties)
+        {
+            if (GetPlayerPropertyHolder(kvp.Value).groups.Contains(group))
+            {
+                output.Add(kvp.Key);
+            }
+        }
+        return output;
+    }
+    // ^^
+
+    public void AddKey(PlayerRef player, int key)
+    {
+        if (GetPlayerPropertyHolder(properties[player]).keys.Contains(key)) return;
+        GetPlayerPropertyHolder(properties[player]).keys.Add(key);
+    }
+
+    public void RemoveKey(PlayerRef player, int key)
+    {
+        if (!GetPlayerPropertyHolder(properties[player]).keys.Contains(key)) return;
+        GetPlayerPropertyHolder(properties[player]).keys.Remove(key);
+    }
+
+    public bool PlayerHasKey(PlayerRef player, int key)
+    {
+        return GetPlayerPropertyHolder(properties[player]).keys.Contains(key);
+    }
+
+    /// <summary>
+    /// Adds device ownership to a player, and sets up device input
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="device"></param>
+    public void AddDevice(PlayerRef player, NetworkId deviceId)
+    {
+        PlayerPropertyHolder pHolder = GetPlayerPropertyHolder(properties[player]);
+        NetworkObject deviceObject = Runner.FindObject(deviceId);
+        PhysDevice physDevice = deviceObject.GetComponent<PhysDevice>();
+        physDevice.AddPlayerInput(player);
+        if (!pHolder.devices.Contains(deviceId)) pHolder.devices.Add(deviceId);
+        RPC_SendDevice(player, deviceId);
+    }
+
+    /// <summary>
+    /// (NOT IMPLEMENTED YET) Remove device ownership from a player
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="device"></param>
+    public void RemoveDevice(PlayerRef player, NetworkId device)
+    {
+
+    }
+
+    /// <summary>
+    /// Sends the information that a new device was added to the player
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="deviceId"></param>
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_SendDevice([RpcTarget] PlayerRef player, NetworkId deviceId)
+    {
+        NetworkObject deviceObject = null; 
+        Runner.TryFindObject(deviceId, out deviceObject);
+        if (deviceObject == null) return;
+        PhysDevice physDevice = deviceObject.GetComponent<PhysDevice>();
+        onDeviceAdd?.Invoke(physDevice);
+    }
+
+    public void SetEnergy(PlayerRef player, int energy)
+    {
+        GetPlayerPropertyHolder(properties[player]).energy = energy;
+    }
+    #endregion
+
+    private void SetPlayerRefName(PlayerRef player, string name)
+    {
+        int index = player.AsIndex;
+        if (!playerRefNames.ContainsKey(index))
+        {
+            playerRefNames.Add(index, name);
+            return;
+        }
+        playerRefNames.Set(index, name);
+    }
+
+    public string GetPlayerRefName(PlayerRef player)
+    {
+        int index = player.AsIndex;
+        if (playerRefNames.ContainsKey(index))
+        {
+            return playerRefNames[index].ToString();
+        }
+        return "";
+    }
+
+    public string GetPlayerRefName(int index)
+    {
+        if (playerRefNames.ContainsKey(index))
+        {
+            return playerRefNames[index].ToString();
+        }
+        return "";
     }
 }

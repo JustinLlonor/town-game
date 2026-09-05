@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
+//using Photon.Pun;
 
 public class ParticleManager : MonoBehaviour
 {
@@ -21,7 +21,7 @@ public class ParticleManager : MonoBehaviour
         instance = this;
     }
 
-    [PunRPC]
+    //[PunRPC]
     public void SpawnParticle(string name, Vector3 position, Vector3 direction, Vector3 tColor)
     {
         Particle p = Array.Find(particles, particle => particle.name == name);

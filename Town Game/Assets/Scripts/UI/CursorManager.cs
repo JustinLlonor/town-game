@@ -15,11 +15,13 @@ public class CursorManager : MonoBehaviour
     {
         isLocked = true;
         Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     public void Unlock()
     {
         isLocked = false;
         Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 }

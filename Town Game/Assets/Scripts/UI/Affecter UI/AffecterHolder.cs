@@ -14,14 +14,14 @@ public class AffecterHolder : MonoBehaviour
 
     private void Awake()
     {
-        FindObjectOfType<PlayerManager>().OnInstantiatePlayer += GetReferences;
+        FindFirstObjectByType<PlayerManager>().onInstantiatePlayer += GetReferences;
     }
 
     void GetReferences(GameObject player)
     {
         trackedStats = player.GetComponent<PlayerStats>();
-        trackedStats.OnAddAffecter += AddAffecter;
-        trackedStats.OnRemoveAffecter += RemoveAffecter;
+        //trackedStats.OnAddAffecter += AddAffecter;
+        //trackedStats.OnRemoveAffecter += RemoveAffecter;
     }
 
     void AddAffecter(StatAffecter affecter)

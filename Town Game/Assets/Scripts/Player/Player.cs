@@ -1,0 +1,402 @@
+using Fusion;
+using Photon.Voice.Unity;
+using Steamworks;
+using UnityEngine;
+using WebSocketSharp;
+
+public class Player : NetworkBehaviour
+{
+    [Networked] public PlayerRef owner { get; set; }
+    [Networked] public string nickname { get; set; } = "";
+    [Networked] public PlayerRef lockedPlayer { get; set; } = PlayerRef.None;
+    PlayerRef previousLocked = PlayerRef.None;
+    public delegate void PlayerEvent();
+    public PlayerEvent Init;
+    public LayerMask glitchLayer;
+    public GameObject serverItem;
+    [Header("References")]
+    public PlayerMovement playerMovement;
+    public PlayerInventory playerInventory;
+    public PlayerDropManager dropManager;
+    public InteractableFinder inf;
+    public ItemUse itemUse;
+    public PlayerClothing playerClothing;
+    public Rigidbody rb;
+    public PlayerGrab playerGrab;
+    public PlayerProgress playerProgress;
+    public PlayerRoom playerRoom;
+    public Speaker speaker;
+    //public ControlPanel connectedPanel;
+    //public ControlPanel connectedClientPanel;
+    public Transform playerGFX;
+    Transform cameraPosition;
+    PlayerManager playerManager;
+    VotingManager votingManager;
+    ApplicationManager applicationManager;
+    PositionManager positionManager;
+    RunnerManager rm;
+    CameraManager cm;
+    CameraMovement camMovement;
+    // To sync the inputs on all other clients
+    [Networked] public float camDirection { get; set; }
+    [Networked] public float camDirectionX { get; set; }
+    [Networked] Vector2 direction { get; set; }
+    bool nicknameSet = false;
+    bool previousCrouchSet = false;
+    // Previous inputs for primary use and secondary use
+    private bool previousPrimary = false;
+    private bool previousSecondary = false;
+
+    private void Awake()
+    {
+        playerManager = FindFirstObjectByType<PlayerManager>();
+        cameraPosition = playerMovement.cameraPosition;
+    }
+
+    private void Start()
+    {
+        playerManager.SetupMovementSettings(gameObject);
+        if (!HasInputAuthority) return;
+        playerManager.SetupOnClient(gameObject);
+    }
+
+    public override void Spawned()
+    {
+        playerManager = FindFirstObjectByType<PlayerManager>();
+        cm = FindFirstObjectByType<CameraManager>();
+        camMovement = FindFirstObjectByType<CameraMovement>();
+        rm = FindFirstObjectByType<RunnerManager>();
+        votingManager = FindFirstObjectByType<VotingManager>();
+        applicationManager = FindAnyObjectByType<ApplicationManager>();
+        positionManager = FindAnyObjectByType<PositionManager>();
+        Init?.Invoke();
+        if (!HasInputAuthority) return;
+        if (SteamManager.Initialized) RPC_SendNickname(SteamFriends.GetPersonaName());
+        else RPC_SendNickname("Player " + Object.InputAuthority.PlayerId.ToString());
+        UIManager.instance.OnUIOpen += MenuOpen;
+        UIManager.instance.OnUIClose += MenuClose;
+        InputManager inputManager = FindFirstObjectByType<InputManager>();
+        inputManager.onExitObserve += OnExitObservable;
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (GetInput(out NetworkInputData data))
+        {
+            playerMovement.horizontalMovement = data.direction.X; // Horizontal and vertical movement inputs
+            playerMovement.verticalMovement = data.direction.Y;
+            if (!HasInputAuthority) // Syncs player rotation, rotates player models
+            {
+                playerGFX.rotation = Quaternion.Euler(0f, data.camDirection, 0f);
+                playerMovement.orientation.rotation = Quaternion.Euler(0f, data.camDirection, 0f); // Orientation transform points toward the direction the player moves in
+                cameraPosition.rotation = Quaternion.Euler(camDirectionX, camDirection, 0f);
+            }
+            if (HasStateAuthority) // Sets properties
+            {
+                camDirection = data.camDirection;
+                camDirectionX = data.camDirectionX;
+                direction = data.direction;
+            }
+            // Player movement
+            if (data.buttons.IsSet(NetworkInputData.Buttons.Jump))
+            {
+                playerMovement.Jump();
+            }
+            CrouchSet(data.buttons.IsSet(NetworkInputData.Buttons.Crouch)); // Crouching stuff, executes functions on first press
+            playerMovement.sprintPressed = data.buttons.IsSet(NetworkInputData.Buttons.Sprint);
+            // Player inventory
+            if (!(data.hotbarKey <= 0))
+            {
+                PlayerInventory(data.hotbarKey);
+            }
+            // Interactable Finder
+            inf.menuData = data.menu;
+            inf.forwardDirection = Quaternion.Euler(data.camDirectionX, data.camDirection, 0f) * Vector3.forward; // orientation/camDirection is mouse x
+            inf.interactionIndex = data.interaction;
+            // Dropping
+            dropManager.dropPressed = data.buttons.IsSet(NetworkInputData.Buttons.Drop);
+            // Observables
+            if (data.buttons.IsSet(NetworkInputData.Buttons.ExitObserve))
+            {
+                ExitObserve();
+            }
+            if (data.subInteractableIndex != -1 && !Runner.IsResimulation)
+            {
+                IncreaseSIAtIndex(data.subInteractableIndex);
+            }
+            // Item use, progress, and grabbing
+            if (!Runner.IsResimulation)
+            {
+                // State change detector
+                bool usePrimary = data.itemUsePrimary;
+                bool useSecondary = data.itemUseSecondary;
+                string equippedItemName = playerInventory.items[playerInventory.equippedSlot].ToString();
+                bool handEmpty = equippedItemName.IsNullOrEmpty();
+                if (dropManager.currentPlacementMode == GizmoMode.Item)
+                {
+                    usePrimary = false;
+                    useSecondary = false;
+                }
+                // Player progress
+                if (!playerProgress.progressing)
+                {
+                    if (usePrimary && (!previousPrimary))
+                    {
+                        playerProgress.InitialCastCheck(true, equippedItemName);
+                    }
+                    else if (useSecondary && (!previousSecondary))
+                    {
+                        playerProgress.InitialCastCheck(false,equippedItemName);
+                    }
+                }
+                else
+                {
+                    if ((!usePrimary) && (!useSecondary))
+                    {
+                        playerProgress.StopProgress();
+                    }
+                    else
+                    {
+                        playerProgress.ContinuationCheck(usePrimary, equippedItemName);
+                    }
+                }
+                if (playerProgress.progressing) // if progressing, set use keys to false
+                {
+                    usePrimary = false;
+                    useSecondary = false;
+                }
+                // Primary state change functions
+                if (usePrimary != previousPrimary)
+                {
+                    previousPrimary = usePrimary;
+                    bool grabbed = false;
+                    // Grabbing
+                    if (usePrimary)
+                    {
+                        grabbed = playerGrab.CheckGrab();
+                    }
+                    else
+                    {
+                        playerGrab.CheckRelease();
+                    }
+                    // Item usage, can only be triggered when grabbing doesn't work
+                    if (!grabbed)
+                    {
+                        if (!handEmpty)
+                        {
+                            if (usePrimary)
+                            {
+                                itemUse.UsePrimary();
+                            }
+                            else
+                            {
+                                itemUse.ReleasePrimary();
+                            }
+                        }
+                    }
+                }
+                // Secondary state change functions
+                if (useSecondary != previousSecondary)
+                {
+                    previousSecondary = useSecondary;
+                    if (!handEmpty)
+                    {
+                        if (useSecondary)
+                        {
+                            itemUse.UseSecondary();
+                        }
+                        else
+                        {
+                            itemUse.ReleaseSecondary();
+                        }
+                    }
+                }
+                // Item use hold functions
+                if (usePrimary)
+                {
+                    itemUse.HoldPrimary();
+                }
+                if (useSecondary)
+                {
+                    itemUse.HoldSecondary();
+                }
+            }
+            
+            dropManager.isRotating = data.rotateModePressed;
+            if (dropManager.isPlacing && dropManager.isRotating && !Runner.IsResimulation)
+            {
+                if (data.rotateDelta != 0f)
+                {
+                    dropManager.ReceiveRotationDelta(data.rotateDelta);
+                }
+            }
+        }
+        Simulate();
+    }
+
+    private void IncreaseSIAtIndex(int index)
+    {
+        ItemObservable io = null;
+        if (HasStateAuthority)
+        {
+            if (!playerManager.playerObservables.ContainsKey(Object.InputAuthority)) return;
+            if (!(playerManager.playerObservables[Object.InputAuthority] is ItemObservable)) return;
+            io = (ItemObservable)playerManager.playerObservables[Object.InputAuthority];
+        }
+        if (HasInputAuthority)
+        {
+            io = (ItemObservable)cm.GetCurrentObservable();
+        }
+
+        io.IncreaseSIProgress(Runner.DeltaTime, index);
+    }
+
+    // An RPC sent from the player to the server to set the nickname
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
+    public void RPC_SendNickname(string name)
+    {
+        if (nicknameSet) return;
+        nickname = name;
+        nicknameSet = true;
+        playerManager.SetNickname(owner, name);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_ResetInput()
+    {
+        if (!HasInputAuthority) return;
+        rm.ResetInputs();
+    }
+
+    private void Update()
+    {
+        if (previousLocked != lockedPlayer && HasInputAuthority)
+        {
+            previousLocked = lockedPlayer;
+            OnLockedChange();
+        }
+        if (IsProxy)
+        {
+            Prediction();
+        }
+    }
+
+    void MenuOpen(int i)
+    {
+        rm.menu = true;
+    }
+
+    void MenuClose()
+    {
+        rm.menu = false;
+    }
+
+    private void OnExitObservable()
+    {
+        rm.exitObservePressed = true;
+    }
+
+    private void ExitObserve()
+    {
+        if (Runner.IsServer)
+        {
+            PlayerRef thisPlayer = Object.InputAuthority;
+            if (playerManager.playerObservables.ContainsKey(thisPlayer))
+            {
+                playerManager.playerObservables[thisPlayer].ExitObservationNetwork(thisPlayer);
+            }
+        }
+        if (HasInputAuthority)
+        {
+            CameraManager cameraManager = FindFirstObjectByType<CameraManager>();
+            cameraManager.GetCurrentObservable().ExitObservation();
+        }
+    }
+
+    void CrouchSet(bool crouchPressed)
+    {
+        if (!crouchPressed) playerMovement.ExitCrouch();
+        if (crouchPressed == previousCrouchSet) return; // If they don't need to change, return
+        previousCrouchSet = crouchPressed;
+        if (crouchPressed)
+        {
+            playerMovement.EnterCrouch();
+        }
+    }
+
+    private void PlayerInventory(int slot)
+    {
+        if (!playerInventory.canSwitchSlots) return; // If can't switch slots, return
+        if (!playerInventory.items[playerInventory.equippedSlot].ToString().IsNullOrEmpty())
+        {
+            // if (pi.equippedItem.large) return; Do later, if the equipped item is large then return
+        }
+        playerInventory.EquipItem(slot - 1);
+        if (HasInputAuthority) playerInventory.UpdateHotbarUI();
+    }
+
+    private void Simulate()
+    {
+        playerMovement.SetIsMoving();
+        playerMovement.Inputs();
+        playerMovement.MovePlayer();
+        playerMovement.CapAirVelocity();
+        playerMovement.StepClimb();
+        playerMovement.GroundSim();
+    }
+
+    //Prediction for the player movement, executed on proxies
+    private void Prediction()
+    {
+        playerGFX.rotation = Quaternion.Euler(0f, camDirection, 0f);
+        cameraPosition.rotation = Quaternion.Euler(camDirectionX, camDirection, 0f);
+        playerMovement.SetDirection(direction);
+    }
+
+    public void EnableUIFront()
+    {
+        playerClothing.SetClothingLayer((int)Mathf.Log(glitchLayer.value, 2));
+        serverItem.layer = (int)Mathf.Log(glitchLayer.value, 2);
+    }
+
+    public void DisableUIFront()
+    {
+        playerClothing.SetClothingLayer(0);
+        serverItem.layer = 0;
+    }
+
+    private void OnLockedChange()
+    {
+        if (lockedPlayer == PlayerRef.None)
+        {
+            camMovement.lockedPlayer = null;
+            return;
+        }
+        GameObject playerObject = playerManager.GetPlayerObject(lockedPlayer);
+        if (playerObject == null)
+        {
+            camMovement.lockedPlayer = null;
+            return;
+        }
+        camMovement.ResetLerpTimer();
+        camMovement.lockedPlayer = playerObject.GetComponent<PlayerMovement>().cameraPosition;
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
+    public void RPC_Vote(int id, PlayerRef voted, RpcInfo info = default)
+    {
+        votingManager.ReceiveVote(id, info.Source, voted);
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
+    public void RPC_SubmitApplication(Vector2Int jobRef, RpcInfo info = default)
+    {
+        applicationManager.SubmitApplication(jobRef, info.Source);
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
+    public void RPC_SubmitResignation(Vector2Int jobRef, RpcInfo info = default)
+    {
+        positionManager.GetJobFromRef(jobRef).RemovePlayer(info.Source);
+    }
+}

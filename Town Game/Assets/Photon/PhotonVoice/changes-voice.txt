@@ -1,5 +1,120 @@
 Photon Voice 2 Change Log
 
+v2.58 (March 03, 2025)
+   PUN2: v2.49 (PUN2.49)
+   RT/lib: v4.1.8.14
+   PhotonVoiceApi: revision 7853
+   Unity: 2019.4.39 or higher
+   UPDATED: Photon3Unity3D.dll, Photon Realtime (LoadBalancing), Photon Chat to v4.1.8.14, PUN to v2.49
+Core:
+   ADDED: Codec enum extension methods IsAudio() and IsVideo() in a new Voice.Utility static class
+   ADDED: AudioOutDelayControl.Delay property: a simplified delay API
+   FIXED: noticeable audio playback start delay when resuming transmission after intentional pause (by sender or with Interest Groups): RemoteVoice considers an incoming frame as current rather than late if the gap with the previous frame is large and continues playback instead of waiting for a "valid" frame
+   FIXED: possible noisy logging before the 1st packet arrives caused by useless ring buffer scan: decodeQueue() call moved after the synchronization wait call in decodeThread
+   FIXED: AudioOutDelayControl.Service() clears the buffer correctly even if it's called rarely (once per sec. for WebGl)
+   CHANGED: AudioOutDelayControl buffer size is at least 2 sec. (for WebGL)
+   FIXED: AudioOutDelayControl buffer minimal size check used the wrong value and never worked
+Unity:
+   FIXED: VoiceComponentImpl.Level always returned 0
+   FIXED: the scene marked as dirty after updating VoiceLogger.LogLevel from another inspector in Editor to not loose the change
+   FIXED: UnityAudioOut zeroes the clip after creation because it may contain non-zero data (e.g. from previously created clip initialized with pcmreadercallback).
+Android:
+   CHANGED: audio capture session is initialized and destroyed asynchronously to prevent ui freezes
+WebGL:
+   FIXED: audio plays without interruption in background browser page due to Photon Realtime update and the following change
+   CHANGED: VoiceConnection incoming packet dispatch call is triggered frequently enough by a worker, not in FixedUpdate() which is called only once per sec. in background browser page
+iOS and Mac:
+   CHANGED: AudioIn libraries set other apps ducking mode to minimum
+
+v2.57 (December 13, 2024)
+   PUN2: v2.45 (PUN2.45) 
+   RT/lib: v4.1.8.8
+   PhotonVoiceApi: revision 7794
+   Unity: 2019.4.39 or higher
+WebGL:
+   ADDED: WebAudioAudioOut spatial ref and max distances control via AudioSource min and max distances
+FMOD:
+   FIXED: FMOD always used device 0 for recording
+Fusion:
+   FIXED: `LogLevel` related errors after importing Fusion 2.0.3
+
+v2.56 (August 19, 2024)
+   PUN2: v2.45 (PUN2.45) 
+   RT/lib: v4.1.8.8
+   PhotonVoiceApi: revision 7650
+   Unity: 2019.4.39 or higher
+   UPDATED: Photon3Unity3D.dll, Photon Realtime (LoadBalancing), Photon Chat to v4.1.8.8
+Unity:
+   FIXED: VoiceFollowClient leaves the room instead of disconnecting the server when follows the "not in room" leader's state: disconnect left the player in the room in an inactive state preventing subsequent connection with the same UserId
+   CHNAGED: LoggerImpl cashes VoiceLogger.LogLevel in SetVoiceLogger() and Log() and uses the cashed value if Log() is called after the VoiceLogger instance is destroyed
+   NOTE: this mitigates but not completely fixes the wrong logging level during scene unload if the global VoiceLogger is destroyed earlier than the logging component; use local VoiceLogger instances to avoid this
+   CHANGED: do not create a voice settings file in the voice install sub-folder if voice is installed in the Packages folder (and then potentially not writable)
+FMOD:
+   ADDED: SpeakerFMOD event is always attached to the game object to support a spatializer in case it's attached to the event
+WebGL:
+   FIXED: WebAudioMicIn allocated a native buffer for captured audio 4 times larger than required
+   FIXED: WebGL Speaker did not negate its position 'y' component
+
+v2.55 (February 26, 2024)
+   PUN2: v2.45 (PUN2.45) 
+   RT/lib: v4.1.8.0
+   PhotonVoiceApi: revision 7409
+   Unity: 2019.4.39 or higher
+   UPDATED: Photon3Unity3D.dll, Photon Realtime (LoadBalancing) to v4.1.8.0
+   UPDATED: PUN to v2.45
+   ADDED: visionOS support (Opus and WebRTC Audio libraries)
+Core:
+   BREAKING: ILogger.Log*() methods replaced with LogLevel enum and single Log() method accepting logging level
+   BREAKING: added ILogger.Level property, that Voice code can check to avoid unnecessary Log() methods calls
+   ADDED: LogLevel.Trace logging level
+   BREAKING: LoadBalancingTransport is no longer ILogger, user code must provide Voice components with ILogger implementation (like Unity.Logger)
+   ADDED: LoadBalancingTransport (and VoiceCLient created by the transport) uses private LBCLogger relying on LoadBalancingClient.DebugReturn() if not provided with an external ILogger
+FMOD:
+   FIXED: FMOD.AudioOutEvent playback (OutPos returns the position not wrapped by the event length)
+PS4/PS5:
+   CHANGED: Speaker.OutputPlugin property is exposed in Speaker's Editor inspector
+
+v2.54 (January 08, 2024)
+   PUN2: v2.43 (PUN2.43)
+   RT/lib: v4.1.7.1
+   PhotonVoiceApi: revision 7300
+   Unity: 2019.4.39 or higher
+Unity:
+   FIXED: Speaker does not call audioOutput.Push() after stopping even if it receives a decoded packet
+   FIXED: added a null-check in ConnectAndJoin.IsConnected that called sometimes before Start() where voiceConnection is initialized
+   FIXED: removed SupportClass.StopAllBackgroundCalls() call from VoiceConnection.OnDestroy() (accidentally left after removal of AppQuit handling from VoiceConnection)
+   REMOVED: LoadBalancingClient.ClientType update in VoiceConnection since we set it in the transport now
+Fusion:
+   ADDED: support for Fusion 2
+   ADDED: additional security in case the Fusion's runner was not yet connecting during Fusionvoiceclient start
+   FIXED: missing AutoConnectAndJoin checkbox in FusionVoiceClient inspector
+   CHANGED: VoiceFollowClient.JoinVoiceRoom is virtual protected to allow room join customization
+PUN:
+   CHANGED: VoiceFollowClient.JoinVoiceRoom is virtual protected to allow room join customization
+Core:
+   FIXED: Set() was called sometimes on closed RemoteVoice.frameQueueReady AutoResetEvent
+   FIXED: LoadBalancingTransport sets LoadBalancingClient.ClientType to Voice
+   FIXED: VoiceClient.onVoiceRemove() referenced null in a log message if the voice was not found
+   CHANGED: LoadBalancingTransport.LoadBalancingPeer.ChannelCount is set to at least 4 instead of length of Codec enum + 1 (the enum may be large while we normally do no need more than 4 channels)
+iOS
+   FIXED: AudioIn: routing audio out to earpiece (receiver) instead of loudspeaker since iOS 17 (and earlier versions for new iPad Pro) due to wrong initialization order (regression): session category is now set after AudioUnit creation
+   FIXED: audio session 'Game' preset Mode changed to 'VoiceChat' from 'Default' that muted audio out sometimes
+   CHANGED: Recorder default iOS Audio Session settings are 'Game' preset
+   CHANGED: iOS Audio Session settings to 'Game' preset in all demos 
+   NOTE: make sure that Recorder iOS Audio Session Preset is 'Game' in existing projects (it may be 'Custom' with wrong 'Default' mode)
+   CHANGED: AudioIn: when stopping recording, session category is set to its previous values instead of Ambient
+PS4/PS5:
+   FIXED: the locking in PlayStationAudioOut.cs
+   ADDED: AudioPluginPhotonVoice which enables support for routing audio output through the Unity Mixer before re-routing it directly to the Sony audioout APIs via a native mixer plugin on the PS4 and PS5
+   ADDED: a new public 'OutputPlugin' field for PS4 and PS5 to Speaker.cs, which enables the user to select if he wants to use the classic PhotonVoiceAudioOutputPlugin (which does neither support nor require the use of a mixer) or the new AudioPluginPhotonVoice (which supports, but also requires the use of a mixer)
+FMOD:
+   FIXED: FMODHelpersMenu.cs was excluded from the project if FMOD was not enabled resulting in missing 'Photon Voice/Enable FMOD Integration' menu
+   BREAKING: FMOD.AudioInReader no longer replaces -1 device id with 0 assuming that -1 is Voice API default mic: callers should always pass FMOD-specific device id
+DemoVoiceUI:
+   ADDED: FMOD microphone input support implemented via Recorder.InputFactory, added internal MicType and made other changes to integrate FMOD mic into the microphone list and differentiate it from AudioTone source, also factory based
+   CHNAGED: RemoteSpeakerUI does not require Speaker (for easier manipulations in Editor)
+   CHANGED: remote player UserId replaced with NickName + ActorNr in UI
+
 v2.53 (September 06, 2023)
    PUN2: v2.43 (PUN2.43) 
    RT/lib: v4.1.7.1

@@ -1,4 +1,4 @@
-using Photon.Pun;
+//using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,19 +23,11 @@ public class RoleRevealer : MonoBehaviour
 
     private void Awake()
     {
-        cm = FindObjectOfType<CameraManager>();
-        bs = FindObjectOfType<BlackScreen>();
-        rtxt = FindObjectOfType<RoleText>();;
-        if (PhotonNetwork.CurrentRoom != null) bs.ShowCover();
-        FindObjectOfType<PlayerManager>().OnInstantiatePlayer += GetReferences;
-    }
-    
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.J))
-        {
-            RevealRole(false);
-        }
+        cm = FindFirstObjectByType<CameraManager>();
+        bs = FindFirstObjectByType<BlackScreen>();
+        rtxt = FindFirstObjectByType<RoleText>();;
+        FindAnyObjectByType<PlayerManager>().onInstantiatePlayer += GetReferences;
+        //if (PhotonNetwork.CurrentRoom != null) bs.ShowCover();
     }
 
     void GetReferences(GameObject player)
@@ -46,6 +38,7 @@ public class RoleRevealer : MonoBehaviour
 
     public void RevealRole(bool isCultist)
     {
+        Debug.Log("RR Start");
         OnGetRole?.Invoke(isCultist);
         StartCoroutine(StartReveal(isCultist));
     }
@@ -60,7 +53,7 @@ public class RoleRevealer : MonoBehaviour
         camPrefab.transform.rotation = playerTransform.rotation;
         cm.SetTrackedCinematicTransform(camPrefab.transform.GetChild(0));
         cm.ChangeCameraMode(CameraManager.CameraMode.Cinematic);
-        bs.SetAlpha(1f);
+        bs.SetAlpha(1f, true);
         cgfx.ShowRenderers();
         cgfx.SetRenderersLayer(uiFrontMask);
         StartCoroutine(SnapToFPS(5f, 1.5f));
@@ -90,6 +83,6 @@ public class RoleRevealer : MonoBehaviour
     IEnumerator FadeBlackScreen(float fadeBlackDuration)
     {
         yield return new WaitForSeconds(fadeBlackDuration);
-        bs.StartAlphaTransition(0f, 1f);
+        bs.StartAlphaTransition(0f, 1f, true);
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using Photon.Pun;
+//using Photon.Pun;
 
 public class PlayerInfoUI : MonoBehaviour
 {
@@ -14,8 +14,8 @@ public class PlayerInfoUI : MonoBehaviour
 
     private void Awake()
     {
-        gm = FindObjectOfType<GameManager>();
-        FindObjectOfType<RoleRevealer>().OnGetRole += SetRole;
+        gm = FindFirstObjectByType<GameManager>();
+        //FindFirstObjectByType<RoleRevealer>().OnGetRole += SetRole;
         //gm.OnUpdatePositions += OnUpdatePositions;
     }
 

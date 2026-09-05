@@ -1,113 +1,50 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
-using Photon.Realtime;
 using System.Linq;
+using Fusion;
 
-public class MeetingManager : MonoBehaviourPunCallbacks, IPunObservable
+public class MeetingManager : NetworkBehaviour
 {
-    public bool meetingQueued = false;
-    public string mealtimeRoom = "Cafeteria";
-    ScheduleManager sm;
-    AnnouncementManager am;
-    GameManager gm;
-    PhotonView view;
-    MeetingRoom meetingRoom;
+    public string meetingPeriodName = "Meeting";
+    public ScheduleManager scheduleManager;
+    public VotingManager votingManager;
+    public bool meetingStarted = false;
+    public MapRoom meetingRoom;
 
-    public MeetingEvent OnMeetingStart;
-    public MeetingEvent OnMeetingEnd;
-    public delegate void MeetingEvent();
-
-    void Awake()
+    public override void Spawned()
     {
-        sm = FindObjectOfType<ScheduleManager>();
-        am = FindObjectOfType<AnnouncementManager>();
-        gm = FindObjectOfType<GameManager>();
-        meetingRoom = FindObjectOfType<MeetingRoom>();
-        view = gameObject.GetComponent<PhotonView>();
-        sm.OnBlockChange += CheckQueue;
-        OnMeetingStart += gm.StopTime;
-        OnMeetingEnd += gm.ResumeTime;
+        scheduleManager.OnMasterBlockStart += CheckMeetingStart;
+        scheduleManager.OnMasterBlockEnd += CheckMeetingEnd;
+        meetingRoom.onPlayerEnter += PlayerEnterMeeting;
+        meetingRoom.onPlayerExit += PlayerLeaveMeeting;
     }
 
-    // Starts the queue
-    [PunRPC]
-    public void QueueMeeting(PhotonMessageInfo info)
+    private void CheckMeetingStart(ScheduleBlock block)
     {
-        if (!PhotonNetwork.IsMasterClient) return;
-        if (meetingQueued) return;
-        meetingQueued = true;
-        string senderName = (string)info.Sender.CustomProperties["name"];
-        am.Announce($"{senderName} has queued a meeting.");
+        if (block.periodName != meetingPeriodName) return;
+        meetingStarted = true;
+        StartVotes();
     }
 
-    // Check if mealtime has ended, then start meeting
-    void CheckQueue(ScheduleBlock from, ScheduleBlock to)
+    private void CheckMeetingEnd(ScheduleBlock block)
     {
-        if (!PhotonNetwork.IsMasterClient) return;
-        if (!meetingQueued) return;
-        // admire the spaghetti in all its glory, and also fuck you because i ain't making this look better
-        if (from != null)
-        {
-            if (from.room != mealtimeRoom)
-            {
-                return;
-            } else
-            {
-                if (from.periodName != "Brunch" && from.periodName != "Dinner") return; //change this if the period changes
-            }
-        } else
-        {
-            return;
-        }
-        meetingQueued = false;
-        view.RPC("StartMeeting", RpcTarget.All);
+        if (block.periodName != meetingPeriodName) return;
+        meetingStarted = false;
     }
 
-    void SetupSeats()
+    public void PlayerEnterMeeting(PlayerRef player)
     {
-        if (!PhotonNetwork.IsMasterClient) return;
-        List<int> takenCivilianSeats = new List<int>(new int[meetingRoom.civilianSeatHolder.childCount]);
-        for (int i = 0; i < takenCivilianSeats.Count; i++) takenCivilianSeats[i] = i;
-        foreach (Player player in gm.alivePlayers)
-        {
-            // if not civilian
-            if ((int)gm.playerPositions[(string)player.CustomProperties["name"]] > 0) continue;
-            int newSeat = Random.Range(0, takenCivilianSeats.Count);
-            Debug.LogWarning(takenCivilianSeats.Count);
-            meetingRoom.view.RPC("TeleportToSeat", player, takenCivilianSeats[newSeat]);
-            takenCivilianSeats.RemoveAt(newSeat);
-        }
-        List<int> takenHigherSeats = new List<int>(new int[meetingRoom.higherSeatHolder.childCount]);
-        for (int i = 0; i < takenHigherSeats.Count; i++) takenHigherSeats[i] = i;
-        foreach (Player player in gm.alivePlayers)
-        {
-            // if civilian
-            if ((int)gm.playerPositions[(string)player.CustomProperties["name"]] == 0) continue;
-            int newSeat = Random.Range(0, takenHigherSeats.Count);
-            meetingRoom.view.RPC("TeleportToSeat", player, takenHigherSeats[newSeat]);
-            takenHigherSeats.RemoveAt(newSeat);
-        }
+        // No meeting started checks, just add player to meeting
     }
 
-    // what do you think it does smartass
-    [PunRPC]
-    public void StartMeeting()
+    public void PlayerLeaveMeeting(PlayerRef player)
     {
-        SetupSeats();
-        OnMeetingStart?.Invoke();
+        
     }
 
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    void StartVotes()
     {
-        if (stream.IsWriting)
-        {
-            stream.SendNext(meetingQueued);
-        } 
-        else
-        {
-            meetingQueued = (bool)stream.ReceiveNext();
-        }
+        votingManager.StartVote("Judgement", "Vote to exile", "Crosshair_22", 30f);
     }
 }

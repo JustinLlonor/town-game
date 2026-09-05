@@ -24,13 +24,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7112498482707897826}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+  m_RootOrder: -2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2977264391406971458
 MonoBehaviour:
@@ -46,9 +46,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   items:
   - {fileID: 11400000, guid: a5d5dffa5b8249d429824aa66f7c6fde, type: 2}
+  - {fileID: 11400000, guid: 26fa129e99124d74f8ab2448a2bb444c, type: 2}
+  - {fileID: 11400000, guid: 049652b286ef5f74a97bd58216a8ee08, type: 2}
+  - {fileID: 11400000, guid: 95d0d81f95731b24389b002969e90b89, type: 2}
+  - {fileID: 11400000, guid: 8943e3d0e8fbd2d4fb1475c73f9fdd7a, type: 2}
   textures:
   - {fileID: 2800000, guid: 669f02f136d943e4a954daad8bbcbeac, type: 3}
   - {fileID: 2800000, guid: f0b90e8d6c5d43c4d91b9cf5faa161a9, type: 3}
+  - {fileID: 2800000, guid: 876125fdce0ef3447aeca2981ff295a5, type: 3}
   clothings:
   - {fileID: 11400000, guid: bc71a214499ce35498253c0637e60fd3, type: 2}
   - {fileID: 11400000, guid: 6ae3cddaa390ea74e9e656a03e5b7a0b, type: 2}
@@ -71,3 +76,31 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 48f4f7ae277917f408d4464244e9e78f, type: 2}
   - {fileID: 11400000, guid: c8593c2794e234a4486431c92b257136, type: 2}
   - {fileID: 11400000, guid: d3922b8ed0318a541956cb0d56437bd3, type: 2}
+  - {fileID: 11400000, guid: 173c512bec5a6f143bcfec5905aefb12, type: 2}
+  prefabs: []
+  curves:
+  - name: Linear
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4

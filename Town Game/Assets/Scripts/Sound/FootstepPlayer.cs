@@ -1,4 +1,3 @@
-using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,17 +8,17 @@ public class FootstepPlayer : MonoBehaviour
     public LayerMask environmentMask;
 
     SoundManager sm;
-    PhotonView view;
+    //PhotonView view;
 
     private void Awake()
     {
-        view = transform.parent.GetComponent<PhotonView>();
-        sm = FindObjectOfType<SoundManager>();
+        //view = transform.parent.GetComponent<PhotonView>();
+        sm = FindFirstObjectByType<SoundManager>();
     }
 
     public void PlayFootstep()
     {
-        if (!view.IsMine) return;
+        //if (!view.IsMine) return;
         RaycastHit hit;
         if (Physics.Raycast(footstepRaycast.position, footstepRaycast.up * -1f, out hit, 1f, (int)environmentMask))
         {

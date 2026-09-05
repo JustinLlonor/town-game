@@ -1,30 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
-using Photon.Realtime;
+using Fusion;
 using System.Linq;
 using TMPro;
 using Steamworks;
 using System;
 using WebSocketSharp;
+using Photon.Realtime;
 
-public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
+public class GameManager : NetworkBehaviour
 {
-    //public Vector2Int testTime;
-    public GlobalEvent testevent;
-    // gamePhase 0 = initialize game/assign roles 1 = main game 2 = results screen
+    // gamePhase 0 = initialize game/assign roles 1 = main game 2 = results screen, not part
     public int gamePhase = 0;
     [Header("Game Variables")]
-    public Player campLeader;
-    public Player[] cultists = new Player[] { };
-    public Player[] alivePlayers = new Player[] { }; // doesn't update with alive players yet
+    public PlayerRef leader;
+    public PlayerRef[] cultists = new PlayerRef[] { };
+    [Networked] public int cultistsLeft { get; set; }
+    public List<PlayerRef> alivePlayers = new List<PlayerRef>();
     public Dictionary<string, Position> playerPositions = new Dictionary<string, Position>();
-    public Dictionary<Player, string> chosenBuildings = new Dictionary<Player, string>();
-    public float gameTime = 0f;
+    public Dictionary<PlayerRef, string> chosenBuildings = new Dictionary<PlayerRef, string>();
+    [Networked] public float gameTime { get; set; } = 0f;
     public float currentPeriod;
     public int currentDay = 0;
-    public bool timeStopped = false;
+    [Networked] public bool timeStopped { get; set; } = false;
     int previousDay = -1;
     [Header("Game Settings")]
     // When an index of this is true, a cultist is added when the players playing is equal to that number.
@@ -32,6 +31,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public float hourLength = 60f;
     public float timeSpeed = 1f;
     public int startCurrency = 100;
+    public int startEnergy = 2;
+    /// <summary>
+    /// The maximum amount of energy the player is allowed to have
+    /// </summary>
+    public int maxEnergy = 2;
     public Vector2Int startTime;
     public float buildingChooseTimer = 8f;
     [Header("Day/Night Cycle")]
@@ -39,28 +43,51 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public float timeSkippedPeriod = 4.5f;
     public float dayStartPeriod = 7.5f;
     [Header("Constants")]
+    public EventHandler cultistEvents;
     public string[] days;
     public string[] positions;
-    PhotonView view;
+    [Header("Testing")]
+    public Transform testTransform; // The transform the player teleports to if they are testing
     RoleRevealer rv;
     RoomManager rm;
     PlayerManager pm;
     ScheduleManager sm;
-    CameraManager cm;
-    bool skippedNight = false;
-    bool startedDay = false;
-    GameTimer gt;
+    RunnerManager runnerManager;
+    PositionManager positionManager;
+    [Networked] public bool skippedNight { get; set; } = false;
+    bool previousSkippedNight = false;
+    /// <summary>
+    /// If the day state is active or not
+    /// </summary>
+    [Networked] public bool isDay { get; set; } = true;
+    /// <summary>
+    /// Note: this delegate does not execute on all clients, only the server, and its attached to clock UI
+    /// </summary>
     public GameEvent OnTimeChange;
     public RevealRoles OnRevealRoles;
+    /// <summary>
+    /// Invoked when the day changes. Also invoked at the start of the game
+    /// </summary>
     public GameEvent OnChangeDay;
     public GameEvent OnUpdatePositions;
     public GameEvent OnNightSkipStart;
-    public GameEvent OnNightSkip;
+    public GameEvent OnNightSkipEnd;
     public GameEvent OnDayStart;
     public GameEvent OnTimeStop;
     public GameEvent OnTimeResume;
+    public GameEvent OnGameStart;
+    /// <summary>
+    /// Called when a player is removed, either by elimination or by leaving
+    /// </summary>
+    public PlayerEvent onPlayerRemove;
+    public Timer onUpdateNightTimer;
     public delegate void GameEvent();
     public delegate void RevealRoles(bool isCultist);
+    public delegate void Timer(float timer);
+    public delegate void PlayerEvent(PlayerRef player);
+    [Networked] public TickTimer nightTimer { get; set; }
+    public bool init = false;
+    public static GameManager i;
 
     public enum Position
     {
@@ -70,65 +97,157 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     // Open when need new variable to synchronize
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.IsWriting)
-        {
-            stream.SendNext(gamePhase);
-            stream.SendNext(cultists);
-            stream.SendNext(gameTime);
-            stream.SendNext(timeSpeed);
-        }
-        else
-        {
-            gamePhase = (int)stream.ReceiveNext();
-            cultists = (Player[])stream.ReceiveNext();
-            gameTime = (float)stream.ReceiveNext();
-            timeSpeed = (float)stream.ReceiveNext();
-        }
-    }
+    //public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    //{
+    //    if (stream.IsWriting)
+    //    {
+    //        stream.SendNext(gamePhase);
+    //        stream.SendNext(cultists);
+    //        stream.SendNext(gameTime);
+    //        stream.SendNext(timeSpeed);
+    //    }
+    //    else
+    //    {
+    //        gamePhase = (int)stream.ReceiveNext();
+    //        cultists = (Player[])stream.ReceiveNext();
+    //        gameTime = (float)stream.ReceiveNext();
+    //        timeSpeed = (float)stream.ReceiveNext();
+    //    }
+    //}
     
     private void Awake()
     {
         rv = gameObject.GetComponent<RoleRevealer>();
-        view = transform.GetComponent<PhotonView>();
+        rm = FindFirstObjectByType<RoomManager>();
+        pm = FindFirstObjectByType<PlayerManager>();
+        sm = FindFirstObjectByType<ScheduleManager>();
+        positionManager = FindAnyObjectByType<PositionManager>();
+        runnerManager = FindFirstObjectByType<RunnerManager>();
+        runnerManager.onPlayerLeave += RemoveAlivePlayer;
+        //cm = FindFirstObjectByType<CameraManager>();
+        if (SessionData.isTesting)
+        {
+            return;
+        }
         OnRevealRoles += rv.RevealRole;
-        rm = FindObjectOfType<RoomManager>();
-        pm = FindObjectOfType<PlayerManager>();
-        sm = FindObjectOfType<ScheduleManager>();
-        gt = gameObject.GetComponent<GameTimer>();
-        cm = FindObjectOfType<CameraManager>();
+        FindFirstObjectByType<BlackScreen>().ShowCover();
     }
 
-    private void Start()
+    void RemoveAlivePlayer(PlayerRef player)
     {
-        if (PhotonNetwork.IsMasterClient)
+        alivePlayers.Remove(player);
+        onPlayerRemove?.Invoke(player);
+    }
+
+    public override void Spawned()
+    {
+        InputManager im = FindFirstObjectByType<InputManager>();
+        // Sets the input maps to building choose when night starts, and sets to base when night skip ends
+        OnNightSkipStart += im.SetCurrentToBuildingChoose;
+        OnNightSkipEnd += im.SetCurrentToBase;
+        init = true;
+        i = this;
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (alivePlayers.Count < pm.playerObjects.Count)
         {
-            AssignRooms();
-            InitiatePositions();
-            SetCurrency();
+            pm.removePlayers = true;
+            Debug.Log("setting");
+        } // More alive players than there are playe robjects
+    }
+
+    // Assigns rooms to different players, sohuld only be called on state authority
+    void AssignRooms()
+    {
+       int playerCount = Runner.ActivePlayers.Count();
+       if (Runner.ActivePlayers.Count() > rm.playerRooms.Count)
+        {
+            Debug.LogError("Not enough rooms!");
+            // Stop game function here
+            return;
+        }
+
+        int[] roomAssignment = new int[playerCount];
+
+        for (int i = 0; i < roomAssignment.Length; i++) roomAssignment[i] = -1;
+
+        for (int i = 0; i < roomAssignment.Length; i++)
+        {
+            int randomRoom = UnityEngine.Random.Range(0, rm.playerRooms.Count);
+            while (roomAssignment.Contains(randomRoom))
+            {
+                randomRoom = UnityEngine.Random.Range(0, rm.playerRooms.Count);
+            }
+            roomAssignment[i] = randomRoom;
+        }
+        
+        for (int i = 0; i < roomAssignment.Length; i++)
+        {
+            PlayerRef rPlayer = new List<PlayerRef>(Runner.ActivePlayers)[i];
+            pm.SetRoom(rPlayer, roomAssignment[i]);
+        }
+    }
+
+    /// <summary>
+    /// Sets the default properties of all players
+    /// </summary>
+    void SetProperties()
+    {
+        // Sets  the currency to the start currency for every player in the lobby
+        foreach (PlayerRef player in  Runner.ActivePlayers)
+        {
+            pm.SetMoney(player, startCurrency);
+            //pm.playerProperties[player].SetCurrency(startCurrency);
+            pm.SetEnergy(player, startEnergy);
+            //pm.playerProperties[player].SetEnergy(startEnergy);
         }
     }
 
     private void Update()
     {
-        CheckDay();
+        if (!init) return;
+        CheckDay(); 
         UpdateGameTime();
-        if (!PhotonNetwork.IsMasterClient) return;
+        ClientNightTimer();
+        ClientNightSkip();
+        CheckDayStart();
+        if (!Runner.IsServer) return;
         //if (Input.GetKeyDown(KeyCode.Backspace)) SetTime(testTime.x, testTime.y);
-        if (Input.GetKeyDown(KeyCode.Backspace))
-        {
-            string[] newStrings = new string[] { testevent.name };
-            float[] newTimes = new float[] { testevent.time };
-            float[] newLengths = new float[] { testevent.length };
-            bool[] newCultistEvents = new bool[] { testevent.cultistEvent };
-            PhotonNetwork.OpCleanRpcBuffer(sm.GetComponent<PhotonView>());
-            // Filter cultists events when making function
-            sm.GetComponent<PhotonView>().RPC("AddGlobalEvents", RpcTarget.AllBuffered, (object)newStrings, (object)newTimes, (object)newLengths, (object)newCultistEvents);
-        }
         PhaseProperties();
         CheckNightSkip();
-        CheckDayStart();
+        CheckNightTimer();
+    }
+
+    void ClientNightSkip()
+    {
+        if (previousSkippedNight != skippedNight)
+        {
+            previousSkippedNight = skippedNight;
+            if (skippedNight) NightSkipSequence();
+            else NightSkipEvent();
+        }
+    }
+
+    void ClientNightTimer()
+    {
+        if (!skippedNight) return;
+        float remainingTime = 0;
+        if (nightTimer.RemainingTime(Runner) != null)
+        {
+            remainingTime = (float)nightTimer.RemainingTime(Runner);
+        }
+        onUpdateNightTimer?.Invoke(remainingTime);
+    }
+
+    void CheckNightTimer()
+    {
+        if (!skippedNight) return;
+        if (nightTimer.ExpiredOrNotRunning(Runner))
+        {
+            SetNightTime();
+        }
     }
 
     void CheckDay()
@@ -153,23 +272,51 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+    IEnumerator UnfreezeAllAfterTime(float time)
+    {
+        yield return new WaitForSeconds(time);
+        pm.UnfreezeAll();
+    }
+
     void Phase0()
     {
-        AssignRoles();
+        pm.CreatePlayerProperties(); // Initialize player properties
+        AssignPlayerPositions(); // Add to player positions
+        AssignRooms(); // Sets the room properties of each player
+        SetProperties(); // Sets the default currency of each player
+        SpawnPositions(); // Spawns each player
+        AssignRoles(); // Assigns the roles of each player (and reveals)
+        OnGameStart?.Invoke();
         SetTime(startTime.x, startTime.y);
+    }
+
+    void AssignPlayerPositions()
+    {
+        foreach (PlayerRef player in Runner.ActivePlayers)
+        {
+            //pm.playerProperties.Add(player, new PlayerProperties("", false, -1, 0));
+            positionManager.AddPlayerToBranch(player, 0);
+        }
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_SendRole([RpcTarget] PlayerRef player, bool isCultist)
+    {
+        //pm.currentPlayerProperties.SetIsCultist(isCultist);
+        OnRevealRoles?.Invoke(isCultist);
     }
 
     void CheckDayStart()
     {
-        if (startedDay) return;
+        if (isDay) return;
         if (currentPeriod - (currentDay * 24f) > dayStartPeriod)
         {
-            startedDay = true;
-            view.RPC("DayStartSequence", RpcTarget.All);
+            isDay = true;
+            DayStartSequence();
         }
     }
 
-    [PunRPC]
+    //[PunRPC]
     public void DayStartSequence()
     {
         OnDayStart?.Invoke();
@@ -187,138 +334,118 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     void NightSkip()
     {
         skippedNight = true;
-        view.RPC("NightSkipSequence", RpcTarget.All);
+        nightTimer = TickTimer.CreateFromSeconds(Runner, buildingChooseTimer + 1f);
+        StopTime();
+        ResetChosenBuildings();
     }
 
-    [PunRPC]
     public void NightSkipSequence()
     {
         OnNightSkipStart?.Invoke();
-        gt.StartTimer(buildingChooseTimer + 1f);
-        StopTime();
-        gt.onTimerFinish.AddListener(SetNightTime);
-        ResetChosenBuildings(); // Resets the building data for all clients
     }
-
+    
     public void SetNightTime()
     {
-        if (!PhotonNetwork.IsMasterClient) return;
+        //if (!PhotonNetwork.IsMasterClient) return;
         skippedNight = false;
         Vector2Int newTime = PeriodToClockTime(timeSkippedPeriod);
         SetTime(newTime.x, newTime.y);
-        startedDay = false;
         ResumeTime();
         TeleportToBuildings();
     }
 
-    // Call to every client
-    [PunRPC]
-    public void SetChosenBuilding(string buildingName, PhotonMessageInfo info) 
+    public void SetChosenBuilding(string buildingName, PlayerRef player)//, PhotonMessageInfo info) 
     {
-        Player player = info.Sender;
-        string newBuilding = "";
-        if (buildingName != "house")
+        if (buildingName != "house" && positionManager.PlayerHasAccessToRoom(player, buildingName))
         {
-            if (Array.Find(rm.workRooms.ToArray(), room => room.roomName == buildingName) != null) // if the room is found
+            MapRoom foundRoom = Array.Find(rm.workRooms.ToArray(), room => room.roomName == buildingName);
+            if (foundRoom != null) // if the room is found
             {
+                int energyDiff = foundRoom.energyDiff;
+                //int playerEnergy = pm.playerProperties[player].energy;
+                int playerEnergy = pm.GetEnergy(player);
+                if (playerEnergy + energyDiff < 0) return; // If the energy is invalid
+                Debug.Log("successfully set to " + buildingName);
                 if (chosenBuildings.ContainsKey(player)) chosenBuildings[player] = buildingName; // Set the chosen building
-            } 
+            }
+            return;
         }
+        if (chosenBuildings.ContainsKey(player)) chosenBuildings[player] = "house";
     }
 
-    [PunRPC]
+    /// <summary>
+    /// When the building choose sequence ends on the client
+    /// </summary>
     public void NightSkipEvent()
     {
-        OnNightSkip?.Invoke();
+        isDay = false;
+        OnNightSkipEnd?.Invoke();
     }
 
+    /// <summary>
+    /// Teleports players to their chosen building from the chosen building list
+    /// </summary>
     void TeleportToBuildings()
     {
-        foreach (KeyValuePair<Player, string> pair in  chosenBuildings)
+        foreach (KeyValuePair<PlayerRef, string> pair in  chosenBuildings)
         {
+            PlayerRef player = pair.Key;
             Transform tpTransform = null;
+            MapRoom tpRoom = null;
             if (pair.Value == "house" || pair.Value.IsNullOrEmpty())
             {
-                tpTransform = rm.playerRooms[(int)pair.Key.CustomProperties["room"]].spawnTransform;
+                //tpRoom = rm.playerRooms[pm.playerProperties[player].room];
+                tpRoom = rm.playerRooms[pm.GetRoom(player)];
+                tpTransform = tpRoom.spawnTransform;
                 Debug.Log("house set");
             }
             else
             {
-                tpTransform = rm.GetWorkBuilding(pair.Value).spawnTransform;
+                tpRoom = rm.GetWorkBuilding(pair.Value);
+                int energyDiff = tpRoom.energyDiff;
+                //int playerEnergy = pm.playerProperties[player].energy;
+                int playerEnergy = pm.GetEnergy(player);
+                if (energyDiff + playerEnergy < 0)
+                {
+                    //tpRoom = rm.playerRooms[pm.playerProperties[player].room];
+                    tpRoom = rm.playerRooms[pm.GetRoom(player)];
+                    tpTransform = tpRoom.spawnTransform;
+                    Debug.Log("house alt set");
+                }
+                else
+                {
+                    tpTransform = tpRoom.spawnTransform;
+                }
             }
-            Debug.Log(tpTransform.position);
-            pm.photonView.RPC("Teleport", pair.Key, tpTransform.position, tpTransform.rotation);
+            int fEnergyDiff = tpRoom.energyDiff;
+            if (tpRoom.roomCategory == RoomCategory.House) fEnergyDiff = rm.houseEnergyGain;
+            //int fPlayerEnergy = pm.playerProperties[player].energy;
+            int fPlayerEnergy = pm.GetEnergy(player);
+
+            pm.SetEnergy(player, Mathf.Clamp(fPlayerEnergy + fEnergyDiff, 0, maxEnergy));
+            pm.Teleport(pair.Key, tpTransform.position, tpTransform.rotation);
         }
-        view.RPC("NightSkipEvent", RpcTarget.All);
     }
 
     void ResetChosenBuildings()
     {
         chosenBuildings.Clear();
-        foreach (Player player in alivePlayers)
+        foreach (PlayerRef player in alivePlayers)
         {
             chosenBuildings.Add(player, "house"); // Adds the player's home as the default building
-        }
-    }
- 
-    void AssignRooms()
-    {
-        if (PhotonNetwork.PlayerList.Length > rm.playerRooms.Count)
-        {
-            Debug.LogError("Not enough rooms!");
-            // Stop game function here
-            return;
-        }
-
-        int[] roomAssignment = new int[PhotonNetwork.PlayerList.Length];
-
-        for (int i = 0; i < roomAssignment.Length; i++) roomAssignment[i] = -1;
-
-        for (int i = 0; i < roomAssignment.Length; i++)
-        {
-            int randomRoom = UnityEngine.Random.Range(0, rm.playerRooms.Count);
-            while (roomAssignment.Contains(randomRoom))
-            {
-                randomRoom = UnityEngine.Random.Range(0, rm.playerRooms.Count);
-            }
-            roomAssignment[i] = randomRoom;
-        }
-
-        for (int i = 0; i < roomAssignment.Length; i++)
-        {
-            ExitGames.Client.Photon.Hashtable pProperties = PhotonNetwork.PlayerList[i].CustomProperties;
-            pProperties["room"] = roomAssignment[i];
-            PhotonNetwork.PlayerList[i].SetCustomProperties(pProperties);
+            //RPC_SendEnergy(player, pm.playerProperties[player].energy);
         }
     }
 
-    // Initiates the positions for every player in the lobby, gets removed on death
-    void InitiatePositions()
-    {
-        foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
-        {
-            view.RPC("CreatePositionToken", RpcTarget.AllBuffered, player.CustomProperties["name"], (int)Position.Habitant);
-        }
-    }
-
-    void SetCurrency()
-    {
-        foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
-        {
-            ExitGames.Client.Photon.Hashtable properties = player.CustomProperties;
-            properties["money"] = 100;
-            player.SetCustomProperties(properties);
-        }
-    }
-
-    [PunRPC]
+    // Old code for position creation, ignore
+    //[PunRPC]
     public void CreatePositionToken(string player, int position)
     {
         playerPositions.Add(player, (Position)position);
         OnUpdatePositions?.Invoke();
     }
 
-    [PunRPC]
+    //[PunRPC]
     public void RemovePositionToken(string player)
     {
         if (!playerPositions.ContainsKey(player)) return;
@@ -326,7 +453,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         OnUpdatePositions?.Invoke();
     }
 
-    [PunRPC]
+    //[PunRPC]
     public void ModifyPositionToken(string player, int position)
     {
         if (!playerPositions.ContainsKey(player)) return;
@@ -335,27 +462,27 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     void AssignRoles()
     {
-        List<Player> players = new List<Player>();
+        List<PlayerRef> players = new List<PlayerRef>();
         // Sets isCultist to false for every player, adds to playerlist
-        foreach (Player player in PhotonNetwork.PlayerList)
+        foreach (PlayerRef player in Runner.ActivePlayers)
         {
             AssignRole(player, false);
             players.Add(player);
         }
-        alivePlayers = players.ToArray();
+        alivePlayers = new List<PlayerRef>(players);
 
         // Sets cultistNumber to the amount of cultists in the game
         int cultistNumber = 0;
         int i = 0;
-        while (i < PhotonNetwork.PlayerList.Length)
+        while (i < Runner.ActivePlayers.Count())
         {
             if (cultistAssignment[i] == true) cultistNumber++;
             i++;
         }
-        Debug.Log("Cultist number " + cultistNumber);
+        //Debug.Log("Cultist number " + cultistNumber);
 
         // Creates a list of the current cultists
-        List<Player> assignedCultists = PhotonNetwork.PlayerList.ToList();
+        List<PlayerRef> assignedCultists = new List<PlayerRef>(Runner.ActivePlayers);
         Debug.Log("Player list count: " + assignedCultists.Count);
         while (assignedCultists.Count > cultistNumber)
         {
@@ -365,42 +492,58 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }
 
         // Sets isCultist to true for every cultist
-        foreach (Player cultist in assignedCultists)
+        foreach (PlayerRef cultist in assignedCultists)
         {
             AssignRole(cultist, true);
         }
 
-        // Reveals roles
-        foreach (Player player in PhotonNetwork.PlayerList)
-        {
-            view.RPC("RevealRole", player);
-        }
-
         cultists = assignedCultists.ToArray();
+        cultistsLeft = cultists.Length;
+
+        if (!SessionData.isTesting) StartCoroutine(UnfreezeAllAfterTime(8f));
+        foreach (PlayerRef player in Runner.ActivePlayers)
+        {
+            RPC_SendRole(player, pm.GetIsCultist(player));
+        }
     }
 
-    void AssignRole(Player player, bool isCultist)
+    void AssignRole(PlayerRef player, bool isCultist)
     {
-        ExitGames.Client.Photon.Hashtable playerProperties = player.CustomProperties;
-        playerProperties["isCultist"] = isCultist;
-        player.SetCustomProperties(playerProperties);
+        pm.SetIsCultist(player, isCultist);
+        //TODO: FIX THIS (the game doesn't start when adding players to groups after assigning)
+        if (isCultist)
+        {
+            pm.AddPlayerToGroup(player, -1);
+            cultistEvents.AddSubscription(player);
+        }
     }
 
-    [PunRPC]
-    public void RevealRole()
+    public void SpawnPositions()
     {
+        alivePlayers = new List<PlayerRef>();
+        if (SessionData.isTesting && testTransform != null)
+        {
+            pm.SpawnPlayerAtTransform(Runner, Runner.LocalPlayer, testTransform);
+            alivePlayers.Add(Runner.LocalPlayer);
+            return;
+        }
         // Invokes reveal roles delegate for the role reveal sequence
-        Transform roomT = rm.playerRooms[(int)PhotonNetwork.LocalPlayer.CustomProperties["room"]].spawnTransform;
-        pm.Teleport(roomT.position, roomT.rotation);
-        OnRevealRoles?.Invoke((bool)PhotonNetwork.LocalPlayer.CustomProperties["isCultist"]);
+        foreach (PlayerRef player in Runner.ActivePlayers)
+        {
+            Transform roomT = rm.playerRooms[pm.GetRoom(player)].spawnTransform;
+            GameObject playerObject = pm.SpawnPlayerAtTransform(Runner, player, roomT);
+            alivePlayers.Add(player);
+            if (!SessionData.isTesting) playerObject.GetComponent<PlayerMovement>().Freeze();
+        }
+        //OnRevealRoles?.Invoke((bool)PhotonNetwork.LocalPlayer.CustomProperties["isCultist"]);
     }
 
     void UpdateGameTime()
     {
-        if (timeStopped) return;
-        gameTime += Time.deltaTime * timeSpeed;
         currentDay = Mathf.FloorToInt((gameTime + hourLength) / (hourLength * 24f));
         currentPeriod = gameTime / hourLength;
+        if (timeStopped) return;
+        gameTime += Time.deltaTime * timeSpeed;
     }
 
     /// <summary>
@@ -410,7 +553,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     /// <param name="minute">Minute of the clock, number from 0 to 59</param>
     public void SetTime(int hour, int minute = 0)
     {
-        if (!PhotonNetwork.IsMasterClient) return;
+        //if (!PhotonNetwork.IsMasterClient) return;
         if (hour < 1 || hour > 24) return;
         if (minute < 0 || minute > 59) return;
 
@@ -452,7 +595,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     public void StopTime()
     {
-        if (!PhotonNetwork.IsMasterClient) return;
+        if (!Runner.IsServer) return;
         if (timeStopped) return;
         timeStopped = true;
         OnTimeStop?.Invoke();
@@ -460,7 +603,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     public void ResumeTime()
     {
-        if (!PhotonNetwork.IsMasterClient) return;
+        if (!Runner.IsServer) return;
         if (!timeStopped) return;
         timeStopped = false;
         OnTimeResume?.Invoke();
@@ -483,6 +626,25 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         return $"{clockTimeStart.x}:{startMins} {startMeridiem}";
     }
 
+    /// <summary>
+    /// Converts local day time to total game time
+    /// </summary>
+    /// <param name="localTime"></param>
+    /// <returns></returns>
+    public float GetGameTimeFromLocalTime(float localTime)
+    {
+        return localTime + (currentDay * 24f * hourLength);
+    }
+
+    /// <summary>
+    /// Returns the local time of the current game time
+    /// </summary>
+    /// <returns></returns>
+    public float GetLocalTimeFromGameTime()
+    {
+        return gameTime - (currentDay * 24f * hourLength);
+    }
+     
     public string GetDay(int day)
     {
         if (day < 0)
@@ -495,37 +657,38 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     public float GetDayProgress()
     {
+        if (!init) return 0f;
         return (gameTime - hourLength * 24f * currentDay) / (hourLength * 24f);
     }
 
-    public override void OnPlayerLeftRoom(Player otherPlayer)
-    {
-        string name = (string)otherPlayer.CustomProperties["name"];
-        if (name == null) return;
-        if (!PhotonNetwork.IsMasterClient) return;
-        view.RPC("RemovePositionToken", RpcTarget.AllBuffered, name);
-        if (cultists.Contains(otherPlayer))
-        {
-            List<Player> newCultists = cultists.ToList();
-            newCultists.Remove(otherPlayer);
-            cultists = newCultists.ToArray();
-            CheckWinCondition();
-        }
-        if (alivePlayers.Contains(otherPlayer))
-        {
-            List<Player> newPlayers = alivePlayers.ToList();
-            newPlayers.Remove(otherPlayer);
-            alivePlayers = newPlayers.ToArray();
-            CheckWinCondition();
-        }
-    }
+    //public override void OnPlayerLeftRoom(Player otherPlayer)
+    //{
+    //    string name = (string)otherPlayer.CustomProperties["name"];
+    //    if (name == null) return;
+    //    if (!PhotonNetwork.IsMasterClient) return;
+    //    view.RPC("RemovePositionToken", RpcTarget.AllBuffered, name);
+    //    if (cultists.Contains(otherPlayer))
+    //    {
+    //        List<Player> newCultists = cultists.ToList();
+    //        newCultists.Remove(otherPlayer);
+    //        cultists = newCultists.ToArray();
+    //        CheckWinCondition();
+    //    }
+    //    if (alivePlayers.Contains(otherPlayer))
+    //    {
+    //        List<Player> newPlayers = alivePlayers.ToList();
+    //        newPlayers.Remove(otherPlayer);
+    //        alivePlayers = newPlayers.ToArray();
+    //        CheckWinCondition();
+    //    }
+    //}
 
     public void CheckWinCondition()
     {
-        if (cultists.Length == 0)
-        {
-            // Inno win condition
-            Debug.LogError("Innos win!");
-        }
+        //if (cultists.Length == 0)
+        //{
+        //    // Inno win condition
+        //    Debug.LogError("Innos win!");
+        //}
     }
 }

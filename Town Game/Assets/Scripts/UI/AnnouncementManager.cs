@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using Photon.Pun;
+using Fusion;
+//using Photon.Pun;
 
 public class AnnouncementManager : MonoBehaviour
 {
@@ -15,20 +16,36 @@ public class AnnouncementManager : MonoBehaviour
     public AnimationCurve pushDownCurve;
     public float fadeSpeed = 2f;
     List<IEnumerator> pdNumerators = new List<IEnumerator>();
-    PhotonView view;
+    //PhotonView view;
 
     private void Awake()
     {
-        view = gameObject.GetComponent<PhotonView>();
+        //view = gameObject.GetComponent<PhotonView>();
     }
 
-    public void Announce(string text, RpcTarget target = RpcTarget.All, float lifespan = 5f)
+    private void Update()
     {
-        view.RPC("AnnounceRPC", target, text, lifespan);
+        /**
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            RPC_AnnounceAll("The cafeteria has opened.");
+        }
+        **/
     }
 
-    [PunRPC]
-    public void AnnounceRPC(string text, float lifespan)
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_AnnounceAll(string text, float lifespan = 6f)
+    {
+        StartAnnouncementUI(text, lifespan);
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_AnnouncePlayer([RpcTarget] PlayerRef player, string text, float lifespan = 6f)
+    {
+        StartAnnouncementUI(text, lifespan);
+    }
+
+    void StartAnnouncementUI(string text, float lifespan)
     {
         GameObject announcement = Instantiate(announcementPrefab, transform);
         announcement.transform.localPosition = new Vector3(0f, pushDown);

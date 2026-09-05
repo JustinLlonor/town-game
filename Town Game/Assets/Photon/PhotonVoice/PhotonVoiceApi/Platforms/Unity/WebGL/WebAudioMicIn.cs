@@ -13,7 +13,7 @@ namespace Photon.Voice.Unity
         private static extern int PhotonVoice_WebAudioMicIn_Start(int handle, string deviceId, Action<int, int, int, int> createCallbackStatic, Action<int, IntPtr, int> dataCallbackStatic);
 
         [DllImport(lib_name, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        private static extern void PhotonVoice_WebAudioMicIn_Stop(int hanle);
+        private static extern void PhotonVoice_WebAudioMicIn_Stop(int handle);
 
         ILogger logger;
         int handle;
@@ -32,12 +32,12 @@ namespace Photon.Voice.Unity
             if (err != 0)
             {
                 Error = "Can't create MediaRecorder: " + err;
-                logger.LogError("[PV] WebAudioMicIn: " + Error);
+                logger.Log(LogLevel.Error, "[PV] WebAudioMicIn: " + Error);
             }
             else
             {
                 sourceSamplingRate = samplingRate;
-                logger.LogInfo("[PV] WebAudioMicIn: microphone initialized, handle = {0}, frequency = {1}, channels = {2}", handle, samplingRate, channels);
+                logger.Log(LogLevel.Info, "[PV] WebAudioMicIn: microphone initialized, handle = {0}, frequency = {1}, channels = {2}", handle, samplingRate, channels);
             }
         }
 

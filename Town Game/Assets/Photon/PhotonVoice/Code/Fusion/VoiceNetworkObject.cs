@@ -4,6 +4,7 @@ namespace Photon.Voice.Fusion
     using global::Fusion;
     using Unity;
     using UnityEngine;
+    using LogLevel = Photon.Voice.LogLevel;
 
     [AddComponentMenu("Photon Voice/Fusion/Voice Network Object")]
     public class VoiceNetworkObject : NetworkBehaviour
@@ -36,7 +37,11 @@ namespace Photon.Voice.Fusion
         public bool IsRecording => this.RecorderInUse != null && this.RecorderInUse.IsCurrentlyTransmitting;
 
 
+#if FUSION2
+        public bool IsLocal => Runner.Topology == Topologies.Shared ? this.Object.HasStateAuthority : this.Object.HasInputAuthority;
+#else
         public bool IsLocal => Runner.Topology == SimulationConfig.Topologies.Shared ? this.Object.HasStateAuthority : this.Object.HasInputAuthority;
+#endif
 #endregion
 
 #region Private Methods
@@ -50,7 +55,7 @@ namespace Photon.Voice.Fusion
             {
                 if (recorders.Length > 1)
                 {
-                    this.Logger.LogWarning("Multiple Recorder components found attached to the GameObject or its children.");
+                    this.Logger.Log(LogLevel.Warning, "Multiple Recorder components found attached to the GameObject or its children.");
                 }
                 recorder = recorders[0];
             }
@@ -62,7 +67,7 @@ namespace Photon.Voice.Fusion
 
             if (null == recorder)
             {
-                this.Logger.LogWarning("Cannot find Recorder. Assign a Recorder to VoiceNetworkObject object or set up FusionVoiceClient.PrimaryRecorder.");
+                this.Logger.Log(LogLevel.Warning, "Cannot find Recorder. Assign a Recorder to VoiceNetworkObject object or set up FusionVoiceClient.PrimaryRecorder.");
             }
             else
             {
@@ -82,7 +87,7 @@ namespace Photon.Voice.Fusion
                 speaker = speakers[0];
                 if (speakers.Length > 1)
                 {
-                    this.Logger.LogWarning("Multiple Speaker components found attached to the GameObject or its children. Using the first one we found.");
+                    this.Logger.Log(LogLevel.Warning, "Multiple Speaker components found attached to the GameObject or its children. Using the first one we found.");
                 }
             }
 
@@ -93,11 +98,11 @@ namespace Photon.Voice.Fusion
 
             if (null == speaker)
             {
-                this.Logger.LogError("No Speaker component or prefab found. Assign a Speaker to VoiceNetworkObject object or set up FusionVoiceClient.SpeakerPrefab.");
+                this.Logger.Log(LogLevel.Error, "No Speaker component or prefab found. Assign a Speaker to VoiceNetworkObject object or set up FusionVoiceClient.SpeakerPrefab.");
             }
             else
             {
-                this.Logger.LogInfo("Speaker instantiated.");
+                this.Logger.Log(LogLevel.Info, "Speaker instantiated.");
             }
             this.SpeakerInUse = speaker;
         }
@@ -118,13 +123,13 @@ namespace Photon.Voice.Fusion
                 this.SetupRecorder();
                 if (this.RecorderInUse == null)
                 {
-                    this.Logger.LogWarning("Recorder not setup for VoiceNetworkObject: playback may not work properly.");
+                    this.Logger.Log(LogLevel.Warning, "Recorder not setup for VoiceNetworkObject: playback may not work properly.");
                 }
                 else
                 {
                     if (!this.RecorderInUse.TransmitEnabled)
                     {
-                        this.Logger.LogWarning("VoiceNetworkObject.RecorderInUse.TransmitEnabled is false, don't forget to set it to true to enable transmission.");
+                        this.Logger.Log(LogLevel.Warning, "VoiceNetworkObject.RecorderInUse.TransmitEnabled is false, don't forget to set it to true to enable transmission.");
                     }
                 }
             }
@@ -132,7 +137,7 @@ namespace Photon.Voice.Fusion
             this.SetupSpeaker();
             if (this.SpeakerInUse == null)
             {
-                this.Logger.LogWarning("Speaker not setup for VoiceNetworkObject: voice chat will not work.");
+                this.Logger.Log(LogLevel.Warning, "Speaker not setup for VoiceNetworkObject: voice chat will not work.");
             }
             else
             {
@@ -145,7 +150,7 @@ namespace Photon.Voice.Fusion
             this.voiceConnection.RemoveRecorder(this.RecorderInUse);
         }
 
-        #endregion
+#endregion
     }
 }
 #endif

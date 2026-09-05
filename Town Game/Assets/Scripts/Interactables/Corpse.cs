@@ -1,40 +1,46 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
+using Fusion;
 
-public class Corpse : MonoBehaviourPunCallbacks
+public class Corpse : NetworkBehaviour//PunCallbacks
 {
-    public string nickname;
-    public bool isCultist;
-    public List<Evidence> evidence;
+    public string nickname { get; set; }
+    public bool isCultist { get; set; }
+    public Rigidbody rootRb;
+    //[Networked, Capacity(0)] public NetworkLinkedList<Evidence> evidences { get; }
 
     UIManager ui;
 
     private void Awake()
     {
-        ui = FindObjectOfType<UIManager>();
+        ui = FindFirstObjectByType<UIManager>();
     }
 
-    [PunRPC]
+    public void Init(Vector3 velocity, bool isMale)
+    {
+        rootRb.velocity = velocity;
+        GetComponent<PlayerClothing>().isMale = isMale;
+    }
+
     public void AddEvidence(string[] icons, string[] descriptions, float time)
     {
-        evidence.Add(new Evidence(icons, descriptions, time));
+        //evidence.Add(new Evidence(icons, descriptions, time));
     }
 
-    [PunRPC]
-    public void SetCorpseData(Photon.Realtime.Player player)
-    {
-        nickname = (string)player.CustomProperties["name"];
-        isCultist = (bool)player.CustomProperties["isCultist"];
-        PlayerClothing pc = transform.GetComponent<PlayerClothing>();
-        pc.isMale = (bool)player.CustomProperties["isMale"];
+    //[PunRPC]
+    //public void SetCorpseData(Photon.Realtime.Player player)
+    //{
+    //    nickname = (string)player.CustomProperties["name"];
+    //    isCultist = (bool)player.CustomProperties["isCultist"];
+    //    PlayerClothing pc = transform.GetComponent<PlayerClothing>();
+    //    pc.isMale = (bool)player.CustomProperties["isMale"];
+    //}
 
-    }
-
-    public void InspectCorpse()
+    public void InspectCorpse() // Make corpses ask for information from the server, and make locations interest
     {
-        ui.OpenCorpse(evidence, nickname, isCultist);
+        return;
+        //ui.OpenCorpse(evidence, nickname, isCultist);
     }
 
     public void SetVelocity(Vector3 velocity)

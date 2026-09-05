@@ -1,21 +1,29 @@
+using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
-using Photon.Realtime;
 using WebSocketSharp;
+//using Photon.Pun;
+//using Photon.Realtime;
+//using WebSocketSharp;
 
-public class PlayerInfoView : MonoBehaviourPunCallbacks
+/// <summary>
+/// The player stats that other players can see
+/// </summary>
+public class PlayerInfoView : NetworkBehaviour
 {
     public Gradient healthGradient = new Gradient();
     public string[] healthTextGradient = new string[] { };
     public Gradient sanityGradient = new Gradient();
     public string[] sanityTextGradient = new string[] { };
-    public PlayerStats stats;
-    public PhotonView view;
+    [HideInInspector] public PlayerStats stats;
+    [HideInInspector] public Player player;
+    [Networked] public float recievedHP { get; set; } = 100f;
     Interactable vi;
+    [HideInInspector] public NetworkObject no;
     int previousIndex = -1;
     bool updatedNick = false;
+    bool init = false;
 
     private void Awake()
     {
@@ -24,21 +32,26 @@ public class PlayerInfoView : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        if (!view.IsMine) return;
-        if (view.IsMine)
+        //if (!view.IsMine) return;
+        if (no.HasInputAuthority)
         {
-            transform.GetComponent<BoxCollider>().enabled = false;
+            transform.GetComponent<Collider>().enabled = false;
         }
     }
-        
-    private void Update()
+
+    public override void Spawned()
     {
-        if (vi == null) return;
-        UpdateNickname();
-        UpdateHP(Mathf.Clamp01(stats.HP / stats.maxHP));
+        init = true;
     }
 
-    [PunRPC]
+    private void Update()
+    {
+        if (!init) return;
+        if (vi == null) return;
+        UpdateNickname();
+        UpdateHP(Mathf.Clamp01(recievedHP / stats.maxHP));
+    }
+
     public void SetNickname(string newName)
     {
         vi.hovers[0].lore = newName;
@@ -48,17 +61,16 @@ public class PlayerInfoView : MonoBehaviourPunCallbacks
     void UpdateNickname()
     {
         if (updatedNick) return;
-        if (view.Owner == null) return;
-        if (!((string)view.Owner.CustomProperties["name"]).IsNullOrEmpty())
+        if (!player.nickname.IsNullOrEmpty())
         {
-            view.RPC("SetNickname", RpcTarget.OthersBuffered, (string)view.Owner.CustomProperties["name"]);
+            SetNickname(player.nickname);
             updatedNick = true;
         }
     }
 
     void UpdateHP(float eval)
     {
-        if (view.IsMine) return;
+        //if (view.IsMine) return;
         int newIndex = Mathf.FloorToInt(healthTextGradient.Length*(1-eval));
         if (newIndex != previousIndex)
         {

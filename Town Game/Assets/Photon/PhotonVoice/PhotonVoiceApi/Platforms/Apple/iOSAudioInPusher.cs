@@ -1,4 +1,4 @@
-﻿#if (UNITY_IOS && !UNITY_EDITOR) || __IOS__
+﻿#if ((UNITY_IOS || UNITY_VISIONOS) && !UNITY_EDITOR) || __IOS__
 using System;
 using System.Threading;
 using System.Collections.Generic;
@@ -40,7 +40,7 @@ namespace Photon.Voice.IOS
                         {
                             Error = "Exception in AudioInPusher constructor";
                         }
-                        logger.LogError("[PV] AudioInPusher: " + Error);
+                        logger.Log(LogLevel.Error, "[PV] AudioInPusher: " + Error);
                     }
                     finally
                     {

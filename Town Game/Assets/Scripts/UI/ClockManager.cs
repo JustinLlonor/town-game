@@ -18,16 +18,17 @@ public class ClockManager : MonoBehaviour
 
     private void Awake()
     {
-        gm = FindObjectOfType<GameManager>();
-        sm = FindObjectOfType<ScheduleManager>();
+        gm = FindFirstObjectByType<GameManager>();
+        sm = FindFirstObjectByType<ScheduleManager>();
     }
 
     private void Start()
     {
         gm.OnTimeChange += ResetMinuteRandom;
-        sm.OnBlockChange += ResetMinuteBlockChange;
         gm.OnNightSkipStart += ResetMinuteRandom;
         gm.OnDayStart += ResetMinuteRandom;
+        sm.OnBlockStart += ResetMinuteBlockChange;
+        sm.OnBlockEnd += ResetMinuteBlockChange;
     }
 
     private void Update()
@@ -83,7 +84,7 @@ public class ClockManager : MonoBehaviour
         minuteRandom = 0;
     }
 
-    void ResetMinuteBlockChange(ScheduleBlock from, ScheduleBlock to)
+    void ResetMinuteBlockChange(ScheduleBlock to)
     {
         minuteRandom = 0;
     }

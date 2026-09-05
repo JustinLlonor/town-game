@@ -4,36 +4,49 @@ using System.Linq;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using Photon.Pun.Demo.Procedural;
-using Photon.Voice.PUN;
+using UnityEngine.InputSystem;
+using Fusion;
 
-public class ScheduleUI : MonoBehaviour
+public class ScheduleUI : NetworkBehaviour
 {
     public int foresight = 3;
     public float hourLength = 50f;
     public float repositionSpeed = 3f;
+    public float tearoutHeight = 53f;
     public GameObject scheduleBlockPrefab;
     public GameObject tearoutPrefab;
     public GameObject bookmarkPrefab;
     public Transform blockHolder;
-    public Transform tearoutHolder;
     public Transform bookmarkHolder;
+    public Transform tearoutHolder;
+    public Transform minimapHolder;
+    public float tearoutAnimationSpeed = .5f;
+    public InputActionReference tearoutSwap;
+    List<ScheduleBlock> tearoutBuffer = new List<ScheduleBlock>();
+    Dictionary<ScheduleBlock, List<UITask>> tearoutTasks = new Dictionary<ScheduleBlock, List<UITask>>();
+    List<UITask> uiTasks = new List<UITask>(); // All the tasks that are displayed on a tearout currently, to be compared when there are changes
+    List<SubtextInfo> clientSubtextBuffer = new List<SubtextInfo>();
+    GameObject currentTearout;
+    ScheduleBlock previousBuffer = ScheduleBlock.None;
+    IEnumerator minimapAnimation = null;
     [Header("Block Settings")]
     public string emptyPeriod = "Free Time";
     public Color primaryColor;
     public Color secondaryColor;
-    [Header("Bookmarks")]
-    public float bookmarkOffset = 5f;
-    public Color innoBookmark;
-    public Color cultistBookmark;
     List<UIBlock> listedBlocks = new List<UIBlock>();
     GameObject tearout;
     GameManager gm;
     ScheduleManager sm;
     public float tearoutRemovalTime = -1;
+    float originalMinimapY = 0f;
+    bool firstFrame = true;
+    int previousKeyText = 0;
+    bool taskRevealStarted = false;
+    bool canStartReveal = false;
+    bool readjust = false;
 
     [System.Serializable]
-    public class UIBlock
+    class UIBlock
     {
         public ScheduleBlock block;
         public Transform transform;
@@ -45,11 +58,40 @@ public class ScheduleUI : MonoBehaviour
         }
     }
 
+    class UITask
+    {
+        public string name;
+        public bool completed;
+
+        public UITask(string name, bool completed)
+        {
+            this.name = name;
+            this.completed = completed;
+        }
+    }
+
+    struct SubtextInfo
+    {
+        public ScheduleBlock trackedBlock;
+        public string subText;
+        public List<Task> tasks;
+
+        public SubtextInfo(ScheduleBlock trackedBlock, string subText, List<Task> tasks)
+        {
+            this.trackedBlock = trackedBlock;
+            this.subText = subText;
+            this.tasks = tasks;
+        }
+    }
+
     private void Awake()
     {
-        sm = FindObjectOfType<ScheduleManager>();
-        gm = FindObjectOfType<GameManager>();
-        sm.OnUpdateGlobalEvents += AddBookmarks;
+        sm = FindFirstObjectByType<ScheduleManager>();
+        gm = FindFirstObjectByType<GameManager>();
+        sm.OnBlockStart += AddTearout;
+        sm.OnBlockEnd += RemoveTearout;
+        FindFirstObjectByType<InputManager>().onScheduleSwap += OnTearoutSwap;
+        originalMinimapY = minimapHolder.localPosition.y;
     }
 
     private void Start()
@@ -57,53 +99,332 @@ public class ScheduleUI : MonoBehaviour
         ((RectTransform)blockHolder).SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, hourLength * (float)foresight);
     }
 
-    private void OnEnable()
-    {
-        ReadSchedule();
-        gm.OnChangeDay += ReadSchedule;
-        sm.OnUpdateSchedule += ReadSchedule; // Make so that tearout is updated when schedule is updated
-        sm.OnBlockChange += UpdateTearout;
-    }
-
-    private void OnDisable()
-    {
-        gm.OnChangeDay -= ReadSchedule;
-        sm.OnUpdateSchedule -= ReadSchedule;
-        sm.OnBlockChange -= UpdateTearout;
-    }
-
     private void Update()
     {
-        //if (Input.GetKeyDown(KeyCode.O)) AddScheduleBlock(new ScheduleBlock(testBlock.periodName, testBlock.room, testBlock.length, testBlock.time));
-        ScrollSchedule();
-        CheckTearout();
+        CheckTaskRevealStart();
     }
 
-    void ScrollSchedule()
+    private void LateUpdate()
     {
-        if (listedBlocks.Count == 0) return;
-        if (BlockPassed(listedBlocks[0].block))
+        CheckReadjustment();
+    }
+
+    // Replaces period task info with this
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_SendTearoutInfo([RpcTarget] PlayerRef player, string periodName, string room, float time, float length, string[] tasks, bool[] completed)
+    {
+        List<UITask> receivedTasks = new List<UITask>();
+        // If the tearout tasks doesn't contain the key
+        for (int i = 0; i < tasks.Length; i++)
         {
-            RemoveScheduleBlock(0);
+            receivedTasks.Add(new UITask(tasks[i], completed[i]));
         }
-        float currentPeriod = gm.currentPeriod - (gm.currentDay * 24f);
-        blockHolder.localPosition = new Vector2(0f, hourLength * currentPeriod);
-        bookmarkHolder.localPosition = new Vector2(0f, hourLength * currentPeriod);
+
+        ScheduleBlock infoBlock = new ScheduleBlock(periodName, room, length, time);
+        // If we haven't added this yet
+        ScheduleBlock tearoutKey = infoBlock.GetEquivalentBlockInSchedule(tearoutTasks.Keys.ToList());
+        if (!tearoutTasks.ContainsKey(tearoutKey))
+        {
+            tearoutTasks.Add(infoBlock, receivedTasks);
+            RenderCurrentTasks(false); // New thing created, dont render differences
+        }
+        else
+        {
+            tearoutTasks[tearoutKey] = receivedTasks;
+            Debug.Log("Rendering true");
+            RenderCurrentTasks(true); // Modified current thing, render the differences
+        }
     }
 
-    void CheckTearout()
+    // Removes the tearout info of the specified tearout
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_RemoveTearoutInfo([RpcTarget] PlayerRef player, string periodName, string room, float time, float length)
     {
-        if (tearoutRemovalTime == -1f) return;
-        if (!(gm.currentPeriod >= tearoutRemovalTime)) return;
-        DestroyTearout();
-        tearoutRemovalTime = -1f;
+
     }
 
-    void DestroyTearout()
+    // Sends the specified subtext
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_SendSubtext([RpcTarget] PlayerRef player, string periodName, string room, float time, float length, string subtext)
     {
-        if (tearout == null) return;
-        StartCoroutine(RemoveTearout(tearout.transform));
-        tearout = null;
+
+    }
+
+    private void RenderCurrentTasks(bool renderDifferences = false)
+    {
+        ScheduleBlock selectedTearout = previousBuffer;
+        if (selectedTearout.GetEquivalentBlockInSchedule(tearoutTasks.Keys.ToList()) == null)
+        {
+            ClearUITasks();
+            return;
+        } // If the selected tearout has no tasks
+        if (renderDifferences)
+        {
+            RenderTearoutDifferences(selectedTearout);
+            return;
+        }
+        ClearUITasks();
+        ScheduleBlock tearoutKey = selectedTearout.GetEquivalentBlockInSchedule(tearoutTasks.Keys.ToList());
+        if (!tearoutTasks.ContainsKey(tearoutKey) || tearoutTasks[tearoutKey] == null) return;
+        foreach (UITask task in tearoutTasks[tearoutKey])
+        {
+            AddUITask(task);
+        }
+    }
+
+    private void RenderTearoutDifferences(ScheduleBlock selectedTearout)
+    {
+        if (currentTearout == null) return;
+        ScheduleBlock tearoutKey = selectedTearout.GetEquivalentBlockInSchedule(tearoutTasks.Keys.ToList());
+        if (tearoutKey == null) return;
+        if (tearoutTasks[tearoutKey] == null) return;
+        List<UITask> diffList = tearoutTasks[tearoutKey]; // new list of uitasks
+        for (int i = 0; i < diffList.Count; i++) // Find differences between uiTasks and diffList
+        {
+            if (i >= uiTasks.Count)
+            {
+                AddUITask(new UITask(diffList[i].name, diffList[i].completed));
+            }
+            if (uiTasks[i].name != diffList[i].name) return;
+            if (uiTasks[i].completed != diffList[i].completed)
+            {
+                uiTasks[i].completed = diffList[i].completed;
+                SetUITaskCompleted(i, diffList[i].completed); // Later make this into an animation
+            }
+        }
+
+        readjust = true;
+    }
+
+    private void AddUITask(UITask task)
+    {
+        TearoutPhys tPhys = currentTearout.GetComponent<TearoutPhys>();
+        if (tPhys == null) return;
+        uiTasks.Add(task);
+        Debug.Log("Adding new uitask");
+        tPhys.AddUITask(task.name, task.completed);
+    }
+
+    private void SetUITaskCompleted(int blockIndex, bool completed)
+    {
+        TearoutPhys tPhys = currentTearout.GetComponent<TearoutPhys>();
+        if (tPhys == null) return;
+        tPhys.SetUITaskCompleted(blockIndex, completed);
+    }
+
+    private void ClearUITasks()
+    {
+        uiTasks.Clear();
+        if (currentTearout != null) currentTearout.GetComponent<TearoutPhys>().ClearUITasks();
+    }
+
+    void AddTearout(ScheduleBlock block)
+    {
+        tearoutBuffer.Add(block);
+        UpdateTearoutUI();
+    }
+
+    void RemoveTearout(ScheduleBlock block)
+    {
+        tearoutBuffer.Remove(block);
+        UpdateTearoutUI();
+    }
+
+    void OnTearoutSwap()
+    {
+        if (tearoutBuffer.Count <= 1) return;
+
+        tearoutBuffer.Add(tearoutBuffer[0]);
+        tearoutBuffer.RemoveAt(0);
+        firstFrame = true;
+        UpdateTearoutUI(true);
+        RenderCurrentTasks();
+    }
+
+    void UpdateTearoutUI(bool isSwapping = false)
+    {
+        ScheduleBlock currentBlock = ScheduleBlock.None;
+        if (tearoutBuffer.Count > 0) currentBlock = tearoutBuffer[0];
+
+        if (previousBuffer.Equals(currentBlock)) { 
+            if (firstFrame || previousKeyText != tearoutBuffer.Count)
+            {
+                firstFrame = false;
+                UpdateTearoutBuffer();
+            }
+            return; 
+        }
+
+        canStartReveal = false;
+        firstFrame = true;
+        if (!currentBlock.Equals(ScheduleBlock.None))
+        {
+            GameObject newTearout = Instantiate(tearoutPrefab, tearoutHolder);
+            UIBlockPhys pub = newTearout.GetComponent<UIBlockPhys>();
+            SetUIBlockProperties(pub, currentBlock);
+            if (isSwapping)
+            {
+                pub.PlayAnimation("TearoutSwap");
+                canStartReveal = true;
+                taskRevealStarted = false;
+                ResetMinimapPosition();
+            } // Animation for swapping tearout
+
+            if (currentTearout != null) Destroy(currentTearout);
+            currentTearout = newTearout;
+
+            if (previousBuffer.Equals(ScheduleBlock.None))
+            {
+                RectTransform rt = (RectTransform)newTearout.transform;
+                rt.sizeDelta = new Vector2(rt.sizeDelta.x, 0f);
+                StartCoroutine(StartTearoutHeightAnimation(newTearout, 0f, tearoutHeight, false, true));
+                StartMinimapAnimation(MinimapAnimation(0f, tearoutHeight));
+            }
+            else
+            {
+                RectTransform rt = (RectTransform)newTearout.transform;
+                rt.sizeDelta = new Vector2(rt.sizeDelta.x, tearoutHeight);
+                canStartReveal = true;
+                taskRevealStarted = false;
+            }
+            previousBuffer = currentBlock;
+            // none -> something, play the animation
+            UpdateTearoutBuffer();
+        }
+        else
+        {
+            previousBuffer = currentBlock;
+            // previous is not current block, and current block is none, or previous was something and current is nothing
+            if (currentTearout != null)
+            {
+                float height = ((RectTransform)currentTearout.transform).sizeDelta.y;
+                StartCoroutine(StartTearoutHeightAnimation(currentTearout, height, 0f, true)); // Start animation to destroy this
+                StartMinimapAnimation(MinimapAnimation(height, 0f));
+            }
+        }
+    }
+
+    void ReadjustTearoutHeight()
+    {
+        if (currentTearout == null) return;
+        TearoutPhys tPhys = currentTearout.GetComponent<TearoutPhys>();
+        float height = ((RectTransform)currentTearout.transform).sizeDelta.y; // Current height
+        float newHeight = tPhys.GetSubtextHeight() + tearoutHeight + tPhys.padding;
+        Debug.Log(height);
+        Debug.Log(newHeight);
+        if (height == newHeight) return;
+        StartCoroutine(StartTearoutHeightAnimation(currentTearout, height, newHeight)); // Start animation to destroy this
+        StartMinimapAnimation(MinimapAnimation(height, newHeight));
+    }
+
+    void UpdateTearoutBuffer()
+    {
+        previousKeyText = tearoutBuffer.Count;
+        if (currentTearout == null) return;
+        // Tearout overlap
+        UIBlockPhys ubp = currentTearout.GetComponent<UIBlockPhys>();
+        if (tearoutBuffer.Count > 1)
+        {
+            ubp.SetKeyVisibility(true);
+            ubp.SetOverlap("(" + tearoutBuffer.Count + ")");
+            string interactText = InputControlPath.ToHumanReadableString(
+                tearoutSwap.action.bindings[0].effectivePath,
+                InputControlPath.HumanReadableStringOptions.OmitDevice);
+            ubp.SetKeyText(interactText);
+        }
+        else
+        {
+            ubp.SetKeyVisibility(false);
+        }
+    }
+
+    void StartMinimapAnimation(IEnumerator newAnimation)
+    {
+        if (minimapAnimation != null) StopCoroutine(minimapAnimation);
+        minimapAnimation = newAnimation;
+        StartCoroutine(minimapAnimation);
+    }
+
+    void SetUIBlockProperties(UIBlockPhys pub, ScheduleBlock block)
+    {
+        pub.SetNameText(block.periodName);
+        pub.SetRoomText(block.room);
+        string clockTimeStart = gm.PeriodToClockString(block.time);
+        string clockTimeEnd = gm.PeriodToClockString(block.time + block.length);
+        pub.SetTimeText($"{clockTimeStart} - {clockTimeEnd}");
+        pub.SetBlockColor(block.color);
+    }
+
+    IEnumerator StartTearoutHeightAnimation(GameObject tearout, float startHeight, float endHeight, bool destroyAfterFinished = false, bool setCanStartReveal = false)
+    {
+        RectTransform rt = (RectTransform)tearout.transform;
+        float height = startHeight;
+        float progress = 0f;
+        while (progress < 1f)
+        {
+            yield return null;
+            if (rt == null) yield break;
+            progress += Time.deltaTime * tearoutAnimationSpeed;
+            height = Mathf.SmoothStep(startHeight, endHeight, progress);
+            rt.sizeDelta = new Vector3(rt.sizeDelta.x, height);
+        }
+        if (rt != null) rt.sizeDelta = new Vector3(rt.sizeDelta.x, endHeight);
+
+        if (destroyAfterFinished) Destroy(tearout);
+        if (setCanStartReveal) canStartReveal = true;
+    }
+
+    // Minimap animation done separately so it can cancel
+    IEnumerator MinimapAnimation(float startHeight, float endHeight)
+    {
+        float height = startHeight;
+        float progress = 0f;
+        while (progress < 1f)
+        {
+            yield return null;
+            progress += Time.deltaTime * tearoutAnimationSpeed;
+            height = Mathf.SmoothStep(startHeight, endHeight, progress);
+            minimapHolder.localPosition = new Vector3(minimapHolder.localPosition.x, originalMinimapY - height);
+        }
+        minimapHolder.localPosition = new Vector3(minimapHolder.localPosition.x, originalMinimapY - endHeight);
+
+    }
+
+    private void CheckReadjustment()
+    {
+        if (!readjust) return;
+        readjust = false;
+        Debug.Log("readjusting");
+        ReadjustTearoutHeight();
+    }
+
+    private void CheckTaskRevealStart()
+    {
+        // Starts the reveal the first available frame canStartReveal is true, and if reveal hasn't started
+        if (!canStartReveal)
+        {
+            taskRevealStarted = false;
+            return;
+        }
+        if (taskRevealStarted) return;
+
+        if (currentTearout == null) return;
+        TearoutPhys tp = currentTearout.GetComponent<TearoutPhys>();
+        if (tp == null) return;
+
+        float newHeight = tp.GetSubtextHeight();
+        if (newHeight != 0f) newHeight += tp.padding;
+        else return;
+        taskRevealStarted = true;
+        StartCoroutine(StartTearoutHeightAnimation(tp.gameObject, tearoutHeight, newHeight + tearoutHeight));
+        StartMinimapAnimation(MinimapAnimation(tearoutHeight, newHeight + tearoutHeight + 4f));
+    }
+
+    private void ResetMinimapPosition()
+    {
+        if (minimapAnimation != null) StopCoroutine(minimapAnimation);
+        minimapAnimation = null;
+        minimapHolder.localPosition = new Vector3(minimapHolder.localPosition.x, originalMinimapY - tearoutHeight);
     }
 
     /// <summary>
@@ -114,179 +435,5 @@ public class ScheduleUI : MonoBehaviour
     bool BlockPassed(ScheduleBlock block)
     {
         return block.time + block.length < gm.currentPeriod;
-    }
-
-    void ReadSchedule()
-    {
-        ClearScheduleBlocks();
-
-        List<ScheduleBlock> blocks = new List<ScheduleBlock>();
-        float minRange = gm.currentDay * 24 - 1;
-        float maxRange = gm.currentDay * 24 + 23;
-
-        // Add immutable blocks
-        foreach (ScheduleBlock block in sm.immutableBlocks)
-        {
-            if (BlockPassed(new ScheduleBlock(block.periodName, block.room, block.length, block.time + (gm.currentDay * 24)))) continue;
-            ScheduleBlock nBlock = new ScheduleBlock(block.periodName, block.room, block.length, block.time + (gm.currentDay * 24));
-            blocks.Add(nBlock);
-        }
-
-        // Add mutable blocks
-        foreach (ScheduleBlock block in sm.schedule)
-        {
-            if (BlockPassed(block)) continue;
-            if (block.time < minRange || block.time > maxRange) continue;
-            blocks.Add(block);
-        }
-
-        // Sort blocks
-        blocks = blocks.OrderBy(o => o.time).ToList();
-
-        // Add empty spaces
-        List<ScheduleBlock> blocksCheck = new List<ScheduleBlock>(blocks);
-        for (int i = 0; i < blocksCheck.Count; i++)
-        {
-            int nextI = i + 1;
-            if (nextI >= blocksCheck.Count) break;
-            if (blocksCheck[i].time + blocksCheck[i].length == blocksCheck[nextI].time) continue; // Continue if there is no space in between blocks
-            if (BlockPassed(new ScheduleBlock(emptyPeriod, "", blocksCheck[nextI].time - (blocksCheck[i].time + blocksCheck[i].length), blocksCheck[i].time + blocksCheck[i].length))) continue; // ... fuck you
-            blocks.Add(new ScheduleBlock(emptyPeriod, "", blocksCheck[nextI].time - (blocksCheck[i].time + blocksCheck[i].length), blocksCheck[i].time + blocksCheck[i].length));
-        }
-
-        GroupAddScheduleBlocks(blocks);
-    }
-
-    void GroupAddScheduleBlocks(List<ScheduleBlock> blocks)
-    {
-        blocks = blocks.OrderBy(o => o.time).ToList();
-
-        foreach (ScheduleBlock block in blocks)
-        {
-            AddScheduleBlock(block);
-        }
-    }
-
-    void AddScheduleBlock(ScheduleBlock block)
-    {
-        GameObject newBlock = Instantiate(scheduleBlockPrefab, blockHolder);
-        Transform nbt = newBlock.transform;
-        float currentPosition = (block.time - (gm.currentDay * 24f)) * hourLength;
-        nbt.localPosition = new Vector2(0f, -currentPosition);
-        RectTransform rt = (RectTransform)nbt;
-        rt.sizeDelta = new Vector2(rt.sizeDelta.x, block.length * hourLength);
-
-        int setPos = 0;
-        for (int i = 0; i < listedBlocks.Count; i++)
-        {
-            if (block.time > listedBlocks[i].block.time) setPos++;
-        }
-        listedBlocks.Insert(setPos, new UIBlock(block, nbt));
-
-        // Sets text data on block
-        nbt.GetChild(1).GetComponent<TextMeshProUGUI>().text = block.periodName;
-        nbt.GetChild(2).GetComponent<TextMeshProUGUI>().text = block.room;
-        // Time data
-        string clockTimeStart = gm.PeriodToClockString(block.time);
-        string clockTimeEnd = gm.PeriodToClockString(block.time + block.length);
-        nbt.GetChild(3).GetComponent<TextMeshProUGUI>().text = $"{clockTimeStart} - {clockTimeEnd}";
-
-        Color newColor = primaryColor;
-        if (setPos % 2 != 0) newColor = secondaryColor;
-        foreach (Transform child in nbt.GetChild(0))
-        {
-            child.GetComponent<RawImage>().color = newColor;
-        }
-    }
-
-    void RemoveScheduleBlock(int index)
-    {
-        Destroy(listedBlocks[index].transform.gameObject);
-        listedBlocks.RemoveAt(index);
-    }
-
-    void ClearScheduleBlocks()
-    {
-        listedBlocks.Clear();
-        foreach (Transform child in blockHolder) Destroy(child.gameObject);
-    }
-
-    void UpdateTearout(ScheduleBlock from, ScheduleBlock to)
-    {
-        if (tearout != null) DestroyTearout();
-        string periodName;
-        string room = "";
-        float timeStart;
-        float timeEnd;
-        // Empty periods
-        if (to == null)
-        {
-            int afterIndex = sm.orderedBlocks.IndexOf(from) + 1;
-            if (afterIndex > sm.orderedBlocks.Count - 1) return;
-            timeStart = from.time + from.length;
-            timeEnd = sm.orderedBlocks[afterIndex].time;
-            periodName = emptyPeriod;
-        }
-        else
-        {
-            periodName = to.periodName;
-            room = to.room;
-            timeStart = to.time;
-            timeEnd = to.time + to.length;
-        }
-        // Removal Time
-        tearoutRemovalTime = timeEnd - 0.95f;
-        // Text data
-        GameObject newTearout = Instantiate(tearoutPrefab, tearoutHolder);
-        Transform nbt = newTearout.transform;
-        tearout = newTearout;
-        nbt.GetChild(0).GetComponent<TextMeshProUGUI>().text = periodName;
-        nbt.GetChild(1).GetComponent<TextMeshProUGUI>().text = room;
-        // Time data
-        string clockTimeStart = gm.PeriodToClockString(timeStart);
-        string clockTimeEnd = gm.PeriodToClockString(timeEnd);
-        nbt.GetChild(2).GetComponent<TextMeshProUGUI>().text = $"{clockTimeStart} - {clockTimeEnd}";
-    }
-
-    IEnumerator RemoveTearout(Transform t)
-    {
-        float time = 0f;
-        float endX = t.localPosition.x + 365f;
-        float ogX = t.localPosition.x;
-        while (time < 1f)
-        {
-            yield return null;
-            time += Time.deltaTime;
-            float newX = Mathf.SmoothStep(ogX, endX, time);
-            t.localPosition = new Vector2(newX, t.localPosition.y);
-        }
-        Destroy(t.gameObject);
-    }
-
-    void AddBookmarks()
-    {
-        ClearBookmarks();
-        foreach (GlobalEvent ge in sm.globalEvents)
-        {
-            Color newColor = innoBookmark;
-            if (ge.cultistEvent) newColor = cultistBookmark;
-
-            GameObject newBookmark = Instantiate(bookmarkPrefab, bookmarkHolder);
-            float currentPosition = -ge.time * hourLength;
-            float offset = -bookmarkOffset;
-            if (ge.cultistEvent) offset = bookmarkOffset;
-            RectTransform rt = newBookmark.GetComponent<RectTransform>();
-            rt.sizeDelta = new Vector2(rt.sizeDelta.x, ge.length * hourLength);
-            rt.localPosition = new Vector2(offset, currentPosition + hourLength * 3); // idk why its this number specifically
-            newBookmark.GetComponent<RawImage>().color = newColor;
-        }
-    }
-
-    void ClearBookmarks()
-    {
-        foreach (Transform child in bookmarkHolder)
-        {
-            Destroy(child.gameObject);
-        }
     }
 }

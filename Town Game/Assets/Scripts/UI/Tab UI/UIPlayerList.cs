@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
+using Fusion;
 using System.Linq;
 
-public class UIPlayerList : MonoBehaviourPunCallbacks
+public class UIPlayerList : MonoBehaviour//PunCallbacks
 {
     // If true, players will be removed from player list on disconnect. If false, players will be marked as dead on disconnect.
     public bool removeOnDC;
@@ -15,21 +15,47 @@ public class UIPlayerList : MonoBehaviourPunCallbacks
     public Color primaryPanelColor;
     public Color secondaryPanelColor;
     List<string> containedPlayers = new List<string>();
+    private List<ClientVoteInstance> uiVotes = new List<ClientVoteInstance>();
 
     public ClickPlayer OnClickPlayer;
     public DeselectPlayer OnDeselectPlayer;
-    public delegate void ClickPlayer(Photon.Realtime.Player player);
-    public delegate void DeselectPlayer(Photon.Realtime.Player player);
+    public delegate void ClickPlayer(PlayerRef player);
+    public delegate void DeselectPlayer(PlayerRef player);
 
-    private void Awake()
+    PlayerManager playerManager;
+    RunnerManager rm;
+    VotingManager votingManager;
+    GameManager gameManager;
+    bool init = false;
+
+    public void Init()
     {
-        
+        init = true;
+        playerManager = FindFirstObjectByType<PlayerManager>();
+        gameManager = FindFirstObjectByType<GameManager>();
+        rm = FindFirstObjectByType<RunnerManager>();
+        votingManager = FindFirstObjectByType<VotingManager>();
+        rm.onPlayerJoin += PlayerEventUpdatePlayerList;
+        rm.onPlayerLeave += PlayerEventUpdatePlayerList;
+        if (votingManager != null) votingManager.onReceiveVote += AddVoteToPlayers;
+    }
+
+    private void Update()
+    {
+        CheckVotes();
+    }
+
+    void PlayerEventUpdatePlayerList(PlayerRef player)
+    {
+        UpdatePlayerList();
     }
 
     // Updates player list off of players in room
     public void UpdatePlayerList()
     {
+        if (!init) return;
         List<GameObject> toDestroy = new List<GameObject>();
+        List<PlayerRef> playerList = rm.nRunner.ActivePlayers.ToList();
         // Update individual cards, destroy unnecessary
         foreach (Transform child in contentHolder.transform)
         {
@@ -37,9 +63,10 @@ public class UIPlayerList : MonoBehaviourPunCallbacks
 
             // Disconnected behaviour
             bool disconnected = true;
-            foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
+            // Iterate over every online palyer
+            foreach (PlayerRef player in playerList)
             {
-                if ((string)player.CustomProperties["name"] == tp.nick)
+                if (playerManager.GetPlayerNetworkObject(player).GetComponent<Player>().nickname == tp.nick)
                 {
                     disconnected = false;
                     break;
@@ -62,9 +89,12 @@ public class UIPlayerList : MonoBehaviourPunCallbacks
         foreach (GameObject go in toDestroy) Destroy(go);
 
         // Add missing players
-        foreach (Photon.Realtime.Player player in PhotonNetwork.PlayerList)
+        foreach (PlayerRef player in playerList)
         {
-            if (!containedPlayers.Contains(player.CustomProperties["name"]))
+            NetworkObject foundObject = playerManager.GetPlayerNetworkObject(player);
+            if (foundObject == null) continue;
+            string nick = foundObject.GetComponent<Player>().nickname;
+            if (!containedPlayers.Contains(nick))
             {
                 AddPlayer(player);
             }
@@ -75,18 +105,29 @@ public class UIPlayerList : MonoBehaviourPunCallbacks
         UpdateColors();
     }
 
-    public void AddPlayer(Photon.Realtime.Player player)
+    public void AddPlayer(PlayerRef player)
     {
-        string name = (string)player.CustomProperties["name"];
+        string name = playerManager.GetPlayerNetworkObject(player).GetComponent<Player>().nickname;
         GameObject newPlayer = Instantiate(tabPlayerPrefab, contentHolder);
         TabPlayer tp = newPlayer.GetComponent<TabPlayer>();
+        tp.uPlayerList = this;
         tp.SetName(name);
         tp.SetNameColor(alivePlayerColor);
-        OnClickPlayer += tp.OnUIClick;
-        tp.uPlayerList = this;
         tp.player = player;
+        OnClickPlayer += tp.OnUIClick;
         containedPlayers.Add(name);
         UpdateColors();
+
+        //string name = (string)player.CustomProperties["name"];
+        //GameObject newPlayer = Instantiate(tabPlayerPrefab, contentHolder);
+        //TabPlayer tp = newPlayer.GetComponent<TabPlayer>();
+        //tp.SetName(name);
+        //tp.SetNameColor(alivePlayerColor);
+        //OnClickPlayer += tp.OnUIClick;
+        //tp.uPlayerList = this;
+        //tp.player = player;
+        //containedPlayers.Add(name);
+        //UpdateColors();
     }
 
     void UpdateColors()
@@ -104,13 +145,70 @@ public class UIPlayerList : MonoBehaviourPunCallbacks
         }
     }
 
-    public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
+    public void AddVoteToPlayers(ClientVoteInstance vote, NetworkBool canVote)
     {
-        UpdatePlayerList();
+        Debug.Log("Adding vote to players");
+        // Starts tracking the vote
+        uiVotes.Add(vote);
+
+        // Add the vote button to every player that is on the voted list
+        List<PlayerRef> votedPlayers = new List<PlayerRef>(vote.votedWhitelist);
+        foreach (Transform child in contentHolder.transform)
+        {
+            TabPlayer tabPlayer = child.GetComponent<TabPlayer>();
+            if (votedPlayers.Contains(tabPlayer.player))
+            {
+                bool sCanVote = canVote;
+                if (tabPlayer.player == playerManager.Runner.LocalPlayer) sCanVote = false;
+                tabPlayer.AddVoteButton(vote, sCanVote, delegate { Vote(vote.id, tabPlayer.player); });
+            }
+        }
     }
 
-    public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
+    /// <summary>
+    /// Iterates over every vote. If one of them is expired, delete it
+    /// </summary>
+    private void CheckVotes()
     {
-        UpdatePlayerList();
+        List<ClientVoteInstance> deletedVotes = new List<ClientVoteInstance>();
+        foreach (ClientVoteInstance vote in uiVotes)
+        {
+            if (VoteExpired(vote))
+            {
+                RemoveVoteFromPlayers(vote.id);
+                deletedVotes.Add(vote);
+            }
+        }
+        foreach (ClientVoteInstance vote in deletedVotes) uiVotes.Remove(vote);
+    }
+
+    /// <summary>
+    /// Removes the vote instance of the specified id from every element
+    /// </summary>
+    /// <param name="id"></param>
+    private void RemoveVoteFromPlayers(int id)
+    {
+        Debug.Log("Removing vote");
+        foreach (Transform child in contentHolder.transform)
+        {
+            TabPlayer tabPlayer = child.GetComponent<TabPlayer>();
+            tabPlayer.RemoveVoteButton(id);
+        }
+    }
+
+    /// <summary>
+    /// Uses game time to check if the vote has expired
+    /// </summary>
+    /// <param name="vote"></param>
+    /// <returns></returns>
+    private bool VoteExpired(ClientVoteInstance vote)
+    {
+        return vote.voteTimeEnd < gameManager.gameTime;
+    }
+
+    public void Vote(int id, PlayerRef voted)
+    {
+        Player player = playerManager.currentPlayer.GetComponent<Player>();
+        player.RPC_Vote(id, voted);
     }
 }

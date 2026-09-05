@@ -39,8 +39,8 @@ public class StatsUI : MonoBehaviour
 
     private void Awake()
     {
-        PlayerManager pm = FindObjectOfType<PlayerManager>();
-        pm.OnInstantiatePlayer += AssignPlayerReferences;
+        PlayerManager pm = FindFirstObjectByType<PlayerManager>();
+        pm.onInstantiatePlayer += AssignPlayerReferences;
     }
 
     private void Start()
@@ -63,9 +63,9 @@ public class StatsUI : MonoBehaviour
     {
         Debug.Log("assignign plaginyoer");
         trackedStats = player.GetComponent<PlayerStats>();
-        trackedStats.OnTakeDamage += ShakeBlob;
-        trackedStats.OnDeath += Splatter;
-        trackedStats.OnDeath += HideBlob;
+        //trackedStats.onHPChange += ShakeBlob;
+        trackedStats.onDeath += Splatter;
+        trackedStats.onDeath += HideBlob;
     }
 
     void UpdateBlobSpeed()

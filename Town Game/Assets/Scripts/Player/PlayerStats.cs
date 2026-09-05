@@ -1,33 +1,24 @@
-using System.Collections;
+using Fusion;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
-using System.Linq;
-using UnityEngine.Events;
-using UnityEngine.SceneManagement;
 
-public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
+public class PlayerStats : NetworkBehaviour
 {
+    public PlayerNodes playerNodes;
     [Header("HP")]
     public float maxHP = 100f;
-    public float HP = 100f;
-    [SerializeField] float HPRegenSpeed = 5f;
-    [Header("Nutrition")]
-    public float maxNutrition = 100f;
-    public float nutrition = 100f;
-    [Header("Sanity")]
-    public float maxSanity = 100f;
-    public float sanity = 100f;
+    [Networked] public float HP { get; set; } = 100f;
+    private float previousHP = 100f;
     [Header("Stamina")]
     public float maxStamina = 100f;
-    public float stamina = 100f;
+    [Networked] public float stamina { get; set; } = 100f;
     [SerializeField] float staminaRegenSpeed = 20f;
     [SerializeField] float regenCooldownPoint = 1f;
-    public float staminaCooldown = 0f;
+    [Networked] public float staminaCooldown { get; set; }
     public float staminaRegenCooldown = .5f;
     public bool canRegenStamina = true;
     [Header("Death")]
-    public GameObject corpsePrefab;
+    public NetworkPrefabRef corpsePrefab;
     public Transform myRig;
     [Header("Hurt")]
     public string hurtLayer = "Hurt";
@@ -36,220 +27,162 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     public Shake softHurt;
     public Shake hardHurt;
     public float softThreshold = 30f;
-    [Header("Affecter Stuff")]
-    public StatAffecter hungerAffecter;
-    public List<StatAffecter> affecters = new List<StatAffecter>();
+    private ChangeDetector changeDetector;
 
-    public delegate void OnDamage(float damage);
-    public OnDamage OnTakeDamage;
-    public delegate void Death();
-    public Death OnDeath;
-    public delegate void AffecterChange(StatAffecter affecter);
-    public AffecterChange OnRemoveAffecter;
-    public AffecterChange OnAddAffecter;
+    public delegate void IntEvent(int value);
+    public delegate void StringEvent(string value);
+    public delegate void StatsEvent();
+    // Server events, executed on the server
+    public IntEvent onHPChange;
+    public IntEvent onHungerChange;
+    public StatsEvent onDeath;
+    // Client events
+    public IntEvent onHPChangeClient;
+    public IntEvent onHungerChangeClient;
 
     CameraShake shake;
-    PhotonView view;
-    PlayerEvidence pe;
-    PlayerMovement pm;
+    //PhotonView view;
+    [HideInInspector] public PlayerMovement pm;
     [HideInInspector] public Animator anim;
-    int hLayer;
-    float hWeight;
+    [HideInInspector] public PlayerInfoView piv;
+    GameManager gameManager;
+    ObjectManager objectManager;
+    bool init = false;
 
     private void Start()
     {
-        pm = gameObject.GetComponent<PlayerMovement>();
-        hLayer = anim.GetLayerIndex(hurtLayer);
-        view = gameObject.GetComponent<PhotonView>();
-        pe = gameObject.GetComponent<PlayerEvidence>();
-        if (!view.IsMine) return;
-        shake = FindObjectOfType<CameraShake>();
+        shake = FindFirstObjectByType<CameraShake>();
+        //pm = gameObject.GetComponent<PlayerMovement>();
+        //view = gameObject.GetComponent<PhotonView>();
+        //if (!view.IsMine) return;
         //if (FindObjectOfType<GameManager>() != null)AddAffector(hungerAffecter);
     }
 
-    private void Update()
+    public override void Spawned()
     {
-        FixDmg();
-        if (!view.IsMine) return;
-        CheckAffecters();
-        if (staminaCooldown > 0f) staminaCooldown -= Time.deltaTime;
-        if (staminaRegenCooldown > 0f) staminaRegenCooldown -= Time.deltaTime;
+        gameManager = FindAnyObjectByType<GameManager>();
+        objectManager = FindAnyObjectByType<ObjectManager>();
+        changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
+        pm.SetGrounded();
+        stamina = 100f;
+        staminaCooldown = 0f;
+        previousHP = HP;
+        init = true;
+    }
+
+    public override void Render()
+    {
+        /**
+        foreach (var change in changeDetector.DetectChanges(this))
+        {
+            switch (change)
+            {
+                case nameof(HP):
+                    onHPChangeClient?.Invoke(HP - previousHP);
+                    previousHP = HP;
+                    break;
+                case nameof(hunger):
+                    onHungerChangeClient?.Invoke(hunger - previousHunger);
+                    previousHunger = hunger;
+                    break;
+            }
+        }
+        **/
+    }
+
+    public override void Despawned(NetworkRunner runner, bool hasState)
+    {
+        if (HasInputAuthority) ClientDeath();
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (!init) return;
+        GetHP();
+        CheckDeath();
+        piv.recievedHP = HP;
+        if (staminaCooldown > 0f) staminaCooldown -= Runner.DeltaTime;
+        if (staminaRegenCooldown > 0f) staminaRegenCooldown -= Runner.DeltaTime;
         if (staminaCooldown <= regenCooldownPoint && canRegenStamina && pm.isGrounded && staminaRegenCooldown <= 0f)
         {
             RegenStamina();
         }
-        if (HP < maxHP)
-        {
-            RegenHP();
-        }
     }
 
-    // Stat affecters
-    public void AddAffector(StatAffecter affecter)
+    public void Damage(float damage)
     {
-        StatAffecter foundAffecter = affecters.FirstOrDefault(i => i.name == affecter.name);
-        if (foundAffecter != null) return;
-        affecters.Add(new StatAffecter(affecter.name, affecter.description, affecter.stat, affecter.changeRate, affecter.timeLeft, affecter.isInfinite, affecter.display));
-        OnAddAffecter?.Invoke(affecter);
+        playerNodes.ChangeNodeValue("Health", -damage);
     }
 
-    public void RemoveAffecter(string name)
+    private void GetHP()
     {
-        for (int i = 0; i < affecters.Count; i++)
-        {
-            if (affecters[i].name == name)
-            {
-                OnRemoveAffecter?.Invoke(affecters[i]);
-                affecters.RemoveAt(i);
-                break;
-            }
-        }
-    }
-
-    void CheckAffecters()
-    {
-        List<StatAffecter> destroyed = new List<StatAffecter>();
-        for (int i = 0; i < affecters.Count; i++)
-        {
-            if (affecters[i].timeLeft <= 0f && !affecters[i].isInfinite)
-            {
-                destroyed.Add(affecters[i]);
-                break;
-            }
-
-            StatAffecter affecter = affecters[i];
-            float changeAmount = affecter.changeRate * Time.deltaTime;
-
-            switch (affecter.stat)
-            {
-                // Changes the stat with change amount
-                case StatAffecter.Stat.Health:
-                    HP = Mathf.Clamp(HP + changeAmount, 0f, maxHP);
-                    CheckDeath();
-                    break;
-                case StatAffecter.Stat.Nutrition:
-                    nutrition = Mathf.Clamp(nutrition + changeAmount, 0f, maxNutrition);
-                    break;
-                case StatAffecter.Stat.Sanity:
-                    sanity = Mathf.Clamp(sanity + changeAmount, 0f, maxSanity);
-                    break;
-            }
-
-            if (!affecter.isInfinite)
-            {
-                affecter.timeLeft -= Time.deltaTime;
-                if (affecter.timeLeft <= 0f)
-                {
-                    destroyed.Add(affecters[i]);
-                }
-            }
-        }
-
-        foreach (StatAffecter i in destroyed)
-        {
-            RemoveAffecter(i.name);
-        }
-    }
-
-    // HP
-    void RegenHP()
-    {
-        HP += HPRegenSpeed * Time.deltaTime;
-        if (HP > maxHP)
-        {
-            HP = maxHP; 
-        }
+        Node foundNode = playerNodes.GetNode("Health");
+        if (!foundNode.IsNone()) HP = playerNodes.GetNode("Health").value;
     }
 
     /// <summary>
-    /// Instantly removes the specified amount of HP.
+    /// Kills the player and destroys the NetworkObject
     /// </summary>
-    /// <param name="amount"></param>
-    [PunRPC]
-    public void Damage(float amount, bool playShake = true)
+    public void Kill()
     {
-        HP -= amount;
-        OnTakeDamage?.Invoke(amount);
-        CheckDeath();
-        view.RPC("DamageAnimation", RpcTarget.All);
-        if (playShake)
+        if (!HasStateAuthority) return;
+        PlayerClothing pc = gameObject.GetComponent<PlayerClothing>();
+        Rigidbody rb = GetComponent<Rigidbody>();
+        Quaternion newRot = Quaternion.Euler(0f, GetComponent<Player>().camDirection, 0f);
+        NetworkObject corpse = Runner.Spawn(corpsePrefab, rb.position, newRot, null, (runner, o) =>
         {
-            if (amount < softThreshold)
-            {
-                shake.StartShake(softHurt.shakeProperties);
-            }
-            else
-            {
-                shake.StartShake(hardHurt.shakeProperties);
-            }
+            o.GetComponent<Corpse>().Init(rb.velocity, pc.isMale);
+        });
+
+        PlayerClothing cpc = corpse.GetComponent<PlayerClothing>(); // Corpse player clothing
+        foreach (PlayerClothing.Attire attire in pc.attires)
+        {
+            if (attire.clothing == null) continue;
+            cpc.SetClothing(attire.clothing.name);
         }
+
+        //Ragdoller ragdoller = corpse.GetComponent<Ragdoller>();
+        //ragdoller.SetPositionsToTarget(myRig);
+
+        // Set corpse nickname
+        //co.SetCorpseData(view.Owner);
+        //corpseView.RPC("SetCorpseData", RpcTarget.OthersBuffered, view.Owner);
+
+        // Sets corpse clothing to this player's clothing
+        onDeath?.Invoke();
+        Runner.Despawn(Object); // Destroy player object
     }
 
-    [PunRPC]
-    public void DamageAnimation()
-    {
-        hWeight = hurtWeight;
-        anim.SetLayerWeight(hLayer, hWeight);
-    }
-
+    /// <summary>
+    /// Checks if the player is qualified for death
+    /// </summary>
     void CheckDeath()
     {
+        if (!Runner.IsServer) return;
         if (HP <= 0f)
         {
             Kill();
         }
     }
 
-    void FixDmg()
+    /// <summary>
+    /// Called on the client when there is death. Only called on this object's input authority.
+    /// </summary>
+    public void ClientDeath()
     {
-        if (hWeight == 0f) return;
-        hWeight = Mathf.Lerp(hWeight, 0f, Time.deltaTime * hurtLerp);
-        anim.SetLayerWeight(hLayer, hWeight);
-        if (hWeight < 0.001f) hWeight = 0f;
+        CameraBobbing cb = FindFirstObjectByType<CameraBobbing>();
+        cb.isBobbing = false;
+        cb.isSprinting = false;
+        FindAnyObjectByType<PlayerManager>().onDestroyPlayer?.Invoke();
     }
 
-    public void Kill()
-    {
-        OnDeath?.Invoke();
-        GameObject corpse = PhotonNetwork.Instantiate(corpsePrefab.name, transform.position, transform.rotation);
-        PhotonView corpseView = corpse.GetComponent<PhotonView>();
-        pe.ApplyEvidence(corpse);
-        Ragdoller ragdoller = corpse.GetComponent<Ragdoller>();
-        ragdoller.SetPositionsToTarget(myRig);
-        FindObjectOfType<CameraBobbing>().isBobbing = false;
-
-        // Set corpse nickname
-        Corpse co = corpse.GetComponent<Corpse>();
-        co.SetVelocity(gameObject.GetComponent<Rigidbody>().velocity);
-        co.SetCorpseData(view.Owner);
-        corpseView.RPC("SetCorpseData", RpcTarget.OthersBuffered, view.Owner);
-
-        // Sets corpse clothing to this player's clothing
-        PlayerClothing cpc = corpse.GetComponent<PlayerClothing>();
-        PlayerClothing pc = gameObject.GetComponent<PlayerClothing>();
-        foreach (PlayerClothing.Attire attire in pc.attires)
-        {
-            if (attire.clothing == null) continue;
-            cpc.SetClothing(attire.clothing.name, cpc.isMale);
-            corpseView.RPC("SetClothing", RpcTarget.OthersBuffered, attire.clothing.name, cpc.isMale);
-        }
-        PhotonNetwork.Destroy(gameObject);
-        return;
-
-        //Destroy player
-    }
-
-    // Stamina
-    void RegenStamina()
+    private void RegenStamina()
     {
         if (stamina == maxStamina) return;
         if (stamina <= maxStamina)
         {
-            stamina += staminaRegenSpeed * Time.deltaTime;
-        }
-        else
-        {
-            stamina = maxStamina;
+            stamina += staminaRegenSpeed * Runner.DeltaTime;
+            if (stamina > maxStamina) stamina = maxStamina;
         }
     }
 
@@ -276,36 +209,9 @@ public class PlayerStats : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (stamina <= 0f) return false;
         if (staminaCooldown > 0f) return false;
-        stamina -= rate * Time.deltaTime;
+        stamina -= rate * Runner.DeltaTime;
         
         return true;
-    }
-
-    public override void OnLeftRoom()
-    {
-        SceneManager.LoadScene(0);
-    }
-
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.IsWriting)
-        {
-            stream.SendNext(HP);
-            stream.SendNext(maxHP);
-            stream.SendNext(nutrition);
-            stream.SendNext(maxNutrition);
-            stream.SendNext(sanity);
-            stream.SendNext(maxSanity);
-        }
-        else
-        {
-            HP = (float)stream.ReceiveNext();
-            maxHP = (float)stream.ReceiveNext();
-            nutrition = (float)stream.ReceiveNext();
-            maxNutrition = (float)stream.ReceiveNext();
-            sanity = (float)stream.ReceiveNext();
-            maxSanity = (float)stream.ReceiveNext();
-        }
     }
 }
 

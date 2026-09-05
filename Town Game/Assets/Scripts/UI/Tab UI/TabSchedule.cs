@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using Photon.Pun;
 using System.Linq;
-using Photon.Voice.Unity.Demos;
 using UnityEngine.UI;
+using Fusion;
+using Pinwheel.Poseidon;
 
 public class TabSchedule : MonoBehaviour
 {
@@ -15,34 +15,71 @@ public class TabSchedule : MonoBehaviour
     public int readDay;
     public Color primaryColor;
     public Color secondaryColor;
-    Photon.Realtime.Player selectedPlayer;
+    PlayerRef selectedPlayer;
     ScheduleManager sm;
     GameManager gm;
     public float hourHeight = 0f;
+    public float maxWidth = 262.7293f;
+    public GameObject select;
+    public GameObject grid;
+
+    struct BlockVolume
+    {
+        public float time;
+        public float length;
+        public List<ScheduleBlock> blocks;
+
+        public BlockVolume(float time, float length, List<ScheduleBlock> blocks)
+        {
+            this.time = time;
+            this.length = length;
+            this.blocks = blocks;
+        }
+    }
+
+    struct BlockBound
+    {
+        public float time;
+        public bool isStart;
+        public int blockIndex;
+
+        public BlockBound(float time, bool isStart, int blockIndex)
+        {
+            this.time = time;
+            this.isStart = isStart;
+            this.blockIndex = blockIndex;
+        }
+    }
 
     private void Awake()
     {
-        sm = FindObjectOfType<ScheduleManager>();
-        gm = FindObjectOfType<GameManager>();
+        sm = FindFirstObjectByType<ScheduleManager>();
+        gm = FindFirstObjectByType<GameManager>();
+        sm.OnProxyScheduleChange += UpdateProxySchedule;
     }
 
     private void Start()
     {
-        List<ScheduleBlock> sortedBlocks = sm.immutableBlocks.OrderBy(o => o.time).ToList();
-        ScheduleBlock lastBlock = sortedBlocks[sm.immutableBlocks.Count - 1];
+        List<ScheduleBlock> sortedBlocks = sm.dailyBlocks.OrderBy(o => o.time).ToList();
+        ScheduleBlock lastBlock = sortedBlocks[sm.dailyBlocks.Count - 1];
         hourHeight = blockHolder.GetComponent<RectTransform>().sizeDelta.y / ((lastBlock.time + lastBlock.length) - (sortedBlocks[0].time));
+    }
+
+    private void OnEnable()
+    {
+        DeselectSchedule(PlayerRef.None);
     }
 
     private void OnDisable()
     {
-        selectedPlayer = null;
+        selectedPlayer = PlayerRef.None;
     }
 
     // Shows the schedule a day in advance
     public void ScrollForward()
     {
         readDay++;
-        if (selectedPlayer != null) DisplaySchedule(selectedPlayer);
+        if (selectedPlayer != PlayerRef.None) DisplaySchedule(selectedPlayer);
     }
 
     // Shows the schedule a day before
@@ -50,89 +87,119 @@ public class TabSchedule : MonoBehaviour
     {
         if (readDay == 0) return;
         readDay--;
-        if (selectedPlayer != null) DisplaySchedule(selectedPlayer);
+        if (selectedPlayer != PlayerRef.None) DisplaySchedule(selectedPlayer);
     }
 
-    public void DisplaySchedule(Photon.Realtime.Player player)
+    void UpdateProxySchedule(PlayerRef player)
     {
+        if (selectedPlayer != player) return;
+        DisplaySchedule(player);
+    }
+
+    public void DisplaySchedule(PlayerRef player)
+    {
+        select.SetActive(false);
+        grid.SetActive(true);
         selectedPlayer = player;
         List<ScheduleBlock> blocks = new List<ScheduleBlock>();
         float minRange = readDay * 24 - 1;
         float maxRange = readDay * 24 + 23;
 
         // Add immutable blocks
-        foreach (ScheduleBlock block in sm.immutableBlocks)
+        foreach (ScheduleBlock block in sm.dailyBlocks)
         {
-            ScheduleBlock nBlock = new ScheduleBlock(block.periodName, block.room, block.length, block.time + (gm.currentDay * 24));
-            blocks.Add(block);
+            ScheduleBlock nBlock = new ScheduleBlock(block.periodName, block.room, block.length, block.time + (readDay * 24), Color.clear);
+            blocks.Add(nBlock);
         }
 
         // Add mutable blocks from selected player
-        foreach (ScheduleBlock block in sm.playerSchedules[player])
+        foreach (ScheduleBlock block in sm.proxySchedules[player])
         {
             if (block.time < minRange || block.time > maxRange) continue;
             blocks.Add(block);
         }
 
-        // Sort blocks
-        blocks = blocks.OrderBy(o => o.time).ToList();
-
-        // Add empty spaces
-        List<ScheduleBlock> blocksCheck = new List<ScheduleBlock>(blocks);
-        for (int i = 0; i < blocksCheck.Count; i++)
+        // Create block volumes
+        List<BlockBound> blockBounds = new List<BlockBound>();
+        for (int i = 0; i < blocks.Count; i++)
         {
-            int nextI = i + 1;
-            if (nextI >= blocksCheck.Count) break;
-            if (blocksCheck[i].time + blocksCheck[i].length == blocksCheck[nextI].time) continue; // Continue if there is no space in between blocks
-            blocks.Add(new ScheduleBlock("Free Time", "", blocksCheck[nextI].time - (blocksCheck[i].time + blocksCheck[i].length), blocksCheck[i].time + blocksCheck[i].length));
+            blockBounds.Add(new BlockBound(blocks[i].time, true, i));
+            blockBounds.Add(new BlockBound(blocks[i].time + blocks[i].length, false, i));
         }
 
-        blocks = blocks.OrderBy(o => o.time).ToList();
-        UpdateSchedule(blocks);
+        // Sort the block bounds
+        blockBounds = blockBounds.OrderBy(o => o.time).ToList();
+
+        List<BlockVolume> blockVolumes = new List<BlockVolume>();
+        List<ScheduleBlock> currentBlocks = new List<ScheduleBlock>();
+        float previousBound = -1f;
+        foreach (BlockBound bound in blockBounds) // Create the volumes, every time there is a bound start it adds the block to a future volume, else it removes the block from future volume.
+        {
+            if (currentBlocks.Count > 0 && (bound.time - previousBound != 0f)) blockVolumes.Add(new BlockVolume(previousBound, bound.time - previousBound, new List<ScheduleBlock>(currentBlocks)));
+            if (bound.isStart) currentBlocks.Add(blocks[bound.blockIndex]);
+            else currentBlocks.Remove(blocks[bound.blockIndex]);
+
+            previousBound = bound.time;
+        }
+
+        UpdateSchedule(blockVolumes);
 
         // Change day text
         dateText.text = gm.GetDay(readDay);
     }
 
     // Sets the read day to the current day
-    public void ResetReadDay(Photon.Realtime.Player player = null)
+    public void ResetReadDay(PlayerRef player)
     {
         readDay = gm.currentDay;
     }
 
-    public void DeselectSchedule(Photon.Realtime.Player player = null)
+    public void DeselectSchedule(PlayerRef player)
     {
         ClearSchedule();
-        selectedPlayer = null;
+        selectedPlayer = PlayerRef.None;
+        select.SetActive(true);
+        grid.SetActive(false);
         dateText.text = "...";
     }
 
-    void UpdateSchedule(List<ScheduleBlock> blocks)
+    void UpdateSchedule(List<BlockVolume> volumes)
     {
         // Clears blocks
         ClearSchedule();
 
-        int i = 0;
         // Instantiates new blocks with color
-        foreach (ScheduleBlock block in blocks)
+        foreach (BlockVolume volume in volumes)
         {
             // Creates block
-            GameObject newBlock = Instantiate(blockPrefab, blockHolder);
-            RectTransform bt = newBlock.GetComponent<RectTransform>();
+            float ySize = volume.length * hourHeight;
+            float roundedTime = volume.time - (24f * readDay);
+            float yPos = (roundedTime - 7f) * hourHeight;
 
-            bt.SetHeight(block.length * hourHeight);
-            bt.GetChild(0).GetComponent<TextMeshProUGUI>().text = block.periodName;
-
-            if (block.length < 1f)
+            int i = 0;
+            foreach (ScheduleBlock block in volume.blocks)
             {
-                Destroy(bt.GetChild(1).gameObject);
-                Destroy(bt.GetChild(2).gameObject);
-                continue;
+                GameObject newBlock = Instantiate(blockPrefab, blockHolder);
+                RectTransform bt = newBlock.GetComponent<RectTransform>();
+                UIBlockPhys ubp = newBlock.GetComponent<UIBlockPhys>();
+                float blockWidth = maxWidth / volume.blocks.Count;
+                bt.sizeDelta = new Vector3(blockWidth, volume.length * hourHeight);
+                bt.localPosition = new Vector3(blockWidth * i, -yPos);
+                float pivotX = 0f;
+                if (volume.blocks.Count > 1)
+                {
+                    pivotX = (1f / (volume.blocks.Count - 1f)) * i;
+                    SetPivot(bt, new Vector2(pivotX, 1f));
+                }
+                if (block.color != Color.clear) ubp.SetBlockColor(block.color);
+                ubp.SetNameText(block.periodName);
+                ubp.SetRoomText(block.room);
+                if (volume.blocks.Count > 0) newBlock.GetComponent<TabBlockPhys>().Init(maxWidth, blockWidth, pivotX, ySize);
+                i++;
             }
+            //ubp.SetTimeText($"{gm.PeriodToClockString(block.time)} - {gm.PeriodToClockString(block.time + block.length)}");
 
-            bt.GetChild(1).GetComponent<TextMeshProUGUI>().text = block.room;
-            bt.GetChild(2).GetComponent<TextMeshProUGUI>().text = $"{gm.PeriodToClockString(block.time)} - {gm.PeriodToClockString(block.time + block.length)}";
-
+            /**
             Image nbI = newBlock.GetComponent<Image>();
 
             // Sets color
@@ -144,8 +211,18 @@ public class TabSchedule : MonoBehaviour
                 nbI.color = secondaryColor;
             }
             i++;
-
+            **/
         }
+    }
+
+    void SetPivot(RectTransform rectTransform, Vector2 pivot)
+    {
+        if (rectTransform == null) return;
+        Vector2 size = rectTransform.rect.size;
+        Vector2 deltaPivot = rectTransform.pivot - pivot;
+        Vector3 deltaPosition = new Vector3(deltaPivot.x * size.x, deltaPivot.y * size.y);
+        rectTransform.pivot = pivot;
+        rectTransform.localPosition -= deltaPosition;
     }
 
     void ClearSchedule()

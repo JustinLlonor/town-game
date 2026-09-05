@@ -1,5 +1,5 @@
-using Photon.Pun;
-using Photon.Pun.Demo.Cockpit;
+//using Photon.Pun;
+//using Photon.Pun.Demo.Cockpit;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,22 +9,27 @@ public class FirstPerson : MonoBehaviour
     public PlayerMovement trackedMV;
     public Transform itemTransform;
     public SkinnedMeshRenderer armsRenderer;
+    public SkinnedMeshRenderer handsRenderer;
     MeshFilter itemFilter;
     MeshRenderer itemRenderer;
     Animator animator;
     Item currentItem;
     CameraManager cameraManager;
+    PlayerStats stats;
     bool visible = true;
+    private Material ogMaterial;
 
     private void Awake()
     {
-        PlayerManager pm = FindObjectOfType<PlayerManager>();
-        if (pm != null) pm.OnInstantiatePlayer += AssignPlayerReferences;
+        PlayerManager pm = FindFirstObjectByType<PlayerManager>();
+        if (pm != null) pm.onInstantiatePlayer += AssignPlayerReferences;
         animator = gameObject.GetComponent<Animator>();
         itemFilter = itemTransform.GetComponent<MeshFilter>();
         itemRenderer = itemTransform.GetComponent<MeshRenderer>();
-        cameraManager = FindObjectOfType<CameraManager>();
-        cameraManager.OnSwitchCameraMode += OnCameraModeChange;
+        cameraManager = FindFirstObjectByType<CameraManager>();
+        cameraManager.onSwitchCameraMode += OnCameraModeChange;
+        cameraManager.onStartCameraTransition += OnTransitionChange;
+        ogMaterial = itemRenderer.sharedMaterial;
     }
 
     private void Update()
@@ -39,6 +44,7 @@ public class FirstPerson : MonoBehaviour
     {
         trackedMV = player.GetComponent<PlayerMovement>();
         trackedMV.OnLeap += OnLeap;
+        stats = player.GetComponent<PlayerStats>();
     }
 
     void OnLeap()
@@ -50,7 +56,12 @@ public class FirstPerson : MonoBehaviour
     {
         StopAllCoroutines();
         itemFilter.mesh = item.mesh;
-        itemRenderer.material.SetTexture("_MainTex", item.texture);
+        if (item.material == null)
+        {
+            itemRenderer.material = ogMaterial;
+            itemRenderer.material.SetTexture("_MainTex", item.texture);
+        }
+        else itemRenderer.material = item.material;
         int gripIndex = animator.GetLayerIndex("Grip");
         int itemIndex = animator.GetLayerIndex("Item");
         animator.Play(item.gripPose);
@@ -98,6 +109,12 @@ public class FirstPerson : MonoBehaviour
         armsRenderer.sharedMesh = mesh;
     }
 
+    public void ChangeArmMaterials(Material material)
+    {
+        armsRenderer.material = material;
+        handsRenderer.material = material;
+    }
+
     void OnCameraModeChange(CameraManager.CameraMode mode)
     {
         if (mode == CameraManager.CameraMode.FirstPerson)
@@ -108,15 +125,27 @@ public class FirstPerson : MonoBehaviour
         Disable();
     }
 
+    /// <summary>
+    /// Disables first person stuff when transitioning
+    /// </summary>
+    /// <param name="mode"></param>
+    void OnTransitionChange(CameraManager.CameraMode mode)
+    {
+        Disable();
+    }
+
     public void Disable()
     {
+        animator.SetBool("isRunning", false);
         visible = false;
         armsRenderer.enabled = false;
+        itemRenderer.enabled = false;
     }
 
     public void Enable()
     {
         visible = true;
         armsRenderer.enabled = true;
+        itemRenderer.enabled = true;
     }
 }

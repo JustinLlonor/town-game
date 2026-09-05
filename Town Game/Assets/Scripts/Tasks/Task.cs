@@ -1,24 +1,75 @@
-using System.Collections;
+using Fusion;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class Task
+public struct Task : INetworkStruct, IEquatable<Task>
 {
-    public string name;
-    public Type type;
-    public float progress;
+    public static int idCounter = 0;
 
-    public enum Type
-    {
-        Completion = 0,
-        Maintainence = 1
-    }
+    public NetworkString<_128> name;
+    public Vector3 location;
+    public NetworkBool isCompleted;
+    public float deadline;
+    public int id;
 
-    public Task(string name, Type type, float progress)
+    /// <summary>
+    /// Creates a task. If the id parameter is set, creates the task with that id.
+    /// Otherwise, creates a task with a new id
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="room"></param>
+    /// <param name="isCompleted"></param>
+    /// <param name="id"></param>
+    public Task(NetworkString<_128> name, float deadline, Vector3 location, NetworkBool isCompleted, int id = -1)
     {
         this.name = name;
-        this.type = type;
-        this.progress = progress;
+        this.location = location;
+        this.isCompleted = isCompleted;
+        this.deadline = deadline;
+        if (id >= 0)
+        {
+            this.id = id;
+            return;
+        }
+        this.id = idCounter;
+        idCounter++;
+    }
+
+    public static Task None
+    {
+        get
+        {
+            return new Task("None", -1f, Vector3.zero, false, -999);
+        }
+    }
+
+    public override bool Equals(object obj)
+    {
+        return obj is Task task && Equals(task);
+    }
+
+    public bool Equals(Task other)
+    {
+        return name.Equals(other.name) &&
+               location.Equals(other.location) &&
+               isCompleted.Equals(other.isCompleted) &&
+               id == other.id;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(name, location, isCompleted, id);
+    }
+
+    public static bool operator ==(Task left, Task right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(Task left, Task right)
+    {
+        return !(left == right);
     }
 }

@@ -23,6 +23,7 @@ PluginImporter:
         Exclude LinuxUniversal: 1
         Exclude Lumin: 1
         Exclude OSXUniversal: 1
+        Exclude VisionOS: 0
         Exclude WebGL: 1
         Exclude Win: 1
         Exclude Win64: 1
@@ -96,6 +97,15 @@ PluginImporter:
       settings:
         CPU: AnyCPU
   - first:
+      VisionOS: VisionOS
+    second:
+      enabled: 1
+      settings:
+        AddToEmbeddedBinaries: false
+        CPU: AnyCPU
+        CompileFlags: 
+        FrameworkDependencies: 
+  - first:
       Windows Store Apps: WindowsStoreApps
     second:
       enabled: 0
@@ -117,3 +127,10 @@ PluginImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 130518
+  packageName: Photon Voice 2
+  packageVersion: 2.58
+  assetPath: Assets/Photon/PhotonVoice/PhotonVoiceLibs/iOS/Photon/AudioIn.h
+  uploadId: 738583

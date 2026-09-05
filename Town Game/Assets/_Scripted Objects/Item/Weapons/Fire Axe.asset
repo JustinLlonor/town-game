@@ -13,21 +13,23 @@ MonoBehaviour:
   m_Name: Fire Axe
   m_EditorClassIdentifier: 
   icon: {fileID: 2800000, guid: f0b90e8d6c5d43c4d91b9cf5faa161a9, type: 3}
-  description: It's a fire axe. Could be used as a weapon, or as a destructive tool.
-  large: 0
+  description: This has no use other than being a neat testing item.
+  customType: 
+  dropSettings: {fileID: 11400000, guid: d52bf0b9242b7f1459e92fbd6028e5ef, type: 2}
+  placedRotation: {x: 0, y: -90, z: -90}
+  itemBehaviourObject: {fileID: 0}
   mesh: {fileID: -7354185949920861747, guid: 67afa0fb94df67d4cbc3dfe48bf0f83e, type: 3}
   texture: {fileID: 2800000, guid: 0738e2d608f3f564ebef95532d118212, type: 3}
+  attributes: feffffff00000000
+  material: {fileID: 0}
+  useSounds: []
   equipSounds:
   - Equip1
   - Equip2
   - Equip3
-  useMethod: 
-  secondaryUseMethod: 
   holdPose: ArmHoldLower_f
   gripPose: FireAxeGrip_f
-  clientAnimations:
-  - FireAxeSwing1_f
-  - FireAxeSwing2_f
+  clientUseAnimations: []
   useAnimations:
   - animation: HeavyAttack1
     layer: Attack
@@ -38,20 +40,10 @@ MonoBehaviour:
     layer: Right Hand
   - animation: Hold One Arm
     layer: Right Arm
-  damage: 40
+  strength: 5
+  defense: 5
   range: 1.8
-  attackLength: 0.5
-  attackCharge: 0.216
-  attackCooldown: 0.432
+  deathScreenAnimationState: 
   shake: {fileID: 11400000, guid: 36e11568946ecd241b77cba0295d9f35, type: 2}
-  attackSounds:
-  - HeavySwing1
-  - HeavySwing2
   damageSounds:
   - Stab1
-  evidenceDescriptions:
-  - It seems that they were cut to death by a sharp object.
-  - It seems that a Fire Axe was used to kill them.
-  evidenceIcons:
-  - FireAxe
-  - FireAxe

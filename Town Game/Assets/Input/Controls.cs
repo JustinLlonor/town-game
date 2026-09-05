@@ -65,12 +65,39 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": ""Drop Item"",
-                    ""type"": ""Button"",
+                    ""type"": ""Value"",
                     ""id"": ""50b94010-a554-4285-80fe-6c43b0871039"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": false
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Equip Item"",
+                    ""type"": ""Value"",
+                    ""id"": ""ee137e7b-18cd-4288-9bcf-36fdc4a51795"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Primary Item"",
+                    ""type"": ""Button"",
+                    ""id"": ""29122822-ea48-4594-9c36-69db899563bd"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Secondary Item"",
+                    ""type"": ""Button"",
+                    ""id"": ""3981f53d-198d-4a17-b540-868def73cf46"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -172,6 +199,50 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""action"": ""Drop Item"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bde7bee9-2a50-4a41-adc7-3268bd227765"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": ""Press"",
+                    ""processors"": ""Scale"",
+                    ""groups"": """",
+                    ""action"": ""Equip Item"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""62cf58c6-f363-4724-afec-839363033617"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": ""Press"",
+                    ""processors"": ""Scale(factor=2)"",
+                    ""groups"": """",
+                    ""action"": ""Equip Item"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e1aa5b75-131c-4fd5-bd6a-a1d54ff46667"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": ""Press"",
+                    ""processors"": ""Scale(factor=3)"",
+                    ""groups"": """",
+                    ""action"": ""Equip Item"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5168d8f2-a3fa-4445-8d01-4d530c05e1ca"",
+                    ""path"": ""<Keyboard>/4"",
+                    ""interactions"": ""Press"",
+                    ""processors"": ""Scale(factor=4)"",
+                    ""groups"": """",
+                    ""action"": ""Equip Item"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -185,6 +256,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_BaseGameplay_Sprint = m_BaseGameplay.FindAction("Sprint", throwIfNotFound: true);
         m_BaseGameplay_Crouch = m_BaseGameplay.FindAction("Crouch", throwIfNotFound: true);
         m_BaseGameplay_DropItem = m_BaseGameplay.FindAction("Drop Item", throwIfNotFound: true);
+        m_BaseGameplay_EquipItem = m_BaseGameplay.FindAction("Equip Item", throwIfNotFound: true);
+        m_BaseGameplay_PrimaryItem = m_BaseGameplay.FindAction("Primary Item", throwIfNotFound: true);
+        m_BaseGameplay_SecondaryItem = m_BaseGameplay.FindAction("Secondary Item", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -251,6 +325,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_BaseGameplay_Sprint;
     private readonly InputAction m_BaseGameplay_Crouch;
     private readonly InputAction m_BaseGameplay_DropItem;
+    private readonly InputAction m_BaseGameplay_EquipItem;
+    private readonly InputAction m_BaseGameplay_PrimaryItem;
+    private readonly InputAction m_BaseGameplay_SecondaryItem;
     public struct BaseGameplayActions
     {
         private @Controls m_Wrapper;
@@ -260,6 +337,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         public InputAction @Sprint => m_Wrapper.m_BaseGameplay_Sprint;
         public InputAction @Crouch => m_Wrapper.m_BaseGameplay_Crouch;
         public InputAction @DropItem => m_Wrapper.m_BaseGameplay_DropItem;
+        public InputAction @EquipItem => m_Wrapper.m_BaseGameplay_EquipItem;
+        public InputAction @PrimaryItem => m_Wrapper.m_BaseGameplay_PrimaryItem;
+        public InputAction @SecondaryItem => m_Wrapper.m_BaseGameplay_SecondaryItem;
         public InputActionMap Get() { return m_Wrapper.m_BaseGameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -284,6 +364,15 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @DropItem.started += instance.OnDropItem;
             @DropItem.performed += instance.OnDropItem;
             @DropItem.canceled += instance.OnDropItem;
+            @EquipItem.started += instance.OnEquipItem;
+            @EquipItem.performed += instance.OnEquipItem;
+            @EquipItem.canceled += instance.OnEquipItem;
+            @PrimaryItem.started += instance.OnPrimaryItem;
+            @PrimaryItem.performed += instance.OnPrimaryItem;
+            @PrimaryItem.canceled += instance.OnPrimaryItem;
+            @SecondaryItem.started += instance.OnSecondaryItem;
+            @SecondaryItem.performed += instance.OnSecondaryItem;
+            @SecondaryItem.canceled += instance.OnSecondaryItem;
         }
 
         private void UnregisterCallbacks(IBaseGameplayActions instance)
@@ -303,6 +392,15 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @DropItem.started -= instance.OnDropItem;
             @DropItem.performed -= instance.OnDropItem;
             @DropItem.canceled -= instance.OnDropItem;
+            @EquipItem.started -= instance.OnEquipItem;
+            @EquipItem.performed -= instance.OnEquipItem;
+            @EquipItem.canceled -= instance.OnEquipItem;
+            @PrimaryItem.started -= instance.OnPrimaryItem;
+            @PrimaryItem.performed -= instance.OnPrimaryItem;
+            @PrimaryItem.canceled -= instance.OnPrimaryItem;
+            @SecondaryItem.started -= instance.OnSecondaryItem;
+            @SecondaryItem.performed -= instance.OnSecondaryItem;
+            @SecondaryItem.canceled -= instance.OnSecondaryItem;
         }
 
         public void RemoveCallbacks(IBaseGameplayActions instance)
@@ -327,5 +425,8 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         void OnSprint(InputAction.CallbackContext context);
         void OnCrouch(InputAction.CallbackContext context);
         void OnDropItem(InputAction.CallbackContext context);
+        void OnEquipItem(InputAction.CallbackContext context);
+        void OnPrimaryItem(InputAction.CallbackContext context);
+        void OnSecondaryItem(InputAction.CallbackContext context);
     }
 }

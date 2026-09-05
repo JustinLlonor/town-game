@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4361076907302772997}
-  - component: {fileID: 6775453173958731212}
   - component: {fileID: 2003156014834811261}
   m_Layer: 0
   m_Name: Waiting Room Manager
@@ -25,37 +24,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1536365586652019142}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6775453173958731212
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1536365586652019142}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents:
-  - {fileID: 2003156014834811261}
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!114 &2003156014834811261
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -68,6 +44,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b5f16e5182e4d9448f2a60709a59c56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  roomPhase: 0
   playersRequired: 2
-  gameTimer: 0
-  clientTimer: 0
+  mapIndex: 2
+  phaseUI: []
+  hostUI: {fileID: 0}

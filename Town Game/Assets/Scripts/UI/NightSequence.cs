@@ -1,4 +1,4 @@
-using Photon.Pun;
+//using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -14,23 +14,39 @@ public class NightSequence : MonoBehaviour
     PlayerManager pm;
     PlayerRoom pr;
     RoomManager rm;
+    bool nightScreen = false;
 
     private void Awake()
     {
-        gm = FindObjectOfType<GameManager>();
-        bs = FindObjectOfType<BlackScreen>();
-        pm = FindObjectOfType<PlayerManager>();
-        rm = FindObjectOfType<RoomManager>();
+        gm = FindFirstObjectByType<GameManager>();
+        bs = FindFirstObjectByType<BlackScreen>();
+        pm = FindFirstObjectByType<PlayerManager>();
+        rm = FindFirstObjectByType<RoomManager>();
 
-        //gm.OnNightSkip += NightStuff;
+        gm.OnNightSkipStart += AllowNightScreen;
         gm.OnDayStart += DayStuff;
-        pm.OnInstantiatePlayer += GetReferences;
+        pm.onInstantiatePlayer += GetReferences;
+    }
 
+    private void AllowNightScreen()
+    {
+        nightScreen = true;
+    }
+
+    private void Update()
+    {
+        if (!gm.init) return;
+        if ((!gm.skippedNight) || (!nightScreen)) return;
+        if (gm.nightTimer.RemainingTime(gm.Runner) <= 2.75f)
+        {
+            nightScreen = false;
+            NightStuff();
+        }
     }
 
     void GetReferences(GameObject player)
     {
-        pr = player.GetComponent<PlayerRoom>();
+        pr = player.GetComponent<Player>().playerRoom;
         Debug.Log(pr);
     }
 
@@ -47,7 +63,6 @@ public class NightSequence : MonoBehaviour
         bs.SetAlpha(0);
         StartCoroutine(Sequence("Night "));
     }
-
     IEnumerator Sequence(string cycleText, bool teleport = true, bool blackScreen = true, bool waitForTransition = true)
     {
         nightText.text = cycleText + (gm.currentDay + 1);
@@ -55,8 +70,8 @@ public class NightSequence : MonoBehaviour
         if (blackScreen) bs.StartAlphaTransition(1f, 2.5f);
         if (waitForTransition) yield return new WaitForSeconds(3f);
         newNightUI.SetActive(true);
-        Transform tpTransform = rm.playerRooms[(int)PhotonNetwork.LocalPlayer.CustomProperties["room"]].spawnTransform;
-        if (teleport) pm.Teleport(tpTransform.position, tpTransform.rotation);
+        //Transform tpTransform = rm.playerRooms[(int)PhotonNetwork.LocalPlayer.CustomProperties["room"]].spawnTransform;
+        //if (teleport) pm.Teleport(tpTransform.position, tpTransform.rotation);
         yield return new WaitForSeconds(1f);
         if (blackScreen) bs.StartAlphaTransition(0f, 2.5f);
         yield return new WaitForSeconds(4.1f);
@@ -65,11 +80,12 @@ public class NightSequence : MonoBehaviour
 
     void SetCultistText()
     {
-        if (gm.cultists.Length == 1)
+        int cultistsLeft = gm.cultistsLeft;
+        if (cultistsLeft == 1)
         {
-            cultistText.text = gm.cultists.Length + " cultist remains.";
+            cultistText.text = cultistsLeft + " cultist remains.";
             return;
         }
-        cultistText.text = gm.cultists.Length + " cultists remain.";
+        cultistText.text = cultistsLeft + " cultists remain.";
     }
 }

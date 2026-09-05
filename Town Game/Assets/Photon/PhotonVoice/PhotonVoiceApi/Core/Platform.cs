@@ -24,7 +24,7 @@ namespace Photon.Voice
 
         static public IAudioInChangeNotifier CreateAudioInChangeNotifier(Action callback, ILogger logger)
         {
-#if (UNITY_IOS && !UNITY_EDITOR)
+#if ((UNITY_IOS || UNITY_VISIONOS) && !UNITY_EDITOR)
             return new IOS.AudioInChangeNotifier(callback, logger);
 #elif UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
             return new MacOS.AudioInChangeNotifier(callback, logger);
@@ -54,7 +54,7 @@ namespace Photon.Voice
             return new Windows.WindowsAudioInPusher(dev.IsDefault ? -1 : dev.IDInt, logger);
 #elif UNITY_WEBGL && UNITY_2021_2_OR_NEWER && !UNITY_EDITOR // requires ES6
             return new Unity.WebAudioMicIn(dev.IDString, samplingRate, channels, logger);
-#elif UNITY_IOS && !UNITY_EDITOR
+#elif (UNITY_IOS || UNITY_VISIONOS) && !UNITY_EDITOR
             if (otherParams == null)
             {
                 return new IOS.AudioInPusher(IOS.AudioSessionParametersPresets.VoIP, logger);
@@ -91,11 +91,11 @@ namespace Photon.Voice
         {
 #if WINDOWS_UWP || ENABLE_WINMD_SUPPORT
             return new UWP.VideoInEnumerator(logger);
-#elif UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
+#elif UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
             return new Unity.VideoInEnumerator(logger);
 #elif UNITY_ANDROID && !UNITY_EDITOR
             return new Unity.AndroidVideoInEnumerator(logger);
-#elif (UNITY_IOS && !UNITY_EDITOR)
+#elif ((UNITY_IOS || UNITY_VISIONOS) && !UNITY_EDITOR)
             return new IOS.VideoInEnumerator(logger);
 #elif UNITY_WEBGL && UNITY_2021_2_OR_NEWER && !UNITY_EDITOR // requires ES6
             return new Unity.WebVideoInEnumerator(logger);
@@ -155,8 +155,12 @@ namespace Photon.Voice
         {
             // native platform-specific recorders
 #if UNITY_ANDROID && !UNITY_EDITOR
+#if PHOTON_VOICE_VIDEO_ANDROID_JAVA_API
             return new Unity.AndroidVideoRecorderSurfaceView(logger, info, camDevice.IDString, onReady);
-#elif UNITY_IOS && !UNITY_EDITOR
+#else
+            return new Unity.AndroidNDKVideoRecorderSurfaceView(logger, info, camDevice.IDString, onReady);
+#endif
+#elif (UNITY_IOS || UNITY_VISIONOS) && !UNITY_EDITOR
             if (info.Codec == Codec.VideoH264)
             {
                 return new IOS.VideoRecorderLayer(logger, info, camDevice.IDString, onReady);
@@ -186,7 +190,7 @@ namespace Photon.Voice
 #if UNITY_ANDROID && !UNITY_EDITOR
             var vda = new Unity.AndroidVideoDecoderSurfaceView(logger, info);
             return new VideoPlayer(vda, vda.Preview, info.Width, info.Height, onReady);
-#elif UNITY_IOS && !UNITY_EDITOR
+#elif (UNITY_IOS || UNITY_VISIONOS) && !UNITY_EDITOR
             if (info.Codec == Codec.VideoH264)
             {
                 var vd = new IOS.VideoDecoderLayer(logger);
@@ -203,7 +207,7 @@ namespace Photon.Voice
 #elif UNITY_WEBGL && UNITY_2021_2_OR_NEWER && !UNITY_EDITOR // requires ES6
             return new Unity.WebCodecsVideoPlayerUnityTexture(logger, info, onReady);
 #endif
-#if UNITY_5_3_OR_NEWER // #if UNITY, multi-platform VideoPlayerUnity or generic VideoPlayer
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
             var vdu = CreateDefaultVideoDecoder(logger, info);
             var vp = new Unity.VideoPlayerUnity(vdu, onReady);
             // assign Draw method copying Image to Unity texture as software decoder Output
@@ -218,7 +222,7 @@ namespace Photon.Voice
         {
 #if UNITY_ANDROID && !UNITY_EDITOR
             return new Unity.AndroidPreviewManagerSurfaceView(logger);
-#elif UNITY_IOS && !UNITY_EDITOR
+#elif (UNITY_IOS || UNITY_VISIONOS) && !UNITY_EDITOR
             return new IOS.PreviewManagerLayer(logger);
 #elif WINDOWS_UWP || (UNITY_WSA && !UNITY_EDITOR)
             return new UWP.PreviewManagerMediaPlayerElement(logger);
@@ -237,8 +241,12 @@ namespace Photon.Voice
         static public IVideoRecorder CreateVideoRecorderUnityTexture(ILogger logger, VoiceInfo info, DeviceInfo camDevice, Action<IVideoRecorder> onReady)
         {
 #if UNITY_ANDROID && !UNITY_EDITOR
+#if PHOTON_VOICE_VIDEO_ANDROID_JAVA_API
             return new Unity.AndroidVideoRecorderUnityTexture(logger, info, camDevice.IDString, onReady);
-#elif UNITY_IOS && !UNITY_EDITOR
+#else
+            return new Unity.AndroidNDKVideoRecorderUnityTexture(logger, info, camDevice.IDString, onReady);
+#endif
+#elif (UNITY_IOS || UNITY_VISIONOS) && !UNITY_EDITOR
             if (info.Codec == Codec.VideoH264)
             {
                 return new IOS.VideoRecorderUnityTexture(logger, info, camDevice.IDString, onReady);
@@ -253,7 +261,7 @@ namespace Photon.Voice
 #elif UNITY_WEBGL && UNITY_2021_2_OR_NEWER && !UNITY_EDITOR // requires ES6
             return new Unity.WebCodecsCameraRecorderUnityTexture(logger, info, camDevice.IDString, onReady);
 #else       // multi-platform VideoRecorderUnity
-#if UNITY_5_3_OR_NEWER // #if UNITY
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
             var ve = CreateDefaultVideoEncoder(logger, info);
             if (ve is IEncoderDirectImage)
             {
@@ -270,7 +278,7 @@ namespace Photon.Voice
             // native platform-specific players
 #if UNITY_ANDROID && !UNITY_EDITOR
             return new Unity.AndroidVideoPlayerUnityTexture(logger, info, onReady);
-#elif UNITY_IOS && !UNITY_EDITOR
+#elif (UNITY_IOS || UNITY_VISIONOS) && !UNITY_EDITOR
             if (info.Codec == Codec.VideoH264)
             {
                 return new IOS.VideoPlayerUnityTexture(logger, info, onReady);
@@ -285,7 +293,7 @@ namespace Photon.Voice
 #elif UNITY_WEBGL && UNITY_2021_2_OR_NEWER && !UNITY_EDITOR // requires ES6
             return new Unity.WebCodecsVideoPlayerUnityTexture(logger, info, onReady);
 #endif
-#if UNITY_5_3_OR_NEWER // #if UNITY, multi-platform VideoPlayerUnity or generic VideoPlayer
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
             var vd = CreateDefaultVideoDecoder(logger, info);
             var vp = new Unity.VideoPlayerUnity(vd, onReady);
             // assign Draw method copying Image to Unity texture as software decoder Output
@@ -302,5 +310,5 @@ namespace Photon.Voice
         }
 #endif // UNITY_5_3_OR_NEWER
 #endif // PHOTON_VOICE_VIDEO_ENABLE
+        }
     }
-}

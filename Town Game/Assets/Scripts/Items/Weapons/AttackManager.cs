@@ -1,136 +1,266 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
+using Fusion;
+using TMPro;
 
-public class AttackManager : MonoBehaviour
+public class AttackManager : NetworkBehaviour
 {
-    public bool isAttacking = false;
-    public float animationCooldown = .1f;
-    public float weightLerp = 50f;
-    public Collider[] colliders;
-    public LayerMask dmgMask;
+    public Collider[] colliders; // DO NOT DELETE YET, use damage colliders for better player interactable  hover
+    public LayerMask playerMask;
     public LayerMask environmentMask;
     [HideInInspector] public Animator animator;
-    [HideInInspector] public PhotonView view;
     [HideInInspector] public Transform animHolder;
+    public Rigidbody rb;
+    public float minSliderSpeed = 350f;
+    public float maxSliderSpeed = 700f;
+    public float minTargetLength = 50f;
+    public float maxTargetLength = 300f;
+    GameObject lockedPlayer;
 
+    //Engagement
+    [Networked] public bool isEngaged { get; set; } = false;
+    bool previouslyEngaged = false;
+    bool isAttacker;
+
+    Player player;
+    GameObject uiGlitch;
+    PlayerInventory inventory;
     FirstPerson fps;
     CameraShake cShake;
-    float tWeight;
-    float currentWeight;
-    float atkCooldown;
-    float animTimer;
-    Transform camTransform;
-    int currentAtk = 0;
-    List<string> resetLayers = new List<string>(); 
+    ConflictManager conflictManager;
+    PlayerManager playerManager;
+    InputManager inputManager;
+    UIManager uiManager;
+    AttackQTE attackQTE;
 
-    private void Awake()
+    Transform camTransform;
+
+    public void Init()
     {
-        cShake = FindObjectOfType<CameraShake>();
-        fps = FindObjectOfType<FirstPerson>();
+        uiManager = FindFirstObjectByType<UIManager>();
+        attackQTE = FindFirstObjectByType<AttackQTE>();
+        attackQTE = uiManager.attackQTE;
+        inputManager = FindFirstObjectByType<InputManager>();
+        inputManager.onJump += EngagementQTE;
+        playerManager = FindFirstObjectByType<PlayerManager>();
+        cShake = FindFirstObjectByType<CameraShake>();
+        fps = FindFirstObjectByType<FirstPerson>();
+        player = gameObject.GetComponent<Player>();
+        conflictManager = FindFirstObjectByType<ConflictManager>();
+        UIManager um = FindFirstObjectByType<UIManager>();
+        if (um != null) uiGlitch = um.glitchObject;
+        inventory = gameObject.GetComponent<PlayerInventory>();
         camTransform = Camera.main.transform;
-        if (!view.IsMine) return;
+        //if (!view.IsMine) return;
         foreach(Collider collider in colliders)
         {
             collider.enabled = false;
         }
     }
 
+    public override void Spawned()
+    {
+        Init();
+    }
+
+    private void OnDisable()
+    {
+        if (HasInputAuthority)
+        {
+            if (uiGlitch != null) uiGlitch.SetActive(false);
+        }
+    }
+
     private void Update()
     {
-        if (!view.IsMine) return;
-        if (animTimer  >= 0 && !isAttacking)
+        DetectLockedPlayer();
+        DetectEngagedChange();
+    }
+
+    void DetectEngagedChange()
+    {
+        if (previouslyEngaged == isEngaged) return;
+        previouslyEngaged = isEngaged; // When there is a change
+        OnEngagedChange();
+    }
+
+    void OnEngagedChange()
+    {
+        if (!isEngaged)
         {
-            animTimer -= Time.deltaTime;
-            if (animTimer < 0f)
+            ResetGlitchEffect();
+        }
+    }
+
+    bool WeaponEquipped()
+    {
+        if (inventory.equippedItem == null) return false;
+        if (inventory.equippedItem is Weapon) return true;
+        return false;
+    }
+
+    Weapon GetWeapon()
+    {
+        return (Weapon)inventory.equippedItem;
+    }
+
+    // WIP, based on various conditions like night time, isCultist, etc. to determine if the player can initiate an attack.
+    bool CanAttack()
+    {
+        if (isEngaged) return false;
+        return true;
+    }
+
+    // Detects locked player for the client
+    void DetectLockedPlayer()
+    {
+        if (!HasInputAuthority) return;
+        if (!CanAttack())
+        {
+            ResetGlitchEffect();
+            return;
+        }
+        if (!WeaponEquipped())
+        {
+            ResetGlitchEffect();
+            return;
+        }
+        Weapon currentWeapon = GetWeapon();
+
+        // Raycasting
+        RaycastHit envHit;
+        RaycastHit playerHit;
+        bool isEnv = Physics.Raycast(camTransform.position, camTransform.rotation * Vector3.forward, out envHit, currentWeapon.range, (int)environmentMask);
+        bool isPlayer = Physics.Raycast(camTransform.position, camTransform.rotation * Vector3.forward, out playerHit, currentWeapon.range, (int)playerMask);
+        if (isEnv && isPlayer) // If a raycast hit both an environment and player
+        {
+            if (envHit.distance < playerHit.distance) // If the environment is in front of the player, return and reset glitch effect
             {
-                currentAtk = 0;
+                ResetGlitchEffect();
+                return;
             }
         }
-        if (atkCooldown > 0f)
+        if (!isPlayer)
         {
-            atkCooldown -= Time.deltaTime;
+            ResetGlitchEffect();
+            return;
         }
-        if (currentWeight != tWeight)
-        {
-            currentWeight = Mathf.Lerp(currentWeight, tWeight, Time.deltaTime * weightLerp);
-            foreach (string layer in resetLayers)
-            {
-                animator.SetLayerWeight(animator.GetLayerIndex(layer), currentWeight);
-            }
-            if (Mathf.Abs(currentWeight - tWeight) < 0.01f)
-            {
-                currentWeight = tWeight;
-                if (currentWeight == 0f)
-                {
-                    resetLayers.Clear();
-                }
-            }
-        }
+
+        // Change detector
+        GameObject currentPlayer = playerHit.transform.gameObject;
+        if (currentPlayer == lockedPlayer) return;
+        if (currentPlayer == gameObject) return;
+
+        // After we lock onto a player
+        uiGlitch.SetActive(true);
+        if (lockedPlayer != null) lockedPlayer.GetComponent<Player>().DisableUIFront(); // Disable ui front for locked player
+        currentPlayer.GetComponent<Player>().EnableUIFront(); // Enable for the current player
+
+        lockedPlayer = currentPlayer;
     }
 
-    public void ResetAttack()
+    void ResetGlitchEffect()
     {
-        StopAllCoroutines();
-        isAttacking = false;
-        currentAtk = 0;
-        ResetAnimations();
+        if (lockedPlayer == null) return;
+        lockedPlayer.GetComponent<Player>().DisableUIFront();
+        lockedPlayer = null;
+        uiGlitch.SetActive(false);
     }
 
-    public void ResetAnimations()
-    {
-        currentWeight = 0f;
-        tWeight = 0f;
-        foreach (string layer in resetLayers)
-        {
-            animator.SetLayerWeight(animator.GetLayerIndex(layer), 0f);
-            animator.Play("New State", animator.GetLayerIndex(layer));
-        }
-        resetLayers.Clear();
-    }
-
-    public void SetAttackCooldown(float cooldown)
-    {
-        atkCooldown = cooldown;
-    }
-
+    // Server calculates attack
     public void Attack(Weapon weapon)
     {
+        // Put client sided stuff here
+        if (!Runner.IsServer) return;
+        TryEngagement(); // Cast a ray on the server
+
+        /**
         if (atkCooldown > 0) return;
         if (isAttacking) return;
-
-        StopAllCoroutines();
-        if (currentAtk == weapon.useAnimations.Length) currentAtk = 0;
         Item.AnimationState state = weapon.useAnimations[currentAtk];
         string cState = weapon.clientAnimations[currentAtk];
-        animator.Play(state.animation, animator.GetLayerIndex(state.layer), 0f);
         fps.PlayItemUseAnimation(cState);
-        view.RPC("AttackManagerPlay", RpcTarget.Others, state.animation, animator.GetLayerIndex(state.layer));
-        tWeight = 1f;
-        if (!resetLayers.Contains(state.layer)) resetLayers.Add(state.layer);
-        StartCoroutine(Charge(weapon, weapon.attackLength));
-        currentAtk++;
+        **/
     }
 
-    IEnumerator Charge(Weapon weapon, float animLength)
+    public void TryEngagement()
     {
-        isAttacking = true;
-        if (weapon.attackCharge > animLength)
+        if (!CanAttack()) return;
+        if (!WeaponEquipped()) return;
+
+        InteractableFinder inf = player.inf;
+        Vector3 castPosition = new Vector3(rb.position.x, inf.trackedTransform.position.y, rb.position.z);
+        Vector3 castDirection = inf.forwardDirection;
+
+        Weapon currentWeapon = GetWeapon();
+
+        // Raycasting
+        RaycastHit envHit;
+        RaycastHit playerHit;
+        bool isEnv = Physics.Raycast(castPosition, castDirection, out envHit, currentWeapon.range, (int)environmentMask);
+        bool isPlayer = Physics.Raycast(castPosition, castDirection, out playerHit, currentWeapon.range, (int)playerMask);
+        if (isEnv && isPlayer)
         {
-            Debug.LogError("Charge is longer than animation!");
-            yield break;
+            if (envHit.distance < playerHit.distance) return;
         }
-        SoundManager.instance.Play3D(weapon.attackSounds[Random.Range(0, weapon.attackSounds.Length)], transform.position);
-        yield return new WaitForSeconds(weapon.attackCharge);
-        PlayShake(weapon.shake);
-        CastAttackRay(weapon.range, weapon.damage, weapon);
-        //Debug.Break();
-        atkCooldown = weapon.attackCooldown;
-        yield return new WaitForSeconds(animLength - weapon.attackCharge);
-        tWeight = 0f;
-        isAttacking = false;
-        animTimer = animationCooldown;
+        if (!isPlayer) return;
+
+        // If we get a hit, check the victim and then start engagement 
+        PlayerRef victim = playerHit.transform.GetComponent<Player>().owner; // Gets the victim 
+        if (victim == player.owner) return; // Can't hit self
+        if (!playerManager.playerObjects.ContainsKey(victim)) return;
+
+        conflictManager.StartEngagement(player.owner, victim, currentWeapon); // Start an engagement with the owner and the victim
+
+        // Raycast to victim object
+    }
+
+    /// <summary>
+    /// Linked to onJump, the function for determining if this client won a quicktime event
+    /// </summary>
+    void EngagementQTE()
+    {
+        if (!HasInputAuthority) return;
+        if (!isEngaged) return;
+        if (isAttacker) return;
+        if (!attackQTE.enabled) return;
+        if (!attackQTE.GetSliderSuccess()) return;
+        RPC_WonQTE();
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_WonQTE()
+    {
+        conflictManager.WonQuicktime(Object.InputAuthority);
+    }
+
+    /// <summary>
+    /// Starts the engagement sequence
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="isAttacker"></param>
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+    public void RPC_StartEngagementSequence([RpcTarget] PlayerRef player, bool isAttacker, int attack, int defense)
+    {
+        this.isAttacker = isAttacker;
+        if (isAttacker)
+        {
+            // Play attack animation, attack sequence
+        }
+        else
+        {
+            if (defense != 0)
+            {
+                attackQTE.gameObject.SetActive(true);
+                float potency = Mathf.Clamp((float)(attack - defense + 1), 0f, 10f) / 10f;
+                float sliderSpeed = (maxSliderSpeed - minSliderSpeed) * potency + minSliderSpeed;
+                float targetLength = (maxTargetLength - minTargetLength) * potency + minTargetLength;
+                attackQTE.Init(sliderSpeed, targetLength); // Calculate this based on attack and defense later
+            }
+            // Play defense animation, defense sequence
+        }
+        uiManager.ExitUI();
     }
 
     public void PlayShake(Shake shake)
@@ -138,60 +268,8 @@ public class AttackManager : MonoBehaviour
         cShake.StartShake(shake.shakeProperties);
     }
 
-    public void CastAttackRay(float distance, float damage, Weapon weapon = null)
-    {
-        RaycastHit hit;
-        if (Physics.Raycast(camTransform.position, camTransform.forward, out hit, distance, dmgMask))
-        {
-            PhotonView view = hit.transform.GetComponent<PhotonView>();
-            if (view == null)
-            {
-                Debug.LogError("View not found!");
-                return;
-            }
-            if (weapon != null)
-            {
-                view.RPC("AddEvidence", view.Owner, "cause", weapon.evidenceIcons, weapon.evidenceDescriptions, 0f);
-                SoundManager.instance.Play3D(weapon.damageSounds[Random.Range(0, weapon.damageSounds.Length)], hit.transform.position);
-            }
-            view.RPC("Damage", view.Owner, damage, true);
-            return;
-        }
-        RaycastHit hit2;
-        if (Physics.Raycast(camTransform.position, camTransform.forward, out hit2, distance, (int)environmentMask))
-        {
-            SoundMaterial hitSM = hit2.transform.GetComponent<SoundMaterial>();
-            Texture2D hitTex = hitSM.hitTexture;
-            Vector2 uv = hit2.textureCoord;
-            uv.x *= hitTex.width;
-            uv.y *= hitTex.height;
-            Color color = hitTex.GetPixel(Mathf.RoundToInt(uv.x), Mathf.RoundToInt(uv.y));
-            Vector3 rotation = Quaternion.FromToRotation(Vector3.up, hit2.normal).eulerAngles;
-            Vector3 tColor = new Vector3(color.r, color.g, color.b);
-            ParticleManager.instance.SpawnParticle("Chunks", hit2.point, rotation, tColor);
-            ParticleManager.instance.transform.GetComponent<PhotonView>().RPC("SpawnParticle", RpcTarget.Others, "Chunks", hit2.point, rotation, tColor);
-
-            SoundMaterial sma = hit2.transform.GetComponent<SoundMaterial>();
-            if (sma == null) return;
-            string mat = sma.GetSMat(hit2.textureCoord);
-            SoundManager.instance.Play3D(mat + "Hit" + Random.Range(0, 3).ToString(), hit2.point);
-        }
-    }
-
-    PhotonView GetDamageView(Transform checkedTransform)
-    {
-        while (checkedTransform.parent != null)
-        {
-            checkedTransform = checkedTransform.parent;
-            if (checkedTransform.gameObject.tag == "Player")
-            {
-                return checkedTransform.GetComponent<PhotonView>();
-            }
-        }
-        return null;
-    }
-
-    [PunRPC]
+    // Plays the 3rd person animation state
+    //[PunRPC]
     public void AttackManagerPlay(string animation, int index)
     {
         animator.Play(animation, index, 0f);
